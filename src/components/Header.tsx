@@ -42,7 +42,7 @@ export function Header() {
             </Link>
 
             <ul className="hidden md:flex items-center gap-1">
-              {NAV_LINKS.map((link) => {
+              {NAV_LINKS.filter((l) => l.href !== "/cuenta").map((link) => {
                 const isActive = pathname === link.href;
                 return (
                   <li key={link.href}>
