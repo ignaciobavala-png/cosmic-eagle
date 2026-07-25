@@ -10,13 +10,13 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 
 ## Estado actual: **SOLO FRONTEND**
 
-- No hay cuenta de Supabase creada
+- Existe un proyecto Supabase creado (`hwayqsgwoaznfqofsyly`) y el MCP de Supabase está conectado (`.mcp.json`), pero el schema `public` está **vacío** (sin tablas ni migraciones) y no hay `.env.local` en el repo — el frontend no está integrado con él todavía
 - No hay proyecto en Vercel deployado
 - Todo es mock data estático
 - Las paginas son placeholders (salvo la home)
-- Sin autenticacion, sin base de datos, sin backend
+- Sin autenticacion, sin base de datos en uso, sin backend
 
-**No escribas codigo que asuma conexion a Supabase** — cuando llegue el momento se configura desde cero.
+**No escribas codigo que asuma conexion a Supabase** — el proyecto existe pero está vacío; cuando se empiece la integración real, seguir los pasos de "Lo que sigue".
 
 ## Stack
 
@@ -31,7 +31,7 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 | Package | pnpm | — |
 | Lint | ESLint 9 flat config | — |
 | TypeScript | strict | — |
-| **Pendiente** | Supabase, Vercel | **no configurado** |
+| **Pendiente** | Supabase (integracion), Vercel | proyecto Supabase creado y MCP conectado, pero sin tablas/env/integracion; Vercel no configurado |
 
 ## Estructura
 
@@ -96,9 +96,9 @@ Estilo "Modern Mystical": dark void (#03050F), gold primary (#E5C278), cyan seco
 - Nav: horizontal en `md+`, hamburger + drawer solo en mobile
 - Footer firma: "i.vavala"
 
-## Lo que sigue (cuando haya cuenta Supabase)
+## Lo que sigue (integracion real con Supabase)
 
-1. Crear proyecto en Supabase, obtener URL y anon key
+1. ~~Crear proyecto en Supabase~~ ya existe (`hwayqsgwoaznfqofsyly`), falta obtener URL y anon key y usarlas en el repo
 2. Crear `.env.local` con `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 3. Crear `src/lib/supabase/` con client.ts (singleton browser), server.ts, proxy.ts
 4. Crear `proxy.ts` en raiz (middleware Next 16) con exclusion de `auth/`
