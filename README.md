@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cosmic Eagle Journey
 
-## Getting Started
+Plataforma web para viajes de ceremonias ancestrales chamánicas. Reemplaza el flujo actual basado en Google Forms + gestión manual por un sitio con panel de administración, panel de usuario, calendario de viajes y formulario de solicitud con flujo de aprobación por datos de salud.
 
-First, run the development server:
+Cliente: Estela (Cosmic Eagle Journey). Contacto de desarrollo: Ignacio Bavala.
+
+## Estado actual: solo frontend
+
+- No hay cuenta de Supabase creada
+- No hay proyecto en Vercel deployado
+- Todo es mock data estática (`src/lib/constants.ts`)
+- Las páginas están en placeholder salvo la home
+- Sin autenticación, sin base de datos, sin backend
+
+## Stack
+
+| Capa | Tecnología | Notas |
+|---|---|---|
+| Framework | Next.js 16 (App Router) | Turbopack |
+| UI | React 19 + Tailwind CSS v4 | tokens `@theme` en `globals.css` |
+| Animaciones | Framer Motion 12 | scroll reveal, drawer |
+| Estado | Zustand 5 | solo UI (drawer), sin persist |
+| Iconos | Lucide React | — |
+| Fuentes | EB Garamond (headings), Montserrat (body) | `next/font/google` |
+| Package manager | pnpm | — |
+| Lint | ESLint 9 (flat config) | — |
+| Lenguaje | TypeScript | strict |
+| Pendiente | Supabase, Vercel | no configurado |
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Estructura
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── page.tsx              # Home (7 secciones)
+│   ├── layout.tsx             # Root layout (fuentes, metadata)
+│   ├── globals.css            # Design system (colores, glass, scrollbar)
+│   ├── not-found.tsx          # 404 custom
+│   ├── nosotros/page.tsx      # placeholder
+│   ├── viajes/page.tsx        # placeholder
+│   ├── contenidos/page.tsx    # placeholder
+│   └── cuenta/page.tsx        # placeholder (futuro auth)
+├── components/
+│   ├── Header.tsx             # nav desktop + drawer mobile
+│   ├── HeroSection.tsx
+│   ├── AboutSection.tsx
+│   ├── RetreatsSection.tsx
+│   ├── ContentSection.tsx
+│   ├── EbookSection.tsx
+│   ├── TestimonialsSection.tsx
+│   ├── Footer.tsx
+│   └── BackToTop.tsx          # FAB scroll
+└── lib/
+    ├── constants.ts           # Mock data, imágenes, nav links
+    └── store.ts               # Zustand (drawerOpen)
+```
 
-## Learn More
+## Design system
 
-To learn more about Next.js, take a look at the following resources:
+Estilo "Modern Mystical": dark void (`#03050F`), gold primary (`#E5C278`), cyan secondary (`#5DE6FF`), parchment text (`#F4F1EA`), glassmorphism.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Tokens de color en `@theme` dentro de `globals.css`
+- Utilidades custom: `glass-card`, `text-shadow-glow`, `animate-float`
+- Scrollbar custom gold
+- Imágenes mock vía `lh3.googleusercontent.com`, sin optimizar (`<img>`)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Documentación
 
-## Deploy on Vercel
+| Documento | Contenido |
+|---|---|
+| [`docs/CONTEXT.md`](docs/CONTEXT.md) | Contexto de negocio, roles, formularios relevados, reglas de negocio y pendientes de definición con la clienta |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Stack técnico y estructura de carpetas planeada (incluye lo que falta: auth, dashboard, API) |
+| [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) | Modelo de tablas para Supabase (viajes, solicitudes primerizo/recurrente, consentimientos, RLS) |
+| [`docs/ROLES.md`](docs/ROLES.md) | Roles (Administrador, Solicitante, Viajero) y flujo completo de aprobación |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Roadmap (cuando haya cuenta de Supabase)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Crear proyecto en Supabase, obtener URL y anon key
+2. `.env.local` con `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. `src/lib/supabase/` (client, server, proxy) + `proxy.ts` en raíz
+4. `app/api/keep-alive/route.ts` + `vercel.json` con cron diario
+5. Migraciones SQL en `supabase/migrations/`
+6. Auth email/password (sin Google OAuth por ahora)
+7. Flujo de solicitud primerizo/recurrente según `docs/DATA_MODEL.md`
+8. Panel de admin y panel de usuario
+9. i18n ES/EN
+10. Chatbot con IA
+
+## Convenciones del proyecto
+
+- Server Components por defecto, `"use client"` solo cuando hay interactividad o Framer Motion
+- Sin CSS-in-JS, solo Tailwind
+- `@/*` apunta a `./src/*`
+- Sin testing, sin Docker
+- Sin binarios en git (Supabase Storage / Vercel Blob para assets cuando haya backend)
+- Nav horizontal en `md+`, hamburger + drawer en mobile
+- Footer: "i.vavala"
+
+Ver `CLAUDE.md` / `AGENTS.md` para instrucciones detalladas de desarrollo con agentes de IA.
