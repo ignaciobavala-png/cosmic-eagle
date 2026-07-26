@@ -8,15 +8,19 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estela. Contacto de desarrollo: Ignacio Bavala.
 
-## Estado actual: **SOLO FRONTEND**
+## Estado actual (actualizado 2026-07-26)
 
-- Existe un proyecto Supabase creado (`hwayqsgwoaznfqofsyly`) y el MCP de Supabase está conectado (`.mcp.json`), pero el schema `public` está **vacío** (sin tablas ni migraciones) y no hay `.env.local` en el repo — el frontend no está integrado con él todavía
-- No hay proyecto en Vercel deployado
-- Todo es mock data estático
-- Las paginas son placeholders (salvo la home)
-- Sin autenticacion, sin base de datos en uso, sin backend
+- Supabase está integrado y en uso real: proyecto `hwayqsgwoaznfqofsyly`, `.env.local` con URL/anon key (gitignored, no en el repo), clientes tipados en `src/lib/supabase/` (`client.ts`, `server.ts`, `proxy.ts`), `proxy.ts` en la raíz refresca sesión
+- Schema completo aplicado via migraciones (`supabase/migrations/`): `profiles`, `trips`, `applications_first_time`, `applications_returning`, `consents`, vistas `my_applications_*`, funciones `is_admin()`/`handle_new_user()` en schema `private`
+- Auth funcionando: login en `/cuenta` (email/password), sin registro todavía (ver "Lo que sigue")
+- `/viajes` conectado a la tabla `trips` real (ya no es mock)
+- Formulario de solicitud de salud funcionando en `/viajes/[id]/solicitar` (primerizo/recurrente, elegido segun historial de aprobaciones del usuario)
+- Panel de admin funcionando en `/admin` (protegido por `profiles.is_admin`): dashboard, CRUD de viajes, revisión de solicitudes (aprobar/rechazar/expirar)
+- `/nosotros` y `/contenidos` siguen siendo placeholders mock
+- No hay proyecto en Vercel deployado todavia
+- Cuenta de prueba admin: ver `~/Escritorio/account/cosmic-eagle-acces.txt` (fuera del repo)
 
-**No escribas codigo que asuma conexion a Supabase** — el proyecto existe pero está vacío; cuando se empiece la integración real, seguir los pasos de "Lo que sigue".
+**Ya se puede escribir código que asuma conexión a Supabase** — el schema existe y está en uso. Antes de tocar RLS/funciones, revisar el checklist de seguridad del skill `supabase`.
 
 ## Stack
 
@@ -31,21 +35,36 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 | Package | pnpm | — |
 | Lint | ESLint 9 flat config | — |
 | TypeScript | strict | — |
-| **Pendiente** | Supabase (integracion), Vercel | proyecto Supabase creado y MCP conectado, pero sin tablas/env/integracion; Vercel no configurado |
+| Backend | Supabase (Postgres + Auth) | `@supabase/ssr`, RLS en todas las tablas, ver `supabase/migrations/` |
+| **Pendiente** | Vercel | no configurado todavia |
 
 ## Estructura
 
 ```
 src/
 ├── app/
-│   ├── page.tsx              # Home (7 secciones)
-│   ├── layout.tsx             # Root layout (fuentes, metadata)
-│   ├── globals.css            # Design system (colores, glass, scrollbar)
-│   ├── not-found.tsx          # 404 custom
-│   ├── nosotros/page.tsx      # placeholder
-│   ├── viajes/page.tsx        # placeholder
-│   ├── contenidos/page.tsx    # placeholder
-│   └── cuenta/page.tsx        # placeholder (futuro auth)
+│   ├── page.tsx                     # Home (7 secciones, mock)
+│   ├── layout.tsx                    # Root layout (fuentes, metadata)
+│   ├── globals.css                   # Design system (colores, glass, scrollbar)
+│   ├── not-found.tsx                 # 404 custom
+│   ├── nosotros/page.tsx             # placeholder
+│   ├── contenidos/page.tsx           # placeholder
+│   ├── viajes/
+│   │   ├── page.tsx                  # conectado a `trips` real
+│   │   └── [id]/solicitar/
+│   │       ├── page.tsx              # elige form primerizo/recurrente segun historial
+│   │       ├── FirstTimeForm.tsx     # "use client"
+│   │       ├── ReturningForm.tsx     # "use client"
+│   │       └── actions.ts            # submitFirstTimeApplication / submitReturningApplication
+│   ├── cuenta/
+│   │   ├── page.tsx                  # login real (sin registro todavia)
+│   │   ├── LoginForm.tsx             # "use client", soporta ?next=
+│   │   └── actions.ts                # login/logout
+│   └── admin/                        # protegido por profiles.is_admin
+│       ├── layout.tsx                # guard + AdminNav
+│       ├── page.tsx                  # dashboard (stats + actividad reciente)
+│       ├── viajes/                   # CRUD de trips
+│       └── solicitudes/              # revision, aprobar/rechazar/expirar
 ├── components/
 │   ├── Header.tsx             # "use client" — nav desktop + drawer mobile
 │   ├── HeroSection.tsx
@@ -57,13 +76,22 @@ src/
 │   ├── Footer.tsx
 │   └── BackToTop.tsx          # "use client" — FAB scroll
 └── lib/
-    ├── constants.ts           # Mock data, imagenes, nav links
-    └── store.ts               # Zustand (drawerOpen)
+    ├── constants.ts           # Mock data (solo home), imagenes, nav links
+    ├── store.ts               # Zustand (drawerOpen)
+    └── supabase/
+        ├── client.ts           # browser client
+        ├── server.ts           # server client (cookies)
+        ├── proxy.ts            # helper de refresco de sesion
+        └── types.ts            # tipos generados (Database)
+proxy.ts                        # Next 16 middleware, en la raiz
+supabase/
+├── migrations/                 # historial de schema, aplicado via MCP
+└── seed.sql                    # datos de ejemplo para `supabase db reset`
 docs/
-├── CONTEXT.md                 # Requerimientos del cliente
-├── ARCHITECTURE.md            # Stack y estructura planeada
-├── DATA_MODEL.md              # Tablas para Supabase (a futuro)
-└── ROLES.md                   # Admin, Solicitante, Viajero
+├── CONTEXT.md                  # Requerimientos del cliente + decisiones de alcance
+├── ARCHITECTURE.md             # Stack y estructura planeada
+├── DATA_MODEL.md               # Tablas de Supabase (implementadas)
+└── ROLES.md                    # Admin, Solicitante, Viajero
 ```
 
 ## Design system
@@ -96,19 +124,22 @@ Estilo "Modern Mystical": dark void (#03050F), gold primary (#E5C278), cyan seco
 - Nav: horizontal en `md+`, hamburger + drawer solo en mobile
 - Footer firma: "i.vavala"
 
-## Lo que sigue (integracion real con Supabase)
+## Lo que sigue
 
-1. ~~Crear proyecto en Supabase~~ ya existe (`hwayqsgwoaznfqofsyly`), falta obtener URL y anon key y usarlas en el repo
-2. Crear `.env.local` con `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-3. Crear `src/lib/supabase/` con client.ts (singleton browser), server.ts, proxy.ts
-4. Crear `proxy.ts` en raiz (middleware Next 16) con exclusion de `auth/`
-5. Crear `app/api/keep-alive/route.ts` + `vercel.json` con cron diario
-6. Migraciones SQL en `supabase/migrations/`
-7. Auth: login/registro con email/password (sin Google OAuth por ahora)
-8. Flujo de solicitud (primerizo/recurrente) segun `docs/DATA_MODEL.md`
-9. Panel de admin y panel de usuario
-10. i18n ES/EN
-11. Chatbot IA
+Hecho: proyecto Supabase, `.env.local`, clientes tipados, `proxy.ts`, migraciones, login, `/viajes` conectado, formulario de solicitud (primerizo/recurrente), panel de admin (dashboard + CRUD viajes + revisión de solicitudes).
+
+Pendiente, en orden sugerido:
+
+1. **Registro de usuarios** — `/cuenta` solo tiene login hoy. Sin esto ningún visitante real puede crear una cuenta ni postularse (bloqueante para uso real). Email/password, sin Google OAuth por ahora.
+2. **Panel de usuario/viajero** — ver sus propias solicitudes y estado (via `my_applications_first_time`/`my_applications_returning`), ver viajes aprobados. Hoy `/cuenta` solo muestra "sesión iniciada", nada mas.
+3. **Consentimiento informado** — tabla `consents` ya existe en el schema pero no hay UI para completarlo. Los textos legales son de la clienta, no inventar contenido (ver "No hacer").
+4. **`app/api/keep-alive/route.ts` + `vercel.json`** con cron diario para evitar que Supabase pause el proyecto por inactividad (plan free) — no configurado todavia.
+5. Vercel: crear proyecto y deployar.
+6. Comunicación admin → usuario (unidireccional, ver `docs/ROLES.md`).
+7. i18n ES/EN.
+8. Chatbot IA.
+
+No urgente pero pendiente: `/nosotros` y `/contenidos` siguen siendo placeholders mock.
 
 ## No hacer
 
