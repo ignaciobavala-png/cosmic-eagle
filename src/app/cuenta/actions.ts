@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export type LoginState = { error: string | null };
 
@@ -11,6 +12,7 @@ export async function login(
 ): Promise<LoginState> {
   const email = formData.get("email");
   const password = formData.get("password");
+  const next = formData.get("next");
 
   if (typeof email !== "string" || typeof password !== "string") {
     return { error: "Completá email y contraseña." };
@@ -26,8 +28,8 @@ export async function login(
     return { error: "Email o contraseña incorrectos." };
   }
 
-  revalidatePath("/cuenta");
-  return { error: null };
+  revalidatePath("/", "layout");
+  redirect(typeof next === "string" && next.startsWith("/") ? next : "/cuenta");
 }
 
 export async function logout() {

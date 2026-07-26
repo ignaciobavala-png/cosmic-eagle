@@ -1,0 +1,131 @@
+"use client";
+
+import { useActionState, useState } from "react";
+import { submitReturningApplication, type ApplicationFormState } from "./actions";
+
+const inputClass =
+  "bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary transition-colors";
+const labelClass = "text-sm text-on-surface-variant tracking-[0.02em]";
+
+function BoolQuestion({ name, label }: { name: string; label: string }) {
+  const [checked, setChecked] = useState(false);
+  return (
+    <div className="flex flex-col gap-2 py-4 border-b border-outline-variant/40 last:border-0">
+      <label className="flex items-center gap-3 text-on-surface cursor-pointer">
+        <input
+          type="checkbox"
+          name={name}
+          onChange={(e) => setChecked(e.target.checked)}
+          className="w-4 h-4 accent-primary"
+        />
+        {label}
+      </label>
+      {checked && (
+        <textarea
+          name={`${name}_detail`}
+          placeholder="Contanos más..."
+          rows={2}
+          className={inputClass}
+        />
+      )}
+    </div>
+  );
+}
+
+export function ReturningForm({
+  tripId,
+  defaultEmail,
+}: {
+  tripId: string;
+  defaultEmail?: string;
+}) {
+  const [state, formAction, pending] = useActionState<
+    ApplicationFormState,
+    FormData
+  >(submitReturningApplication.bind(null, tripId), { error: null });
+
+  return (
+    <form
+      action={formAction}
+      className="glass-card rounded-2xl p-6 md:p-8 flex flex-col gap-2 max-w-2xl"
+    >
+      <h2 className="font-display text-xl text-primary mb-2">
+        Datos personales
+      </h2>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>Nombre completo</label>
+          <input name="full_name" type="text" required className={inputClass} />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>Email</label>
+          <input
+            name="email"
+            type="email"
+            required
+            defaultValue={defaultEmail}
+            className={inputClass}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>Ceremonias previas</label>
+          <input
+            name="previous_ceremonies"
+            type="number"
+            min={1}
+            required
+            className={inputClass}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>Última ceremonia (opcional)</label>
+          <input name="ceremony_date" type="date" className={inputClass} />
+        </div>
+      </div>
+
+      <h2 className="font-display text-xl text-primary mt-4 mb-1">
+        Actualización de salud
+      </h2>
+      <p className="text-xs text-on-surface-variant mb-2">
+        Ya tenemos tu historial de salud. Sólo necesitamos saber si algo
+        cambió desde tu última ceremonia.
+      </p>
+
+      <BoolQuestion
+        name="new_treatment"
+        label="¿Empezaste algún tratamiento médico nuevo desde tu última ceremonia?"
+      />
+      <BoolQuestion
+        name="stress_anxiety"
+        label="¿Estás atravesando estrés o ansiedad con frecuencia?"
+      />
+
+      <div className="flex flex-col gap-1.5 py-4">
+        <label className={labelClass}>
+          Tema o intención que querés trabajar
+        </label>
+        <textarea name="theme" required rows={2} className={inputClass} />
+      </div>
+
+      <div className="flex flex-col gap-1.5 py-2">
+        <label className={labelClass}>Propósito de tu participación</label>
+        <textarea name="purpose" required rows={2} className={inputClass} />
+      </div>
+
+      {state.error && (
+        <p className="text-error text-sm" role="alert">
+          {state.error}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={pending}
+        className="mt-2 bg-primary text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-container transition-colors disabled:opacity-60"
+      >
+        {pending ? "Enviando..." : "Enviar solicitud"}
+      </button>
+    </form>
+  );
+}

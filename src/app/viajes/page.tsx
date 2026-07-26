@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
@@ -84,9 +85,17 @@ export default async function ViajesPage() {
                       {trip.location} · {formatDateRange(trip.start_date, trip.end_date)}
                     </p>
                     {trip.description && (
-                      <p className="text-on-surface-variant max-w-md opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <p className="text-on-surface-variant max-w-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 mb-3">
                         {trip.description}
                       </p>
+                    )}
+                    {trip.status === "open" && (
+                      <Link
+                        href={`/viajes/${trip.id}/solicitar`}
+                        className="inline-block bg-primary text-on-primary text-sm font-medium tracking-[0.05em] rounded-lg px-4 py-2 hover:bg-primary-container transition-colors"
+                      >
+                        Postularme
+                      </Link>
                     )}
                   </div>
                 </div>

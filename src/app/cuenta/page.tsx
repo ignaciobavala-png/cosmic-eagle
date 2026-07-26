@@ -5,7 +5,12 @@ import { createClient } from "@/lib/supabase/server";
 import { LoginForm } from "./LoginForm";
 import { logout } from "./actions";
 
-export default async function CuentaPage() {
+export default async function CuentaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -43,7 +48,7 @@ export default async function CuentaPage() {
                 Iniciá sesión para acceder a tu cuenta.
               </p>
             </div>
-            <LoginForm />
+            <LoginForm next={next} />
           </div>
         )}
       </main>
