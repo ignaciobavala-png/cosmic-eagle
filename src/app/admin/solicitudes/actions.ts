@@ -21,6 +21,16 @@ export async function reviewApplication(
     data: { user },
   } = await supabase.auth.getUser();
 
+  const { data: application } = await supabase
+    .from(table)
+    .select("user_id")
+    .eq("id", id)
+    .single();
+
+  if (application?.user_id === user?.id) {
+    throw new Error("No podés revisar tu propia solicitud.");
+  }
+
   const { error } = await supabase
     .from(table)
     .update({

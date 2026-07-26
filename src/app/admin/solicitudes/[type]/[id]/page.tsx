@@ -58,6 +58,9 @@ export default async function SolicitudDetallePage({
   if (!table) notFound();
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { data: application } = await supabase
     .from(table)
     .select("*, trips(title, start_date, end_date)")
@@ -65,6 +68,8 @@ export default async function SolicitudDetallePage({
     .single();
 
   if (!application) notFound();
+
+  const isOwnApplication = application.user_id === user?.id;
 
   const needsManualReview =
     table === "applications_first_time" &&
@@ -102,7 +107,14 @@ export default async function SolicitudDetallePage({
 
       <div className="glass-card rounded-2xl p-6 md:p-8 mb-6">
         <h2 className="font-display text-xl text-primary mb-2">Revisión</h2>
-        <ReviewButtons table={table} id={id} currentStatus={application.status} />
+        {isOwnApplication ? (
+          <p className="text-on-surface-variant text-sm">
+            Esta es tu propia solicitud — no podés aprobarla ni rechazarla. Pedile
+            a otro admin que la revise.
+          </p>
+        ) : (
+          <ReviewButtons table={table} id={id} currentStatus={application.status} />
+        )}
       </div>
 
       <div className="glass-card rounded-2xl p-6 md:p-8">

@@ -3,32 +3,82 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { LoginForm } from "./LoginForm";
+import { SignupForm } from "./SignupForm";
 import { logout } from "./actions";
+import { MisSolicitudes } from "./MisSolicitudes";
 
 export default async function CuentaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; modo?: string }>;
 }) {
-  const { next } = await searchParams;
+  const { next, modo } = await searchParams;
+  const isSignup = modo === "registro";
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  let applications: {
+    id: string;
+    trip_id: string;
+    status: string;
+    created_at: string;
+    type: "primerizo" | "recurrente";
+    trip: { title: string; location: string | null; start_date: string; end_date: string } | null;
+  }[] = [];
+
+  if (user) {
+    const [{ data: firstTime }, { data: returning }] = await Promise.all([
+      supabase
+        .from("my_applications_first_time")
+        .select("id, trip_id, status, created_at")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("my_applications_returning")
+        .select("id, trip_id, status, created_at")
+        .order("created_at", { ascending: false }),
+    ]);
+
+    const raw = [
+      ...(firstTime ?? []).map((a) => ({ ...a, type: "primerizo" as const })),
+      ...(returning ?? []).map((a) => ({ ...a, type: "recurrente" as const })),
+    ].filter(
+      (a): a is typeof a & { id: string; trip_id: string; status: string; created_at: string } =>
+        a.id !== null && a.trip_id !== null && a.status !== null && a.created_at !== null
+    );
+
+    const tripIds = [...new Set(raw.map((a) => a.trip_id))];
+    const { data: trips } =
+      tripIds.length > 0
+        ? await supabase
+            .from("trips")
+            .select("id, title, location, start_date, end_date")
+            .in("id", tripIds)
+        : { data: [] };
+
+    const tripsById = new Map((trips ?? []).map((t) => [t.id, t]));
+
+    applications = raw
+      .map((a) => ({ ...a, trip: tripsById.get(a.trip_id) ?? null }))
+      .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+  }
 
   return (
     <>
       <Header />
       <main className="pt-16 min-h-screen flex items-center justify-center">
         {user ? (
-          <div className="text-center px-5 flex flex-col items-center gap-4">
-            <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary mb-2">
+          <div className="px-5 w-full max-w-3xl flex flex-col items-center gap-4 py-12">
+            <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary mb-2 text-center">
               Mi Cuenta
             </h1>
-            <p className="text-on-surface-variant max-w-md">
-              Sesión iniciada como {user.email}. El panel de usuario todavía
-              está en construcción.
+            <p className="text-on-surface-variant text-center">
+              Sesión iniciada como {user.email}.
             </p>
+
+            <MisSolicitudes applications={applications} />
+
             <form action={logout}>
               <button
                 type="submit"
@@ -45,10 +95,20 @@ export default async function CuentaPage({
                 Mi Cuenta
               </h1>
               <p className="text-on-surface-variant max-w-md">
-                Iniciá sesión para acceder a tu cuenta.
+                {isSignup
+                  ? "Creá tu cuenta para postularte a un viaje."
+                  : "Iniciá sesión para acceder a tu cuenta."}
               </p>
             </div>
-            <LoginForm next={next} />
+            {isSignup ? <SignupForm next={next} /> : <LoginForm next={next} />}
+            <a
+              href={`/cuenta${isSignup ? "" : "?modo=registro"}${
+                next ? `${isSignup ? "?" : "&"}next=${encodeURIComponent(next)}` : ""
+              }`}
+              className="text-sm text-on-surface-variant hover:text-primary transition-colors underline"
+            >
+              {isSignup ? "¿Ya tenés cuenta? Iniciá sesión" : "¿No tenés cuenta? Registrate"}
+            </a>
           </div>
         )}
       </main>

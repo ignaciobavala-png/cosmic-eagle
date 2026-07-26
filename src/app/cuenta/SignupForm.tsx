@@ -2,23 +2,37 @@
 
 import { useActionState, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { login, type LoginState } from "./actions";
+import { signup, type SignupState } from "./actions";
 
-const initialState: LoginState = { error: null };
+const initialState: SignupState = { error: null };
 
-export function LoginForm({ next }: { next?: string }) {
-  const [state, formAction, pending] = useActionState(login, initialState);
+export function SignupForm({ next }: { next?: string }) {
+  const [state, formAction, pending] = useActionState(signup, initialState);
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <form action={formAction} className="glass-card rounded-2xl p-8 w-full max-w-sm flex flex-col gap-5">
       {next && <input type="hidden" name="next" value={next} />}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="email" className="text-sm text-on-surface-variant tracking-[0.02em]">
+        <label htmlFor="full_name" className="text-sm text-on-surface-variant tracking-[0.02em]">
+          Nombre completo
+        </label>
+        <input
+          id="full_name"
+          name="full_name"
+          type="text"
+          required
+          autoComplete="name"
+          className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary transition-colors"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="signup-email" className="text-sm text-on-surface-variant tracking-[0.02em]">
           Email
         </label>
         <input
-          id="email"
+          id="signup-email"
           name="email"
           type="email"
           required
@@ -28,16 +42,17 @@ export function LoginForm({ next }: { next?: string }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="password" className="text-sm text-on-surface-variant tracking-[0.02em]">
+        <label htmlFor="signup-password" className="text-sm text-on-surface-variant tracking-[0.02em]">
           Contraseña
         </label>
         <div className="relative">
           <input
-            id="password"
+            id="signup-password"
             name="password"
             type={showPassword ? "text" : "password"}
             required
-            autoComplete="current-password"
+            minLength={8}
+            autoComplete="new-password"
             className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 pr-11 w-full text-on-surface focus:outline-none focus:border-primary transition-colors"
           />
           <button
@@ -49,6 +64,7 @@ export function LoginForm({ next }: { next?: string }) {
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
+        <p className="text-xs text-on-surface-variant/70">Mínimo 8 caracteres.</p>
       </div>
 
       {state.error && (
@@ -62,7 +78,7 @@ export function LoginForm({ next }: { next?: string }) {
         disabled={pending}
         className="mt-2 bg-primary text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-container transition-colors disabled:opacity-60"
       >
-        {pending ? "Ingresando..." : "Ingresar"}
+        {pending ? "Creando cuenta..." : "Crear cuenta"}
       </button>
     </form>
   );
