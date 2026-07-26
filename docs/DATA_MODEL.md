@@ -51,7 +51,7 @@
 | fears | boolean | — |
 | fears_detail | text | — |
 | comment | text | — |
-| status | enum | pending_review, approved, rejected |
+| status | enum | pending_review, approved, rejected, expired |
 | reviewed_by | uuid | auth.users (admin) |
 | reviewed_at | timestamptz | — |
 | created_at | timestamptz | — |
@@ -77,7 +77,7 @@
 | theme | text | — |
 | purpose | text | — |
 | previous_ceremonies | integer | — |
-| status | enum | pending_review, approved, rejected |
+| status | enum | pending_review, approved, rejected, expired |
 | reviewed_by | uuid | auth.users (admin) |
 | reviewed_at | timestamptz | — |
 | created_at | timestamptz | — |
@@ -105,7 +105,10 @@
 
 ## Usuario vs. Solicitante
 
-Un `auth.users` puede tener 0, 1 o muchas solicitudes. El campo `status` en la solicitud define si es:
+Un `auth.users` puede tener 0, 1 o muchas solicitudes — **una por viaje**, no un perfil de salud unico de por vida. El campo `status` en la solicitud define su estado:
 - `pending_review` → Solicitante (pre-aprobacion)
-- `approved` → Viajero (acceso al panel de usuario)
-- `rejected` → sin acceso
+- `approved` → Viajero para ese viaje (acceso al panel de usuario mientras tenga al menos una solicitud `approved`)
+- `rejected` → sin acceso para ese viaje, pero puede volver a aplicar a otro viaje (nueva fila, no se edita la rechazada)
+- `expired` → aprobacion invalidada manualmente por el admin (ej. cambio de condicion de salud, viaje que ya paso)
+
+Esto significa que el historial de un usuario es la lista completa de sus filas en `applications_first_time` / `applications_returning`, no un unico registro que se sobreescribe. El admin necesita una vista que muestre ese historial completo por usuario, no solo la solicitud mas reciente.

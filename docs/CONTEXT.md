@@ -34,7 +34,7 @@ Cliente: Estela (Cosmic Eagle Journey). Contacto de desarrollo: Ignacio Bavala.
 | Cliente / Viajero | Sí (acceso directo) | Si convive con flujo de aprobación manual antes de habilitar el acceso |
 | Solicitante (pre-aprobación) | No | Estado intermedio: envía formulario → espera revisión → aprobado/rechazado |
 
-**Importante:** la propuesta aprobada asume inscripción directa. El pedido original y los formularios reales muestran un flujo de **aprobación manual previa basada en datos de salud**. Esto está pendiente de confirmar con la clienta (ver `Cosmic_Eagle_Journey_Relevamiento.docx`, secciones 1 y 2).
+**Decidido (2026-07-25):** el flujo es de **aprobación manual previa obligatoria** basada en datos de salud, no inscripción directa. Al ser viajes de turismo que exigen revisión de medicación, no puede haber acceso directo sin revisión de un admin.
 
 ## 4. Modelo de datos actual (relevado de los formularios en uso)
 
@@ -117,19 +117,26 @@ Estructura:
 4. Los formularios están vinculados a **un viaje/ceremonia concreto** (piden fecha de la próxima ceremonia), no son un perfil único estático — es razonable modelarlo como una solicitud por viaje, no un formulario de salud "de por vida".
 5. Todo el contenido de salud es dato sensible — ver sección 6 del documento Word (`Legal y privacidad`) para retención y control de acceso.
 
-## 6. Pendientes de definición
+## 6. Decisiones de alcance (2026-07-25)
+
+- **Aprobación:** manual y obligatoria, nunca directa (ver §4 arriba).
+- **Comunicación:** en esta primera fase, solo jerárquica admin → usuario. Comunicación entre usuarios/comunidad queda para una fase futura, no se construye ahora.
+- **Rangos de usuario:** se arranca simple, un solo rango. Estados posibles: `visitante` (sin aprobación) y `viajero aprobado`. No hay niveles adicionales por ahora.
+- **Versionado de solicitudes:** las solicitudes son **por viaje**, no de por vida — un usuario rechazado para un viaje puede volver a aplicar y ser aprobado para otro (ej. no podía por medicación un año, al año siguiente sí). El admin debe poder ver el historial completo de solicitudes de un usuario, no solo la última.
+- **Retención/expiración:** el admin puede marcar solicitudes/aprobaciones como expiradas manualmente (no hay borrado automático todavía). Política de borrado de datos de salud queda pendiente (legal).
+
+## 7. Pendientes de definición
 
 Ver `Cosmic_Eagle_Journey_Relevamiento.docx` / `.pdf` para el detalle completo. En resumen, sigue abierto:
 
-- Flujo exacto de aprobación/rechazo (quién, con qué criterios, notificación)
-- Comunicación entre usuarios / comunidad
-- Definición de "rango" de usuario
+- Criterios exactos de aprobación/rechazo dentro de una revisión (quién decide en casos límite) y canal de notificación (email, in-app)
 - Legal: política de privacidad, retención de datos de salud, derecho de borrado
 - Secciones finales del panel de administración (borrador en sección 7 del Word)
 
-## 7. Notas para agentes de desarrollo (Claude Code / OpenCode)
+## 8. Notas para agentes de desarrollo (Claude Code / OpenCode)
 
 - Los datos de salud (sección 4.1 y 4.2) son **dato sensible** — cualquier tabla que los contenga necesita RLS (Row Level Security) en Supabase restringido a rol admin, nunca expuesto en el cliente sin control de acceso.
 - No auto-generar copys de marketing ni textos legales — los bloques de consentimiento (sección 4.3) son contenido fijo provisto por la clienta, no se reescriben.
-- Antes de tocar el flujo de aprobación/inscripción, confirmar con Ignacio si ya se resolvió el punto de la sección 5 de este documento (inscripción directa vs. aprobación manual) — es una decisión de producto, no técnica.
+- El flujo es de aprobación manual obligatoria (§4, §6) — ya no está en discusión, no ofrecer "inscripción directa" como alternativa.
 - Mantener separación clara entre formulario primerizo y recurrente como dos flujos, no un único formulario con campos opcionales.
+- No construir comunicación entre usuarios ni sistema de rangos múltiples — fuera de alcance de esta fase (§6).
