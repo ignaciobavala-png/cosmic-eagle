@@ -12,10 +12,11 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 
 - Supabase está integrado y en uso real: proyecto `hwayqsgwoaznfqofsyly`, `.env.local` con URL/anon key (gitignored, no en el repo), clientes tipados en `src/lib/supabase/` (`client.ts`, `server.ts`, `proxy.ts`), `proxy.ts` en la raíz refresca sesión
 - Schema completo aplicado via migraciones (`supabase/migrations/`): `profiles`, `trips`, `applications_first_time`, `applications_returning`, `consents`, vistas `my_applications_*`, funciones `is_admin()`/`handle_new_user()` en schema `private`
-- Auth funcionando: login en `/cuenta` (email/password), sin registro todavía (ver "Lo que sigue")
+- Auth funcionando en `/cuenta`: login + **registro** (email/password, toggle `?modo=registro`, sin confirmación por mail — el gate real de acceso es la aprobación manual del admin, no la verificación de email). Login redirige directo a `/admin` si `profiles.is_admin`
+- `/cuenta` logueado muestra **panel de viajero**: viajes aprobados + tabla de "Mis solicitudes" con estado (via `my_applications_first_time`/`my_applications_returning` + `trips`, sin exponer datos de salud)
 - `/viajes` conectado a la tabla `trips` real (ya no es mock)
 - Formulario de solicitud de salud funcionando en `/viajes/[id]/solicitar` (primerizo/recurrente, elegido segun historial de aprobaciones del usuario)
-- Panel de admin funcionando en `/admin` (protegido por `profiles.is_admin`): dashboard, CRUD de viajes, revisión de solicitudes (aprobar/rechazar/expirar)
+- Panel de admin funcionando en `/admin` (protegido por `profiles.is_admin`): dashboard, CRUD de viajes, revisión de solicitudes (aprobar/rechazar/expirar). Un admin no puede aprobar/rechazar su propia solicitud (guard en `reviewApplication` + oculto en la UI)
 - `/nosotros` y `/contenidos` siguen siendo placeholders mock
 - No hay proyecto en Vercel deployado todavia
 - Cuenta de prueba admin: ver `~/Escritorio/account/cosmic-eagle-acces.txt` (fuera del repo)
@@ -57,14 +58,16 @@ src/
 │   │       ├── ReturningForm.tsx     # "use client"
 │   │       └── actions.ts            # submitFirstTimeApplication / submitReturningApplication
 │   ├── cuenta/
-│   │   ├── page.tsx                  # login real (sin registro todavia)
-│   │   ├── LoginForm.tsx             # "use client", soporta ?next=
-│   │   └── actions.ts                # login/logout
+│   │   ├── page.tsx                  # login/registro (?modo=registro) + panel de viajero
+│   │   ├── LoginForm.tsx             # "use client", soporta ?next=, ojito password
+│   │   ├── SignupForm.tsx            # "use client", ojito password
+│   │   ├── MisSolicitudes.tsx        # viajes aprobados + tabla de solicitudes propias
+│   │   └── actions.ts                # login/signup/logout
 │   └── admin/                        # protegido por profiles.is_admin
 │       ├── layout.tsx                # guard + AdminNav
 │       ├── page.tsx                  # dashboard (stats + actividad reciente)
 │       ├── viajes/                   # CRUD de trips
-│       └── solicitudes/              # revision, aprobar/rechazar/expirar
+│       └── solicitudes/              # revision, aprobar/rechazar/expirar (bloquea auto-revision)
 ├── components/
 │   ├── Header.tsx             # "use client" — nav desktop + drawer mobile
 │   ├── HeroSection.tsx
@@ -126,18 +129,16 @@ Estilo "Modern Mystical": dark void (#03050F), gold primary (#E5C278), cyan seco
 
 ## Lo que sigue
 
-Hecho: proyecto Supabase, `.env.local`, clientes tipados, `proxy.ts`, migraciones, login, `/viajes` conectado, formulario de solicitud (primerizo/recurrente), panel de admin (dashboard + CRUD viajes + revisión de solicitudes).
+Hecho: proyecto Supabase, `.env.local`, clientes tipados, `proxy.ts`, migraciones, login + registro, redirect admin en login, `/viajes` conectado, formulario de solicitud (primerizo/recurrente), panel de admin (dashboard + CRUD viajes + revisión de solicitudes, con bloqueo de auto-aprobación), panel de usuario/viajero (`/cuenta`: viajes aprobados + estado de solicitudes).
 
 Pendiente, en orden sugerido:
 
-1. **Registro de usuarios** — `/cuenta` solo tiene login hoy. Sin esto ningún visitante real puede crear una cuenta ni postularse (bloqueante para uso real). Email/password, sin Google OAuth por ahora.
-2. **Panel de usuario/viajero** — ver sus propias solicitudes y estado (via `my_applications_first_time`/`my_applications_returning`), ver viajes aprobados. Hoy `/cuenta` solo muestra "sesión iniciada", nada mas.
-3. **Consentimiento informado** — tabla `consents` ya existe en el schema pero no hay UI para completarlo. Los textos legales son de la clienta, no inventar contenido (ver "No hacer").
-4. **`app/api/keep-alive/route.ts` + `vercel.json`** con cron diario para evitar que Supabase pause el proyecto por inactividad (plan free) — no configurado todavia.
-5. Vercel: crear proyecto y deployar.
-6. Comunicación admin → usuario (unidireccional, ver `docs/ROLES.md`).
-7. i18n ES/EN.
-8. Chatbot IA.
+1. **Consentimiento informado** — tabla `consents` ya existe en el schema pero no hay UI para completarlo. Los textos legales (5 bloques: Viaje, Facilitador, Experiencia, Consideraciones, Confidencialidad + 4 confirmaciones) son de la clienta — **no están en el repo, hay que pedírselos a Estela antes de construir la UI**, no inventar contenido (ver "No hacer").
+2. **`app/api/keep-alive/route.ts` + `vercel.json`** con cron diario para evitar que Supabase pause el proyecto por inactividad (plan free) — no configurado todavia.
+3. Vercel: crear proyecto y deployar.
+4. Comunicación admin → usuario (unidireccional, ver `docs/ROLES.md`).
+5. **i18n ES/EN** — decidido: no traducir a mano string por string. Escribir todo en `es.json`, generar `en.json` una vez (o cuando cambien los textos) vía script que llama a una API de traducción (DeepL/LLM), revisar a mano los términos específicos (ceremonia, chamánico, etc.), servir estático con `next-intl` — sin llamadas a API en cada request.
+6. Chatbot IA.
 
 No urgente pero pendiente: `/nosotros` y `/contenidos` siguen siendo placeholders mock.
 
