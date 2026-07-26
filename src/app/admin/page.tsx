@@ -1,0 +1,255 @@
+import Link from "next/link";
+import {
+  CalendarCheck2,
+  ClipboardList,
+  Compass,
+  UserCheck,
+} from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+
+const STATUS_LABEL: Record<string, string> = {
+  pending_review: "Pendiente",
+  approved: "Aprobada",
+  rejected: "Rechazada",
+  expired: "Expirada",
+};
+
+function formatDate(iso: string) {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("es-AR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+export default async function AdminDashboardPage() {
+  const supabase = await createClient();
+
+  const [
+    { count: openTrips },
+    { count: totalTrips },
+    { count: pendingFirstTime },
+    { count: pendingReturning },
+    { count: approvedFirstTime },
+    { count: approvedReturning },
+    { data: upcomingTrips },
+    { data: pendingApplicationsFirstTime },
+    { data: pendingApplicationsReturning },
+  ] = await Promise.all([
+    supabase
+      .from("trips")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "open"),
+    supabase.from("trips").select("*", { count: "exact", head: true }),
+    supabase
+      .from("applications_first_time")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "pending_review"),
+    supabase
+      .from("applications_returning")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "pending_review"),
+    supabase
+      .from("applications_first_time")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "approved"),
+    supabase
+      .from("applications_returning")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "approved"),
+    supabase
+      .from("trips")
+      .select("id, title, start_date, end_date, capacity, status")
+      .in("status", ["open", "closed"])
+      .order("start_date", { ascending: true })
+      .limit(4),
+    supabase
+      .from("applications_first_time")
+      .select("id, full_name, created_at, trips(title)")
+      .eq("status", "pending_review")
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("applications_returning")
+      .select("id, full_name, created_at, trips(title)")
+      .eq("status", "pending_review")
+      .order("created_at", { ascending: false })
+      .limit(5),
+  ]);
+
+  const pendingCount = (pendingFirstTime ?? 0) + (pendingReturning ?? 0);
+  const approvedCount = (approvedFirstTime ?? 0) + (approvedReturning ?? 0);
+
+  const recentApplications = [
+    ...(pendingApplicationsFirstTime ?? []).map((a) => ({
+      ...a,
+      type: "primerizo" as const,
+    })),
+    ...(pendingApplicationsReturning ?? []).map((a) => ({
+      ...a,
+      type: "recurrente" as const,
+    })),
+  ]
+    .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
+    .slice(0, 5);
+
+  const stats = [
+    {
+      href: "/admin/viajes",
+      label: "Viajes activos",
+      value: openTrips ?? 0,
+      hint: `${totalTrips ?? 0} en total`,
+      icon: Compass,
+    },
+    {
+      href: "/admin/solicitudes?status=pending_review",
+      label: "Solicitudes pendientes",
+      value: pendingCount,
+      hint: "esperando revisión",
+      icon: ClipboardList,
+      highlight: pendingCount > 0,
+    },
+    {
+      href: "/admin/solicitudes?status=approved",
+      label: "Aprobaciones vigentes",
+      value: approvedCount,
+      hint: "acceso al panel de viajero",
+      icon: UserCheck,
+    },
+    {
+      href: "/admin/viajes",
+      label: "Próximo viaje",
+      value: upcomingTrips?.[0] ? formatDate(upcomingTrips[0].start_date) : "—",
+      hint: upcomingTrips?.[0]?.title ?? "sin viajes programados",
+      icon: CalendarCheck2,
+      isText: true,
+    },
+  ];
+
+  return (
+    <div>
+      <h1 className="font-display text-3xl text-primary mb-8">Dashboard</h1>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        {stats.map((card) => {
+          const Icon = card.icon;
+          return (
+            <Link
+              key={card.label}
+              href={card.href}
+              className={`glass-card rounded-2xl p-6 block hover:border-primary/40 transition-colors ${
+                card.highlight ? "border-secondary/40" : ""
+              }`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs text-on-surface-variant tracking-[0.05em] uppercase">
+                  {card.label}
+                </p>
+                <Icon size={18} className="text-secondary shrink-0" />
+              </div>
+              <p
+                className={`font-display text-primary mb-1 ${
+                  card.isText ? "text-xl leading-tight" : "text-4xl"
+                }`}
+              >
+                {card.value}
+              </p>
+              <p className="text-xs text-on-surface-variant truncate">
+                {card.hint}
+              </p>
+            </Link>
+          );
+        })}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="glass-card rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-xl text-primary">
+              Solicitudes recientes
+            </h2>
+            <Link
+              href="/admin/solicitudes"
+              className="text-xs text-secondary hover:underline"
+            >
+              Ver todas
+            </Link>
+          </div>
+
+          {recentApplications.length === 0 ? (
+            <p className="text-on-surface-variant text-sm">
+              No hay solicitudes pendientes.
+            </p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-outline-variant/40">
+              {recentApplications.map((app) => (
+                <li key={`${app.type}-${app.id}`} className="py-3">
+                  <Link
+                    href={`/admin/solicitudes/${app.type}/${app.id}`}
+                    className="flex items-center justify-between gap-4 group"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-on-surface font-medium truncate group-hover:text-primary transition-colors">
+                        {app.full_name}
+                      </p>
+                      <p className="text-xs text-on-surface-variant truncate">
+                        {app.trips?.title ?? "—"} · {app.type}
+                      </p>
+                    </div>
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-secondary shrink-0">
+                      {STATUS_LABEL.pending_review}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="glass-card rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-xl text-primary">
+              Próximos viajes
+            </h2>
+            <Link
+              href="/admin/viajes"
+              className="text-xs text-secondary hover:underline"
+            >
+              Gestionar
+            </Link>
+          </div>
+
+          {!upcomingTrips || upcomingTrips.length === 0 ? (
+            <p className="text-on-surface-variant text-sm">
+              No hay viajes publicados.
+            </p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-outline-variant/40">
+              {upcomingTrips.map((trip) => (
+                <li key={trip.id} className="py-3">
+                  <Link
+                    href={`/admin/viajes/${trip.id}/editar`}
+                    className="flex items-center justify-between gap-4 group"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-on-surface font-medium truncate group-hover:text-primary transition-colors">
+                        {trip.title}
+                      </p>
+                      <p className="text-xs text-on-surface-variant">
+                        {formatDate(trip.start_date)} – {formatDate(trip.end_date)}
+                      </p>
+                    </div>
+                    <span className="text-xs text-on-surface-variant shrink-0">
+                      cupo {trip.capacity}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
