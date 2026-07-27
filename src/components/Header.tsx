@@ -2,6 +2,7 @@
 
 import { useUIStore } from "@/lib/store";
 import { IMAGES, NAV_LINKS } from "@/lib/constants";
+import { createClient } from "@/lib/supabase/client";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Menu,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const iconMap = {
   Home,
@@ -24,9 +26,50 @@ const iconMap = {
   User,
 };
 
+type AccountProfile = { fullName: string | null; avatarUrl: string | null } | null;
+
 export function Header() {
   const { drawerOpen, toggleDrawer, setDrawerOpen } = useUIStore();
   const pathname = usePathname();
+  const [profile, setProfile] = useState<AccountProfile>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    let active = true;
+
+    async function load() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!active) return;
+
+      if (!user) {
+        setProfile(null);
+        return;
+      }
+
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name, avatar_url")
+        .eq("id", user.id)
+        .single();
+
+      if (!active) return;
+      setProfile({ fullName: data?.full_name ?? null, avatarUrl: data?.avatar_url ?? null });
+    }
+
+    load();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => load());
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   return (
     <>
@@ -67,9 +110,17 @@ export function Header() {
               href="/cuenta"
               className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors duration-300"
             >
-              <CircleUser size={20} />
+              {profile?.avatarUrl ? (
+                <img
+                  src={profile.avatarUrl}
+                  alt=""
+                  className="w-6 h-6 rounded-full object-cover"
+                />
+              ) : (
+                <CircleUser size={20} />
+              )}
               <span className="text-sm font-medium tracking-[0.05em]">
-                Mi Cuenta
+                {profile ? profile.fullName?.split(" ")[0] || "Mi Cuenta" : "Mi Cuenta"}
               </span>
             </Link>
 

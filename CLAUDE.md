@@ -19,8 +19,8 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 - Panel de admin funcionando en `/admin` (protegido por `profiles.is_admin`): dashboard, CRUD de viajes, revisión de solicitudes (aprobar/rechazar/expirar). Un admin no puede aprobar/rechazar su propia solicitud (guard en `reviewApplication` + oculto en la UI)
 - `/nosotros` y `/contenidos` siguen siendo placeholders mock
 - `pnpm build` (producción) verificado sin errores — listo para deployar en cuanto a código
-- `app/api/keep-alive/route.ts` + `vercel.json` (cron diario 12:00 UTC) armados para que Supabase free tier no pause el proyecto por inactividad. Protegido con `CRON_SECRET` si esa env var existe (falta cargarla en Vercel al deployar)
-- No hay proyecto en Vercel deployado todavia — falta crear el proyecto y cargar `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `CRON_SECRET` como env vars ahí
+- `app/api/keep-alive/route.ts` + `vercel.json` (cron diario 12:00 UTC) armados para que Supabase free tier no pause el proyecto por inactividad. Protegido con `CRON_SECRET`
+- **Proyecto deployado en Vercel**: `cosmic-eagle` (org `ethoslogs-projects`), URL de producción `https://cosmic-eagle.vercel.app`. Env vars `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `CRON_SECRET` cargadas en Development/Preview/Production
 - Cuenta de prueba admin: ver `~/Escritorio/account/cosmic-eagle-acces.txt` (fuera del repo)
 
 **Ya se puede escribir código que asuma conexión a Supabase** — el schema existe y está en uso. Antes de tocar RLS/funciones, revisar el checklist de seguridad del skill `supabase`.
@@ -133,15 +133,14 @@ Estilo "Modern Mystical": dark void (#03050F), gold primary (#E5C278), cyan seco
 
 ## Lo que sigue
 
-Hecho: proyecto Supabase, `.env.local`, clientes tipados, `proxy.ts`, migraciones, login + registro, redirect admin en login, `/viajes` conectado, formulario de solicitud (primerizo/recurrente), panel de admin (dashboard + CRUD viajes + revisión de solicitudes, con bloqueo de auto-aprobación), panel de usuario/viajero (`/cuenta`: viajes aprobados + estado de solicitudes), keep-alive (`app/api/keep-alive` + `vercel.json`, cron diario), build de producción verificado.
+Hecho: proyecto Supabase, `.env.local`, clientes tipados, `proxy.ts`, migraciones, login + registro, redirect admin en login, `/viajes` conectado, formulario de solicitud (primerizo/recurrente), panel de admin (dashboard + CRUD viajes + revisión de solicitudes, con bloqueo de auto-aprobación), panel de usuario/viajero (`/cuenta`: viajes aprobados + estado de solicitudes), keep-alive (`app/api/keep-alive` + `vercel.json`, cron diario), build de producción verificado, **proyecto deployado en Vercel** (`cosmic-eagle`, env vars cargadas).
 
 Pendiente, en orden sugerido:
 
 1. **Consentimiento informado** — tabla `consents` ya existe en el schema pero no hay UI para completarlo. Los textos legales (5 bloques: Viaje, Facilitador, Experiencia, Consideraciones, Confidencialidad + 4 confirmaciones) son de la clienta — **no están en el repo, hay que pedírselos a Estela antes de construir la UI**, no inventar contenido (ver "No hacer").
-2. **Vercel: crear proyecto y deployar.** El código ya está listo (`vercel.json` + keep-alive armados, build verificado) — falta crear el proyecto en Vercel y cargar ahí `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `CRON_SECRET` (cualquier string random, protege el endpoint de keep-alive).
-3. Comunicación admin → usuario (unidireccional, ver `docs/ROLES.md`).
-4. **i18n ES/EN** — decidido: no traducir a mano string por string. Escribir todo en `es.json`, generar `en.json` una vez (o cuando cambien los textos) vía script que llama a una API de traducción (DeepL/LLM), revisar a mano los términos específicos (ceremonia, chamánico, etc.), servir estático con `next-intl` — sin llamadas a API en cada request.
-5. Chatbot IA.
+2. Comunicación admin → usuario (unidireccional, ver `docs/ROLES.md`).
+3. **i18n ES/EN** — decidido: no traducir a mano string por string. Escribir todo en `es.json`, generar `en.json` una vez (o cuando cambien los textos) vía script que llama a una API de traducción (DeepL/LLM), revisar a mano los términos específicos (ceremonia, chamánico, etc.), servir estático con `next-intl` — sin llamadas a API en cada request.
+4. Chatbot IA.
 
 No urgente pero pendiente: `/nosotros` y `/contenidos` siguen siendo placeholders mock.
 

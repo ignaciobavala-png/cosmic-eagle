@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 export type LoginState = { error: string | null };
 export type SignupState = { error: string | null };
+export type AvatarState = { error: string | null };
 
 export async function login(
   _prevState: LoginState,
@@ -26,6 +27,9 @@ export async function login(
   });
 
   if (error) {
+    if (error.code === "email_not_confirmed") {
+      return { error: "Confirmá tu email antes de iniciar sesión. Revisá tu bandeja de entrada." };
+    }
     return { error: "Email o contraseña incorrectos." };
   }
 
@@ -84,6 +88,57 @@ export async function signup(
 
   revalidatePath("/", "layout");
   redirect(typeof next === "string" && next.startsWith("/") ? next : "/cuenta");
+}
+
+export async function updateAvatar(
+  _prevState: AvatarState,
+  formData: FormData
+): Promise<AvatarState> {
+  const file = formData.get("avatar");
+
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Elegí una imagen." };
+  }
+
+  if (!file.type.startsWith("image/")) {
+    return { error: "El archivo debe ser una imagen." };
+  }
+
+  if (file.size > 3 * 1024 * 1024) {
+    return { error: "La imagen no puede superar los 3MB." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Sesión expirada. Volvé a iniciar sesión." };
+  }
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const path = `${user.id}/avatar.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("avatars")
+    .upload(path, file, { upsert: true, contentType: file.type });
+
+  if (uploadError) {
+    return { error: "No se pudo subir la imagen. Probá de nuevo." };
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("avatars").getPublicUrl(path);
+
+  await supabase
+    .from("profiles")
+    .update({ avatar_url: `${publicUrl}?v=${Date.now()}` })
+    .eq("id", user.id);
+
+  revalidatePath("/", "layout");
+  return { error: null };
 }
 
 export async function logout() {
