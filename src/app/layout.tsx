@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { EB_Garamond, Montserrat } from "next/font/google";
+import { Domine, Literata } from "next/font/google";
 import "./globals.css";
 
-const ebGaramond = EB_Garamond({
+const domine = Domine({
   subsets: ["latin"],
   variable: "--font-display",
 });
 
-const montserrat = Montserrat({
+const literata = Literata({
   subsets: ["latin"],
   variable: "--font-body",
 });
@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${ebGaramond.variable} ${montserrat.variable} h-full antialiased`}
+      className={`${domine.variable} ${literata.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

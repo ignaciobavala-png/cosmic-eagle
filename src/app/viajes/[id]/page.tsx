@@ -19,7 +19,7 @@ const STATUS_LABEL: Record<string, string> = {
 const STATUS_CLASS: Record<string, string> = {
   open: "bg-secondary/20 text-secondary border-secondary/40",
   closed: "bg-outline-variant/40 text-on-surface-variant border-outline/40",
-  completed: "bg-primary/20 text-primary border-primary/40",
+  completed: "bg-primary-container/20 text-primary-fixed-dim border-primary-fixed-dim/40",
 };
 
 // Postgres `date` llega como "YYYY-MM-DD": parsear y formatear en UTC evita que
@@ -119,7 +119,7 @@ export default async function ViajePage({ params }: Props) {
         <div className="px-5 max-w-5xl mx-auto py-10 md:py-16">
           <Link
             href="/viajes"
-            className="inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary-fixed-dim transition-colors mb-6"
           >
             <ArrowLeft size={16} />
             Todos los viajes
@@ -151,7 +151,7 @@ export default async function ViajePage({ params }: Props) {
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
             <div>
-              <h2 className="font-display text-2xl text-primary mb-4">
+              <h2 className="font-display text-2xl text-primary-fixed-dim mb-4">
                 Sobre este viaje
               </h2>
               {trip.description ? (
@@ -183,7 +183,7 @@ export default async function ViajePage({ params }: Props) {
             <aside className="glass-card rounded-2xl p-6 lg:sticky lg:top-24">
               {!isOpen ? (
                 <>
-                  <h2 className="font-display text-xl text-primary mb-2">
+                  <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
                     {trip.status === "completed"
                       ? "Este viaje ya finalizó"
                       : "Inscripciones cerradas"}
@@ -194,14 +194,14 @@ export default async function ViajePage({ params }: Props) {
                   </p>
                   <Link
                     href="/viajes"
-                    className="block text-center border border-primary/40 text-primary text-sm font-medium tracking-[0.05em] rounded-lg px-4 py-3 hover:bg-primary/10 transition-colors"
+                    className="block text-center border border-primary-fixed-dim/40 text-primary-fixed-dim text-sm font-medium tracking-[0.05em] rounded-lg px-4 py-3 hover:bg-primary-container/10 transition-colors"
                   >
                     Ver otros viajes
                   </Link>
                 </>
               ) : (
                 <>
-                  <h2 className="font-display text-xl text-primary mb-2">
+                  <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
                     Postularte a este viaje
                   </h2>
                   <p className="text-on-surface-variant text-sm mb-5">
@@ -215,7 +215,7 @@ export default async function ViajePage({ params }: Props) {
                         ? solicitarHref
                         : `/cuenta?next=${encodeURIComponent(solicitarHref)}`
                     }
-                    className="block text-center bg-primary text-on-primary text-sm font-medium tracking-[0.05em] rounded-lg px-4 py-3 hover:bg-primary-container transition-colors"
+                    className="block text-center bg-primary-container text-on-primary text-sm font-medium tracking-[0.05em] rounded-lg px-4 py-3 hover:bg-primary-fixed transition-colors"
                   >
                     {user ? "Completar solicitud" : "Iniciar sesión y postularme"}
                   </Link>

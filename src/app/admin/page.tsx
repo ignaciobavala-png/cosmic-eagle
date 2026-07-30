@@ -129,7 +129,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl text-primary mb-8">Dashboard</h1>
+      <h1 className="font-display text-3xl text-primary-fixed-dim mb-8">Dashboard</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
         {stats.map((card) => {
@@ -138,7 +138,7 @@ export default async function AdminDashboardPage() {
             <Link
               key={card.label}
               href={card.href}
-              className={`glass-card rounded-2xl p-6 block hover:border-primary/40 transition-colors ${
+              className={`glass-card rounded-2xl p-6 block hover:border-primary-fixed-dim/40 transition-colors ${
                 card.highlight ? "border-secondary/40" : ""
               }`}
             >
@@ -149,7 +149,7 @@ export default async function AdminDashboardPage() {
                 <Icon size={18} className="text-secondary shrink-0" />
               </div>
               <p
-                className={`font-display text-primary mb-1 ${
+                className={`font-display text-primary-fixed-dim mb-1 ${
                   card.isText ? "text-xl leading-tight" : "text-4xl"
                 }`}
               >
@@ -166,7 +166,7 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="glass-card rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-xl text-primary">
+            <h2 className="font-display text-xl text-primary-fixed-dim">
               Solicitudes recientes
             </h2>
             <Link
@@ -190,7 +190,7 @@ export default async function AdminDashboardPage() {
                     className="flex items-center justify-between gap-4 group"
                   >
                     <div className="min-w-0">
-                      <p className="text-on-surface font-medium truncate group-hover:text-primary transition-colors">
+                      <p className="text-on-surface font-medium truncate group-hover:text-primary-fixed-dim transition-colors">
                         {app.full_name}
                       </p>
                       <p className="text-xs text-on-surface-variant truncate">
@@ -209,7 +209,7 @@ export default async function AdminDashboardPage() {
 
         <div className="glass-card rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-xl text-primary">
+            <h2 className="font-display text-xl text-primary-fixed-dim">
               Próximos viajes
             </h2>
             <Link
@@ -233,7 +233,7 @@ export default async function AdminDashboardPage() {
                     className="flex items-center justify-between gap-4 group"
                   >
                     <div className="min-w-0">
-                      <p className="text-on-surface font-medium truncate group-hover:text-primary transition-colors">
+                      <p className="text-on-surface font-medium truncate group-hover:text-primary-fixed-dim transition-colors">
                         {trip.title}
                       </p>
                       <p className="text-xs text-on-surface-variant">

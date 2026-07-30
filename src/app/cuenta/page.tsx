@@ -85,7 +85,7 @@ export default async function CuentaPage({
               fallbackLabel={(profile?.full_name?.trim()?.[0] ?? user.email?.[0] ?? "?").toUpperCase()}
             />
             <div className="text-center">
-              <h1 className="font-display text-[28px] md:text-[36px] font-medium text-primary">
+              <h1 className="font-display text-[28px] md:text-[36px] font-medium text-primary-fixed-dim">
                 {profile?.full_name?.trim() || "Mi Cuenta"}
               </h1>
               <p className="text-on-surface-variant text-sm mt-1">{user.email}</p>
@@ -96,7 +96,7 @@ export default async function CuentaPage({
             <form action={logout}>
               <button
                 type="submit"
-                className="mt-2 text-sm text-on-surface-variant hover:text-primary transition-colors underline"
+                className="mt-2 text-sm text-on-surface-variant hover:text-primary-fixed-dim transition-colors underline"
               >
                 Cerrar sesión
               </button>
@@ -105,7 +105,7 @@ export default async function CuentaPage({
         ) : (
           <div className="text-center px-5 flex flex-col items-center gap-6">
             <div>
-              <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary mb-2">
+              <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary-fixed-dim mb-2">
                 Mi Cuenta
               </h1>
               <p className="text-on-surface-variant max-w-md">
@@ -119,7 +119,7 @@ export default async function CuentaPage({
               href={`/cuenta${isSignup ? "" : "?modo=registro"}${
                 next ? `${isSignup ? "?" : "&"}next=${encodeURIComponent(next)}` : ""
               }`}
-              className="text-sm text-on-surface-variant hover:text-primary transition-colors underline"
+              className="text-sm text-on-surface-variant hover:text-primary-fixed-dim transition-colors underline"
             >
               {isSignup ? "¿Ya tenés cuenta? Iniciá sesión" : "¿No tenés cuenta? Registrate"}
             </a>

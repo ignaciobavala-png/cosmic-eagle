@@ -9,7 +9,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_CLASS: Record<string, string> = {
   pending_review: "bg-secondary/20 text-secondary border-secondary/40",
-  approved: "bg-primary/20 text-primary border-primary/40",
+  approved: "bg-primary-container/20 text-primary-fixed-dim border-primary-fixed-dim/40",
   rejected: "bg-error/20 text-error border-error/40",
   expired: "bg-outline-variant/30 text-on-surface-variant border-outline/40",
 };
@@ -47,7 +47,7 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
     return (
       <p className="text-on-surface-variant text-center max-w-md">
         Todavía no tenés solicitudes. Elegí un viaje en{" "}
-        <Link href="/viajes" className="text-primary underline">
+        <Link href="/viajes" className="text-primary-fixed-dim underline">
           Viajes
         </Link>{" "}
         para postularte.
@@ -59,7 +59,7 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
     <div className="w-full flex flex-col gap-8 mt-4">
       {approved.length > 0 && (
         <section>
-          <h2 className="text-lg font-medium text-primary mb-3">Viajes aprobados</h2>
+          <h2 className="text-lg font-medium text-primary-fixed-dim mb-3">Viajes aprobados</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {approved.map((a) => (
               <div key={a.id} className="glass-card rounded-xl p-4">
@@ -78,7 +78,7 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
       )}
 
       <section>
-        <h2 className="text-lg font-medium text-primary mb-3">Mis solicitudes</h2>
+        <h2 className="text-lg font-medium text-primary-fixed-dim mb-3">Mis solicitudes</h2>
         <div className="glass-card rounded-2xl overflow-hidden overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

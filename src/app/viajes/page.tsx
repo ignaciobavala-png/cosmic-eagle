@@ -43,7 +43,7 @@ export default async function ViajesPage() {
             <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block mb-2">
               Calendario de viajes
             </span>
-            <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary">
+            <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary-fixed-dim">
               Próximos Viajes y Ceremonias
             </h1>
           </div>
@@ -88,7 +88,7 @@ export default async function ViajesPage() {
                         {trip.description}
                       </p>
                     )}
-                    <span className="inline-block bg-primary text-on-primary text-sm font-medium tracking-[0.05em] rounded-lg px-4 py-2 group-hover:bg-primary-container transition-colors">
+                    <span className="inline-block bg-primary-container text-on-primary text-sm font-medium tracking-[0.05em] rounded-lg px-4 py-2 group-hover:bg-primary-fixed transition-colors">
                       Ver viaje
                     </span>
                   </div>

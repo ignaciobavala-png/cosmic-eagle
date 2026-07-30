@@ -11,7 +11,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_CLASS: Record<string, string> = {
   pending_review: "bg-secondary/20 text-secondary border-secondary/40",
-  approved: "bg-primary/20 text-primary border-primary/40",
+  approved: "bg-primary-container/20 text-primary-fixed-dim border-primary-fixed-dim/40",
   rejected: "bg-error/20 text-error border-error/40",
   expired: "bg-outline-variant/30 text-on-surface-variant border-outline/40",
 };
@@ -74,7 +74,7 @@ export default async function AdminSolicitudesPage({
 
   return (
     <div>
-      <h1 className="font-display text-3xl text-primary mb-6">Solicitudes</h1>
+      <h1 className="font-display text-3xl text-primary-fixed-dim mb-6">Solicitudes</h1>
 
       <div className="flex flex-wrap gap-2 mb-8">
         {FILTERS.map((f) => (
@@ -83,7 +83,7 @@ export default async function AdminSolicitudesPage({
             href={`/admin/solicitudes?status=${f.value}`}
             className={`px-3 py-1.5 rounded-full text-xs font-medium tracking-[0.02em] border transition-colors ${
               status === f.value
-                ? "bg-primary/20 text-primary border-primary/40"
+                ? "bg-primary-container/20 text-primary-fixed-dim border-primary-fixed-dim/40"
                 : "text-on-surface-variant border-outline-variant hover:text-on-surface"
             }`}
           >

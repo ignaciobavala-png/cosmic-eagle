@@ -12,7 +12,7 @@ const STATUS_OPTIONS: { value: Tables<"trips">["status"]; label: string }[] = [
 ];
 
 const inputClass =
-  "bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary transition-colors";
+  "bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors";
 const labelClass = "text-sm text-on-surface-variant tracking-[0.02em]";
 
 export function TripForm({
@@ -161,7 +161,7 @@ export function TripForm({
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 bg-primary text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-container transition-colors disabled:opacity-60"
+        className="mt-2 bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-fixed transition-colors disabled:opacity-60"
       >
         {pending ? "Guardando..." : trip ? "Guardar cambios" : "Crear viaje"}
       </button>

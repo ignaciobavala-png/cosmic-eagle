@@ -93,7 +93,7 @@ export function Header() {
                       href={link.href}
                       className={`px-3 py-2 rounded-lg text-sm font-medium tracking-[0.05em] transition-colors duration-200 ${
                         isActive
-                          ? "text-primary"
+                          ? "text-primary-fixed-dim"
                           : "text-on-surface-variant hover:text-on-surface"
                       }`}
                     >
@@ -108,7 +108,7 @@ export function Header() {
           <div className="flex items-center gap-4">
             <Link
               href="/cuenta"
-              className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors duration-300"
+              className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
             >
               {profile?.avatarUrl ? (
                 <img
@@ -129,7 +129,7 @@ export function Header() {
               className="md:hidden active:scale-95 transition-transform"
               aria-label="Abrir menú"
             >
-              <Menu className="text-primary" size={24} />
+              <Menu className="text-primary-fixed-dim" size={24} />
             </button>
           </div>
         </nav>
@@ -153,7 +153,7 @@ export function Header() {
               className="fixed inset-y-0 left-0 z-[60] w-80 bg-surface-container-low/95 backdrop-blur-2xl border-r border-parchment/10 shadow-2xl flex flex-col py-6 md:hidden"
             >
               <div className="px-6 py-4 border-b border-parchment/5 flex justify-between items-center">
-                <h2 className="font-display text-2xl text-primary">
+                <h2 className="font-display text-2xl text-primary-fixed-dim">
                   Cosmic Journey
                 </h2>
                 <button

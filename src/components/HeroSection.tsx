@@ -13,7 +13,7 @@ export function HeroSection() {
       className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-5"
     >
       <div className="relative z-10 max-w-4xl text-center flex flex-col items-center">
-        <h1 className="font-display text-[32px] leading-[40px] md:text-[64px] md:leading-[72px] md:tracking-[-0.02em] font-medium text-primary text-shadow-glow mb-6">
+        <h1 className="font-display text-[32px] leading-[40px] md:text-[64px] md:leading-[72px] md:tracking-[-0.02em] font-medium text-primary-fixed-dim text-shadow-glow mb-6">
           Sabiduría Cósmica para la <br className="hidden md:block" />
           Evolución Humana
         </h1>
@@ -23,7 +23,7 @@ export function HeroSection() {
           integración, reconectamos con la inteligencia del alma.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <button className="px-8 py-4 bg-primary text-on-primary text-sm font-semibold tracking-[0.1em] rounded-full hover:shadow-[0_0_20px_rgba(229,194,120,0.5)] transition-all duration-300 flex items-center justify-center gap-2 group">
+          <button className="px-8 py-4 bg-primary-container text-on-primary text-sm font-semibold tracking-[0.1em] rounded-full hover:shadow-[0_0_20px_rgba(227,195,125,0.5)] transition-all duration-300 flex items-center justify-center gap-2 group">
             Explorar Viajes
             <ArrowUpRight
               size={18}
@@ -38,7 +38,7 @@ export function HeroSection() {
       </div>
 
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-        <ChevronsDown size={32} className="text-primary/50" />
+        <ChevronsDown size={32} className="text-primary-fixed-dim/50" />
       </div>
     </motion.section>
   );

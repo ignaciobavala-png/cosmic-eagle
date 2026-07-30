@@ -18,7 +18,7 @@ export function AboutSection() {
           <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block">
             Sobre Cosmic Eagle
           </span>
-          <h2 className="font-display text-[32px] md:text-[40px] md:leading-[48px] font-medium text-primary">
+          <h2 className="font-display text-[32px] md:text-[40px] md:leading-[48px] font-medium text-primary-fixed-dim">
             Un Camino de Evolución Consciente
           </h2>
           <div className="space-y-4 text-on-surface-variant leading-relaxed">
@@ -38,8 +38,8 @@ export function AboutSection() {
               la vida.
             </p>
           </div>
-          <button className="group mt-6 flex items-center gap-4 text-primary text-sm font-semibold tracking-[0.1em] hover:text-secondary transition-colors">
-            <span className="h-px w-12 bg-primary group-hover:bg-secondary transition-all group-hover:w-16" />
+          <button className="group mt-6 flex items-center gap-4 text-primary-fixed-dim text-sm font-semibold tracking-[0.1em] hover:text-secondary transition-colors">
+            <span className="h-px w-12 bg-primary-container group-hover:bg-secondary transition-all group-hover:w-16" />
             Leer Más
             <ArrowRight
               size={18}
@@ -50,7 +50,7 @@ export function AboutSection() {
 
         <div className="order-1 lg:order-2 relative aspect-square group">
           <div className="absolute inset-0 bg-nebula-glow rounded-3xl blur-3xl group-hover:blur-[60px] transition-all duration-700" />
-          <div className="relative w-full h-full rounded-3xl overflow-hidden glass-card p-2 border border-primary/20">
+          <div className="relative w-full h-full rounded-3xl overflow-hidden glass-card p-2 border border-primary-fixed-dim/20">
             <img
               src={IMAGES.about}
               alt="Siluetas humanas conectadas con energía cósmica"

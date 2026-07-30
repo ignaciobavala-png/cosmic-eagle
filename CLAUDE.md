@@ -110,11 +110,17 @@ docs/
 
 ## Design system
 
-Estilo "Modern Mystical": dark void (#03050F), gold primary (#E5C278), cyan secondary (#5DE6FF), parchment text (#F4F1EA), glassmorphism.
+**"Aetheric Mysticism"** (confirmado por la diseñadora, aplicado 2026-07-30). Reemplaza al "Modern Mystical" anterior (dark void #03050F / gold #E5C278 / cyan #5DE6FF). Base cálida #131410, atmósfera azul "Midnight Celestial", oro champagne, glassmorphism.
 
-- Todos los tokens de color en `@theme` dentro de `globals.css`
-- Utilidades custom: `glass-card`, `text-shadow-glow`, `animate-float`
-- Scrollbar custom gold
+- Todos los tokens en `@theme` dentro de `globals.css`, con los nombres de rol de Material
+- **Ojo con el rol del oro**: en el set confirmado `primary` es `#fff6eb` (blanco cálido), NO el oro. El oro son `primary-fixed-dim` (`#e3c37d` — headings, bordes, íconos, acentos) y `primary-container` (`#f9d78f` — CTA sólido, con `text-on-primary`). Los componentes ya usan esos tokens; no volver a mapear `text-primary` a "dorado"
+- El fondo **nunca es plano**: `body::before` fija 4 blobs radiales (`#0079b3` + `#05125a`) sobre la base `#131410`. La intensidad se regula con los 4 alphas de esos gradientes
+- Fuentes: **Domine** (display/headings) + **Literata** (body), via `next/font/google`
+- Escala tipográfica como tokens `--text-*`: `text-display-lg`, `text-headline-lg/md`, `text-body-lg/md`, `text-label-sm` (labels en mayúscula con tracking)
+- Radios ajustados a la guía (4–8px para contenedores): `rounded-2xl` ahora es 8px, no 16px
+- Layout: `max-w-narrative` (1200px), `px-gutter` (24px), `px-margin-mobile`/`px-margin-desktop` (20/64px), `py-section` (120px). **No** se cambió el `--spacing` base de Tailwind a 8px porque duplicaría cada `p-4` existente
+- Utilidades custom: `glass-card` (golden glass: `#b3964b` al 10% + blur 20px + borde dorado), `glint-edge` (borde con degradé dorado, **opt-in** porque agrega `position: relative`), `aura-gold`/`aura-blue` (blobs locales), `text-shadow-glow`, `animate-float`
+- Pendiente del spec, a la espera de assets de la diseñadora: sacred geometry, textura stardust, watermark del águila, inputs de solo borde inferior, dividers con estrella de 4 puntas, tinte azul en imágenes
 - Imagenes mock via `lh3.googleusercontent.com` (AIDA), no optimizadas — usan `<img>`, next.config ya tiene el hostname
 
 ## Secciones de la home (todas mock)

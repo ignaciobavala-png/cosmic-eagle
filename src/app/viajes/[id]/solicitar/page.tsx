@@ -85,7 +85,7 @@ export default async function SolicitarPage({
             <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block mb-2">
               Solicitud de participación
             </span>
-            <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary mb-2">
+            <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary-fixed-dim mb-2">
               {trip.title}
             </h1>
             <p className="text-on-surface-variant">{trip.location}</p>
@@ -99,7 +99,7 @@ export default async function SolicitarPage({
             </div>
           ) : existing ? (
             <div className="glass-card rounded-2xl p-6">
-              <h2 className="font-display text-xl text-primary mb-2">
+              <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
                 {STATUS_MESSAGE[existing.status ?? "pending_review"].title}
               </h2>
               <p className="text-on-surface-variant">

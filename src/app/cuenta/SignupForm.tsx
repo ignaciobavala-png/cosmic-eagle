@@ -23,7 +23,7 @@ export function SignupForm({ next }: { next?: string }) {
           type="text"
           required
           autoComplete="name"
-          className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary transition-colors"
+          className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors"
         />
       </div>
 
@@ -37,7 +37,7 @@ export function SignupForm({ next }: { next?: string }) {
           type="email"
           required
           autoComplete="email"
-          className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary transition-colors"
+          className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors"
         />
       </div>
 
@@ -53,13 +53,13 @@ export function SignupForm({ next }: { next?: string }) {
             required
             minLength={8}
             autoComplete="new-password"
-            className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 pr-11 w-full text-on-surface focus:outline-none focus:border-primary transition-colors"
+            className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 pr-11 w-full text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors"
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-            className="absolute inset-y-0 right-0 flex items-center px-3 text-on-surface-variant hover:text-primary transition-colors"
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -76,7 +76,7 @@ export function SignupForm({ next }: { next?: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 bg-primary text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-container transition-colors disabled:opacity-60"
+        className="mt-2 bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-fixed transition-colors disabled:opacity-60"
       >
         {pending ? "Creando cuenta..." : "Crear cuenta"}
       </button>

@@ -80,14 +80,14 @@ export default async function SolicitudDetallePage({
     <div className="max-w-3xl">
       <Link
         href="/admin/solicitudes"
-        className="text-sm text-on-surface-variant hover:text-primary transition-colors mb-6 inline-block"
+        className="text-sm text-on-surface-variant hover:text-primary-fixed-dim transition-colors mb-6 inline-block"
       >
         ← Volver a solicitudes
       </Link>
 
       <div className="flex items-start justify-between mb-2">
-        <h1 className="font-display text-3xl text-primary">{application.full_name}</h1>
-        <span className="px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest border bg-primary/10 text-primary border-primary/30">
+        <h1 className="font-display text-3xl text-primary-fixed-dim">{application.full_name}</h1>
+        <span className="px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest border bg-primary-container/10 text-primary-fixed-dim border-primary-fixed-dim/30">
           {STATUS_LABEL[application.status] ?? application.status}
         </span>
       </div>
@@ -106,7 +106,7 @@ export default async function SolicitudDetallePage({
       )}
 
       <div className="glass-card rounded-2xl p-6 md:p-8 mb-6">
-        <h2 className="font-display text-xl text-primary mb-2">Revisión</h2>
+        <h2 className="font-display text-xl text-primary-fixed-dim mb-2">Revisión</h2>
         {isOwnApplication ? (
           <p className="text-on-surface-variant text-sm">
             Esta es tu propia solicitud — no podés aprobarla ni rechazarla. Pedile
@@ -118,7 +118,7 @@ export default async function SolicitudDetallePage({
       </div>
 
       <div className="glass-card rounded-2xl p-6 md:p-8">
-        <h2 className="font-display text-xl text-primary mb-2">Datos</h2>
+        <h2 className="font-display text-xl text-primary-fixed-dim mb-2">Datos</h2>
 
         {table === "applications_first_time" && "age" in application ? (
           <>

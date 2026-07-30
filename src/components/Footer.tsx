@@ -16,18 +16,18 @@ export function Footer() {
           </p>
           <a
             href="mailto:contacto@cosmiceaglejourney.com"
-            className="text-primary hover:text-secondary transition-colors block"
+            className="text-primary-fixed-dim hover:text-secondary transition-colors block"
           >
             contacto@cosmiceaglejourney.com
           </a>
         </div>
         <div className="space-y-4">
-          <h6 className="font-display text-2xl text-primary">Info</h6>
+          <h6 className="font-display text-2xl text-primary-fixed-dim">Info</h6>
           <ul className="space-y-2">
             <li>
               <a
                 href="#"
-                className="text-on-surface-variant hover:text-primary transition-colors"
+                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
               >
                 Términos y Condiciones
               </a>
@@ -35,7 +35,7 @@ export function Footer() {
             <li>
               <a
                 href="#"
-                className="text-on-surface-variant hover:text-primary transition-colors"
+                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
               >
                 Política de Cancelación
               </a>
@@ -43,7 +43,7 @@ export function Footer() {
             <li>
               <a
                 href="#"
-                className="text-on-surface-variant hover:text-primary transition-colors"
+                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
               >
                 Aviso Legal
               </a>
@@ -51,7 +51,7 @@ export function Footer() {
             <li>
               <a
                 href="#"
-                className="text-on-surface-variant hover:text-primary transition-colors"
+                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
               >
                 Privacidad
               </a>
@@ -59,12 +59,12 @@ export function Footer() {
           </ul>
         </div>
         <div className="space-y-4">
-          <h6 className="font-display text-2xl text-primary">Viajes</h6>
+          <h6 className="font-display text-2xl text-primary-fixed-dim">Viajes</h6>
           <ul className="space-y-2">
             <li>
               <a
                 href="#"
-                className="text-on-surface-variant hover:text-primary transition-colors"
+                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
               >
                 Retiros
               </a>
@@ -72,7 +72,7 @@ export function Footer() {
             <li>
               <a
                 href="#"
-                className="text-on-surface-variant hover:text-primary transition-colors"
+                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
               >
                 Ceremonias
               </a>
@@ -80,7 +80,7 @@ export function Footer() {
             <li>
               <a
                 href="#"
-                className="text-on-surface-variant hover:text-primary transition-colors"
+                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
               >
                 Instagram
               </a>

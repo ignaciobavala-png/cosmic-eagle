@@ -1,58 +1,167 @@
 @import "tailwindcss";
 
+/* Design system: Aetheric Mysticism
+   Tokens confirmados por diseño. El rol del oro lo cubren primary-fixed-dim
+   (#e3c37d, acentos/bordes/headings) y primary-container (#f9d78f, CTA solido).
+   `primary` (#fff6eb) queda para el realce mas brillante. */
 @theme {
-  --font-display: var(--font-display, "EB Garamond", serif);
-  --font-body: var(--font-body, "Montserrat", sans-serif);
+  --font-display: var(--font-display, "Domine", serif);
+  --font-body: var(--font-body, "Literata", serif);
 
-  --color-void-black: #03050F;
-  --color-background: #0D112A;
-  --color-surface: #0D112A;
-  --color-surface-dim: #0D112A;
-  --color-surface-bright: #333752;
-  --color-surface-container-lowest: #080C25;
-  --color-surface-container-low: #161A33;
-  --color-surface-container: #1A1E37;
-  --color-surface-container-high: #242842;
-  --color-surface-container-highest: #2F334E;
-  --color-surface-variant: #2F334E;
-  --color-surface-tint: #E5C278;
-  --color-on-surface: #DEE0FF;
-  --color-on-surface-variant: #D0C5B4;
-  --color-on-background: #DEE0FF;
-  --color-primary: #E5C278;
-  --color-on-primary: #3F2E00;
-  --color-primary-container: #C4A45D;
-  --color-on-primary-container: #4F3A00;
-  --color-inverse-primary: #745B1B;
-  --color-secondary: #5DE6FF;
-  --color-on-secondary: #00363E;
-  --color-secondary-container: #00CBE6;
-  --color-on-secondary-container: #00515D;
-  --color-tertiary: #B8C5F5;
-  --color-on-tertiary: #212F56;
-  --color-tertiary-container: #99A7D5;
-  --color-on-tertiary-container: #2E3C64;
-  --color-error: #FFB4AB;
-  --color-on-error: #690005;
-  --color-error-container: #93000A;
-  --color-on-error-container: #FFDAD6;
-  --color-inverse-surface: #DEE0FF;
-  --color-inverse-on-surface: #2B2F49;
+  --color-background: #131410;
+  --color-on-background: #e5e2db;
+  --color-surface: #131410;
+  --color-surface-dim: #131410;
+  --color-surface-bright: #3a3935;
+  --color-surface-container-lowest: #0e0e0b;
+  --color-surface-container-low: #1c1c18;
+  --color-surface-container: #20201c;
+  --color-surface-container-high: #2a2a26;
+  --color-surface-container-highest: #353530;
+  --color-surface-variant: #353530;
+  --color-surface-tint: #e3c37d;
+  --color-on-surface: #e5e2db;
+  --color-on-surface-variant: #d0c5b4;
+  --color-inverse-surface: #e5e2db;
+  --color-inverse-on-surface: #31312c;
   --color-outline: #999080;
-  --color-outline-variant: #4D4639;
-  --color-parchment: #F4F1EA;
-  --color-nebula-glow: rgba(34, 211, 238, 0.15);
+  --color-outline-variant: #4d4639;
+
+  --color-primary: #fff6eb;
+  --color-on-primary: #3f2e00;
+  --color-primary-container: #f9d78f;
+  --color-on-primary-container: #755c21;
+  --color-inverse-primary: #735b20;
+  --color-primary-fixed: #ffdf9c;
+  --color-primary-fixed-dim: #e3c37d;
+  --color-on-primary-fixed: #251a00;
+  --color-on-primary-fixed-variant: #5a4308;
+
+  --color-secondary: #8fcdff;
+  --color-on-secondary: #003450;
+  --color-secondary-container: #0079b2;
+  --color-on-secondary-container: #f5f9ff;
+  --color-secondary-fixed: #cbe6ff;
+  --color-secondary-fixed-dim: #8fcdff;
+  --color-on-secondary-fixed: #001e30;
+  --color-on-secondary-fixed-variant: #004b71;
+
+  --color-tertiary: #f8f6ff;
+  --color-on-tertiary: #1e296e;
+  --color-tertiary-container: #d5d8ff;
+  --color-on-tertiary-container: #4f5aa0;
+  --color-tertiary-fixed: #dfe0ff;
+  --color-tertiary-fixed-dim: #bbc3ff;
+  --color-on-tertiary-fixed: #041059;
+  --color-on-tertiary-fixed-variant: #364185;
+
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+
+  /* Alias heredados del sistema anterior, remapeados a la paleta nueva */
+  --color-void-black: #0e0e0b;
+  --color-parchment: #e5e2db;
+  --color-nebula-glow: rgba(143, 205, 255, 0.15);
+
+  /* Escala tipografica */
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 56px;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 700;
+  --text-display-mobile: 36px;
+  --text-display-mobile--line-height: 44px;
+  --text-display-mobile--letter-spacing: -0.02em;
+  --text-display-mobile--font-weight: 700;
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 40px;
+  --text-headline-lg--font-weight: 600;
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-md--font-weight: 600;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-body-lg--font-weight: 400;
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-md--font-weight: 400;
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 16px;
+  --text-label-sm--letter-spacing: 0.1em;
+  --text-label-sm--font-weight: 600;
+
+  /* Radios: contenedores en 4-8px, sin esquinas "burbuja" */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 0.5rem;
+  --radius-3xl: 0.75rem;
+
+  /* Layout: base de 8px, ancho narrativo y margenes */
+  --container-narrative: 1200px;
+  --spacing-gutter: 24px;
+  --spacing-margin-mobile: 20px;
+  --spacing-margin-desktop: 64px;
+  --spacing-section: 120px;
 }
 
+/* Golden glass: superficie de oro a baja opacidad con blur y borde tenue */
 @utility glass-card {
-  background: rgba(13, 17, 42, 0.4);
+  background: rgba(179, 150, 75, 0.1);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(244, 241, 234, 0.1);
+  border: 1px solid rgba(227, 195, 125, 0.14);
+}
+
+/* Borde con "glint" dorado en el borde superior-izquierdo. Opt-in:
+   agrega position:relative, no aplicarlo a contenedores que dependan de static. */
+@utility glint-edge {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      rgba(227, 195, 125, 0.55),
+      rgba(227, 195, 125, 0) 45%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
 }
 
 @utility text-shadow-glow {
-  text-shadow: 0 0 10px rgba(229, 194, 120, 0.4);
+  text-shadow: 0 0 10px rgba(227, 195, 125, 0.4);
+}
+
+/* Blobs de atmosfera cosmica */
+@utility aura-gold {
+  background: radial-gradient(
+    circle,
+    rgba(227, 195, 125, 0.16),
+    rgba(227, 195, 125, 0) 70%
+  );
+}
+
+@utility aura-blue {
+  background: radial-gradient(
+    circle,
+    rgba(0, 121, 178, 0.22),
+    rgba(0, 121, 178, 0) 70%
+  );
 }
 
 @keyframes float {
@@ -71,7 +180,7 @@
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #e5c278 #03050f;
+  scrollbar-color: #e3c37d #0e0e0b;
 }
 
 html {
@@ -79,9 +188,41 @@ html {
 }
 
 body {
-  background-color: #03050f;
-  color: #dee0ff;
-  font-family: var(--font-body, "Montserrat", sans-serif);
+  position: relative;
+  background-color: #131410;
+  color: #e5e2db;
+  font-family: var(--font-body, "Literata", serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Midnight Celestial: el fondo nunca es plano. Base calida #131410 con blobs
+   radiales del azul secundario (#0079b3) al azul abisal (#05125a). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      70rem 55rem at 12% -12%,
+      rgba(0, 121, 178, 0.3),
+      transparent 62%
+    ),
+    radial-gradient(
+      55rem 45rem at 92% 8%,
+      rgba(5, 18, 90, 0.42),
+      transparent 60%
+    ),
+    radial-gradient(
+      80rem 60rem at 50% 118%,
+      rgba(5, 18, 90, 0.55),
+      transparent 65%
+    ),
+    radial-gradient(
+      45rem 40rem at 78% 55%,
+      rgba(0, 121, 178, 0.16),
+      transparent 65%
+    );
 }

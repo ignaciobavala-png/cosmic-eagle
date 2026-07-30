@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import { submitReturningApplication, type ApplicationFormState } from "./actions";
 
 const inputClass =
-  "bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary transition-colors";
+  "bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors";
 const labelClass = "text-sm text-on-surface-variant tracking-[0.02em]";
 
 function BoolQuestion({ name, label }: { name: string; label: string }) {
@@ -16,7 +16,7 @@ function BoolQuestion({ name, label }: { name: string; label: string }) {
           type="checkbox"
           name={name}
           onChange={(e) => setChecked(e.target.checked)}
-          className="w-4 h-4 accent-primary"
+          className="w-4 h-4 accent-primary-fixed-dim"
         />
         {label}
       </label>
@@ -49,7 +49,7 @@ export function ReturningForm({
       action={formAction}
       className="glass-card rounded-2xl p-6 md:p-8 flex flex-col gap-2 max-w-2xl"
     >
-      <h2 className="font-display text-xl text-primary mb-2">
+      <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
         Datos personales
       </h2>
 
@@ -84,7 +84,7 @@ export function ReturningForm({
         </div>
       </div>
 
-      <h2 className="font-display text-xl text-primary mt-4 mb-1">
+      <h2 className="font-display text-xl text-primary-fixed-dim mt-4 mb-1">
         Actualización de salud
       </h2>
       <p className="text-xs text-on-surface-variant mb-2">
@@ -122,7 +122,7 @@ export function ReturningForm({
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 bg-primary text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-container transition-colors disabled:opacity-60"
+        className="mt-2 bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-fixed transition-colors disabled:opacity-60"
       >
         {pending ? "Enviando..." : "Enviar solicitud"}
       </button>

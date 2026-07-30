@@ -17,7 +17,7 @@ export function TestimonialsSection() {
         <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block mb-2">
           Clientes
         </span>
-        <h2 className="font-display text-[32px] md:text-[40px] md:leading-[48px] font-medium text-primary mb-16">
+        <h2 className="font-display text-[32px] md:text-[40px] md:leading-[48px] font-medium text-primary-fixed-dim mb-16">
           Lo que dicen Nuestros Viajeros
         </h2>
 
@@ -27,11 +27,11 @@ export function TestimonialsSection() {
               key={t.name}
               className={`glass-card p-8 rounded-3xl text-left relative ${
                 i % 2 === 0
-                  ? "border-b-4 border-b-primary/50"
+                  ? "border-b-4 border-b-primary-fixed-dim/50"
                   : "border-b-4 border-b-secondary/50"
               }`}
             >
-              <div className="flex text-primary mb-6 gap-0.5">
+              <div className="flex text-primary-fixed-dim mb-6 gap-0.5">
                 {Array.from({ length: 5 }).map((_, j) => (
                   <Star key={j} size={16} fill="currentColor" />
                 ))}
@@ -40,7 +40,7 @@ export function TestimonialsSection() {
                 &ldquo;{t.quote}&rdquo;
               </p>
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-surface-variant border border-primary/20 flex items-center justify-center text-primary font-bold">
+                <div className="w-10 h-10 rounded-full bg-surface-variant border border-primary-fixed-dim/20 flex items-center justify-center text-primary-fixed-dim font-bold">
                   {t.initial}
                 </div>
                 <span className="text-xs font-medium tracking-[0.05em] text-on-surface-variant">

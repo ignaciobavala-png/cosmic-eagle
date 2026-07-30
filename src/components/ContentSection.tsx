@@ -6,9 +6,9 @@ import { ArrowRight } from "lucide-react";
 
 const accentStyles = {
   primary: {
-    overlay: "bg-primary/10",
-    border: "hover:border-primary/40",
-    badge: "border-primary/40",
+    overlay: "bg-primary-container/10",
+    border: "hover:border-primary-fixed-dim/40",
+    badge: "border-primary-fixed-dim/40",
   },
   secondary: {
     overlay: "bg-secondary/10",
@@ -31,7 +31,7 @@ export function ContentSection() {
           <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block mb-2">
             Explora más
           </span>
-          <h2 className="font-display text-[40px] md:text-[64px] md:leading-[72px] md:tracking-[-0.02em] font-medium text-primary">
+          <h2 className="font-display text-[40px] md:text-[64px] md:leading-[72px] md:tracking-[-0.02em] font-medium text-primary-fixed-dim">
             Contenidos
           </h2>
           <p className="max-w-xl mx-auto text-on-surface-variant mt-4">
@@ -60,13 +60,13 @@ export function ContentSection() {
                     className={`absolute inset-0 ${accent.overlay} mix-blend-overlay`}
                   />
                 </div>
-                <h4 className="font-display text-2xl leading-8 text-primary mb-4">
+                <h4 className="font-display text-2xl leading-8 text-primary-fixed-dim mb-4">
                   {card.title}
                 </h4>
                 <p className="text-on-surface-variant flex-grow">
                   {card.description}
                 </p>
-                <button className="mt-6 flex items-center gap-2 text-primary hover:text-secondary transition-colors text-sm font-semibold tracking-[0.1em]">
+                <button className="mt-6 flex items-center gap-2 text-primary-fixed-dim hover:text-secondary transition-colors text-sm font-semibold tracking-[0.1em]">
                   Ver Contenido
                   <ArrowRight
                     size={18}

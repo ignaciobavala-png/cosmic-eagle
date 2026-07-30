@@ -13,7 +13,7 @@ const STATUS_CLASS: Record<string, string> = {
   draft: "bg-outline-variant/30 text-on-surface-variant border-outline/40",
   open: "bg-secondary/20 text-secondary border-secondary/40",
   closed: "bg-error/20 text-error border-error/40",
-  completed: "bg-primary/20 text-primary border-primary/40",
+  completed: "bg-primary-container/20 text-primary-fixed-dim border-primary-fixed-dim/40",
 };
 
 function formatDate(iso: string) {
@@ -35,10 +35,10 @@ export default async function AdminViajesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="font-display text-3xl text-primary">Viajes</h1>
+        <h1 className="font-display text-3xl text-primary-fixed-dim">Viajes</h1>
         <Link
           href="/admin/viajes/nuevo"
-          className="bg-primary text-on-primary font-medium tracking-[0.05em] rounded-lg px-4 py-2.5 text-sm hover:bg-primary-container transition-colors"
+          className="bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg px-4 py-2.5 text-sm hover:bg-primary-fixed transition-colors"
         >
           Nuevo viaje
         </Link>

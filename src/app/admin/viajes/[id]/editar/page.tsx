@@ -20,7 +20,7 @@ export default async function EditarViajePage({
 
   return (
     <div>
-      <h1 className="font-display text-3xl text-primary mb-8">Editar viaje</h1>
+      <h1 className="font-display text-3xl text-primary-fixed-dim mb-8">Editar viaje</h1>
       <TripForm trip={trip} action={updateTrip.bind(null, id)} />
     </div>
   );

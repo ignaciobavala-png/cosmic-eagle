@@ -17,7 +17,7 @@ export function AdminNav() {
     <header className="border-b border-parchment/10 bg-surface/80 backdrop-blur-xl">
       <nav className="flex items-center justify-between px-5 md:px-8 h-16 max-w-6xl mx-auto">
         <div className="flex items-center gap-6">
-          <Link href="/admin" className="font-display text-lg text-primary">
+          <Link href="/admin" className="font-display text-lg text-primary-fixed-dim">
             Cosmic Eagle · Admin
           </Link>
           <ul className="hidden md:flex items-center gap-1">
@@ -32,7 +32,7 @@ export function AdminNav() {
                     href={link.href}
                     className={`px-3 py-2 rounded-lg text-sm font-medium tracking-[0.02em] transition-colors ${
                       isActive
-                        ? "text-primary bg-primary/10"
+                        ? "text-primary-fixed-dim bg-primary-container/10"
                         : "text-on-surface-variant hover:text-on-surface"
                     }`}
                   >
@@ -46,14 +46,14 @@ export function AdminNav() {
         <div className="flex items-center gap-4">
           <Link
             href="/"
-            className="text-sm text-on-surface-variant hover:text-primary transition-colors"
+            className="text-sm text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
           >
             Ver sitio
           </Link>
           <form action={logout}>
             <button
               type="submit"
-              className="text-sm text-on-surface-variant hover:text-primary transition-colors underline"
+              className="text-sm text-on-surface-variant hover:text-primary-fixed-dim transition-colors underline"
             >
               Cerrar sesión
             </button>

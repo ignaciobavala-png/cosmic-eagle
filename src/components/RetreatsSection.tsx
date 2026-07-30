@@ -18,11 +18,11 @@ export function RetreatsSection() {
             <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block">
               Encuentra tu retiro
             </span>
-            <h2 className="font-display text-[32px] md:text-[40px] md:leading-[48px] font-medium text-primary">
+            <h2 className="font-display text-[32px] md:text-[40px] md:leading-[48px] font-medium text-primary-fixed-dim">
               Experiencias Próximas
             </h2>
           </div>
-          <button className="px-6 py-2 border border-primary/30 rounded-full text-primary text-xs font-medium tracking-[0.05em] hover:bg-primary hover:text-on-primary transition-all">
+          <button className="px-6 py-2 border border-primary-fixed-dim/30 rounded-full text-primary-fixed-dim text-xs font-medium tracking-[0.05em] hover:bg-primary-container hover:text-on-primary transition-all">
             Ver todos los viajes
           </button>
         </div>
@@ -57,7 +57,7 @@ export function RetreatsSection() {
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
             />
             <div className="absolute bottom-0 left-0 p-6 z-20">
-              <span className="bg-primary/20 text-primary border border-primary/40 px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest mb-4 inline-block backdrop-blur-md">
+              <span className="bg-primary-container/20 text-primary-fixed-dim border border-primary-fixed-dim/40 px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest mb-4 inline-block backdrop-blur-md">
                 Ceremonias
               </span>
               <h3 className="font-display text-2xl md:text-[32px] leading-[40px] text-white">
