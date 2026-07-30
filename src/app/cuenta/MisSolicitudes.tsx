@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const STATUS_LABEL: Record<string, string> = {
   pending_review: "En revisión",
   approved: "Aprobada",
@@ -45,9 +47,9 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
     return (
       <p className="text-on-surface-variant text-center max-w-md">
         Todavía no tenés solicitudes. Elegí un viaje en{" "}
-        <a href="/viajes" className="text-primary underline">
+        <Link href="/viajes" className="text-primary underline">
           Viajes
-        </a>{" "}
+        </Link>{" "}
         para postularte.
       </p>
     );

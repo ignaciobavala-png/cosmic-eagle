@@ -3,9 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
-import { IMAGES } from "@/lib/constants";
-
-const PLACEHOLDER_IMAGES = [IMAGES.retreats, IMAGES.ceremony] as const;
+import { tripPlaceholderImage } from "@/lib/constants";
 
 const STATUS_LABEL: Record<string, string> = {
   open: "Cupos disponibles",
@@ -57,14 +55,15 @@ export default async function ViajesPage() {
             </p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {trips.map((trip, index) => (
-                <div
+              {trips.map((trip) => (
+                <Link
                   key={trip.id}
-                  className="group relative h-[420px] rounded-3xl overflow-hidden glass-card"
+                  href={`/viajes/${trip.id}`}
+                  className="group relative h-[420px] rounded-3xl overflow-hidden glass-card block"
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-void-black via-void-black/30 to-transparent z-10" />
                   <img
-                    src={PLACEHOLDER_IMAGES[index % PLACEHOLDER_IMAGES.length]}
+                    src={tripPlaceholderImage(trip.id)}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                   />
@@ -89,16 +88,11 @@ export default async function ViajesPage() {
                         {trip.description}
                       </p>
                     )}
-                    {trip.status === "open" && (
-                      <Link
-                        href={`/viajes/${trip.id}/solicitar`}
-                        className="inline-block bg-primary text-on-primary text-sm font-medium tracking-[0.05em] rounded-lg px-4 py-2 hover:bg-primary-container transition-colors"
-                      >
-                        Postularme
-                      </Link>
-                    )}
+                    <span className="inline-block bg-primary text-on-primary text-sm font-medium tracking-[0.05em] rounded-lg px-4 py-2 group-hover:bg-primary-container transition-colors">
+                      Ver viaje
+                    </span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

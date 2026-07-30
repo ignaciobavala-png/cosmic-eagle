@@ -14,6 +14,16 @@ export const IMAGES = {
     "https://lh3.googleusercontent.com/aida-public/AB6AXuADcsbJJFqVYXAobUkQqMxMyKZh_w54tCiwr06evOpYslL5iJsrurlbuHI4ktwPEpqYbrzzktLb2ZE0czasX_C-iZz5gFWd5EKw82kRGnMHQrFVjSjlsCX6k2dEY8oxgccbDqWXyg9oO1NuIi4nk_Tcjs6rvqaQ9199TLdeN0AExmUblPNJcvMK4OK8nhV_m4YmRiDrkvDMQbHYmrXln7UgP5wbPr6wVAw0Hs4nURKv8NM-QmWPLlzpPr5ZoHoPIbteEiGlmYs3mig",
 };
 
+// Todavia no hay imagen por viaje en la tabla `trips`: elegimos un placeholder
+// estable a partir del id para que la portada sea la misma en el listado y en
+// el detalle del viaje.
+const TRIP_PLACEHOLDERS = [IMAGES.retreats, IMAGES.ceremony] as const;
+
+export function tripPlaceholderImage(id: string) {
+  const sum = [...id].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return TRIP_PLACEHOLDERS[sum % TRIP_PLACEHOLDERS.length];
+}
+
 export const NAV_LINKS = [
   { label: "Inicio", href: "/", icon: "Home" as const },
   { label: "Nosotros", href: "/nosotros", icon: "Info" as const },
