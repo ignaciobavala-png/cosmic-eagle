@@ -16,7 +16,9 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 - Auth funcionando en `/cuenta`: login + **registro** (email/password, toggle `?modo=registro`). Diseño: sin confirmación por mail — el gate real de acceso es la aprobación manual del admin. **Ojo**: el toggle "Confirm email" del dashboard de Supabase (Authentication → Sign In/Providers → Email) tenía este comportamiento activado por defecto y rompía el login (`email_not_confirmed` se mostraba como "Email o contraseña incorrectos"); se pidió desactivarlo — **verificar que siga desactivado** si vuelve a aparecer este síntoma. Login redirige directo a `/admin` si `profiles.is_admin`
 - `/cuenta` logueado muestra **tarjeta de perfil** (avatar editable + nombre + email) y **panel de viajero**: viajes aprobados + tabla de "Mis solicitudes" con estado (via `my_applications_first_time`/`my_applications_returning` + `trips`, sin exponer datos de salud)
 - Navbar (`Header.tsx`) muestra avatar + primer nombre en el link "Mi Cuenta" cuando hay sesión (fetch client-side, se actualiza con `onAuthStateChange`)
-- `/viajes` conectado a la tabla `trips` real (ya no es mock)
+- `/viajes` conectado a la tabla `trips` real (ya no es mock). La tarjeta entera linkea al detalle
+- `/viajes/[id]` es la **página pública de detalle del viaje** (no requiere sesión): portada, estado, descripción y datos (fechas, duración, lugar, cupo, aporte) + `generateMetadata`. El CTA cambia según sesión: sin usuario va a `/cuenta?next=/viajes/{id}/solicitar`, con usuario va directo al form; si el viaje está `closed`/`completed` muestra aviso. **Ojo**: la policy `trips_select_public` deja leer *todos* los trips a `anon`, incluidos los `draft` — el filtro de borradores se hace en la página (404), no en RLS. Cualquier ruta pública nueva que lea `trips` tiene que filtrar igual
+- Imagen de portada: `trips` **no tiene columna de imagen**; se usa `tripPlaceholderImage(id)` de `lib/constants.ts` (elige placeholder por hash del id, así coincide listado y detalle). Si se quiere portada real hay que agregar `image_url` a la tabla y al form del admin
 - Formulario de solicitud de salud funcionando en `/viajes/[id]/solicitar` (primerizo/recurrente, elegido segun historial de aprobaciones del usuario)
 - Panel de admin funcionando en `/admin` (protegido por `profiles.is_admin`): dashboard, CRUD de viajes, revisión de solicitudes (aprobar/rechazar/expirar). Un admin no puede aprobar/rechazar su propia solicitud (guard en `reviewApplication` + oculto en la UI)
 - `/nosotros` y `/contenidos` siguen siendo placeholders mock
@@ -56,12 +58,14 @@ src/
 │   ├── contenidos/page.tsx           # placeholder
 │   ├── api/keep-alive/route.ts       # ping a `trips`, cron diario via vercel.json
 │   ├── viajes/
-│   │   ├── page.tsx                  # conectado a `trips` real
-│   │   └── [id]/solicitar/
-│   │       ├── page.tsx              # elige form primerizo/recurrente segun historial
-│   │       ├── FirstTimeForm.tsx     # "use client"
-│   │       ├── ReturningForm.tsx     # "use client"
-│   │       └── actions.ts            # submitFirstTimeApplication / submitReturningApplication
+│   │   ├── page.tsx                  # listado, conectado a `trips` real
+│   │   └── [id]/
+│   │       ├── page.tsx              # detalle PUBLICO del viaje (sin login)
+│   │       └── solicitar/
+│   │           ├── page.tsx          # elige form primerizo/recurrente segun historial
+│   │           ├── FirstTimeForm.tsx     # "use client"
+│   │           ├── ReturningForm.tsx     # "use client"
+│   │           └── actions.ts            # submitFirstTimeApplication / submitReturningApplication
 │   ├── cuenta/
 │   │   ├── page.tsx                  # login/registro (?modo=registro) + panel de viajero
 │   │   ├── LoginForm.tsx             # "use client", soporta ?next=, ojito password
@@ -136,7 +140,7 @@ Estilo "Modern Mystical": dark void (#03050F), gold primary (#E5C278), cyan seco
 
 ## Lo que sigue
 
-Hecho: proyecto Supabase, `.env.local`, clientes tipados, `proxy.ts`, migraciones, login + registro, redirect admin en login, `/viajes` conectado, formulario de solicitud (primerizo/recurrente), panel de admin (dashboard + CRUD viajes + revisión de solicitudes, con bloqueo de auto-aprobación), panel de usuario/viajero (`/cuenta`: tarjeta de perfil con avatar + viajes aprobados + estado de solicitudes), avatar de perfil (bucket `avatars` + upload), navbar personalizado (avatar + nombre), fix del bug de login por email sin confirmar, keep-alive (`app/api/keep-alive` + `vercel.json`, cron diario), build de producción verificado, **proyecto deployado en Vercel con auto-deploy conectado a GitHub** (`cosmic-eagle`, env vars cargadas).
+Hecho: proyecto Supabase, `.env.local`, clientes tipados, `proxy.ts`, migraciones, login + registro, redirect admin en login, `/viajes` conectado, detalle público de viaje (`/viajes/[id]`), formulario de solicitud (primerizo/recurrente), panel de admin (dashboard + CRUD viajes + revisión de solicitudes, con bloqueo de auto-aprobación), panel de usuario/viajero (`/cuenta`: tarjeta de perfil con avatar + viajes aprobados + estado de solicitudes), avatar de perfil (bucket `avatars` + upload), navbar personalizado (avatar + nombre), fix del bug de login por email sin confirmar, keep-alive (`app/api/keep-alive` + `vercel.json`, cron diario), build de producción verificado, **proyecto deployado en Vercel con auto-deploy conectado a GitHub** (`cosmic-eagle`, env vars cargadas).
 
 Pendiente, en orden sugerido:
 
