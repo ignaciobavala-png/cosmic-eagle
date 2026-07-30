@@ -15,7 +15,7 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 - Bucket de Storage `avatars` (público, RLS por carpeta `{user_id}/...`) para foto de perfil, subida desde `/cuenta` con `AvatarUpload.tsx` + server action `updateAvatar`
 - Auth funcionando en `/cuenta`: login + **registro** (email/password, toggle `?modo=registro`). Diseño: sin confirmación por mail — el gate real de acceso es la aprobación manual del admin. **Ojo**: el toggle "Confirm email" del dashboard de Supabase (Authentication → Sign In/Providers → Email) tenía este comportamiento activado por defecto y rompía el login (`email_not_confirmed` se mostraba como "Email o contraseña incorrectos"); se pidió desactivarlo — **verificar que siga desactivado** si vuelve a aparecer este síntoma. Login redirige directo a `/admin` si `profiles.is_admin`
 - `/cuenta` logueado muestra **tarjeta de perfil** (avatar editable + nombre + email) y **panel de viajero**: viajes aprobados + tabla de "Mis solicitudes" con estado (via `my_applications_first_time`/`my_applications_returning` + `trips`, sin exponer datos de salud)
-- Navbar (`Header.tsx`) muestra avatar + primer nombre en el link "Mi Cuenta" cuando hay sesión (fetch client-side, se actualiza con `onAuthStateChange`)
+- Navbar (`Header.tsx`) muestra avatar + primer nombre en el link "Mi Cuenta" cuando hay sesión (fetch client-side, se actualiza con `onAuthStateChange`). Usa el **logo oficial** (`public/logo.png`, via `next/image`) en desktop, drawer mobile y footer. **No hay link "Inicio"**: al home se llega tocando el logo, tanto en el navbar como en la cabecera del drawer
 - `/viajes` conectado a la tabla `trips` real (ya no es mock). La tarjeta entera linkea al detalle
 - `/viajes/[id]` es la **página pública de detalle del viaje** (no requiere sesión): portada, estado, descripción y datos (fechas, duración, lugar, cupo, aporte) + `generateMetadata`. El CTA cambia según sesión: sin usuario va a `/cuenta?next=/viajes/{id}/solicitar`, con usuario va directo al form; si el viaje está `closed`/`completed` muestra aviso. **Ojo**: la policy `trips_select_public` deja leer *todos* los trips a `anon`, incluidos los `draft` — el filtro de borradores se hace en la página (404), no en RLS. Cualquier ruta pública nueva que lea `trips` tiene que filtrar igual
 - Imagen de portada: `trips` **no tiene columna de imagen**; se usa `tripPlaceholderImage(id)` de `lib/constants.ts` (elige placeholder por hash del id, así coincide listado y detalle). Si se quiere portada real hay que agregar `image_url` a la tabla y al form del admin
@@ -101,8 +101,12 @@ vercel.json                     # cron diario -> /api/keep-alive
 supabase/
 ├── migrations/                 # historial de schema, aplicado via MCP
 └── seed.sql                    # datos de ejemplo para `supabase db reset`
+public/
+└── logo.png                    # logo oficial de la disenadora (914x267, alpha recortado)
 docs/
 ├── CONTEXT.md                  # Requerimientos del cliente + decisiones de alcance
+├── CONTENT_MAP.md              # Secciones propuestas por Sofia mapeadas a las rutas
+├── FORMULARIOS.md              # Google Forms originales de Estela + paridad con la app
 ├── ARCHITECTURE.md             # Stack y estructura planeada
 ├── DATA_MODEL.md               # Tablas de Supabase (implementadas)
 └── ROLES.md                    # Admin, Solicitante, Viajero
@@ -148,14 +152,20 @@ docs/
 
 Hecho: proyecto Supabase, `.env.local`, clientes tipados, `proxy.ts`, migraciones, login + registro, redirect admin en login, `/viajes` conectado, detalle público de viaje (`/viajes/[id]`), formulario de solicitud (primerizo/recurrente), panel de admin (dashboard + CRUD viajes + revisión de solicitudes, con bloqueo de auto-aprobación), panel de usuario/viajero (`/cuenta`: tarjeta de perfil con avatar + viajes aprobados + estado de solicitudes), avatar de perfil (bucket `avatars` + upload), navbar personalizado (avatar + nombre), fix del bug de login por email sin confirmar, keep-alive (`app/api/keep-alive` + `vercel.json`, cron diario), build de producción verificado, **proyecto deployado en Vercel con auto-deploy conectado a GitHub** (`cosmic-eagle`, env vars cargadas).
 
+**Arquitectura de contenido definida (2026-07-30)**: ver `docs/CONTENT_MAP.md` — mapeo de las 6 secciones que propuso Sofía sobre las rutas existentes. Resumen: ceremonias y retiros son ambos `trips` (con campo `type`), `/contenidos` es un hub de categorías (Biblioteca + Ciencia Almática + Testimonios), y la única ruta nueva a construir es `/preparacion`. Todo lo demás es contenido que hay que pedirle a la clienta.
+
+**Formularios originales relevados (2026-07-30)**: ver `docs/FORMULARIOS.md`. Los forms de Google de Estela son 3 × 2 idiomas (salud primeriza, "Viajer@s"/recurrente, consentimiento) — "Travelers" es el inglés de Viajer@s, **no** un formulario de facilitadores. `FirstTimeForm`/`ReturningForm` coinciden 1:1 con los reales.
+
 Pendiente, en orden sugerido:
 
-1. **Consentimiento informado** — tabla `consents` ya existe en el schema pero no hay UI para completarlo. Los textos legales (5 bloques: Viaje, Facilitador, Experiencia, Consideraciones, Confidencialidad + 4 confirmaciones) son de la clienta — **no están en el repo, hay que pedírselos a Estela antes de construir la UI**, no inventar contenido (ver "No hacer").
+1. **Consentimiento informado** — tabla `consents` ya existe en el schema pero no hay UI para completarlo. Los textos legales (5 bloques + 4 confirmaciones + firma) son de la clienta — **no están en el repo**, no inventar contenido (ver "No hacer"). Ojo: en el flujo real el consentimiento es un paso *posterior* a la solicitud, no parte del mismo form.
 2. Comunicación admin → usuario (unidireccional, ver `docs/ROLES.md`).
 3. **i18n ES/EN** — decidido: no traducir a mano string por string. Escribir todo en `es.json`, generar `en.json` una vez (o cuando cambien los textos) vía script que llama a una API de traducción (DeepL/LLM), revisar a mano los términos específicos (ceremonia, chamánico, etc.), servir estático con `next-intl` — sin llamadas a API en cada request.
 4. Chatbot IA.
 
-No urgente pero pendiente: `/nosotros` y `/contenidos` siguen siendo placeholders mock.
+Decisiones abiertas que bloquean trabajo (detalle en `docs/FORMULARIOS.md`): cómo tratar a los recurrentes que ceremoniaron vía Google Forms (historial cero en Supabase → se les mostraría el form de primera vez), y si los Google Forms se apagan al salir la web o conviven un tiempo.
+
+No urgente pero pendiente: `/nosotros` y `/contenidos` siguen siendo placeholders mock. `/preparacion` no existe todavía.
 
 ## No hacer
 
