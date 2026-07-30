@@ -9,8 +9,8 @@ export function Footer() {
           <Image
             src={IMAGES.logo}
             alt="Cosmic Eagle"
-            width={1207}
-            height={433}
+            width={914}
+            height={267}
             sizes="280px"
             className="h-10 w-auto object-contain"
           />

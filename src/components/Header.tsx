@@ -79,8 +79,8 @@ export function Header() {
               <Image
                 src={IMAGES.logo}
                 alt="Cosmic Eagle"
-                width={1207}
-                height={433}
+                width={914}
+                height={267}
                 priority
                 sizes="(min-width: 768px) 280px, 220px"
                 className="h-10 md:h-12 w-auto object-contain"
@@ -160,8 +160,8 @@ export function Header() {
                   <Image
                     src={IMAGES.logo}
                     alt="Cosmic Eagle"
-                    width={1207}
-                    height={433}
+                    width={914}
+                    height={267}
                     sizes="200px"
                     className="h-8 w-auto object-contain"
                   />
