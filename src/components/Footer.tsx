@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { IMAGES } from "@/lib/constants";
 
 export function Footer() {
@@ -5,10 +6,13 @@ export function Footer() {
     <footer className="bg-void-black border-t border-parchment/10 pt-12 pb-6 px-5">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="md:col-span-2 space-y-6">
-          <img
+          <Image
             src={IMAGES.logo}
-            alt="Cosmic Eagle Logo"
-            className="h-10"
+            alt="Cosmic Eagle"
+            width={1207}
+            height={433}
+            sizes="280px"
+            className="h-10 w-auto object-contain"
           />
           <p className="text-on-surface-variant max-w-sm">
             Viajes Cósmicos para la Evolución Humana. Uniendo sabiduría

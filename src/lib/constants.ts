@@ -1,5 +1,6 @@
 export const IMAGES = {
-  logo: "https://lh3.googleusercontent.com/aida/AP1WRLtSXRuSvXCjir0FGoU8deJZBL34_O8tIH7NjFB6PxMGTx0PXtX5PPXsG69c6fYrbWizjytnh7zQ0yJquw3IaE92giacdrlTK7H38UQ1mi1IiVDzK1Js8Pltq4fXkefVnlmSuQK0Atwr_ujbSGojdZ2x3FlSM2BMS5pz8ZJ2Qrts1jBEAHMDELp-H_kE3FvcLTlhj-Vv-bhsMpJOP-O1YbYCzNAUCdSgUTqBsTtZXamYJWpwNCgMrkb9CIQ",
+  // Logo oficial de la disenadora (PNG con alpha, 1207x433), servido desde /public
+  logo: "/logo.png",
   about:
     "https://lh3.googleusercontent.com/aida-public/AB6AXuCBsQzvne_vdYJfpqGaSuVgIT87dSP0JNQ9ngN3TJAoGD1YsMnHyb7TkONENuBJV3mNcMqWXrIU_QQskTUtFRihvcTLdY3ixjZ24ynYHpvOb3-RfgFUUkSMrBX_zpZUZsVjTcHatxQEEbylnIxpcA3k61c2woLlXP6FWs366mecKHiYU9W_2ltPH_H9DK8ilRyOK2fBUhxjIt8H3-KQAp5vaGHVqcptiqOh5P4EvfOUyUWJd-e1CHmyOb6q-ui7YX5IHe6XCJYZ1DM",
   retreats:
@@ -24,8 +25,8 @@ export function tripPlaceholderImage(id: string) {
   return TRIP_PLACEHOLDERS[sum % TRIP_PLACEHOLDERS.length];
 }
 
+// "Inicio" no va en el nav: al home se llega tocando el logo (desktop y drawer)
 export const NAV_LINKS = [
-  { label: "Inicio", href: "/", icon: "Home" as const },
   { label: "Nosotros", href: "/nosotros", icon: "Info" as const },
   { label: "Viajes", href: "/viajes", icon: "Sparkles" as const },
   { label: "Contenidos", href: "/contenidos", icon: "BookOpen" as const },

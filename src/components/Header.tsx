@@ -7,19 +7,18 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Menu,
   X,
-  Home,
   Info,
   Sparkles,
   BookOpen,
   User,
   CircleUser,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const iconMap = {
-  Home,
   Info,
   Sparkles,
   BookOpen,
@@ -77,10 +76,14 @@ export function Header() {
         <nav className="flex items-center justify-between px-5 md:px-16 h-16 w-full max-w-7xl mx-auto">
           <div className="flex items-center gap-8">
             <Link href="/">
-              <img
+              <Image
                 src={IMAGES.logo}
-                alt="Cosmic Eagle Logo"
-                className="h-8 md:h-10 object-contain"
+                alt="Cosmic Eagle"
+                width={1207}
+                height={433}
+                priority
+                sizes="(min-width: 768px) 280px, 220px"
+                className="h-10 md:h-12 w-auto object-contain"
               />
             </Link>
 
@@ -153,9 +156,16 @@ export function Header() {
               className="fixed inset-y-0 left-0 z-[60] w-80 bg-surface-container-low/95 backdrop-blur-2xl border-r border-parchment/10 shadow-2xl flex flex-col py-6 md:hidden"
             >
               <div className="px-6 py-4 border-b border-parchment/5 flex justify-between items-center">
-                <h2 className="font-display text-2xl text-primary-fixed-dim">
-                  Cosmic Journey
-                </h2>
+                <Link href="/" onClick={() => setDrawerOpen(false)}>
+                  <Image
+                    src={IMAGES.logo}
+                    alt="Cosmic Eagle"
+                    width={1207}
+                    height={433}
+                    sizes="200px"
+                    className="h-8 w-auto object-contain"
+                  />
+                </Link>
                 <button
                   onClick={() => setDrawerOpen(false)}
                   className="text-on-surface-variant"
@@ -175,7 +185,7 @@ export function Header() {
                         onClick={() => setDrawerOpen(false)}
                         className={`mx-2 flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 ${
                           isActive
-                            ? "bg-primary-container text-on-primary-container"
+                            ? "bg-primary-container text-on-primary"
                             : "text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30"
                         }`}
                       >
