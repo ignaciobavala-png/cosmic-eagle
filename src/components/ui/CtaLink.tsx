@@ -11,6 +11,16 @@ const VARIANTS: Record<Variant, string> = {
     "border border-primary-fixed-dim/45 text-primary-fixed-dim backdrop-blur-md hover:border-primary-fixed-dim hover:text-primary-fixed bg-white/[0.03]",
 };
 
+/**
+ * Boton solido / ghost del sistema.
+ *
+ * Ojo: `className` NO sirve para cambiar el `display`. La base ya trae
+ * `inline-flex`, y Tailwind resuelve el conflicto por el orden en la hoja
+ * generada (`.inline-flex` se emite despues de `.hidden`), no por el orden en
+ * que se escriben las clases. Pasarle `hidden lg:inline-flex` deja el boton
+ * visible siempre. Para mostrarlo/ocultarlo por breakpoint, envolverlo en un
+ * contenedor que lleve el `hidden`.
+ */
 export function CtaLink({
   href,
   children,

@@ -139,13 +139,17 @@ export function Header() {
                 </span>
               </Link>
             ) : (
-              <CtaLink
-                href="/cuenta?modo=registro"
-                className="hidden lg:inline-flex whitespace-nowrap px-5 py-2"
-              >
-                Unirme al círculo
-                <ArrowRight size={14} />
-              </CtaLink>
+              // El `hidden` va en el wrapper, no en el CtaLink: su base trae
+              // `inline-flex` y le gana a `hidden` por orden de la hoja.
+              <div className="hidden lg:flex">
+                <CtaLink
+                  href="/cuenta?modo=registro"
+                  className="whitespace-nowrap px-5 py-2"
+                >
+                  Unirme al círculo
+                  <ArrowRight size={14} />
+                </CtaLink>
+              </div>
             )}
 
             <button
