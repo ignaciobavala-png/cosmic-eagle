@@ -27,7 +27,11 @@ const iconMap = {
   User,
 };
 
-type AccountProfile = { fullName: string | null; avatarUrl: string | null } | null;
+type AccountProfile = {
+  fullName: string | null;
+  avatarUrl: string | null;
+  isAdmin: boolean;
+} | null;
 
 export function Header() {
   const { drawerOpen, toggleDrawer, setDrawerOpen } = useUIStore();
@@ -52,12 +56,16 @@ export function Header() {
 
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, avatar_url")
+        .select("full_name, avatar_url, is_admin")
         .eq("id", user.id)
         .single();
 
       if (!active) return;
-      setProfile({ fullName: data?.full_name ?? null, avatarUrl: data?.avatar_url ?? null });
+      setProfile({
+        fullName: data?.full_name ?? null,
+        avatarUrl: data?.avatar_url ?? null,
+        isAdmin: data?.is_admin ?? false,
+      });
     }
 
     load();
@@ -111,7 +119,7 @@ export function Header() {
           <div className="flex items-center gap-4">
             {profile ? (
               <Link
-                href="/cuenta"
+                href={profile.isAdmin ? "/admin" : "/cuenta"}
                 className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
               >
                 {profile.avatarUrl ? (

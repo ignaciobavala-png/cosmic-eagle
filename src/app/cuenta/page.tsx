@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
@@ -11,9 +12,9 @@ import { AvatarUpload } from "./AvatarUpload";
 export default async function CuentaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; modo?: string }>;
+  searchParams: Promise<{ next?: string; modo?: string; vista?: string }>;
 }) {
-  const { next, modo } = await searchParams;
+  const { next, modo, vista } = await searchParams;
   const isSignup = modo === "registro";
   const supabase = await createClient();
   const {
@@ -34,10 +35,15 @@ export default async function CuentaPage({
   if (user) {
     const { data } = await supabase
       .from("profiles")
-      .select("full_name, avatar_url")
+      .select("full_name, avatar_url, is_admin")
       .eq("id", user.id)
       .single();
     profile = data;
+
+    // El admin no se postula a viajes: su "cuenta" es el panel. Se puede ver
+    // igual el perfil de viajero con ?vista=viajero (link en AdminNav), y un
+    // ?next= pendiente siempre gana, para no romper un flujo a medias.
+    if (data?.is_admin && vista !== "viajero") redirect(next || "/admin");
 
     const [{ data: firstTime }, { data: returning }] = await Promise.all([
       supabase

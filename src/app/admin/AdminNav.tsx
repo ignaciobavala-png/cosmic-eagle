@@ -45,6 +45,12 @@ export function AdminNav() {
         </div>
         <div className="flex items-center gap-4">
           <Link
+            href="/cuenta?vista=viajero"
+            className="text-sm text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
+          >
+            Mi perfil
+          </Link>
+          <Link
             href="/"
             className="text-sm text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
           >
