@@ -4,6 +4,7 @@ import { useUIStore } from "@/lib/store";
 import { IMAGES, NAV_LINKS } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
 import { AnimatePresence, motion } from "framer-motion";
+import { CtaLink } from "@/components/ui/CtaLink";
 import {
   Menu,
   X,
@@ -12,6 +13,7 @@ import {
   BookOpen,
   User,
   CircleUser,
+  ArrowRight,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -72,60 +74,68 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-parchment/10">
-        <nav className="flex items-center justify-between px-5 md:px-16 h-16 w-full max-w-7xl mx-auto">
-          <div className="flex items-center gap-8">
-            <Link href="/">
-              <Image
-                src={IMAGES.logo}
-                alt="Cosmic Eagle"
-                width={914}
-                height={267}
-                priority
-                sizes="(min-width: 768px) 280px, 220px"
-                className="h-10 md:h-12 w-auto object-contain"
-              />
-            </Link>
+      <header className="fixed top-0 w-full z-50 bg-[#05060a]/70 backdrop-blur-xl border-b border-primary-fixed-dim/12">
+        <nav className="flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16 w-full max-w-narrative mx-auto">
+          <Link href="/" className="shrink-0">
+            <Image
+              src={IMAGES.logo}
+              alt="Cosmic Eagle"
+              width={914}
+              height={267}
+              priority
+              sizes="(min-width: 768px) 280px, 220px"
+              className="h-9 md:h-11 w-auto object-contain"
+            />
+          </Link>
 
-            <ul className="hidden md:flex items-center gap-1">
-              {NAV_LINKS.filter((l) => l.href !== "/cuenta").map((link) => {
-                const isActive = pathname === link.href;
-                return (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium tracking-[0.05em] transition-colors duration-200 ${
-                        isActive
-                          ? "text-primary-fixed-dim"
-                          : "text-on-surface-variant hover:text-on-surface"
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+          <ul className="hidden md:flex items-center gap-2">
+            {NAV_LINKS.filter((l) => l.href !== "/cuenta").map((link) => {
+              const isActive = pathname.startsWith(link.href);
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={`px-4 py-2 text-label-sm uppercase transition-colors duration-200 ${
+                      isActive
+                        ? "text-primary-fixed-dim"
+                        : "text-on-surface-variant hover:text-on-surface"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
 
           <div className="flex items-center gap-4">
-            <Link
-              href="/cuenta"
-              className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
-            >
-              {profile?.avatarUrl ? (
-                <img
-                  src={profile.avatarUrl}
-                  alt=""
-                  className="w-6 h-6 rounded-full object-cover"
-                />
-              ) : (
-                <CircleUser size={20} />
-              )}
-              <span className="text-sm font-medium tracking-[0.05em]">
-                {profile ? profile.fullName?.split(" ")[0] || "Mi Cuenta" : "Mi Cuenta"}
-              </span>
-            </Link>
+            {profile ? (
+              <Link
+                href="/cuenta"
+                className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
+              >
+                {profile.avatarUrl ? (
+                  <img
+                    src={profile.avatarUrl}
+                    alt=""
+                    className="w-7 h-7 rounded-full object-cover"
+                  />
+                ) : (
+                  <CircleUser size={20} />
+                )}
+                <span className="text-label-sm uppercase">
+                  {profile.fullName?.split(" ")[0] || "Mi Cuenta"}
+                </span>
+              </Link>
+            ) : (
+              <CtaLink
+                href="/cuenta?modo=registro"
+                className="hidden md:inline-flex px-5 py-2"
+              >
+                Unirme al círculo
+                <ArrowRight size={14} />
+              </CtaLink>
+            )}
 
             <button
               onClick={toggleDrawer}
@@ -198,6 +208,21 @@ export function Header() {
                   );
                 })}
               </ul>
+
+              {!profile && (
+                <div
+                  className="mt-auto px-6"
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  <CtaLink
+                    href="/cuenta?modo=registro"
+                    className="w-full"
+                  >
+                    Unirme al círculo
+                    <ArrowRight size={14} />
+                  </CtaLink>
+                </div>
+              )}
             </motion.div>
           </>
         )}

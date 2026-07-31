@@ -187,42 +187,58 @@ html {
   scroll-behavior: smooth;
 }
 
+/* El `background` en `html` corta la propagacion del fondo de `body` al canvas.
+   Sin esto el degrade se dimensionaria contra el viewport y no contra el alto
+   del documento, y el remate oscuro del pie nunca se veria. */
+html {
+  background-color: #05060a;
+}
+
+/* Midnight Celestial: el fondo nunca es plano. Degrade vertical de documento
+   completo, del azul celeste del hero al negro del pie, tal como el mockup. */
 body {
   position: relative;
-  background-color: #131410;
   color: #e5e2db;
   font-family: var(--font-body, "Literata", serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #05060a;
+  background-image:
+    radial-gradient(
+      110rem 55rem at 50% -8%,
+      rgba(0, 121, 178, 0.26),
+      transparent 60%
+    ),
+    linear-gradient(
+      180deg,
+      #0a2a52 0%,
+      #071c3f 20%,
+      #051230 42%,
+      #060b1a 68%,
+      #05060a 100%
+    );
+  background-repeat: no-repeat;
 }
 
-/* Midnight Celestial: el fondo nunca es plano. Base calida #131410 con blobs
-   radiales del azul secundario (#0079b3) al azul abisal (#05125a). */
+/* Campo de estrellas: tres capas de puntos tileados a distinta densidad y
+   tamano. Fija, para que el cielo no "viaje" con el scroll. */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background:
-    radial-gradient(
-      70rem 55rem at 12% -12%,
-      rgba(0, 121, 178, 0.3),
-      transparent 62%
-    ),
-    radial-gradient(
-      55rem 45rem at 92% 8%,
-      rgba(5, 18, 90, 0.42),
-      transparent 60%
-    ),
-    radial-gradient(
-      80rem 60rem at 50% 118%,
-      rgba(5, 18, 90, 0.55),
-      transparent 65%
-    ),
-    radial-gradient(
-      45rem 40rem at 78% 55%,
-      rgba(0, 121, 178, 0.16),
-      transparent 65%
-    );
+  background-image:
+    radial-gradient(1.6px 1.6px at 18% 24%, rgba(255, 255, 255, 0.75), transparent 100%),
+    radial-gradient(1.2px 1.2px at 72% 58%, rgba(255, 255, 255, 0.6), transparent 100%),
+    radial-gradient(1.9px 1.9px at 41% 81%, rgba(227, 195, 125, 0.5), transparent 100%),
+    radial-gradient(1.1px 1.1px at 88% 12%, rgba(255, 255, 255, 0.45), transparent 100%),
+    radial-gradient(1.4px 1.4px at 6% 66%, rgba(143, 205, 255, 0.5), transparent 100%);
+  background-size:
+    260px 260px,
+    340px 340px,
+    470px 470px,
+    610px 610px,
+    780px 780px;
+  opacity: 0.7;
 }

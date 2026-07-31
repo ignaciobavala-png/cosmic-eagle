@@ -1,6 +1,11 @@
 export const IMAGES = {
   // Logo oficial de la disenadora (PNG con alpha, 1207x433), servido desde /public
   logo: "/logo.png",
+  // Assets de Julia, convertidos a WebP y servidos desde /public/img
+  // (fuente original en ~/Descargas/frontend_eagle, ver docs/DESIGN_ASSETS.md)
+  heroNosotros: "/img/hero-nosotros.webp",
+  nosotrosProposito: "/img/nosotros-proposito.webp",
+  nosotrosMetodologia: "/img/nosotros-metodologia.webp",
   about:
     "https://lh3.googleusercontent.com/aida-public/AB6AXuCBsQzvne_vdYJfpqGaSuVgIT87dSP0JNQ9ngN3TJAoGD1YsMnHyb7TkONENuBJV3mNcMqWXrIU_QQskTUtFRihvcTLdY3ixjZ24ynYHpvOb3-RfgFUUkSMrBX_zpZUZsVjTcHatxQEEbylnIxpcA3k61c2woLlXP6FWs366mecKHiYU9W_2ltPH_H9DK8ilRyOK2fBUhxjIt8H3-KQAp5vaGHVqcptiqOh5P4EvfOUyUWJd-e1CHmyOb6q-ui7YX5IHe6XCJYZ1DM",
   retreats:
@@ -32,6 +37,30 @@ export const NAV_LINKS = [
   { label: "Contenidos", href: "/contenidos", icon: "BookOpen" as const },
   { label: "Mi Cuenta", href: "/cuenta", icon: "User" as const },
 ];
+
+// Columnas del footer segun el mockup de Julia. `href: null` = la ruta todavia
+// no existe (Blog y Soporte estan diferidos a segunda etapa, ver docs/RECORRIDO.md);
+// el Footer las pinta apagadas en vez de generar links muertos.
+export const FOOTER_COLUMNS = [
+  {
+    title: "Explorar",
+    links: [
+      { label: "Retiros", href: "/viajes" },
+      { label: "E-book", href: null },
+      { label: "Blog", href: null },
+      { label: "Nosotros", href: "/nosotros" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacidad", href: null },
+      { label: "Términos de Servicio", href: null },
+      { label: "Contacto", href: "mailto:contacto@cosmiceaglejourney.com" },
+      { label: "Soporte", href: null },
+    ],
+  },
+] as const;
 
 export const TESTIMONIALS = [
   {

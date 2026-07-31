@@ -21,7 +21,8 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 - Imagen de portada: `trips` **no tiene columna de imagen**; se usa `tripPlaceholderImage(id)` de `lib/constants.ts` (elige placeholder por hash del id, así coincide listado y detalle). Si se quiere portada real hay que agregar `image_url` a la tabla y al form del admin
 - Formulario de solicitud de salud funcionando en `/viajes/[id]/solicitar` (primerizo/recurrente, elegido segun historial de aprobaciones del usuario)
 - Panel de admin funcionando en `/admin` (protegido por `profiles.is_admin`): dashboard, CRUD de viajes, revisión de solicitudes (aprobar/rechazar/expirar). Un admin no puede aprobar/rechazar su propia solicitud (guard en `reviewApplication` + oculto en la UI)
-- `/nosotros` y `/contenidos` siguen siendo placeholders mock
+- **Assets de diseño de Julia recibidos (2026-07-30)**: ver `docs/DESIGN_ASSETS.md` (mapeo de la carpeta a las rutas) y `docs/RECORRIDO.md` (el recorrido del negocio + las 8 primitivas visuales del sistema). La carpeta original está en `~/Descargas/frontend_eagle`, **fuera del repo**
+- `/nosotros` **implementado** con el mockup de Julia y copy real de la clienta (hero + propósito + metodología + Nuestra Visión). `/contenidos` sigue siendo placeholder mock
 - `pnpm build` (producción) verificado sin errores — listo para deployar en cuanto a código
 - `app/api/keep-alive/route.ts` + `vercel.json` (cron diario 12:00 UTC) armados para que Supabase free tier no pause el proyecto por inactividad. Protegido con `CRON_SECRET`
 - **Proyecto deployado en Vercel**: `cosmic-eagle` (org `ethoslogs-projects`), URL de producción `https://cosmic-eagle.vercel.app`. Env vars `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `CRON_SECRET` cargadas en Development/Preview/Production. **Repo de GitHub conectado al proyecto de Vercel** (vía GitHub App, no webhook clásico) — cada push a `main` deploya solo a producción, no hace falta correr `vercel --prod` a mano
@@ -54,7 +55,7 @@ src/
 │   ├── layout.tsx                    # Root layout (fuentes, metadata)
 │   ├── globals.css                   # Design system (colores, glass, scrollbar)
 │   ├── not-found.tsx                 # 404 custom
-│   ├── nosotros/page.tsx             # placeholder
+│   ├── nosotros/page.tsx             # implementado (mockup de Julia + copy real)
 │   ├── contenidos/page.tsx           # placeholder
 │   ├── api/keep-alive/route.ts       # ping a `trips`, cron diario via vercel.json
 │   ├── viajes/
@@ -86,10 +87,16 @@ src/
 │   ├── ContentSection.tsx
 │   ├── EbookSection.tsx
 │   ├── TestimonialsSection.tsx
-│   ├── Footer.tsx
-│   └── BackToTop.tsx          # "use client" — FAB scroll
+│   ├── Footer.tsx             # 4 columnas segun mockup (links sin ruta van apagados)
+│   ├── BackToTop.tsx          # "use client" — FAB scroll
+│   └── ui/                    # primitivas del sistema visual de Julia
+│       ├── PageHero.tsx           # P1 — hero de pagina
+│       ├── DocumentCard.tsx       # P2 — card documento (golden glass)
+│       ├── FeatureBlock.tsx       # P3 — par asimetrico texto/imagen
+│       ├── ClosingSection.tsx     # P5 — cierre centrado + FourPointStar
+│       └── CtaLink.tsx            # boton solido / ghost
 └── lib/
-    ├── constants.ts           # Mock data (solo home), imagenes, nav links
+    ├── constants.ts           # Mock data (solo home), imagenes, nav links, footer
     ├── store.ts               # Zustand (drawerOpen)
     └── supabase/
         ├── client.ts           # browser client
@@ -102,9 +109,12 @@ supabase/
 ├── migrations/                 # historial de schema, aplicado via MCP
 └── seed.sql                    # datos de ejemplo para `supabase db reset`
 public/
-└── logo.png                    # logo oficial de la disenadora (914x267, alpha recortado)
+├── logo.png                    # logo oficial de la disenadora (914x267, alpha recortado)
+└── img/                        # assets de Julia convertidos a WebP (11.4 MB -> 267 KB)
 docs/
 ├── CONTEXT.md                  # Requerimientos del cliente + decisiones de alcance
+├── RECORRIDO.md                # El recorrido del negocio + las 8 primitivas visuales
+├── DESIGN_ASSETS.md            # Carpeta de assets de Julia mapeada a las rutas
 ├── CONTENT_MAP.md              # Secciones propuestas por Sofia mapeadas a las rutas
 ├── FORMULARIOS.md              # Google Forms originales de Estela + paridad con la app
 ├── ARCHITECTURE.md             # Stack y estructura planeada
@@ -118,7 +128,8 @@ docs/
 
 - Todos los tokens en `@theme` dentro de `globals.css`, con los nombres de rol de Material
 - **Ojo con el rol del oro**: en el set confirmado `primary` es `#fff6eb` (blanco cálido), NO el oro. El oro son `primary-fixed-dim` (`#e3c37d` — headings, bordes, íconos, acentos) y `primary-container` (`#f9d78f` — CTA sólido, con `text-on-primary`). Los componentes ya usan esos tokens; no volver a mapear `text-primary` a "dorado"
-- El fondo **nunca es plano**: `body::before` fija 4 blobs radiales (`#0079b3` + `#05125a`) sobre la base `#131410`. La intensidad se regula con los 4 alphas de esos gradientes
+- El fondo **nunca es plano**: degradé vertical de documento completo (azul celeste `#0a2a52` arriba → negro `#05060a` en el pie) en `body`, más un campo de estrellas fijo de 5 capas en `body::before`. **Ojo**: `html` lleva `background-color` a propósito, para cortar la propagación del fondo de `body` al canvas — sin eso el degradé se dimensiona contra el viewport y el remate oscuro del pie no se ve nunca
+- **Primitivas del sistema** en `src/components/ui/`: `PageHero` (P1), `DocumentCard` (P2), `FeatureBlock` (P3, par asimétrico texto/imagen), `ClosingSection` + `FourPointStar` (P5), `CtaLink`. Salen del mockup de Julia y son con las que se componen las páginas narrativas — antes de escribir una sección nueva, revisar si ya existe la primitiva (catálogo completo de las 8 en `docs/RECORRIDO.md` §4)
 - Fuentes: **Domine** (display/headings) + **Literata** (body), via `next/font/google`
 - Escala tipográfica como tokens `--text-*`: `text-display-lg`, `text-headline-lg/md`, `text-body-lg/md`, `text-label-sm` (labels en mayúscula con tracking)
 - Radios ajustados a la guía (4–8px para contenedores): `rounded-2xl` ahora es 8px, no 16px
@@ -144,7 +155,7 @@ docs/
 - Sin CSS-in-JS, solo Tailwind
 - `@/*` alias apunta a `./src/*`
 - Sin testing, sin Docker
-- Sin binarios en git (usar Supabase Storage/Vercel Blob para assets cuando haya backend)
+- Binarios en git: **solo assets fijos de layout** (logo, heros, imágenes de secciones narrativas), siempre convertidos a WebP y redimensionados, en `public/img/`. El contenido editable por la clienta (portadas de viajes, avatares) va a Supabase Storage. **A confirmar con Ignacio** — la regla anterior era "sin binarios en git", pero `public/logo.png` ya sentó el precedente
 - Nav: horizontal en `md+`, hamburger + drawer solo en mobile
 - Footer firma: "i.vavala"
 
@@ -165,7 +176,11 @@ Pendiente, en orden sugerido:
 
 Decisiones abiertas que bloquean trabajo (detalle en `docs/FORMULARIOS.md`): cómo tratar a los recurrentes que ceremoniaron vía Google Forms (historial cero en Supabase → se les mostraría el form de primera vez), y si los Google Forms se apagan al salir la web o conviven un tiempo.
 
-No urgente pero pendiente: `/nosotros` y `/contenidos` siguen siendo placeholders mock. `/preparacion` no existe todavía.
+**Frontend de Julia, orden de trabajo (ver `docs/RECORRIDO.md` §5)**: hecho el chrome global (fondo + navbar + footer) y `/nosotros`. Sigue: `/viajes` + cards con `image_url`, recomponer la home (carrusel P8 + grilla P4), y recién ahí `/preparacion`, que con las primitivas ya construidas es composición pura.
+
+Decisiones tomadas sola que hay que validar: el CTA **"Unirme al círculo"** del navbar apunta a `/cuenta?modo=registro` (con sesión se reemplaza por el avatar). El texto es de Julia pero **promete comunidad, que está fuera de alcance** (`docs/CONTEXT.md` §6) — confirmar con ellas. El input de newsletter del footer está deshabilitado (no hay backend); los links del footer sin ruta (Blog, E-book, Privacidad, Términos, Soporte) se pintan apagados en vez de linkear a `#`.
+
+No urgente pero pendiente: `/contenidos` sigue siendo placeholder mock. `/preparacion` no existe todavía.
 
 ## No hacer
 

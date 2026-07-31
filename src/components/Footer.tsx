@@ -1,11 +1,13 @@
 import Image from "next/image";
-import { IMAGES } from "@/lib/constants";
+import Link from "next/link";
+import { Send } from "lucide-react";
+import { FOOTER_COLUMNS, IMAGES } from "@/lib/constants";
 
 export function Footer() {
   return (
-    <footer className="bg-void-black border-t border-parchment/10 pt-12 pb-6 px-5">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-        <div className="md:col-span-2 space-y-6">
+    <footer className="border-t border-primary-fixed-dim/12 bg-[#05060a]/60 pt-16 pb-8 px-margin-mobile md:px-margin-desktop">
+      <div className="mx-auto grid max-w-narrative grid-cols-1 gap-12 md:grid-cols-4">
+        <Link href="/" className="md:self-start">
           <Image
             src={IMAGES.logo}
             alt="Cosmic Eagle"
@@ -14,89 +16,65 @@ export function Footer() {
             sizes="280px"
             className="h-10 w-auto object-contain"
           />
-          <p className="text-on-surface-variant max-w-sm">
-            Viajes Cósmicos para la Evolución Humana. Uniendo sabiduría
-            ancestral y tecnología moderna de la conciencia.
+        </Link>
+
+        {FOOTER_COLUMNS.map((column) => (
+          <nav key={column.title} className="space-y-4">
+            <h2 className="text-label-sm uppercase text-primary-fixed-dim">
+              {column.title}
+            </h2>
+            <ul className="space-y-3">
+              {column.links.map((link) => (
+                <li key={link.label}>
+                  {link.href ? (
+                    <Link
+                      href={link.href}
+                      className="text-body-md text-on-surface-variant transition-colors hover:text-primary-fixed-dim"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    // Sin ruta todavia: se muestra apagado en vez de linkear a "#"
+                    <span
+                      className="text-body-md text-on-surface-variant/40"
+                      title="Próximamente"
+                    >
+                      {link.label}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
+
+        <div className="space-y-4">
+          <h2 className="text-label-sm uppercase text-primary-fixed-dim">
+            Sintoniza
+          </h2>
+          <p className="text-body-md text-on-surface-variant">
+            Enterate de las novedades antes que nadie.
           </p>
-          <a
-            href="mailto:contacto@cosmiceaglejourney.com"
-            className="text-primary-fixed-dim hover:text-secondary transition-colors block"
-          >
-            contacto@cosmiceaglejourney.com
-          </a>
-        </div>
-        <div className="space-y-4">
-          <h6 className="font-display text-2xl text-primary-fixed-dim">Info</h6>
-          <ul className="space-y-2">
-            <li>
-              <a
-                href="#"
-                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
-              >
-                Términos y Condiciones
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
-              >
-                Política de Cancelación
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
-              >
-                Aviso Legal
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
-              >
-                Privacidad
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div className="space-y-4">
-          <h6 className="font-display text-2xl text-primary-fixed-dim">Viajes</h6>
-          <ul className="space-y-2">
-            <li>
-              <a
-                href="#"
-                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
-              >
-                Retiros
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
-              >
-                Ceremonias
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
-              >
-                Instagram
-              </a>
-            </li>
-          </ul>
+          {/* Sin backend de newsletter todavia: se deja el campo inhabilitado
+              antes que recolectar mails que no van a ningun lado. */}
+          <div className="flex items-center gap-2 rounded-lg border border-primary-fixed-dim/25 bg-white/[0.03] px-4 py-2.5 opacity-60">
+            <input
+              type="email"
+              disabled
+              placeholder="Tu correo electrónico"
+              aria-label="Tu correo electrónico (próximamente)"
+              className="w-full bg-transparent text-body-md text-on-surface placeholder:text-on-surface-variant/60 outline-none"
+            />
+            <Send size={16} className="shrink-0 text-primary-fixed-dim" />
+          </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-parchment/5 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-        <p className="text-on-surface-variant text-sm">
-          &copy; 2026 Cosmic Eagle Journey. All rights reserved.
+
+      <div className="mx-auto mt-14 flex max-w-narrative flex-col items-center justify-between gap-4 border-t border-primary-fixed-dim/8 pt-6 text-center md:flex-row md:text-left">
+        <p className="text-label-sm uppercase text-on-surface-variant/70">
+          &copy; 2026 Cosmic Eagle Journey
         </p>
-        <p className="text-on-surface-variant text-sm">
+        <p className="text-label-sm uppercase text-on-surface-variant/70">
           i.vavala
         </p>
       </div>
