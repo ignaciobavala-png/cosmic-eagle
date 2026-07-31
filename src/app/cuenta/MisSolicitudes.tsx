@@ -79,8 +79,8 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
 
       <section>
         <h2 className="text-lg font-medium text-primary-fixed-dim mb-3">Mis solicitudes</h2>
-        <div className="glass-card rounded-2xl overflow-hidden overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="glass-card rounded-2xl overflow-x-auto">
+          <table className="w-full min-w-[34rem] text-sm">
             <thead>
               <tr className="border-b border-outline-variant text-left text-on-surface-variant">
                 <th className="px-4 py-3 font-medium">Viaje</th>

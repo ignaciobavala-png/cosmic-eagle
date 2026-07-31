@@ -95,8 +95,8 @@ export default async function AdminSolicitudesPage({
       {applications.length === 0 ? (
         <p className="text-on-surface-variant">No hay solicitudes en este estado.</p>
       ) : (
-        <div className="glass-card rounded-2xl overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="glass-card rounded-2xl overflow-x-auto">
+          <table className="w-full min-w-[46rem] text-sm">
             <thead>
               <tr className="border-b border-outline-variant text-left text-on-surface-variant">
                 <th className="px-5 py-3 font-medium">Nombre</th>

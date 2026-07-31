@@ -63,7 +63,7 @@ export default async function ViajesPage() {
               <span className="text-label-sm uppercase text-on-surface-variant">
                 Calendario de viajes
               </span>
-              <h2 className="mt-2 font-display text-headline-lg text-on-surface">
+              <h2 className="mt-2 font-display text-headline-md sm:text-headline-lg text-on-surface">
                 Próximos Retiros
               </h2>
             </div>
@@ -74,7 +74,7 @@ export default async function ViajesPage() {
                 pronto.
               </p>
             ) : (
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {trips.map((trip) => (
                   <TripCard key={trip.id} trip={trip} />
                 ))}

@@ -16,7 +16,10 @@ export function PortalsSection() {
   return (
     <section
       id="portales"
-      className="mx-auto w-full max-w-narrative px-margin-mobile md:px-margin-desktop py-20 md:py-section"
+      // `overflow-x-clip`: los ovalos laterales se salen del ancho de contenido
+      // a proposito. Sin el clip empujan el scroll horizontal de toda la pagina
+      // en mobile. `clip` en vez de `hidden` para no crear un scroll container.
+      className="mx-auto w-full max-w-narrative overflow-x-clip px-margin-mobile md:px-margin-desktop py-20 md:py-section"
     >
       <div className="text-center">
         <h2 className="font-display text-headline-md md:text-headline-lg text-primary">
@@ -27,7 +30,7 @@ export function PortalsSection() {
         </p>
       </div>
 
-      <div className="relative mt-14 flex h-[26rem] items-center justify-center md:h-[32rem]">
+      <div className="relative mt-10 flex h-[20rem] items-center justify-center sm:mt-14 sm:h-[26rem] md:h-[32rem]">
         {PORTALS.map((portal, i) => {
           // -1 izquierda, 0 centro, 1 derecha
           const raw = (i - active + PORTALS.length) % PORTALS.length;
@@ -57,7 +60,7 @@ export function PortalsSection() {
                 src={portal.image}
                 alt={portal.alt}
                 fill
-                sizes="(min-width: 768px) 24rem, 18rem"
+                sizes="(min-width: 768px) 24rem, 15rem"
                 className="object-cover"
               />
               {!isActive && <div className="absolute inset-0 bg-[#05102a]/50" />}

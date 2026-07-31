@@ -125,22 +125,22 @@ export default async function ViajePage({ params }: Props) {
             Todos los viajes
           </Link>
 
-          <div className="relative h-[280px] md:h-[400px] rounded-3xl overflow-hidden glass-card mb-10">
+          <div className="relative h-[240px] sm:h-[280px] md:h-[400px] rounded-3xl overflow-hidden glass-card mb-10">
             <div className="absolute inset-0 bg-gradient-to-t from-void-black via-void-black/40 to-transparent z-10" />
             <img
               src={trip.image_url ?? tripPlaceholderImage(trip.id)}
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 z-20">
+            <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 md:p-10 z-20">
               <span
-                className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest mb-4 inline-block backdrop-blur-md border ${
+                className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest mb-3 sm:mb-4 inline-block backdrop-blur-md border ${
                   STATUS_CLASS[trip.status] ?? ""
                 }`}
               >
                 {STATUS_LABEL[trip.status] ?? trip.status}
               </span>
-              <h1 className="font-display text-[32px] md:text-[48px] leading-tight font-medium text-white text-shadow-glow">
+              <h1 className="font-display text-[26px] sm:text-[32px] md:text-[48px] leading-tight font-medium text-white text-shadow-glow text-balance">
                 {trip.title}
               </h1>
               {trip.location && (
@@ -167,7 +167,7 @@ export default async function ViajePage({ params }: Props) {
                 </p>
               )}
 
-              <dl className="grid grid-cols-2 gap-4 mt-10">
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-10">
                 {details.map(({ icon: Icon, label, value }) => (
                   <div key={label} className="glass-card rounded-2xl p-4">
                     <dt className="flex items-center gap-2 text-xs uppercase tracking-widest text-on-surface-variant mb-1.5">

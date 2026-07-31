@@ -28,7 +28,7 @@ export async function RetreatsSection() {
       <div className="mx-auto max-w-narrative px-margin-mobile md:px-margin-desktop">
         <div className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <h2 className="font-display text-headline-lg text-on-surface">
+            <h2 className="font-display text-headline-md sm:text-headline-lg text-on-surface">
               Próximos Retiros
             </h2>
             <p className="mt-2 text-body-md text-on-surface-variant">
@@ -40,7 +40,7 @@ export async function RetreatsSection() {
           </CtaLink>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {trips.map((trip) => (
             <TripCard key={trip.id} trip={trip} />
           ))}

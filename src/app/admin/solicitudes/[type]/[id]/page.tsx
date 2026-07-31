@@ -85,9 +85,11 @@ export default async function SolicitudDetallePage({
         ← Volver a solicitudes
       </Link>
 
-      <div className="flex items-start justify-between mb-2">
-        <h1 className="font-display text-3xl text-primary-fixed-dim">{application.full_name}</h1>
-        <span className="px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest border bg-primary-container/10 text-primary-fixed-dim border-primary-fixed-dim/30">
+      <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+        <h1 className="font-display text-2xl sm:text-3xl text-primary-fixed-dim break-words">
+          {application.full_name}
+        </h1>
+        <span className="shrink-0 px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest border bg-primary-container/10 text-primary-fixed-dim border-primary-fixed-dim/30">
           {STATUS_LABEL[application.status] ?? application.status}
         </span>
       </div>

@@ -33,7 +33,7 @@ export function TripForm({
   return (
     <form
       action={formAction}
-      className="glass-card rounded-2xl p-6 md:p-8 flex flex-col gap-5 max-w-2xl"
+      className="glass-card rounded-2xl p-5 md:p-8 flex flex-col gap-5 max-w-2xl"
     >
       <div className="flex flex-col gap-1.5">
         <label htmlFor="title" className={labelClass}>
@@ -67,7 +67,7 @@ export function TripForm({
           Portada
         </label>
         {trip?.image_url && (
-          <div className="relative aspect-[4/3] w-48 overflow-hidden rounded-lg border border-outline-variant">
+          <div className="relative aspect-[4/3] w-full max-w-48 overflow-hidden rounded-lg border border-outline-variant">
             <Image
               src={trip.image_url}
               alt="Portada actual del viaje"
@@ -103,7 +103,7 @@ export function TripForm({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="start_date" className={labelClass}>
             Fecha inicio
@@ -132,7 +132,7 @@ export function TripForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="capacity" className={labelClass}>
             Cupo

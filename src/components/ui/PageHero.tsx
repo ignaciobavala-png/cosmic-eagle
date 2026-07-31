@@ -29,7 +29,9 @@ export function PageHero({
   priority?: boolean;
 }) {
   return (
-    <section className="relative min-h-[36rem] h-[82vh] max-h-[52rem] w-full overflow-hidden">
+    // `svh` en mobile a proposito: con `vh` la barra del browser queda fuera de
+    // la cuenta y el hint de scroll cae debajo del pliegue visible.
+    <section className="relative min-h-[30rem] h-[82svh] max-h-[52rem] w-full overflow-hidden md:min-h-[36rem] md:h-[82vh]">
       {/* La foto y sus tintes van juntos dentro de un grupo enmascarado: el borde
           inferior se desvanece a transparente y deja ver el degrade del `body`,
           en vez de cortar contra un negro que no coincide con el azul de la
@@ -60,7 +62,7 @@ export function PageHero({
           </p>
         )}
         {actions.length > 0 && (
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-8 flex w-full max-w-sm flex-col items-stretch gap-3 sm:mt-9 sm:w-auto sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
             {actions.map((action) => (
               <CtaLink
                 key={action.href + action.label}

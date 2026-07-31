@@ -83,7 +83,9 @@ export function Header() {
   return (
     <>
       <header className="fixed top-0 w-full z-50 bg-[#05060a]/70 backdrop-blur-xl border-b border-primary-fixed-dim/12">
-        <nav className="flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16 w-full max-w-narrative mx-auto">
+        {/* El margen de 64px recien entra en lg: a 768px exactos el logo + los
+            3 links + el CTA no caben en 640px de contenido y el nav desborda. */}
+        <nav className="flex items-center justify-between px-margin-mobile md:px-8 lg:px-margin-desktop h-16 w-full max-w-narrative mx-auto">
           <Link href="/" className="shrink-0">
             <Image
               src={IMAGES.logo}
@@ -96,14 +98,14 @@ export function Header() {
             />
           </Link>
 
-          <ul className="hidden md:flex items-center gap-2">
+          <ul className="hidden md:flex items-center gap-0 lg:gap-2">
             {NAV_LINKS.filter((l) => l.href !== "/cuenta").map((link) => {
               const isActive = pathname.startsWith(link.href);
               return (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={`px-4 py-2 text-label-sm uppercase transition-colors duration-200 ${
+                    className={`whitespace-nowrap px-3 py-2 lg:px-4 text-label-sm uppercase transition-colors duration-200 ${
                       isActive
                         ? "text-primary-fixed-dim"
                         : "text-on-surface-variant hover:text-on-surface"
@@ -116,7 +118,7 @@ export function Header() {
             })}
           </ul>
 
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center gap-4">
             {profile ? (
               <Link
                 href={profile.isAdmin ? "/admin" : "/cuenta"}
@@ -138,7 +140,7 @@ export function Header() {
             ) : (
               <CtaLink
                 href="/cuenta?modo=registro"
-                className="hidden md:inline-flex px-5 py-2"
+                className="hidden md:inline-flex whitespace-nowrap px-4 py-2 lg:px-5"
               >
                 Unirme al círculo
                 <ArrowRight size={14} />

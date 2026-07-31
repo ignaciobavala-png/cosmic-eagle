@@ -41,7 +41,7 @@ export function TripCard({ trip }: { trip: TripCardData }) {
           src={trip.image_url ?? tripPlaceholderImage(trip.id)}
           alt=""
           fill
-          sizes="(min-width: 768px) 33vw, 100vw"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-1000 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-[#05102a]/20" />
@@ -57,7 +57,7 @@ export function TripCard({ trip }: { trip: TripCardData }) {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col p-6">
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
         <h3 className="font-display text-headline-md text-on-surface">
           {trip.title}
         </h3>

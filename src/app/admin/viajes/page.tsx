@@ -34,11 +34,11 @@ export default async function AdminViajesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="font-display text-3xl text-primary-fixed-dim">Viajes</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
+        <h1 className="font-display text-2xl sm:text-3xl text-primary-fixed-dim">Viajes</h1>
         <Link
           href="/admin/viajes/nuevo"
-          className="bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg px-4 py-2.5 text-sm hover:bg-primary-fixed transition-colors"
+          className="bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg px-4 py-2.5 text-sm whitespace-nowrap hover:bg-primary-fixed transition-colors"
         >
           Nuevo viaje
         </Link>
@@ -47,8 +47,8 @@ export default async function AdminViajesPage() {
       {!trips || trips.length === 0 ? (
         <p className="text-on-surface-variant">No hay viajes creados todavía.</p>
       ) : (
-        <div className="glass-card rounded-2xl overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="glass-card rounded-2xl overflow-x-auto">
+          <table className="w-full min-w-[48rem] text-sm">
             <thead>
               <tr className="border-b border-outline-variant text-left text-on-surface-variant">
                 <th className="px-5 py-3 font-medium">Título</th>
