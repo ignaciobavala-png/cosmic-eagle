@@ -83,9 +83,10 @@ export function Header() {
   return (
     <>
       <header className="fixed top-0 w-full z-50 bg-[#05060a]/70 backdrop-blur-xl border-b border-primary-fixed-dim/12">
-        {/* El margen de 64px recien entra en lg: a 768px exactos el logo + los
-            3 links + el CTA no caben en 640px de contenido y el nav desborda. */}
-        <nav className="flex items-center justify-between px-margin-mobile md:px-8 lg:px-margin-desktop h-16 w-full max-w-narrative mx-auto">
+        {/* La barra horizontal arranca en lg, no en md: entre 768 y 1024 el
+            logo + los 3 links + "Unirme al circulo" no entran y el CTA termina
+            pisando el logo. Hasta 1024 manda el drawer, que entra siempre. */}
+        <nav className="flex items-center justify-between gap-4 px-margin-mobile lg:px-margin-desktop h-16 w-full max-w-narrative mx-auto">
           <Link href="/" className="shrink-0">
             <Image
               src={IMAGES.logo}
@@ -93,19 +94,19 @@ export function Header() {
               width={914}
               height={267}
               priority
-              sizes="(min-width: 768px) 280px, 220px"
-              className="h-9 md:h-11 w-auto object-contain"
+              sizes="(min-width: 1024px) 280px, 220px"
+              className="h-9 lg:h-11 w-auto object-contain"
             />
           </Link>
 
-          <ul className="hidden md:flex items-center gap-0 lg:gap-2">
+          <ul className="hidden lg:flex items-center gap-2">
             {NAV_LINKS.filter((l) => l.href !== "/cuenta").map((link) => {
               const isActive = pathname.startsWith(link.href);
               return (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={`whitespace-nowrap px-3 py-2 lg:px-4 text-label-sm uppercase transition-colors duration-200 ${
+                    className={`whitespace-nowrap px-4 py-2 text-label-sm uppercase transition-colors duration-200 ${
                       isActive
                         ? "text-primary-fixed-dim"
                         : "text-on-surface-variant hover:text-on-surface"
@@ -122,7 +123,7 @@ export function Header() {
             {profile ? (
               <Link
                 href={profile.isAdmin ? "/admin" : "/cuenta"}
-                className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
+                className="hidden lg:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
               >
                 {profile.avatarUrl ? (
                   <img
@@ -140,7 +141,7 @@ export function Header() {
             ) : (
               <CtaLink
                 href="/cuenta?modo=registro"
-                className="hidden md:inline-flex whitespace-nowrap px-4 py-2 lg:px-5"
+                className="hidden lg:inline-flex whitespace-nowrap px-5 py-2"
               >
                 Unirme al círculo
                 <ArrowRight size={14} />
@@ -149,7 +150,7 @@ export function Header() {
 
             <button
               onClick={toggleDrawer}
-              className="md:hidden active:scale-95 transition-transform"
+              className="lg:hidden active:scale-95 transition-transform"
               aria-label="Abrir menú"
             >
               <Menu className="text-primary-fixed-dim" size={24} />
@@ -165,7 +166,7 @@ export function Header() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[60] bg-void-black/60 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-[60] bg-void-black/60 backdrop-blur-sm lg:hidden"
               onClick={() => setDrawerOpen(false)}
             />
             <motion.div
@@ -173,7 +174,7 @@ export function Header() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 z-[60] w-80 bg-surface-container-low/95 backdrop-blur-2xl border-r border-parchment/10 shadow-2xl flex flex-col py-6 md:hidden"
+              className="fixed inset-y-0 left-0 z-[60] w-80 max-w-[85vw] bg-surface-container-low/95 backdrop-blur-2xl border-r border-parchment/10 shadow-2xl flex flex-col py-6 lg:hidden"
             >
               <div className="px-6 py-4 border-b border-parchment/5 flex justify-between items-center">
                 <Link href="/" onClick={() => setDrawerOpen(false)}>
