@@ -30,17 +30,25 @@ export function PageHero({
 }) {
   return (
     <section className="relative min-h-[36rem] h-[82vh] max-h-[52rem] w-full overflow-hidden">
-      <Image
-        src={image}
-        alt={imageAlt}
-        fill
-        priority={priority}
-        sizes="100vw"
-        className="object-cover"
-      />
-      {/* Tinte azul + desvanecido a los bordes para integrar la foto al fondo */}
-      <div className="absolute inset-0 bg-[#05102a]/35" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#05060a]/70 via-transparent to-[#05060a]" />
+      {/* La foto y sus tintes van juntos dentro de un grupo enmascarado: el borde
+          inferior se desvanece a transparente y deja ver el degrade del `body`,
+          en vez de cortar contra un negro que no coincide con el azul de la
+          pagina. Sin la mascara el limite banner/seccion queda como una linea. */}
+      <div
+        className="absolute inset-0 [mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)]"
+      >
+        <Image
+          src={image}
+          alt={imageAlt}
+          fill
+          priority={priority}
+          sizes="100vw"
+          className="object-cover"
+        />
+        {/* Tinte azul + oscurecido arriba (para el navbar) */}
+        <div className="absolute inset-0 bg-[#05102a]/35" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05060a]/70 via-transparent to-[#05060a]/45" />
+      </div>
 
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-margin-mobile md:px-margin-desktop text-center">
         <h1 className="font-display text-display-mobile md:text-display-lg text-primary text-shadow-glow max-w-3xl text-balance">

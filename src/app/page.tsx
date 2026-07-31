@@ -3,7 +3,6 @@ import { HeroSection } from "@/components/HeroSection";
 import { PortalsSection } from "@/components/PortalsSection";
 import { AboutSection } from "@/components/AboutSection";
 import { RetreatsSection } from "@/components/RetreatsSection";
-import { ContentSection } from "@/components/ContentSection";
 import { EbookSection } from "@/components/EbookSection";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { Footer } from "@/components/Footer";
@@ -18,7 +17,6 @@ export default function Home() {
         <PortalsSection />
         <AboutSection />
         <RetreatsSection />
-        <ContentSection />
         <EbookSection />
         <TestimonialsSection />
       </main>
