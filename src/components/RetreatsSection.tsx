@@ -1,72 +1,51 @@
-"use client";
+import { CtaLink } from "@/components/ui/CtaLink";
+import { Reveal } from "@/components/ui/Reveal";
+import { TripCard } from "@/components/ui/TripCard";
+import { createClient } from "@/lib/supabase/server";
 
-import { motion } from "framer-motion";
-import { IMAGES } from "@/lib/constants";
+/**
+ * "Proximos Retiros" de la home: grilla P4 con los tres viajes reales mas
+ * proximos. Antes eran dos tarjetas hardcodeadas con viajes que no existian.
+ *
+ * Filtra `draft` explicitamente: la policy `trips_select_public` deja leer
+ * todos los trips a `anon`, asi que el filtro de borradores va siempre en la
+ * consulta, nunca se asume desde RLS.
+ */
+export async function RetreatsSection() {
+  const supabase = await createClient();
+  const { data: trips } = await supabase
+    .from("trips")
+    .select("id, title, description, location, start_date, end_date, image_url")
+    .in("status", ["open", "closed"])
+    .order("start_date", { ascending: true })
+    .limit(3);
 
-export function RetreatsSection() {
+  // Sin viajes publicados la seccion no aporta nada: se omite entera.
+  if (!trips || trips.length === 0) return null;
+
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.8 }}
-      className="py-20 md:py-24 bg-surface-container-lowest/50"
-    >
-      <div className="px-5 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+    <Reveal className="py-20 md:py-24">
+      <div className="mx-auto max-w-narrative px-margin-mobile md:px-margin-desktop">
+        <div className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block">
-              Encuentra tu retiro
-            </span>
-            <h2 className="font-display text-[32px] md:text-[40px] md:leading-[48px] font-medium text-primary-fixed-dim">
-              Experiencias Próximas
+            <h2 className="font-display text-headline-lg text-on-surface">
+              Próximos Retiros
             </h2>
+            <p className="mt-2 text-body-md text-on-surface-variant">
+              Experiencias inmersivas diseñadas en espacios exclusivos.
+            </p>
           </div>
-          <button className="px-6 py-2 border border-primary-fixed-dim/30 rounded-full text-primary-fixed-dim text-xs font-medium tracking-[0.05em] hover:bg-primary-container hover:text-on-primary transition-all">
-            Ver todos los viajes
-          </button>
+          <CtaLink href="/viajes" variant="ghost" className="px-6 py-2">
+            Ver calendario completo
+          </CtaLink>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          <div className="md:col-span-8 group relative h-[400px] rounded-3xl overflow-hidden glass-card">
-            <div className="absolute inset-0 bg-gradient-to-t from-void-black via-void-black/20 to-transparent z-10" />
-            <img
-              src={IMAGES.retreats}
-              alt="Valle sagrado con neblina entre montañas"
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-            />
-            <div className="absolute bottom-0 left-0 p-6 z-20">
-              <span className="bg-secondary/20 text-secondary border border-secondary/40 px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest mb-4 inline-block backdrop-blur-md">
-                Próximos Retiros
-              </span>
-              <h3 className="font-display text-2xl md:text-[32px] leading-[40px] text-white mb-2">
-                Despertar en la Montaña Sagrada
-              </h3>
-              <p className="text-on-surface-variant max-w-md opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                Un viaje de 7 días de inmersión profunda y silencio consciente
-                para reconectar con el origen.
-              </p>
-            </div>
-          </div>
-
-          <div className="md:col-span-4 group relative h-[400px] rounded-3xl overflow-hidden glass-card">
-            <div className="absolute inset-0 bg-gradient-to-t from-void-black via-void-black/20 to-transparent z-10" />
-            <img
-              src={IMAGES.ceremony}
-              alt="Elementos rituales con incienso y luz de vela"
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-            />
-            <div className="absolute bottom-0 left-0 p-6 z-20">
-              <span className="bg-primary-container/20 text-primary-fixed-dim border border-primary-fixed-dim/40 px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest mb-4 inline-block backdrop-blur-md">
-                Ceremonias
-              </span>
-              <h3 className="font-display text-2xl md:text-[32px] leading-[40px] text-white">
-                Equinoccio Galáctico
-              </h3>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {trips.map((trip) => (
+            <TripCard key={trip.id} trip={trip} />
+          ))}
         </div>
       </div>
-    </motion.section>
+    </Reveal>
   );
 }

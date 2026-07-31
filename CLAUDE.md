@@ -18,11 +18,13 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 - Navbar (`Header.tsx`) muestra avatar + primer nombre en el link "Mi Cuenta" cuando hay sesión (fetch client-side, se actualiza con `onAuthStateChange`). Usa el **logo oficial** (`public/logo.png`, via `next/image`) en desktop, drawer mobile y footer. **No hay link "Inicio"**: al home se llega tocando el logo, tanto en el navbar como en la cabecera del drawer
 - `/viajes` conectado a la tabla `trips` real (ya no es mock). La tarjeta entera linkea al detalle
 - `/viajes/[id]` es la **página pública de detalle del viaje** (no requiere sesión): portada, estado, descripción y datos (fechas, duración, lugar, cupo, aporte) + `generateMetadata`. El CTA cambia según sesión: sin usuario va a `/cuenta?next=/viajes/{id}/solicitar`, con usuario va directo al form; si el viaje está `closed`/`completed` muestra aviso. **Ojo**: la policy `trips_select_public` deja leer *todos* los trips a `anon`, incluidos los `draft` — el filtro de borradores se hace en la página (404), no en RLS. Cualquier ruta pública nueva que lea `trips` tiene que filtrar igual
-- Imagen de portada: `trips` **no tiene columna de imagen**; se usa `tripPlaceholderImage(id)` de `lib/constants.ts` (elige placeholder por hash del id, así coincide listado y detalle). Si se quiere portada real hay que agregar `image_url` a la tabla y al form del admin
+- Imagen de portada: `trips.image_url` + bucket `trip-images` (público, escritura solo admin via `private.is_admin()`), subida desde el form del admin (`uploadCover` en `admin/viajes/actions.ts`). Las tres lecturas (home, `/viajes`, detalle) hacen `trip.image_url ?? tripPlaceholderImage(trip.id)`, así que un viaje sin portada sigue funcionando. **Ojo**: `next.config.ts` tiene que listar el hostname de Supabase en `remotePatterns` o `next/image` rechaza las portadas — falla en runtime, no en build
+- **Ojo con los buckets públicos**: una policy de SELECT abierta sobre `storage.objects` **no** hace falta para leer por URL (esa lectura no pasa por RLS) y lo único que habilita es listar el bucket entero (advisor `lint 0025`). En `trip-images` el SELECT está restringido a admin, que igual lo necesita porque el upsert de Storage exige INSERT + SELECT + UPDATE. `avatars` todavía arrastra la policy abierta, pendiente de corregir igual
 - Formulario de solicitud de salud funcionando en `/viajes/[id]/solicitar` (primerizo/recurrente, elegido segun historial de aprobaciones del usuario)
 - Panel de admin funcionando en `/admin` (protegido por `profiles.is_admin`): dashboard, CRUD de viajes, revisión de solicitudes (aprobar/rechazar/expirar). Un admin no puede aprobar/rechazar su propia solicitud (guard en `reviewApplication` + oculto en la UI)
 - **Assets de diseño de Julia recibidos (2026-07-30)**: ver `docs/DESIGN_ASSETS.md` (mapeo de la carpeta a las rutas) y `docs/RECORRIDO.md` (el recorrido del negocio + las 8 primitivas visuales del sistema). La carpeta original está en `~/Descargas/frontend_eagle`, **fuera del repo**
 - `/nosotros` **implementado** con el mockup de Julia y copy real de la clienta (hero + propósito + metodología + Nuestra Visión). `/contenidos` sigue siendo placeholder mock
+- **Home parcialmente rediseñada**: hero sobre `PageHero` con el banner de Julia, carrusel "Portales de transformación" (`PortalsSection`) y "Próximos Retiros" **conectado a `trips` real** (antes eran dos tarjetas hardcodeadas con viajes inexistentes). Consultar Supabase desde la home la volvió dinámica (`ƒ`), ya no es prerender estático. Siguen mock `AboutSection`, `ContentSection`, `EbookSection` y `TestimonialsSection`
 - `pnpm build` (producción) verificado sin errores — listo para deployar en cuanto a código
 - `app/api/keep-alive/route.ts` + `vercel.json` (cron diario 12:00 UTC) armados para que Supabase free tier no pause el proyecto por inactividad. Protegido con `CRON_SECRET`
 - **Proyecto deployado en Vercel**: `cosmic-eagle` (org `ethoslogs-projects`), URL de producción `https://cosmic-eagle.vercel.app`. Env vars `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `CRON_SECRET` cargadas en Development/Preview/Production. **Repo de GitHub conectado al proyecto de Vercel** (vía GitHub App, no webhook clásico) — cada push a `main` deploya solo a producción, no hace falta correr `vercel --prod` a mano
@@ -81,6 +83,7 @@ src/
 │       └── solicitudes/              # revision, aprobar/rechazar/expirar (bloquea auto-revision)
 ├── components/
 │   ├── Header.tsx             # "use client" — nav desktop + drawer mobile
+│   ├── PortalsSection.tsx     # "use client" — carrusel P8 de la home
 │   ├── HeroSection.tsx
 │   ├── AboutSection.tsx
 │   ├── RetreatsSection.tsx
@@ -93,10 +96,13 @@ src/
 │       ├── PageHero.tsx           # P1 — hero de pagina
 │       ├── DocumentCard.tsx       # P2 — card documento (golden glass)
 │       ├── FeatureBlock.tsx       # P3 — par asimetrico texto/imagen
+│       ├── TripCard.tsx           # P4 — tarjeta de viaje con portada
 │       ├── ClosingSection.tsx     # P5 — cierre centrado + FourPointStar
+│       ├── Reveal.tsx             # "use client" — scroll reveal aislado
 │       └── CtaLink.tsx            # boton solido / ghost
 └── lib/
     ├── constants.ts           # Mock data (solo home), imagenes, nav links, footer
+    ├── format.ts              # formatDateRangeCompact (parsea `date` en UTC)
     ├── store.ts               # Zustand (drawerOpen)
     └── supabase/
         ├── client.ts           # browser client
@@ -129,7 +135,8 @@ docs/
 - Todos los tokens en `@theme` dentro de `globals.css`, con los nombres de rol de Material
 - **Ojo con el rol del oro**: en el set confirmado `primary` es `#fff6eb` (blanco cálido), NO el oro. El oro son `primary-fixed-dim` (`#e3c37d` — headings, bordes, íconos, acentos) y `primary-container` (`#f9d78f` — CTA sólido, con `text-on-primary`). Los componentes ya usan esos tokens; no volver a mapear `text-primary` a "dorado"
 - El fondo **nunca es plano**: degradé vertical de documento completo (azul celeste `#0a2a52` arriba → negro `#05060a` en el pie) en `body`, más un campo de estrellas fijo de 5 capas en `body::before`. **Ojo**: `html` lleva `background-color` a propósito, para cortar la propagación del fondo de `body` al canvas — sin eso el degradé se dimensiona contra el viewport y el remate oscuro del pie no se ve nunca
-- **Primitivas del sistema** en `src/components/ui/`: `PageHero` (P1), `DocumentCard` (P2), `FeatureBlock` (P3, par asimétrico texto/imagen), `ClosingSection` + `FourPointStar` (P5), `CtaLink`. Salen del mockup de Julia y son con las que se componen las páginas narrativas — antes de escribir una sección nueva, revisar si ya existe la primitiva (catálogo completo de las 8 en `docs/RECORRIDO.md` §4)
+- **Primitivas del sistema** en `src/components/ui/`: `PageHero` (P1), `DocumentCard` (P2), `FeatureBlock` (P3, par asimétrico texto/imagen), `TripCard` (P4), `ClosingSection` + `FourPointStar` (P5), más `CtaLink` y `Reveal`. Salen del mockup de Julia y son con las que se componen las páginas narrativas — antes de escribir una sección nueva, revisar si ya existe la primitiva (catálogo completo de las 8 en `docs/RECORRIDO.md` §4). Faltan construir P6 (banda de llamado), P7 (header con dividers) y P8 vive todavía dentro de `PortalsSection`
+- `Reveal` existe para que una sección con scroll reveal pueda seguir siendo Server Component: envuelve los hijos en el `motion.div` y deja el `"use client"` acotado al wrapper. Es lo que permitió que `RetreatsSection` consulte Supabase
 - Fuentes: **Domine** (display/headings) + **Literata** (body), via `next/font/google`
 - Escala tipográfica como tokens `--text-*`: `text-display-lg`, `text-headline-lg/md`, `text-body-lg/md`, `text-label-sm` (labels en mayúscula con tracking)
 - Radios ajustados a la guía (4–8px para contenedores): `rounded-2xl` ahora es 8px, no 16px
@@ -176,7 +183,16 @@ Pendiente, en orden sugerido:
 
 Decisiones abiertas que bloquean trabajo (detalle en `docs/FORMULARIOS.md`): cómo tratar a los recurrentes que ceremoniaron vía Google Forms (historial cero en Supabase → se les mostraría el form de primera vez), y si los Google Forms se apagan al salir la web o conviven un tiempo.
 
-**Frontend de Julia, orden de trabajo (ver `docs/RECORRIDO.md` §5)**: hecho el chrome global (fondo + navbar + footer) y `/nosotros`. Sigue: `/viajes` + cards con `image_url`, recomponer la home (carrusel P8 + grilla P4), y recién ahí `/preparacion`, que con las primitivas ya construidas es composición pura.
+**Frontend de Julia, orden de trabajo (ver `docs/RECORRIDO.md` §5)**: hecho el chrome global (fondo + navbar + footer), `/nosotros`, y de la home el hero, el carrusel y Próximos Retiros conectado a `trips` con portada real.
+
+Lo próximo, en orden:
+
+1. **Compresor a WebP del lado del cliente** en el input de portada del admin. **No es por storage** (el free tier de Supabase aguanta ~200 viajes con el tope de 5MB): es porque `next/image` transformando un PNG de 5MB en frío cuelga la primera visita, justo la que hace la clienta al revisar el viaje que acaba de cargar. Canvas nativo, sin dependencias. **Antes de escribirlo, leer el skill `client-side-image-compress` de brain-data**: ya tiene la implementación resuelta (`compressImage()`), incluidos los dos detalles que se hacen mal solos — la orientación EXIF (las fotos de celular salen rotadas) y el fallback al original si `toBlob` falla. De yapa, pasar por canvas borra el EXIF, incluida la geolocalización.
+2. Rediseñar las 4 secciones mock que quedan de la home (`AboutSection`, `EbookSection`, `TestimonialsSection`; `ContentSection` está en pausa hasta cerrar `/contenidos` con Sofía). En testimonios y en "Nuestra Esencia" **nuestro contenido es mejor que el del mockup** (personas reales vs. maqueta): se toma la forma de Julia, se conserva nuestro texto.
+3. `/viajes` adoptando `TripCard` en vez de su markup propio.
+4. `/preparacion`, que con las primitivas ya construidas es composición pura.
+
+CTAs muertos que quedan: "Comprar Ahora" del e-book (no hay ruta ni checkout) y "Leer Más" de `AboutSection` (probablemente vaya a `/nosotros`).
 
 Decisiones tomadas sola que hay que validar: el CTA **"Unirme al círculo"** del navbar apunta a `/cuenta?modo=registro` (con sesión se reemplaza por el avatar). El texto es de Julia pero **promete comunidad, que está fuera de alcance** (`docs/CONTEXT.md` §6) — confirmar con ellas. El input de newsletter del footer está deshabilitado (no hay backend); los links del footer sin ruta (Blog, E-book, Privacidad, Términos, Soporte) se pintan apagados en vez de linkear a `#`.
 

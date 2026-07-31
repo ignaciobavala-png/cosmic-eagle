@@ -30,7 +30,9 @@ export default async function ViajesPage() {
   const supabase = await createClient();
   const { data: trips } = await supabase
     .from("trips")
-    .select("id, title, description, location, start_date, end_date, price, status")
+    .select(
+      "id, title, description, location, start_date, end_date, price, status, image_url"
+    )
     .in("status", ["open", "closed"])
     .order("start_date", { ascending: true });
 
@@ -63,7 +65,7 @@ export default async function ViajesPage() {
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-void-black via-void-black/30 to-transparent z-10" />
                   <img
-                    src={tripPlaceholderImage(trip.id)}
+                    src={trip.image_url ?? tripPlaceholderImage(trip.id)}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                   />

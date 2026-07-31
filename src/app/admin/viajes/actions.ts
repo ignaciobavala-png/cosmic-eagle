@@ -59,6 +59,59 @@ function parseTripForm(formData: FormData) {
   } as const;
 }
 
+const BUCKET = "trip-images";
+const PUBLIC_PREFIX = `/storage/v1/object/public/${BUCKET}/`;
+
+type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
+
+/**
+ * Sube la portada si vino un archivo nuevo. Devuelve `undefined` cuando no hay
+ * archivo, para poder distinguir "no tocar la portada" de "portada vacia".
+ * La escritura del bucket esta restringida a admin por RLS (ver la migracion
+ * 20260731182000_trip_cover_image.sql), asi que no hace falta chequear el rol
+ * aca de nuevo: si no es admin, el upload falla.
+ */
+async function uploadCover(
+  supabase: SupabaseClient,
+  formData: FormData,
+  currentUrl?: string | null
+): Promise<{ error: string | null; url?: string }> {
+  const file = formData.get("image");
+
+  if (!(file instanceof File) || file.size === 0) return { error: null };
+
+  if (!file.type.startsWith("image/")) {
+    return { error: "La portada debe ser una imagen." };
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    return { error: "La portada no puede superar los 5MB." };
+  }
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const path = `${crypto.randomUUID()}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(path, file, { contentType: file.type });
+
+  if (error) {
+    return { error: "No se pudo subir la portada. Probá de nuevo." };
+  }
+
+  // Reemplazo: borra la anterior para que el bucket no crezca sin limite.
+  if (currentUrl?.includes(PUBLIC_PREFIX)) {
+    const oldPath = currentUrl.split(PUBLIC_PREFIX)[1]?.split("?")[0];
+    if (oldPath) await supabase.storage.from(BUCKET).remove([oldPath]);
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from(BUCKET).getPublicUrl(path);
+
+  return { error: null, url: publicUrl };
+}
+
 export async function createTrip(
   _prevState: TripFormState,
   formData: FormData
@@ -67,7 +120,13 @@ export async function createTrip(
   if (parsed.error) return { error: parsed.error };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("trips").insert(parsed.data);
+
+  const cover = await uploadCover(supabase, formData);
+  if (cover.error) return { error: cover.error };
+
+  const { error } = await supabase
+    .from("trips")
+    .insert({ ...parsed.data, image_url: cover.url ?? null });
   if (error) return { error: `No se pudo crear el viaje: ${error.message}` };
 
   revalidatePath("/admin/viajes");
@@ -84,9 +143,20 @@ export async function updateTrip(
   if (parsed.error) return { error: parsed.error };
 
   const supabase = await createClient();
+
+  const { data: current } = await supabase
+    .from("trips")
+    .select("image_url")
+    .eq("id", id)
+    .single();
+
+  const cover = await uploadCover(supabase, formData, current?.image_url);
+  if (cover.error) return { error: cover.error };
+
+  // Sin archivo nuevo la portada queda como esta: no se pisa con null.
   const { error } = await supabase
     .from("trips")
-    .update(parsed.data)
+    .update(cover.url ? { ...parsed.data, image_url: cover.url } : parsed.data)
     .eq("id", id);
   if (error)
     return { error: `No se pudo actualizar el viaje: ${error.message}` };

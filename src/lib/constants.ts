@@ -3,6 +3,7 @@ export const IMAGES = {
   logo: "/logo.png",
   // Assets de Julia, convertidos a WebP y servidos desde /public/img
   // (fuente original en ~/Descargas/frontend_eagle, ver docs/DESIGN_ASSETS.md)
+  heroHome: "/img/hero-home.webp",
   heroNosotros: "/img/hero-nosotros.webp",
   nosotrosProposito: "/img/nosotros-proposito.webp",
   nosotrosMetodologia: "/img/nosotros-metodologia.webp",
@@ -61,6 +62,23 @@ export const FOOTER_COLUMNS = [
     ],
   },
 ] as const;
+
+// Carrusel "Portales de transformación" de la home. Los textos son de la
+// maqueta de Julia; si la clienta manda los definitivos, se reemplazan aca.
+export const PORTALS = [
+  {
+    image: "/img/portal-1.webp",
+    alt: "Figura humana ascendiendo por un haz de luz cósmica",
+  },
+  {
+    image: "/img/portal-2.webp",
+    alt: "Silueta envuelta en una nebulosa de partículas doradas",
+  },
+  {
+    image: "/img/portal-3.webp",
+    alt: "Portal de energía abriéndose sobre un cielo estrellado",
+  },
+];
 
 export const TESTIMONIALS = [
   {

@@ -11,7 +11,7 @@ export function AboutSection() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.8 }}
-      className="py-20 md:py-24 px-5 max-w-7xl mx-auto"
+      className="py-20 md:py-24 px-margin-mobile md:px-margin-desktop max-w-narrative mx-auto"
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div className="order-2 lg:order-1 space-y-6">

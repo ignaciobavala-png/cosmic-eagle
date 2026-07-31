@@ -52,7 +52,7 @@ async function getTrip(id: string) {
   const { data } = await supabase
     .from("trips")
     .select(
-      "id, title, description, location, start_date, end_date, capacity, price, status"
+      "id, title, description, location, start_date, end_date, capacity, price, status, image_url"
     )
     .eq("id", id)
     .single();
@@ -128,7 +128,7 @@ export default async function ViajePage({ params }: Props) {
           <div className="relative h-[280px] md:h-[400px] rounded-3xl overflow-hidden glass-card mb-10">
             <div className="absolute inset-0 bg-gradient-to-t from-void-black via-void-black/40 to-transparent z-10" />
             <img
-              src={tripPlaceholderImage(trip.id)}
+              src={trip.image_url ?? tripPlaceholderImage(trip.id)}
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
             />

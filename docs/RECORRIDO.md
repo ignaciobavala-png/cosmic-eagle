@@ -114,6 +114,11 @@ justificaba la pregunta 4 — queda construida y con lugar para crecer.
 
 ## 5. Orden de trabajo que se desprende
 
+> **Estado al 2026-07-31**: hechos los pasos 1 y 2, y del 3 la parte de la home
+> (grilla P4 conectada a `trips` + `image_url` con subida desde el admin). El
+> carrusel P8 tambien esta. Falta el resto del paso 4 y los pasos 5 y 6.
+
+
 1. **Fondo global + navbar + footer** — el chrome de Julia, que toca todas las páginas.
    Resolver antes qué hace "UNIRME AL CÍRCULO".
 2. **`/nosotros`** — es la de mejor relación esfuerzo/valor: hoy es placeholder, tiene

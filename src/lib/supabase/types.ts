@@ -307,6 +307,7 @@ export type Database = {
           description: string | null
           end_date: string
           id: string
+          image_url: string | null
           location: string | null
           price: number
           start_date: string
@@ -319,6 +320,7 @@ export type Database = {
           description?: string | null
           end_date: string
           id?: string
+          image_url?: string | null
           location?: string | null
           price?: number
           start_date: string
@@ -331,6 +333,7 @@ export type Database = {
           description?: string | null
           end_date?: string
           id?: string
+          image_url?: string | null
           location?: string | null
           price?: number
           start_date?: string

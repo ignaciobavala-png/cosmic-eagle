@@ -24,9 +24,9 @@ export function ContentSection() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.8 }}
-      className="py-20 md:py-24 px-5 overflow-hidden"
+      className="py-20 md:py-24 px-margin-mobile md:px-margin-desktop overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-narrative mx-auto">
         <div className="text-center mb-16 md:mb-20">
           <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block mb-2">
             Explora más

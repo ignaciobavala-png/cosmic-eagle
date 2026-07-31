@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Image from "next/image";
 import type { Tables } from "@/lib/supabase/types";
 import type { TripFormState } from "./actions";
 
@@ -59,6 +60,34 @@ export function TripForm({
           defaultValue={trip?.description ?? ""}
           className={inputClass}
         />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="image" className={labelClass}>
+          Portada
+        </label>
+        {trip?.image_url && (
+          <div className="relative aspect-[4/3] w-48 overflow-hidden rounded-lg border border-outline-variant">
+            <Image
+              src={trip.image_url}
+              alt="Portada actual del viaje"
+              fill
+              sizes="192px"
+              className="object-cover"
+            />
+          </div>
+        )}
+        <input
+          id="image"
+          name="image"
+          type="file"
+          accept="image/*"
+          className={`${inputClass} file:mr-4 file:rounded-md file:border-0 file:bg-primary-container file:px-3 file:py-1 file:text-on-primary`}
+        />
+        <p className="text-xs text-on-surface-variant/70">
+          Apaisada, hasta 5MB. {trip?.image_url && "Si no elegís una, se mantiene la actual. "}
+          Sin portada se usa una imagen genérica.
+        </p>
       </div>
 
       <div className="flex flex-col gap-1.5">

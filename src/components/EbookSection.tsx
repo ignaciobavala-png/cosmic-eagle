@@ -17,9 +17,9 @@ export function EbookSection() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.8 }}
-      className="py-20 md:py-24 relative overflow-hidden bg-surface-container-lowest"
+      className="py-20 md:py-24 relative overflow-hidden"
     >
-      <div className="px-5 max-w-7xl mx-auto relative z-10">
+      <div className="px-margin-mobile md:px-margin-desktop max-w-narrative mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-20 items-center">
           <div className="relative flex justify-center">
             <div className="absolute inset-0 bg-primary-container/20 blur-[100px] animate-pulse" />
@@ -62,7 +62,8 @@ export function EbookSection() {
                 );
               })}
             </ul>
-            <button className="mt-10 w-full sm:w-auto px-10 py-4 bg-primary-container text-on-primary text-sm font-semibold tracking-[0.1em] rounded-full shadow-lg hover:shadow-primary-fixed-dim/20 transition-all duration-300">
+            {/* Sigue sin destino: no hay ruta de e-book ni checkout todavia */}
+            <button className="mt-10 w-full sm:w-auto px-10 py-4 bg-primary-container text-on-primary text-label-sm uppercase rounded-lg shadow-[0_0_24px_rgba(249,215,143,0.25)] hover:bg-primary-fixed transition-all duration-300">
               Comprar Ahora
             </button>
           </div>
