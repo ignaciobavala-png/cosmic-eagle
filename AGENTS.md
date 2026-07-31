@@ -26,6 +26,14 @@ Perfil técnico del desarrollador Ignacio Bavala. Define el stack tecnológico, 
 - Cuando necesites saber qué stack usar por defecto
 - Para mantener consistencia tecnológica entre proyectos
 
+## Cómo dirigirse a él
+
+**Ignacio es hombre.** En español rioplatense los adjetivos van en masculino:
+"vos solo", "quedaste tranquilo", "avisame cuando estés listo". Ojo con las
+concordancias que se cuelan al escribir rápido ("sola", "lista", "preparada").
+
+Tuteo con voseo, registro directo, sin formalismos.
+
 ## Stack por defecto para nuevos proyectos
 
 ```
@@ -78,6 +86,8 @@ Leer el archivo completo solo si la tarea actual lo requiere — esta lista es s
 
 - **Tiquetera Vite + Supabase — bugs silenciosos y patrones seguros** (`/home/nch/Escritorio/brain-data/skills/tiquetera-vite-supabase/SKILL.md`)
   Al trabajar en cualquier sistema de tickets/entradas con: localStorage como caché de tickets en el cliente Supabase como fuente de verdad Escaneo de QR con confirmación de ingreso Registro de asistentes por email
+- **React Email + Resend — setup, migración v6 y patrones de envío** (`/home/nch/Escritorio/brain-data/skills/react-email-resend/SKILL.md`)
+  Al conectar envío de emails transaccionales o campañas de mailing en un proyecto Next.js + Supabase. Aplica tanto a la primera integración como a mantenimiento de templates existentes.
 - **Google OAuth con Supabase SSR en Next.js 16** (`/home/nch/Escritorio/brain-data/skills/supabase-oauth-nextjs/SKILL.md`)
   Guía completa para instalar Google OAuth en Next.js 16 (App Router) con `@supabase/ssr`. Incluye los bugs conocidos que rompen el login silenciosamente.  ## 1. Google Cloud Console 1. Crear proyecto en https://console.cl…
 - **Enviopack en Next.js — integración completa de cotización de envíos** (`/home/nch/Escritorio/brain-data/skills/enviopack-nextjs/SKILL.md`)
@@ -94,8 +104,6 @@ Leer el archivo completo solo si la tarea actual lo requiere — esta lista es s
   Al configurar Tailwind v4 en un proyecto nuevo, definir tokens de diseño, o implementar layouts responsivos.
 - **Testing E2E con Playwright — ecommerce Next.js + Supabase** (`/home/nch/Escritorio/brain-data/skills/playwright-ecommerce/SKILL.md`)
   Cuando haya un proyecto Next.js + Supabase con autenticación por roles y flujos de compra que necesiten cobertura de regresión antes del lanzamiento.
-- **React Email + Resend — setup, migración v6 y patrones de envío** (`/home/nch/Escritorio/brain-data/skills/react-email-resend/SKILL.md`)
-  Al conectar envío de emails transaccionales o campañas de mailing en un proyecto Next.js + Supabase. Aplica tanto a la primera integración como a mantenimiento de templates existentes.
 - **Jeeliz FaceFilter + Three.js — Web AR try-on** (`/home/nch/Escritorio/brain-data/skills/jeeliz-web-ar-tryon/SKILL.md`)
   ## Cuando usarla Al integrar el face tracker Jeeliz FaceFilter con Three.js en una app React (Vite) para probadores virtuales de anteojos. La API de Jeeliz es singleton global y opera sobre WebGL crudo; Three.js debe com…
 - **Navegación con shell persistente (route group + framer-motion)** (`/home/nch/Escritorio/brain-data/skills/nextjs-persistent-shell-nav/SKILL.md`)
@@ -106,12 +114,18 @@ Leer el archivo completo solo si la tarea actual lo requiere — esta lista es s
   Al optimizar una página lenta, reducir el bundle, revisar re-renders, o hacer deploy en Vercel.
 - **Scaffold Next.js 16 + Supabase (kickstart)** (`/home/nch/Escritorio/brain-data/skills/scaffold-nextjs-supabase/SKILL.md`)
   Al arrancar cualquier proyecto nuevo. En vez de re-hacer el setup a mano y re-debuggear los mismos bugs silenciosos en cada cliente, generar el proyecto ya con todo baked-in. Dos targets según el peso del proyecto: **`ve…
+- **Bug silencioso — referencia externa huérfana al reintentar un pago** (`/home/nch/Escritorio/brain-data/skills/checkout-referencia-externa-huerfana/SKILL.md`)
+  Al integrar cualquier pasarela de pago (Mercado Pago, Stripe, MODO, PayPal) donde: se genera una `external_reference` / `client_reference_id` por orden, las filas de la orden se crean **antes** de redirigir al checkout,…
+- **Uploader con path fijo — la foto nueva nunca se ve (URL idéntica + CDN)** (`/home/nch/Escritorio/brain-data/skills/uploader-path-fijo-cache/SKILL.md`)
+  Cuando el cliente/admin dice **"subo la foto y no cambia nada en el sitio"** y en la DB la fila del asset no se movió (`updated_at` viejo) o tiene exactamente la misma URL. Aplica a cualquier uploader a Supabase Storage…
 - **Chatbot FAQ grounded con AI SDK v5 + Groq (widget Q&A)** (`/home/nch/Escritorio/brain-data/skills/ai-sdk-chatbot-grounded/SKILL.md`)
   Al agregar un widget de preguntas frecuentes / asistente virtual a un sitio, cuando la respuesta debe estar **anclada a un FAQ oficial** (sin inventar datos) y el objetivo es un chat simple con streaming, no un agente co…
 - **Inputs decimales en es-AR — coma como separador y estado string** (`/home/nch/Escritorio/brain-data/skills/inputs-decimales-coma-es-ar/SKILL.md`)
   Siempre que un formulario React/Next.js tenga campos numéricos con decimales (dimensiones, peso, precios, porcentajes) para usuarios argentinos. Síntoma típico reportado por el usuario: **"el input no toma decimales"** —…
 - **Onboarding multi-paso con guest+fotos — rollback en fallo y RLS de storage por dueño** (`/home/nch/Escritorio/brain-data/skills/onboarding-guest-rollback-storage-rls/SKILL.md`)
   Cuando un flujo público (sin login) crea una fila "dueña" (guest, invitado, registro) y después, en el mismo submit, sube archivos y/o inserta filas relacionadas (acompañante, adjuntos) — típico de un onboarding con invi…
+- **Postgres — MIN()/MAX() no existen para uuid y rompen la función en TODA llamada** (`/home/nch/Escritorio/brain-data/skills/postgres-min-max-no-existe-para-uuid/SKILL.md`)
+  Al escribir cualquier función plpgsql o query que agregue una columna `uuid`, típicamente para "traer el id del grupo" en un `SELECT COUNT(*), MIN(algo_id)`.
 - **Supabase — Max Rows silencioso trunca queries sin paginar** (`/home/nch/Escritorio/brain-data/skills/supabase-max-rows-limit/SKILL.md`)
   Al escribir o revisar cualquier `select()` de Supabase que traiga una tabla que puede crecer sin límite (emails, suscriptores, registros de eventos, logs, mensajes). También si un conteo o listado "deja de sumar" o parec…
 - **Recurrencia de eventos anclada a día de semana real (no a created_at)** (`/home/nch/Escritorio/brain-data/skills/recurrencia-eventos-dia-semana/SKILL.md`)
@@ -122,10 +136,18 @@ Leer el archivo completo solo si la tarea actual lo requiere — esta lista es s
   Cuando en Supabase/Postgres una tabla con RLS **devuelve 401 en TODA lectura** para un rol (típicamente `anon`), o cuando "el sitio público muestra vacío / la landing no carga datos" para visitantes no logueados, o cuand…
 - **Conectar Supabase CLI con PAT** (`/home/nch/Escritorio/brain-data/skills/supabase-conexion-cli/SKILL.md`)
   El PAT de Supabase es **por cuenta**, no por proyecto. Un solo token sirve para todos los proyectos de la organización. ### Generar token 1. Ir a https://supabase.com/dashboard/account/tokens 2. Crear nuevo token 3. Copi…
+- **Bucket público de Supabase — la policy de SELECT abierta deja listar todo** (`/home/nch/Escritorio/brain-data/skills/supabase-bucket-publico-select-listing/SKILL.md`)
+  Al crear cualquier bucket de Supabase Storage con `public: true` (avatares, portadas, adjuntos), y al copiar las policies de un bucket existente a uno nuevo.
 - **Supabase MCP Multiproyecto** (`/home/nch/Escritorio/brain-data/skills/supabase-mcp-multiproyecto/SKILL.md`)
   Siempre. Esta skill es un guard automático: cada vez que se use cualquier herramienta MCP de Supabase, se debe verificar que el proyecto destino coincide con el proyecto activo del directorio de trabajo. No se debe deleg…
+- **sharp en Vercel con pnpm — binarios nativos que no llegan al bundle** (`/home/nch/Escritorio/brain-data/skills/sharp-vercel-pnpm-tracing/SKILL.md`)
+  Cuando una ruta API de Next.js que usa `sharp` funciona en local pero en Vercel tira `ERR_DLOPEN_FAILED` (buscando `libvips-cpp.so.X`) o el cliente recibe `JSON.parse: unexpected character at line 1 column 1` (la función…
+- **Soft delete sin filtrar `active` en todas las lecturas** (`/home/nch/Escritorio/brain-data/skills/soft-delete-filtro-incompleto/SKILL.md`)
+  Cuando "borré algo desde el admin y volvió a aparecer" — en el listado del admin, en la home, en el listado público o en el checkout. También al introducir un soft delete nuevo.
 - **Bug silencioso — login colgado en "Cargando..." con @supabase/ssr + embed ambiguo** (`/home/nch/Escritorio/brain-data/skills/supabase-ssr-login-deadlock/SKILL.md`)
   Dos bugs de admin Next.js + Supabase que aparecieron juntos en Pampa Estudio: 1. El botón de login queda en "Cargando…" para siempre (la sesión igual se crea). 2. Listados del admin muestran 0 filas / KPIs en 0 sin error…
+- **Hono setSignedCookie async sin await rompe cookies silenciosamente** (`/home/nch/Escritorio/brain-data/skills/hono-set-signed-cookie-async/SKILL.md`)
+  Cuando uses `setSignedCookie` de Hono para auth con cookies firmadas y el login parezca funcionar (redirige) pero luego las rutas protegidas fallen (loop infinito de login).
 - **Bug silencioso de datetime-local con timestamps UTC** (`/home/nch/Escritorio/brain-data/skills/datetime-local-utc-bug/SKILL.md`)
   Siempre que un form tenga `<input type="datetime-local">` cuyo valor se carga desde un timestamp guardado en UTC (Supabase `timestamptz`, ISO strings) y se vuelve a guardar.
 - **ON CONFLICT en Postgres debe matchear una constraint real, o falla siempre** (`/home/nch/Escritorio/brain-data/skills/postgres-on-conflict-debe-matchear-constraint-real/SKILL.md`)
