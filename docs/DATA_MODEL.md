@@ -96,11 +96,26 @@
 | consent_version | text | version del texto legal |
 | created_at | timestamptz | — |
 
+## newsletter_subscribers
+
+Altas del formulario "Sintoniza" del pie de pagina. No tiene relacion con `auth.users`:
+suscribirse no requiere cuenta.
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| id | uuid | pk |
+| email | text | CHECK de formato + unico por `lower(email)` |
+| created_at | timestamptz | — |
+
+No hay baja ni estado de suscripcion: si hace falta dar de baja a alguien, hoy es un
+`delete` a mano. El panel (`/admin/suscriptores`) es solo lectura.
+
 ## Reglas RLS
 
 - Datos de salud (`applications_*`) → solo admin puede leer/escribir. El usuario solo ve sus propias solicitudes (status, no datos medicos).
 - `consents` → usuario ve/crea sus propios, admin ve todos.
 - `trips` → lectura publica, escritura solo admin.
+- `newsletter_subscribers` → **insert publico** (unica tabla que escribe `anon`, acotado por grant a la columna `email`), lectura solo admin: la lista de correos no la ve ni un usuario logueado.
 - `users` → tabla custom para metadata de perfil (rangos, etc.), no confundir con `auth.users`.
 
 ## Usuario vs. Solicitante

@@ -3,6 +3,7 @@ import {
   CalendarCheck2,
   ClipboardList,
   Compass,
+  Mail,
   UserCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -33,6 +34,7 @@ export default async function AdminDashboardPage() {
     { count: pendingReturning },
     { count: approvedFirstTime },
     { count: approvedReturning },
+    { count: subscribers },
     { data: upcomingTrips },
     { data: pendingApplicationsFirstTime },
     { data: pendingApplicationsReturning },
@@ -58,6 +60,9 @@ export default async function AdminDashboardPage() {
       .from("applications_returning")
       .select("*", { count: "exact", head: true })
       .eq("status", "approved"),
+    supabase
+      .from("newsletter_subscribers")
+      .select("*", { count: "exact", head: true }),
     supabase
       .from("trips")
       .select("id, title, start_date, end_date, capacity, status")
@@ -118,6 +123,13 @@ export default async function AdminDashboardPage() {
       icon: UserCheck,
     },
     {
+      href: "/admin/suscriptores",
+      label: "Suscriptores",
+      value: subscribers ?? 0,
+      hint: "newsletter del footer",
+      icon: Mail,
+    },
+    {
       href: "/admin/viajes",
       label: "Próximo viaje",
       value: upcomingTrips?.[0] ? formatDate(upcomingTrips[0].start_date) : "—",
@@ -131,7 +143,7 @@ export default async function AdminDashboardPage() {
     <div>
       <h1 className="font-display text-3xl text-primary-fixed-dim mb-8">Dashboard</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-10">
         {stats.map((card) => {
           const Icon = card.icon;
           return (

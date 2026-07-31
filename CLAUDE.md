@@ -31,6 +31,7 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 - `pnpm build` (producción) verificado sin errores — listo para deployar en cuanto a código
 - `app/api/keep-alive/route.ts` + `vercel.json` (cron diario 12:00 UTC) armados para que Supabase free tier no pause el proyecto por inactividad. Protegido con `CRON_SECRET`
 - **Proyecto deployado en Vercel**: `cosmic-eagle` (org `ethoslogs-projects`), URL de producción `https://cosmic-eagle.vercel.app`. Env vars `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `CRON_SECRET` cargadas en Development/Preview/Production. **Repo de GitHub conectado al proyecto de Vercel** (vía GitHub App, no webhook clásico) — cada push a `main` deploya solo a producción, no hace falta correr `vercel --prod` a mano
+- **Newsletter "Sintoniza"**: el input del footer ya guarda. Tabla `newsletter_subscribers` (RLS: insert público para `anon`, select solo admin), server action `subscribeNewsletter`, y los correos se leen en `/admin/suscriptores` (tabla + botón de copiar al portapapeles). Es la **única tabla que escribe `anon`**: el insert está acotado por grant a la columna `email` y el formato lo valida un CHECK. Un mail repetido responde "listo" igual (no revela quién está suscripto). **No hay rate limit** — si aparece spam, el paso siguiente es un captcha o un límite por IP, no tocar la policy. El advisor `lint 0024` (`WITH CHECK (true)`) queda en WARN a propósito: cualquiera puede suscribirse, esa es la función
 - Cuenta de prueba admin: ver `~/Escritorio/account/cosmic-eagle-acces.txt` (fuera del repo)
 
 **Ya se puede escribir código que asuma conexión a Supabase** — el schema existe y está en uso. Antes de tocar RLS/funciones, revisar el checklist de seguridad del skill `supabase`.
@@ -83,6 +84,7 @@ src/
 │       ├── layout.tsx                # guard + AdminNav
 │       ├── page.tsx                  # dashboard (stats + actividad reciente)
 │       ├── viajes/                   # CRUD de trips
+│       ├── suscriptores/             # lista del newsletter (solo lectura + copiar)
 │       └── solicitudes/              # revision, aprobar/rechazar/expirar (bloquea auto-revision)
 ├── components/
 │   ├── Header.tsx             # "use client" — nav desktop + drawer mobile
@@ -94,6 +96,8 @@ src/
 │   ├── EbookSection.tsx
 │   ├── TestimonialsSection.tsx
 │   ├── Footer.tsx             # 4 columnas segun mockup (links sin ruta van apagados)
+│   ├── NewsletterForm.tsx     # "use client" — alta al newsletter (useActionState)
+│   ├── newsletter-actions.ts  # "use server" — subscribeNewsletter
 │   ├── BackToTop.tsx          # "use client" — FAB scroll
 │   └── ui/                    # primitivas del sistema visual de Julia
 │       ├── PageHero.tsx           # P1 — hero de pagina
@@ -198,7 +202,7 @@ Lo próximo, en orden:
 
 CTAs muertos que quedan: "Comprar Ahora" del e-book (no hay ruta ni checkout) y "Leer Más" de `AboutSection` (probablemente vaya a `/nosotros`).
 
-Decisiones tomadas sola que hay que validar: el CTA **"Unirme al círculo"** del navbar apunta a `/cuenta?modo=registro` (con sesión se reemplaza por el avatar). El texto es de Julia pero **promete comunidad, que está fuera de alcance** (`docs/CONTEXT.md` §6) — confirmar con ellas. El input de newsletter del footer está deshabilitado (no hay backend); los links del footer sin ruta (Blog, E-book, Privacidad, Términos, Soporte) se pintan apagados en vez de linkear a `#`.
+Decisiones tomadas sola que hay que validar: el CTA **"Unirme al círculo"** del navbar apunta a `/cuenta?modo=registro` (con sesión se reemplaza por el avatar). El texto es de Julia pero **promete comunidad, que está fuera de alcance** (`docs/CONTEXT.md` §6) — confirmar con ellas. Los links del footer sin ruta (Blog, E-book, Privacidad, Términos, Soporte) se pintan apagados en vez de linkear a `#`.
 
 No urgente pero pendiente: `/contenidos` es la sección mock de la home mudada de lugar, no una página propia. `/preparacion` no existe todavía.
 

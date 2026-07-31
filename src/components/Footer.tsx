@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Send } from "lucide-react";
 import { FOOTER_COLUMNS, IMAGES } from "@/lib/constants";
+import { NewsletterForm } from "./NewsletterForm";
 
 export function Footer() {
   return (
@@ -55,18 +55,7 @@ export function Footer() {
           <p className="text-body-md text-on-surface-variant">
             Enterate de las novedades antes que nadie.
           </p>
-          {/* Sin backend de newsletter todavia: se deja el campo inhabilitado
-              antes que recolectar mails que no van a ningun lado. */}
-          <div className="flex items-center gap-2 rounded-lg border border-primary-fixed-dim/25 bg-white/[0.03] px-4 py-2.5 opacity-60">
-            <input
-              type="email"
-              disabled
-              placeholder="Tu correo electrónico"
-              aria-label="Tu correo electrónico (próximamente)"
-              className="w-full bg-transparent text-body-md text-on-surface placeholder:text-on-surface-variant/60 outline-none"
-            />
-            <Send size={16} className="shrink-0 text-primary-fixed-dim" />
-          </div>
+          <NewsletterForm />
         </div>
       </div>
 
