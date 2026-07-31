@@ -4,7 +4,12 @@ export const IMAGES = {
   // Assets de Julia, convertidos a WebP y servidos desde /public/img
   // (fuente original en ~/Descargas/frontend_eagle, ver docs/DESIGN_ASSETS.md)
   heroHome: "/img/hero-home.webp",
-  heroNosotros: "/img/hero-nosotros.webp",
+  heroViajes: "/img/hero-viajes.webp",
+  // Las siluetas de particulas se repiten a proposito en el mockup: son el hero
+  // de /nosotros y el fondo de la banda de llamado de /viajes. Julia exporto el
+  // mismo archivo en las dos carpetas (BANNER_HERO_NOSOTROS = IMAGE_VIAJES_PT2),
+  // asi que aca tambien es uno solo.
+  almas: "/img/almas-particulas.webp",
   nosotrosProposito: "/img/nosotros-proposito.webp",
   nosotrosMetodologia: "/img/nosotros-metodologia.webp",
   about:

@@ -1,37 +1,35 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
+import { PageHero } from "@/components/ui/PageHero";
+import { TripCard } from "@/components/ui/TripCard";
+import { CallBand } from "@/components/ui/CallBand";
+import { Reveal } from "@/components/ui/Reveal";
 import { createClient } from "@/lib/supabase/server";
-import { tripPlaceholderImage } from "@/lib/constants";
+import { IMAGES } from "@/lib/constants";
 
-const STATUS_LABEL: Record<string, string> = {
-  open: "Cupos disponibles",
-  closed: "Cupo completo",
-  completed: "Finalizado",
+export const metadata: Metadata = {
+  title: "Retiros & Ceremonias | Cosmic Eagle",
+  description:
+    "Calendario de viajes y ceremonias ancestrales. Descubrí el viaje ideal para vos.",
 };
 
-function formatDateRange(startDate: string, endDate: string) {
-  // Postgres `date` llega como "YYYY-MM-DD": parsear como UTC y formatear en
-  // UTC evita que el timezone local corra la fecha un dia hacia atras.
-  const format = (iso: string) =>
-    new Date(`${iso}T00:00:00Z`).toLocaleDateString("es-AR", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      timeZone: "UTC",
-    });
-  return startDate === endDate
-    ? format(startDate)
-    : `${format(startDate)} — ${format(endDate)}`;
-}
-
+/**
+ * Composicion del mockup VIAJES de Julia: P1 hero -> grilla P4 -> P6 llamado.
+ *
+ * El listado usaba markup propio; ahora comparte TripCard con la home, asi que
+ * una tarjeta de viaje se ve igual en los dos lugares.
+ *
+ * Filtra `draft` explicitamente (via el `in` de status): la policy
+ * trips_select_public deja leer todos los trips a `anon`.
+ */
 export default async function ViajesPage() {
   const supabase = await createClient();
   const { data: trips } = await supabase
     .from("trips")
     .select(
-      "id, title, description, location, start_date, end_date, price, status, image_url"
+      "id, title, description, location, start_date, end_date, status, image_url"
     )
     .in("status", ["open", "closed"])
     .order("start_date", { ascending: true });
@@ -39,66 +37,59 @@ export default async function ViajesPage() {
   return (
     <>
       <Header />
-      <main className="pt-16 min-h-screen">
-        <div className="px-5 max-w-7xl mx-auto py-16 md:py-20">
-          <div className="text-center mb-12">
-            <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block mb-2">
-              Calendario de viajes
-            </span>
-            <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary-fixed-dim">
-              Próximos Viajes y Ceremonias
-            </h1>
-          </div>
+      <main className="pt-16">
+        <PageHero
+          image={IMAGES.heroViajes}
+          title="Retiros & Ceremonias"
+          subtitle="Descubrí el viaje ideal para vos"
+          actions={[
+            { label: "Explorar destinos", href: "#proximos", variant: "solid" },
+            {
+              label: "Nuestra metodología",
+              href: "/nosotros#metodologia",
+              variant: "ghost",
+            },
+          ]}
+          scrollHint="Explorar"
+          scrollTo="proximos"
+        />
 
-          {!trips || trips.length === 0 ? (
-            <p className="text-on-surface-variant text-center max-w-md mx-auto">
-              No hay viajes publicados por el momento. Volvé a visitarnos
-              pronto.
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {trips.map((trip) => (
-                <Link
-                  key={trip.id}
-                  href={`/viajes/${trip.id}`}
-                  className="group relative h-[420px] rounded-3xl overflow-hidden glass-card block"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-void-black via-void-black/30 to-transparent z-10" />
-                  <img
-                    src={trip.image_url ?? tripPlaceholderImage(trip.id)}
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
-                    <span
-                      className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest mb-4 inline-block backdrop-blur-md border ${
-                        trip.status === "open"
-                          ? "bg-secondary/20 text-secondary border-secondary/40"
-                          : "bg-outline-variant/40 text-on-surface-variant border-outline/40"
-                      }`}
-                    >
-                      {STATUS_LABEL[trip.status] ?? trip.status}
-                    </span>
-                    <h2 className="font-display text-2xl md:text-[32px] leading-[40px] text-white mb-2">
-                      {trip.title}
-                    </h2>
-                    <p className="text-on-surface-variant text-sm mb-1">
-                      {trip.location} · {formatDateRange(trip.start_date, trip.end_date)}
-                    </p>
-                    {trip.description && (
-                      <p className="text-on-surface-variant max-w-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 mb-3">
-                        {trip.description}
-                      </p>
-                    )}
-                    <span className="inline-block bg-primary-container text-on-primary text-sm font-medium tracking-[0.05em] rounded-lg px-4 py-2 group-hover:bg-primary-fixed transition-colors">
-                      Ver viaje
-                    </span>
-                  </div>
-                </Link>
-              ))}
+        <Reveal className="py-20 md:py-24">
+          <div
+            id="proximos"
+            className="mx-auto max-w-narrative px-margin-mobile md:px-margin-desktop scroll-mt-24"
+          >
+            <div className="mb-12 text-center">
+              <span className="text-label-sm uppercase text-on-surface-variant">
+                Calendario de viajes
+              </span>
+              <h2 className="mt-2 font-display text-headline-lg text-on-surface">
+                Próximos Retiros
+              </h2>
             </div>
-          )}
-        </div>
+
+            {!trips || trips.length === 0 ? (
+              <p className="mx-auto max-w-md text-center text-body-md text-on-surface-variant">
+                No hay viajes publicados por el momento. Volvé a visitarnos
+                pronto.
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                {trips.map((trip) => (
+                  <TripCard key={trip.id} trip={trip} />
+                ))}
+              </div>
+            )}
+          </div>
+        </Reveal>
+
+        {/* El CTA ancla al listado de arriba: aplicar es siempre a *un* viaje
+            concreto (/viajes/[id]/solicitar), no hay un formulario general. */}
+        <CallBand
+          image={IMAGES.almas}
+          title="¿Sentís el llamado?"
+          action={{ label: "Aplicar para un viaje", href: "#proximos" }}
+        />
       </main>
       <Footer />
       <BackToTop />

@@ -12,6 +12,13 @@ export type TripCardData = {
   start_date: string;
   end_date: string;
   image_url: string | null;
+  /** Opcional: solo el listado de /viajes avisa cuando el cupo ya no esta abierto. */
+  status?: string | null;
+};
+
+const STATUS_LABEL: Record<string, string> = {
+  closed: "Cupo completo",
+  completed: "Finalizado",
 };
 
 /**
@@ -41,6 +48,11 @@ export function TripCard({ trip }: { trip: TripCardData }) {
         {trip.location && (
           <span className="absolute left-4 top-4 rounded-full border border-primary-fixed-dim/40 bg-[#05060a]/70 px-3 py-1 text-label-sm uppercase text-primary-fixed-dim backdrop-blur-md">
             {trip.location}
+          </span>
+        )}
+        {trip.status && STATUS_LABEL[trip.status] && (
+          <span className="absolute right-4 top-4 rounded-full border border-outline/40 bg-[#05060a]/70 px-3 py-1 text-label-sm uppercase text-on-surface-variant backdrop-blur-md">
+            {STATUS_LABEL[trip.status]}
           </span>
         )}
       </div>

@@ -114,9 +114,11 @@ justificaba la pregunta 4 — queda construida y con lugar para crecer.
 
 ## 5. Orden de trabajo que se desprende
 
-> **Estado al 2026-07-31**: hechos los pasos 1 y 2, y del 3 la parte de la home
-> (grilla P4 conectada a `trips` + `image_url` con subida desde el admin). El
-> carrusel P8 tambien esta. Falta el resto del paso 4 y los pasos 5 y 6.
+> **Estado al 2026-07-31**: hechos los pasos 1, 2 y 3. `/viajes` quedó con el
+> hero P1, la grilla P4 (compartida con la home) y la banda P6 al pie, así que
+> **P6 ya está construida** (`ui/CallBand.tsx`). De la home falta rediseñar
+> `AboutSection`, `EbookSection` y `TestimonialsSection` — esta última es la que
+> pide P7, la única primitiva que sigue sin construirse. Faltan los pasos 5 y 6.
 
 
 1. **Fondo global + navbar + footer** — el chrome de Julia, que toca todas las páginas.

@@ -25,7 +25,7 @@ export default function NosotrosPage() {
       <Header />
       <main className="pt-16">
         <PageHero
-          image={IMAGES.heroNosotros}
+          image={IMAGES.almas}
           title="Un espacio de luz y amor."
           subtitle="+10 años acompañando transformaciones"
           scrollHint="Conocenos"

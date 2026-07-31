@@ -24,8 +24,10 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 - Formulario de solicitud de salud funcionando en `/viajes/[id]/solicitar` (primerizo/recurrente, elegido segun historial de aprobaciones del usuario)
 - Panel de admin funcionando en `/admin` (protegido por `profiles.is_admin`): dashboard, CRUD de viajes, revisión de solicitudes (aprobar/rechazar/expirar). Un admin no puede aprobar/rechazar su propia solicitud (guard en `reviewApplication` + oculto en la UI)
 - **Assets de diseño de Julia recibidos (2026-07-30)**: ver `docs/DESIGN_ASSETS.md` (mapeo de la carpeta a las rutas) y `docs/RECORRIDO.md` (el recorrido del negocio + las 8 primitivas visuales del sistema). La carpeta original está en `~/Descargas/frontend_eagle`, **fuera del repo**
-- `/nosotros` **implementado** con el mockup de Julia y copy real de la clienta (hero + propósito + metodología + Nuestra Visión). `/contenidos` sigue siendo placeholder mock
-- **Home parcialmente rediseñada**: hero sobre `PageHero` con el banner de Julia, carrusel "Portales de transformación" (`PortalsSection`) y "Próximos Retiros" **conectado a `trips` real** (antes eran dos tarjetas hardcodeadas con viajes inexistentes). Consultar Supabase desde la home la volvió dinámica (`ƒ`), ya no es prerender estático. Siguen mock `AboutSection`, `ContentSection`, `EbookSection` y `TestimonialsSection`
+- `/nosotros` **implementado** con el mockup de Julia y copy real de la clienta (hero + propósito + metodología + Nuestra Visión)
+- `/viajes` **implementada sobre el mockup de Julia**: hero P1 (`hero-viajes.webp`) + grilla de `TripCard` (P4, la misma de la home) + banda de llamado P6 al pie. El CTA "Aplicar para un viaje" **ancla al listado** (`#proximos`), no linkea a un form: aplicar es siempre a *un* viaje concreto
+- `/contenidos` dejó de ser placeholder: hospeda **provisoriamente** la sección "Contenidos" que estaba en la home (mock, CTAs sin destino), hasta cerrar `docs/CONTENT_MAP.md` con Sofía
+- **Home parcialmente rediseñada**: hero sobre `PageHero` con el banner de Julia, carrusel "Portales de transformación" (`PortalsSection`) y "Próximos Retiros" **conectado a `trips` real** (antes eran dos tarjetas hardcodeadas con viajes inexistentes). Consultar Supabase desde la home la volvió dinámica (`ƒ`), ya no es prerender estático. Siguen mock `AboutSection`, `EbookSection` y `TestimonialsSection` (`ContentSection` se mudó a `/contenidos`)
 - `pnpm build` (producción) verificado sin errores — listo para deployar en cuanto a código
 - `app/api/keep-alive/route.ts` + `vercel.json` (cron diario 12:00 UTC) armados para que Supabase free tier no pause el proyecto por inactividad. Protegido con `CRON_SECRET`
 - **Proyecto deployado en Vercel**: `cosmic-eagle` (org `ethoslogs-projects`), URL de producción `https://cosmic-eagle.vercel.app`. Env vars `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `CRON_SECRET` cargadas en Development/Preview/Production. **Repo de GitHub conectado al proyecto de Vercel** (vía GitHub App, no webhook clásico) — cada push a `main` deploya solo a producción, no hace falta correr `vercel --prod` a mano
@@ -54,15 +56,15 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 ```
 src/
 ├── app/
-│   ├── page.tsx                     # Home (7 secciones, mock)
+│   ├── page.tsx                     # Home (6 secciones, 3 rediseñadas)
 │   ├── layout.tsx                    # Root layout (fuentes, metadata)
 │   ├── globals.css                   # Design system (colores, glass, scrollbar)
 │   ├── not-found.tsx                 # 404 custom
 │   ├── nosotros/page.tsx             # implementado (mockup de Julia + copy real)
-│   ├── contenidos/page.tsx           # placeholder
+│   ├── contenidos/page.tsx           # provisorio: la seccion mock que estaba en la home
 │   ├── api/keep-alive/route.ts       # ping a `trips`, cron diario via vercel.json
 │   ├── viajes/
-│   │   ├── page.tsx                  # listado, conectado a `trips` real
+│   │   ├── page.tsx                  # P1 + grilla P4 + P6, conectado a `trips` real
 │   │   └── [id]/
 │   │       ├── page.tsx              # detalle PUBLICO del viaje (sin login)
 │   │       └── solicitar/
@@ -99,6 +101,7 @@ src/
 │       ├── FeatureBlock.tsx       # P3 — par asimetrico texto/imagen
 │       ├── TripCard.tsx           # P4 — tarjeta de viaje con portada
 │       ├── ClosingSection.tsx     # P5 — cierre centrado + FourPointStar
+│       ├── CallBand.tsx           # P6 — banda de llamado (imagen + titulo + 1 CTA)
 │       ├── Reveal.tsx             # "use client" — scroll reveal aislado
 │       └── CtaLink.tsx            # boton solido / ghost
 └── lib/
@@ -136,7 +139,7 @@ docs/
 - Todos los tokens en `@theme` dentro de `globals.css`, con los nombres de rol de Material
 - **Ojo con el rol del oro**: en el set confirmado `primary` es `#fff6eb` (blanco cálido), NO el oro. El oro son `primary-fixed-dim` (`#e3c37d` — headings, bordes, íconos, acentos) y `primary-container` (`#f9d78f` — CTA sólido, con `text-on-primary`). Los componentes ya usan esos tokens; no volver a mapear `text-primary` a "dorado"
 - El fondo **nunca es plano**: degradé vertical de documento completo (azul celeste `#0a2a52` arriba → negro `#05060a` en el pie) en `body`, más un campo de estrellas fijo de 5 capas en `body::before`. **Ojo**: `html` lleva `background-color` a propósito, para cortar la propagación del fondo de `body` al canvas — sin eso el degradé se dimensiona contra el viewport y el remate oscuro del pie no se ve nunca
-- **Primitivas del sistema** en `src/components/ui/`: `PageHero` (P1), `DocumentCard` (P2), `FeatureBlock` (P3, par asimétrico texto/imagen), `TripCard` (P4), `ClosingSection` + `FourPointStar` (P5), más `CtaLink` y `Reveal`. Salen del mockup de Julia y son con las que se componen las páginas narrativas — antes de escribir una sección nueva, revisar si ya existe la primitiva (catálogo completo de las 8 en `docs/RECORRIDO.md` §4). Faltan construir P6 (banda de llamado), P7 (header con dividers) y P8 vive todavía dentro de `PortalsSection`
+- **Primitivas del sistema** en `src/components/ui/`: `PageHero` (P1), `DocumentCard` (P2), `FeatureBlock` (P3, par asimétrico texto/imagen), `TripCard` (P4), `ClosingSection` + `FourPointStar` (P5), `CallBand` (P6), más `CtaLink` y `Reveal`. Salen del mockup de Julia y son con las que se componen las páginas narrativas — antes de escribir una sección nueva, revisar si ya existe la primitiva (catálogo completo de las 8 en `docs/RECORRIDO.md` §4). Falta construir P7 (header con dividers, lo pide `TestimonialsSection`) y P8 vive todavía dentro de `PortalsSection`
 - `Reveal` existe para que una sección con scroll reveal pueda seguir siendo Server Component: envuelve los hijos en el `motion.div` y deja el `"use client"` acotado al wrapper. Es lo que permitió que `RetreatsSection` consulte Supabase
 - Fuentes: **Domine** (display/headings) + **Literata** (body), via `next/font/google`
 - Escala tipográfica como tokens `--text-*`: `text-display-lg`, `text-headline-lg/md`, `text-body-lg/md`, `text-label-sm` (labels en mayúscula con tracking)
@@ -184,20 +187,20 @@ Pendiente, en orden sugerido:
 
 Decisiones abiertas que bloquean trabajo (detalle en `docs/FORMULARIOS.md`): cómo tratar a los recurrentes que ceremoniaron vía Google Forms (historial cero en Supabase → se les mostraría el form de primera vez), y si los Google Forms se apagan al salir la web o conviven un tiempo.
 
-**Frontend de Julia, orden de trabajo (ver `docs/RECORRIDO.md` §5)**: hecho el chrome global (fondo + navbar + footer), `/nosotros`, y de la home el hero, el carrusel y Próximos Retiros conectado a `trips` con portada real.
+**Frontend de Julia, orden de trabajo (ver `docs/RECORRIDO.md` §5)**: hecho el chrome global (fondo + navbar + footer), `/nosotros`, `/viajes` completa (P1 + P4 + P6) y, de la home, el hero, el carrusel y Próximos Retiros conectado a `trips` con portada real. De las 8 primitivas solo falta P7.
 
 Lo próximo, en orden:
 
 1. **Compresor a WebP del lado del cliente** en el input de portada del admin. **No es por storage** (el free tier de Supabase aguanta ~200 viajes con el tope de 5MB): es porque `next/image` transformando un PNG de 5MB en frío cuelga la primera visita, justo la que hace la clienta al revisar el viaje que acaba de cargar. Canvas nativo, sin dependencias. **Antes de escribirlo, leer el skill `client-side-image-compress` de brain-data**: ya tiene la implementación resuelta (`compressImage()`), incluidos los dos detalles que se hacen mal solos — la orientación EXIF (las fotos de celular salen rotadas) y el fallback al original si `toBlob` falla. De yapa, pasar por canvas borra el EXIF, incluida la geolocalización.
-2. Rediseñar las 4 secciones mock que quedan de la home (`AboutSection`, `EbookSection`, `TestimonialsSection`; `ContentSection` está en pausa hasta cerrar `/contenidos` con Sofía). En testimonios y en "Nuestra Esencia" **nuestro contenido es mejor que el del mockup** (personas reales vs. maqueta): se toma la forma de Julia, se conserva nuestro texto.
-3. `/viajes` adoptando `TripCard` en vez de su markup propio.
-4. `/preparacion`, que con las primitivas ya construidas es composición pura.
+2. Rediseñar las 3 secciones mock que quedan de la home: `AboutSection` (el asset `ICONO_ABOUTSECTION.png` es el único de la entrega de Julia sin convertir ni usar), `EbookSection` y `TestimonialsSection` — esta última es la que pide construir P7. En testimonios y en "Nuestra Esencia" **nuestro contenido es mejor que el del mockup** (personas reales vs. maqueta): se toma la forma de Julia, se conserva nuestro texto.
+3. `/preparacion`, que con las primitivas ya construidas es composición pura.
+4. `/contenidos` de verdad, cuando cierre `docs/CONTENT_MAP.md` con Sofía: hoy es la sección mock de la home mudada de lugar.
 
 CTAs muertos que quedan: "Comprar Ahora" del e-book (no hay ruta ni checkout) y "Leer Más" de `AboutSection` (probablemente vaya a `/nosotros`).
 
 Decisiones tomadas sola que hay que validar: el CTA **"Unirme al círculo"** del navbar apunta a `/cuenta?modo=registro` (con sesión se reemplaza por el avatar). El texto es de Julia pero **promete comunidad, que está fuera de alcance** (`docs/CONTEXT.md` §6) — confirmar con ellas. El input de newsletter del footer está deshabilitado (no hay backend); los links del footer sin ruta (Blog, E-book, Privacidad, Términos, Soporte) se pintan apagados en vez de linkear a `#`.
 
-No urgente pero pendiente: `/contenidos` sigue siendo placeholder mock. `/preparacion` no existe todavía.
+No urgente pero pendiente: `/contenidos` es la sección mock de la home mudada de lugar, no una página propia. `/preparacion` no existe todavía.
 
 ## No hacer
 
