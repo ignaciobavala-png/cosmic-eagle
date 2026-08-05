@@ -194,6 +194,37 @@ Decisiones abiertas que bloquean trabajo (detalle en `docs/FORMULARIOS.md`): có
 
 **Frontend de Julia, orden de trabajo (ver `docs/RECORRIDO.md` §5)**: hecho el chrome global (fondo + navbar + footer), `/nosotros`, `/viajes` completa (P1 + P4 + P6) y, de la home, el hero, el carrusel y Próximos Retiros conectado a `trips` con portada real. De las 8 primitivas solo falta P7.
 
+### Sesión del 2026-08-05 — dónde retomar
+
+Todo lo de abajo está **mergeado a `main` y deployado a producción** (verificado
+contra el sitio en vivo). La rama `dashboard` quedó al día con `main`.
+
+Entró: enum `trip_type` + desplegable Retiros/Ceremonias en el navbar, CRM en
+`/admin/crm`, recuperación de contraseña por mail, favicon del águila.
+
+**Lo primero al retomar — configurar los mails de auth en el dashboard de
+Supabase.** Es lo único que quedó a medias a propósito: `/cuenta/recuperar` está
+visible en producción pero **no manda nada** hasta tocar las plantillas y las
+redirect URLs. Paso a paso completo en `docs/AUTH_EMAIL.md`. Ojo con el mailer
+incluido: solo entrega a miembros de la organización de Supabase, así que sirve
+para que pruebe Ignacio pero a la clienta no le llega — para eso hace falta SMTP
+propio, que **no** depende de tener el dominio.
+
+**A validar con Estela y Sofía** (todo anotado en `docs/CRM.md` §6):
+- Los umbrales de Avanzado y Experto del CRM (hoy 10 y 20) están **inventados**:
+  ella solo dio los tres primeros. Marcados como provisorios en `src/lib/crm.ts`
+  y al pie de `/admin/crm`.
+- La cuenta de ceremonias toma el máximo entre las aprobadas en la plataforma y
+  las declaradas en el form de recurrente, para no clasificar como "nuevo" a
+  quien viene ceremoniando por Google Forms.
+- De dónde salen género, cargo y país (¿los carga el admin o se piden al
+  registrarse?). Sin eso, dos de los cuatro ejes del CRM no existen.
+- Cupones e invitaciones: documentados en `docs/CRM.md` §5, **sin implementar**.
+  Bloqueado porque la plataforma no cobra.
+
+Nota de data: hoy hay un solo viaje de prueba y quedó marcado como `ceremonia`,
+así que la solapa "Retiros" de `/viajes` se ve vacía. Es data, no un bug.
+
 Lo próximo, en orden:
 
 1. **Compresor a WebP del lado del cliente** en el input de portada del admin. **No es por storage** (el free tier de Supabase aguanta ~200 viajes con el tope de 5MB): es porque `next/image` transformando un PNG de 5MB en frío cuelga la primera visita, justo la que hace la clienta al revisar el viaje que acaba de cargar. Canvas nativo, sin dependencias. **Antes de escribirlo, leer el skill `client-side-image-compress` de brain-data**: ya tiene la implementación resuelta (`compressImage()`), incluidos los dos detalles que se hacen mal solos — la orientación EXIF (las fotos de celular salen rotadas) y el fallback al original si `toBlob` falla. De yapa, pasar por canvas borra el EXIF, incluida la geolocalización.
