@@ -36,12 +36,58 @@ export function tripPlaceholderImage(id: string) {
   return TRIP_PLACEHOLDERS[sum % TRIP_PLACEHOLDERS.length];
 }
 
+// Retiros y ceremonias son ambos `trips`, separados por `trips.type`
+// (decision de docs/CONTENT_MAP.md). No son dos rutas: son un filtro de /viajes,
+// y el `slug` es el valor que viaja en ?tipo= — en castellano y en plural, que
+// es como se ve en el navbar.
+export const TRIP_TYPES = [
+  {
+    value: "retiro",
+    slug: "retiros",
+    label: "Retiros",
+    singular: "Retiro",
+    description: "Viajes de varios dias en grupo",
+  },
+  {
+    value: "ceremonia",
+    slug: "ceremonias",
+    label: "Ceremonias",
+    singular: "Ceremonia",
+    description: "Encuentros ceremoniales puntuales",
+  },
+] as const;
+
+export type TripTypeSlug = (typeof TRIP_TYPES)[number]["slug"];
+
+/** Traduce el ?tipo= de la URL al valor del enum. Devuelve null si no matchea. */
+export function tripTypeFromSlug(slug: string | undefined) {
+  return TRIP_TYPES.find((t) => t.slug === slug) ?? null;
+}
+
+export type NavLink = {
+  label: string;
+  href: string;
+  icon: "Info" | "Sparkles" | "BookOpen" | "User";
+  children?: { label: string; href: string; description: string }[];
+};
+
 // "Inicio" no va en el nav: al home se llega tocando el logo (desktop y drawer)
-export const NAV_LINKS = [
-  { label: "Nosotros", href: "/nosotros", icon: "Info" as const },
-  { label: "Viajes", href: "/viajes", icon: "Sparkles" as const },
-  { label: "Contenidos", href: "/contenidos", icon: "BookOpen" as const },
-  { label: "Mi Cuenta", href: "/cuenta", icon: "User" as const },
+export const NAV_LINKS: NavLink[] = [
+  { label: "Nosotros", href: "/nosotros", icon: "Info" },
+  {
+    label: "Viajes",
+    href: "/viajes",
+    icon: "Sparkles",
+    // El desplegable no reemplaza al link: "Viajes" sigue yendo al listado
+    // completo, los hijos son atajos al mismo listado ya filtrado.
+    children: TRIP_TYPES.map((t) => ({
+      label: t.label,
+      href: `/viajes?tipo=${t.slug}`,
+      description: t.description,
+    })),
+  },
+  { label: "Contenidos", href: "/contenidos", icon: "BookOpen" },
+  { label: "Mi Cuenta", href: "/cuenta", icon: "User" },
 ];
 
 // Columnas del footer segun el mockup de Julia. `href: null` = la ruta todavia

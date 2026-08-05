@@ -16,6 +16,7 @@ function parseTripForm(formData: FormData) {
   const capacity = formData.get("capacity");
   const price = formData.get("price");
   const status = formData.get("status");
+  const type = formData.get("type");
 
   if (
     typeof title !== "string" ||
@@ -26,7 +27,8 @@ function parseTripForm(formData: FormData) {
     !end_date ||
     typeof capacity !== "string" ||
     !capacity ||
-    typeof status !== "string"
+    typeof status !== "string" ||
+    typeof type !== "string"
   ) {
     return { error: "Completá los campos requeridos.", data: null } as const;
   }
@@ -55,6 +57,7 @@ function parseTripForm(formData: FormData) {
       capacity: Number(capacity),
       price: typeof price === "string" && price ? Number(price) : 0,
       status: status as Enums<"trip_status">,
+      type: type as Enums<"trip_type">,
     },
   } as const;
 }

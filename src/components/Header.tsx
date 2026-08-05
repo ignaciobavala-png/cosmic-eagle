@@ -14,6 +14,7 @@ import {
   User,
   CircleUser,
   ArrowRight,
+  ChevronDown,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -103,17 +104,50 @@ export function Header() {
             {NAV_LINKS.filter((l) => l.href !== "/cuenta").map((link) => {
               const isActive = pathname.startsWith(link.href);
               return (
-                <li key={link.href}>
+                <li key={link.href} className="relative group">
                   <Link
                     href={link.href}
-                    className={`whitespace-nowrap px-4 py-2 text-label-sm uppercase transition-colors duration-200 ${
+                    className={`flex items-center gap-1.5 whitespace-nowrap px-4 py-2 text-label-sm uppercase transition-colors duration-200 ${
                       isActive
                         ? "text-primary-fixed-dim"
                         : "text-on-surface-variant hover:text-on-surface"
                     }`}
                   >
                     {link.label}
+                    {link.children && (
+                      <ChevronDown
+                        size={13}
+                        aria-hidden="true"
+                        className="transition-transform duration-200 group-hover:rotate-180"
+                      />
+                    )}
                   </Link>
+
+                  {/* El wrapper arranca pegado al link (`top-full`) y la
+                      separacion visual la da su `pt-2`: con un `top` desplazado
+                      queda un hueco muerto entre las dos cajas y el menu se
+                      cierra al bajar el mouse en diagonal. */}
+                  {link.children && (
+                    <div className="invisible absolute left-0 top-full z-50 pt-2 opacity-0 transition-opacity duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                      <ul className="min-w-56 rounded-2xl border border-primary-fixed-dim/20 bg-[#05060a]/95 p-2 shadow-2xl backdrop-blur-xl">
+                        {link.children.map((child) => (
+                          <li key={child.href}>
+                            <Link
+                              href={child.href}
+                              className="block rounded-lg px-3 py-2 transition-colors hover:bg-primary-container/10"
+                            >
+                              <span className="block text-label-sm uppercase text-on-surface">
+                                {child.label}
+                              </span>
+                              <span className="mt-0.5 block text-xs text-on-surface-variant">
+                                {child.description}
+                              </span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </li>
               );
             })}
@@ -219,6 +253,24 @@ export function Header() {
                           {link.label}
                         </span>
                       </Link>
+
+                      {/* En el drawer no hay hover: los hijos se muestran
+                          siempre, indentados bajo el padre. */}
+                      {link.children && (
+                        <ul className="mb-1 ml-[3.25rem] mr-2 flex flex-col border-l border-primary-fixed-dim/20 pl-3">
+                          {link.children.map((child) => (
+                            <li key={child.href}>
+                              <Link
+                                href={child.href}
+                                onClick={() => setDrawerOpen(false)}
+                                className="block rounded-lg px-3 py-2 text-sm tracking-[0.05em] text-on-surface-variant uppercase transition-colors hover:bg-surface-variant/30 hover:text-on-surface"
+                              >
+                                {child.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </li>
                   );
                 })}

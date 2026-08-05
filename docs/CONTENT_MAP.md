@@ -51,6 +51,9 @@ le quitan secciones, se le da una nav donde cada link responde una de *sus* preg
 
 - **Ceremonias y retiros son ambos `trips`**, diferenciados por un campo `type`. No son
   dos secciones: son un filtro en el listado. Confirmado con el cliente 2026-07-30.
+  **Implementado 2026-08-05** (migración `20260805191705_trip_type.sql`): enum
+  `trip_type` con `retiro`/`ceremonia`, filtro `?tipo=` en `/viajes`, y desplegable en el
+  link "Viajes" del navbar.
 - **"Calendario" no es una vista nueva**: es el mismo listado de `/viajes` ordenado por fecha.
 - **"Cómo postular" no es una página**: es un bloque de 3 pasos arriba del listado.
 - **`/contenidos` es un hub de categorías**, no varios links de nav. Deja la nav en cinco

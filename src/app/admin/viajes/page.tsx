@@ -9,6 +9,11 @@ const STATUS_LABEL: Record<string, string> = {
   completed: "Finalizado",
 };
 
+const TYPE_LABEL: Record<string, string> = {
+  retiro: "Retiro",
+  ceremonia: "Ceremonia",
+};
+
 const STATUS_CLASS: Record<string, string> = {
   draft: "bg-outline-variant/30 text-on-surface-variant border-outline/40",
   open: "bg-secondary/20 text-secondary border-secondary/40",
@@ -29,7 +34,9 @@ export default async function AdminViajesPage() {
   const supabase = await createClient();
   const { data: trips } = await supabase
     .from("trips")
-    .select("id, title, location, start_date, end_date, capacity, price, status")
+    .select(
+      "id, title, location, start_date, end_date, capacity, price, status, type"
+    )
     .order("start_date", { ascending: true });
 
   return (
@@ -64,7 +71,10 @@ export default async function AdminViajesPage() {
                 <tr key={trip.id} className="border-b border-outline-variant/40 last:border-0">
                   <td className="px-5 py-4">
                     <p className="text-on-surface font-medium">{trip.title}</p>
-                    <p className="text-on-surface-variant text-xs">{trip.location}</p>
+                    <p className="text-on-surface-variant text-xs">
+                      {TYPE_LABEL[trip.type] ?? trip.type}
+                      {trip.location && ` · ${trip.location}`}
+                    </p>
                   </td>
                   <td className="px-5 py-4 text-on-surface-variant">
                     {formatDate(trip.start_date)} – {formatDate(trip.end_date)}

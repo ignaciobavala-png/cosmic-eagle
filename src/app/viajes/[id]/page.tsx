@@ -16,6 +16,11 @@ const STATUS_LABEL: Record<string, string> = {
   completed: "Finalizado",
 };
 
+const TYPE_LABEL: Record<string, string> = {
+  retiro: "Retiro",
+  ceremonia: "Ceremonia",
+};
+
 const STATUS_CLASS: Record<string, string> = {
   open: "bg-secondary/20 text-secondary border-secondary/40",
   closed: "bg-outline-variant/40 text-on-surface-variant border-outline/40",
@@ -52,7 +57,7 @@ async function getTrip(id: string) {
   const { data } = await supabase
     .from("trips")
     .select(
-      "id, title, description, location, start_date, end_date, capacity, price, status, image_url"
+      "id, title, description, location, start_date, end_date, capacity, price, status, image_url, type"
     )
     .eq("id", id)
     .single();
@@ -133,13 +138,18 @@ export default async function ViajePage({ params }: Props) {
               className="absolute inset-0 w-full h-full object-cover"
             />
             <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 md:p-10 z-20">
-              <span
-                className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest mb-3 sm:mb-4 inline-block backdrop-blur-md border ${
-                  STATUS_CLASS[trip.status] ?? ""
-                }`}
-              >
-                {STATUS_LABEL[trip.status] ?? trip.status}
-              </span>
+              <div className="mb-3 sm:mb-4 flex flex-wrap gap-2">
+                <span className="px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest inline-block backdrop-blur-md bg-primary-container/90 text-on-primary">
+                  {TYPE_LABEL[trip.type] ?? trip.type}
+                </span>
+                <span
+                  className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest inline-block backdrop-blur-md border ${
+                    STATUS_CLASS[trip.status] ?? ""
+                  }`}
+                >
+                  {STATUS_LABEL[trip.status] ?? trip.status}
+                </span>
+              </div>
               <h1 className="font-display text-[26px] sm:text-[32px] md:text-[48px] leading-tight font-medium text-white text-shadow-glow text-balance">
                 {trip.title}
               </h1>

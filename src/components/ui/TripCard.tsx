@@ -14,11 +14,18 @@ export type TripCardData = {
   image_url: string | null;
   /** Opcional: solo el listado de /viajes avisa cuando el cupo ya no esta abierto. */
   status?: string | null;
+  /** Opcional: retiro o ceremonia. Solo lo pide el listado, no la home. */
+  type?: string | null;
 };
 
 const STATUS_LABEL: Record<string, string> = {
   closed: "Cupo completo",
   completed: "Finalizado",
+};
+
+const TYPE_LABEL: Record<string, string> = {
+  retiro: "Retiro",
+  ceremonia: "Ceremonia",
 };
 
 /**
@@ -45,11 +52,18 @@ export function TripCard({ trip }: { trip: TripCardData }) {
           className="object-cover transition-transform duration-1000 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-[#05102a]/20" />
-        {trip.location && (
-          <span className="absolute left-4 top-4 rounded-full border border-primary-fixed-dim/40 bg-[#05060a]/70 px-3 py-1 text-label-sm uppercase text-primary-fixed-dim backdrop-blur-md">
-            {trip.location}
-          </span>
-        )}
+        <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+          {trip.type && TYPE_LABEL[trip.type] && (
+            <span className="rounded-full bg-primary-container/90 px-3 py-1 text-label-sm uppercase text-on-primary backdrop-blur-md">
+              {TYPE_LABEL[trip.type]}
+            </span>
+          )}
+          {trip.location && (
+            <span className="rounded-full border border-primary-fixed-dim/40 bg-[#05060a]/70 px-3 py-1 text-label-sm uppercase text-primary-fixed-dim backdrop-blur-md">
+              {trip.location}
+            </span>
+          )}
+        </div>
         {trip.status && STATUS_LABEL[trip.status] && (
           <span className="absolute right-4 top-4 rounded-full border border-outline/40 bg-[#05060a]/70 px-3 py-1 text-label-sm uppercase text-on-surface-variant backdrop-blur-md">
             {STATUS_LABEL[trip.status]}

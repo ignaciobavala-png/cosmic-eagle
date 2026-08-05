@@ -15,7 +15,9 @@ export async function RetreatsSection() {
   const supabase = await createClient();
   const { data: trips } = await supabase
     .from("trips")
-    .select("id, title, description, location, start_date, end_date, image_url")
+    .select(
+      "id, title, description, location, start_date, end_date, image_url, type"
+    )
     .in("status", ["open", "closed"])
     .order("start_date", { ascending: true })
     .limit(3);

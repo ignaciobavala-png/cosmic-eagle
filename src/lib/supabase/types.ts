@@ -298,6 +298,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          email: string | null
           full_name: string | null
           id: string
           is_admin: boolean
@@ -305,6 +306,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id: string
           is_admin?: boolean
@@ -312,6 +314,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id?: string
           is_admin?: boolean
@@ -331,6 +334,7 @@ export type Database = {
           start_date: string
           status: Database["public"]["Enums"]["trip_status"]
           title: string
+          type: Database["public"]["Enums"]["trip_type"]
         }
         Insert: {
           capacity: number
@@ -344,6 +348,7 @@ export type Database = {
           start_date: string
           status?: Database["public"]["Enums"]["trip_status"]
           title: string
+          type?: Database["public"]["Enums"]["trip_type"]
         }
         Update: {
           capacity?: number
@@ -357,6 +362,7 @@ export type Database = {
           start_date?: string
           status?: Database["public"]["Enums"]["trip_status"]
           title?: string
+          type?: Database["public"]["Enums"]["trip_type"]
         }
         Relationships: []
       }
@@ -433,6 +439,7 @@ export type Database = {
     Enums: {
       application_status: "pending_review" | "approved" | "rejected" | "expired"
       trip_status: "draft" | "open" | "closed" | "completed"
+      trip_type: "retiro" | "ceremonia"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -562,6 +569,7 @@ export const Constants = {
     Enums: {
       application_status: ["pending_review", "approved", "rejected", "expired"],
       trip_status: ["draft", "open", "closed", "completed"],
+      trip_type: ["retiro", "ceremonia"],
     },
   },
 } as const

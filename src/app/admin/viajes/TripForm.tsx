@@ -5,6 +5,11 @@ import Image from "next/image";
 import type { Tables } from "@/lib/supabase/types";
 import type { TripFormState } from "./actions";
 
+const TYPE_OPTIONS: { value: Tables<"trips">["type"]; label: string }[] = [
+  { value: "retiro", label: "Retiro" },
+  { value: "ceremonia", label: "Ceremonia" },
+];
+
 const STATUS_OPTIONS: { value: Tables<"trips">["status"]; label: string }[] = [
   { value: "draft", label: "Borrador" },
   { value: "open", label: "Abierto" },
@@ -163,22 +168,44 @@ export function TripForm({
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="status" className={labelClass}>
-          Estado
-        </label>
-        <select
-          id="status"
-          name="status"
-          defaultValue={trip?.status ?? "draft"}
-          className={inputClass}
-        >
-          {STATUS_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="type" className={labelClass}>
+            Tipo
+          </label>
+          <select
+            id="type"
+            name="type"
+            defaultValue={trip?.type ?? "retiro"}
+            className={inputClass}
+          >
+            {TYPE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-on-surface-variant/70">
+            Define en qué solapa de /viajes aparece.
+          </p>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="status" className={labelClass}>
+            Estado
+          </label>
+          <select
+            id="status"
+            name="status"
+            defaultValue={trip?.status ?? "draft"}
+            className={inputClass}
+          >
+            {STATUS_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {state.error && (
