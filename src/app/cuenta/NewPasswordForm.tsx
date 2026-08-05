@@ -1,44 +1,38 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
-import { login, type LoginState } from "./actions";
+import { updatePassword, type NewPasswordState } from "./actions";
 
-const initialState: LoginState = { error: null };
+const initialState: NewPasswordState = { error: null };
 
-export function LoginForm({ next }: { next?: string }) {
-  const [state, formAction, pending] = useActionState(login, initialState);
+export function NewPasswordForm() {
+  const [state, formAction, pending] = useActionState(
+    updatePassword,
+    initialState
+  );
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <form action={formAction} className="glass-card rounded-2xl p-8 w-full max-w-sm flex flex-col gap-5">
-      {next && <input type="hidden" name="next" value={next} />}
+    <form
+      action={formAction}
+      className="glass-card rounded-2xl p-8 w-full max-w-sm flex flex-col gap-5"
+    >
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="email" className="text-sm text-on-surface-variant tracking-[0.02em]">
-          Email
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors"
-        />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="password" className="text-sm text-on-surface-variant tracking-[0.02em]">
-          Contraseña
+        <label
+          htmlFor="new-password"
+          className="text-sm text-on-surface-variant tracking-[0.02em]"
+        >
+          Contraseña nueva
         </label>
         <div className="relative">
           <input
-            id="password"
+            id="new-password"
             name="password"
             type={showPassword ? "text" : "password"}
             required
-            autoComplete="current-password"
+            minLength={8}
+            autoComplete="new-password"
             className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 pr-11 w-full text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors"
           />
           <button
@@ -52,6 +46,24 @@ export function LoginForm({ next }: { next?: string }) {
         </div>
       </div>
 
+      <div className="flex flex-col gap-1.5">
+        <label
+          htmlFor="new-password-confirm"
+          className="text-sm text-on-surface-variant tracking-[0.02em]"
+        >
+          Repetir contraseña
+        </label>
+        <input
+          id="new-password-confirm"
+          name="password_confirm"
+          type={showPassword ? "text" : "password"}
+          required
+          minLength={8}
+          autoComplete="new-password"
+          className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 w-full text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors"
+        />
+      </div>
+
       {state.error && (
         <p className="text-error text-sm" role="alert">
           {state.error}
@@ -63,15 +75,8 @@ export function LoginForm({ next }: { next?: string }) {
         disabled={pending}
         className="mt-2 bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-fixed transition-colors disabled:opacity-60"
       >
-        {pending ? "Ingresando..." : "Ingresar"}
+        {pending ? "Guardando..." : "Guardar contraseña"}
       </button>
-
-      <Link
-        href="/cuenta/recuperar"
-        className="text-center text-sm text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
-      >
-        ¿Olvidaste tu contraseña?
-      </Link>
     </form>
   );
 }

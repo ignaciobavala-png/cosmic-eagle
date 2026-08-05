@@ -1,12 +1,15 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getSiteUrl } from "@/lib/site-url";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export type LoginState = { error: string | null };
 export type SignupState = { error: string | null };
 export type AvatarState = { error: string | null };
+export type RecoverState = { error: string | null; sent: boolean };
+export type NewPasswordState = { error: string | null };
 
 export async function login(
   _prevState: LoginState,
@@ -76,6 +79,10 @@ export async function signup(
     password,
     options: {
       data: { full_name: fullName.trim() },
+      // Hoy la confirmacion por mail esta apagada a proposito (el gate real es
+      // la aprobacion manual del admin), asi que este link no se manda. Se deja
+      // igual para que prenderla en el dashboard sea un toggle y no un deploy.
+      emailRedirectTo: `${await getSiteUrl()}/auth/confirm`,
     },
   });
 
@@ -88,6 +95,80 @@ export async function signup(
 
   revalidatePath("/", "layout");
   redirect(typeof next === "string" && next.startsWith("/") ? next : "/cuenta");
+}
+
+/**
+ * Paso 1 de recuperar la clave: manda el mail.
+ *
+ * Responde "listo" siempre, exista o no la cuenta. Si distinguiera los dos
+ * casos, el formulario seria un oraculo para averiguar quien esta registrado —
+ * y en esta plataforma estar registrado se correlaciona con haber participado
+ * de una ceremonia, que es justo el dato sensible.
+ */
+export async function requestPasswordReset(
+  _prevState: RecoverState,
+  formData: FormData
+): Promise<RecoverState> {
+  const email = formData.get("email");
+
+  if (typeof email !== "string" || !email.includes("@")) {
+    return { error: "Ingresá un email válido.", sent: false };
+  }
+
+  const supabase = await createClient();
+
+  // El `next` no hace falta: la ruta de confirmacion ya manda las
+  // recuperaciones a /cuenta/nueva-clave.
+  await supabase.auth.resetPasswordForEmail(email.trim(), {
+    redirectTo: `${await getSiteUrl()}/auth/confirm`,
+  });
+
+  return { error: null, sent: true };
+}
+
+/**
+ * Paso 2: la persona volvio del mail, ya tiene sesion (la creo el verifyOtp de
+ * /auth/confirm) y define la clave nueva.
+ */
+export async function updatePassword(
+  _prevState: NewPasswordState,
+  formData: FormData
+): Promise<NewPasswordState> {
+  const password = formData.get("password");
+  const confirm = formData.get("password_confirm");
+
+  if (typeof password !== "string" || typeof confirm !== "string") {
+    return { error: "Completá los dos campos." };
+  }
+
+  if (password.length < 8) {
+    return { error: "La contraseña debe tener al menos 8 caracteres." };
+  }
+
+  if (password !== confirm) {
+    return { error: "Las contraseñas no coinciden." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "El enlace venció. Pedí uno nuevo desde “¿Olvidaste tu contraseña?”." };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    if (error.code === "same_password") {
+      return { error: "La contraseña nueva tiene que ser distinta de la anterior." };
+    }
+    return { error: "No se pudo cambiar la contraseña. Probá de nuevo." };
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/cuenta?aviso=clave-cambiada");
 }
 
 export async function updateAvatar(

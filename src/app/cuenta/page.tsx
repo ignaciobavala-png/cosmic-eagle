@@ -9,12 +9,44 @@ import { logout } from "./actions";
 import { MisSolicitudes } from "./MisSolicitudes";
 import { AvatarUpload } from "./AvatarUpload";
 
+// Avisos que llegan por querystring desde /auth/confirm y desde updatePassword.
+const ERROR_MESSAGES: Record<string, string> = {
+  "enlace-vencido":
+    "El enlace venció o ya se usó. Pedí uno nuevo desde “¿Olvidaste tu contraseña?”.",
+  "enlace-invalido": "El enlace no es válido. Probá pidiendo uno nuevo.",
+};
+
+const AVISO_MESSAGES: Record<string, string> = {
+  "clave-cambiada": "Listo, tu contraseña quedó actualizada.",
+};
+
+function Notice({ text, tone }: { text: string; tone: "error" | "ok" }) {
+  return (
+    <p
+      role="alert"
+      className={`rounded-lg border px-4 py-3 text-sm max-w-sm ${
+        tone === "error"
+          ? "border-error/40 bg-error/10 text-error"
+          : "border-primary-fixed-dim/40 bg-primary-container/10 text-primary-fixed-dim"
+      }`}
+    >
+      {text}
+    </p>
+  );
+}
+
 export default async function CuentaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; modo?: string; vista?: string }>;
+  searchParams: Promise<{
+    next?: string;
+    modo?: string;
+    vista?: string;
+    error?: string;
+    aviso?: string;
+  }>;
 }) {
-  const { next, modo, vista } = await searchParams;
+  const { next, modo, vista, error, aviso } = await searchParams;
   const isSignup = modo === "registro";
   const supabase = await createClient();
   const {
@@ -97,6 +129,10 @@ export default async function CuentaPage({
               <p className="text-on-surface-variant text-sm mt-1">{user.email}</p>
             </div>
 
+            {aviso && AVISO_MESSAGES[aviso] && (
+              <Notice text={AVISO_MESSAGES[aviso]} tone="ok" />
+            )}
+
             <MisSolicitudes applications={applications} />
 
             <form action={logout}>
@@ -120,6 +156,9 @@ export default async function CuentaPage({
                   : "Iniciá sesión para acceder a tu cuenta."}
               </p>
             </div>
+            {error && ERROR_MESSAGES[error] && (
+              <Notice text={ERROR_MESSAGES[error]} tone="error" />
+            )}
             {isSignup ? <SignupForm next={next} /> : <LoginForm next={next} />}
             <a
               href={`/cuenta${isSignup ? "" : "?modo=registro"}${
