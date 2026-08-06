@@ -4,8 +4,24 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/lib/supabase/types";
+import { parseSchedule, sortSchedule } from "@/lib/trip-schedule";
 
 export type TripFormState = { error: string | null };
+
+/**
+ * El programa llega como un unico campo con el JSON que arma ScheduleEditor.
+ * Nunca se confia en el: se parsea con el mismo validador que usa la lectura y
+ * se guarda ordenado por hora, asi el orden no depende de como se cargo.
+ */
+function parseScheduleField(value: FormDataEntryValue | null) {
+  if (typeof value !== "string" || !value.trim()) return [];
+
+  try {
+    return sortSchedule(parseSchedule(JSON.parse(value)));
+  } catch {
+    return [];
+  }
+}
 
 function parseTripForm(formData: FormData) {
   const title = formData.get("title");
@@ -17,6 +33,8 @@ function parseTripForm(formData: FormData) {
   const price = formData.get("price");
   const status = formData.get("status");
   const type = formData.get("type");
+  const terms = formData.get("terms");
+  const schedule = parseScheduleField(formData.get("schedule"));
 
   if (
     typeof title !== "string" ||
@@ -58,6 +76,8 @@ function parseTripForm(formData: FormData) {
       price: typeof price === "string" && price ? Number(price) : 0,
       status: status as Enums<"trip_status">,
       type: type as Enums<"trip_type">,
+      terms: typeof terms === "string" && terms.trim() ? terms.trim() : null,
+      schedule,
     },
   } as const;
 }

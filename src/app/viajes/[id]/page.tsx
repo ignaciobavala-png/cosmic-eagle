@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { tripPlaceholderImage } from "@/lib/constants";
+import { parseSchedule, sortSchedule } from "@/lib/trip-schedule";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -57,7 +58,7 @@ async function getTrip(id: string) {
   const { data } = await supabase
     .from("trips")
     .select(
-      "id, title, description, location, start_date, end_date, capacity, price, status, image_url, type"
+      "id, title, description, location, start_date, end_date, capacity, price, status, image_url, type, schedule, terms"
     )
     .eq("id", id)
     .single();
@@ -94,6 +95,7 @@ export default async function ViajePage({ params }: Props) {
 
   const solicitarHref = `/viajes/${trip.id}/solicitar`;
   const isOpen = trip.status === "open";
+  const schedule = sortSchedule(parseSchedule(trip.schedule));
 
   const details = [
     {
@@ -188,6 +190,31 @@ export default async function ViajePage({ params }: Props) {
                   </div>
                 ))}
               </dl>
+
+              {/* El "Programa" del flyer: hora + actividad, separados por una
+                  linea dorada. Sin horarios cargados no se muestra nada. */}
+              {schedule.length > 0 && (
+                <section className="mt-12">
+                  <h2 className="font-display text-2xl text-primary-fixed-dim mb-5">
+                    Programa
+                  </h2>
+                  <ol className="glass-card rounded-2xl px-5 py-2 sm:px-6">
+                    {schedule.map((item, i) => (
+                      <li
+                        key={`${item.time}-${i}`}
+                        className="flex items-baseline gap-4 border-b border-primary-fixed-dim/20 py-4 last:border-b-0 sm:gap-6"
+                      >
+                        <span className="font-display text-lg sm:text-xl text-primary-fixed-dim tabular-nums shrink-0 w-16">
+                          {item.time}
+                        </span>
+                        <span className="text-on-surface leading-snug">
+                          {item.activity}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              )}
             </div>
 
             <aside className="glass-card rounded-2xl p-6 lg:sticky lg:top-24">
@@ -241,6 +268,23 @@ export default async function ViajePage({ params }: Props) {
                     </p>
                   )}
                 </>
+              )}
+
+              {/* Aporte + condiciones, como el pie del flyer. El cobro no pasa
+                  por la web: esto informa, no reserva. */}
+              {(trip.price > 0 || trip.terms) && (
+                <div className="mt-6 border-t border-primary-fixed-dim/20 pt-5">
+                  {trip.price > 0 && (
+                    <p className="font-display text-2xl text-primary-fixed-dim">
+                      USD {trip.price}
+                    </p>
+                  )}
+                  {trip.terms && (
+                    <p className="mt-2 text-xs leading-relaxed text-on-surface-variant">
+                      {trip.terms}
+                    </p>
+                  )}
+                </div>
               )}
             </aside>
           </div>

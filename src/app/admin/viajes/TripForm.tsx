@@ -3,6 +3,8 @@
 import { useActionState } from "react";
 import Image from "next/image";
 import type { Tables } from "@/lib/supabase/types";
+import { parseSchedule } from "@/lib/trip-schedule";
+import { ScheduleEditor } from "./ScheduleEditor";
 import type { TripFormState } from "./actions";
 
 const TYPE_OPTIONS: { value: Tables<"trips">["type"]; label: string }[] = [
@@ -166,6 +168,26 @@ export function TripForm({
             className={inputClass}
           />
         </div>
+      </div>
+
+      <ScheduleEditor defaultValue={parseSchedule(trip?.schedule)} />
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="terms" className={labelClass}>
+          Condiciones de inscripción
+        </label>
+        <textarea
+          id="terms"
+          name="terms"
+          rows={3}
+          defaultValue={trip?.terms ?? ""}
+          placeholder="Inscripciones con formulario de salud aprobado. Pago del 50% para reservar cupo, reembolsable hasta 7 días antes del evento."
+          className={inputClass}
+        />
+        <p className="text-xs text-on-surface-variant/70">
+          Seña, reembolsos, requisitos. Se muestra junto al aporte. El cobro
+          sigue siendo por fuera de la web.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

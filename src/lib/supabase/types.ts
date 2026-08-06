@@ -331,8 +331,10 @@ export type Database = {
           image_url: string | null
           location: string | null
           price: number
+          schedule: Json
           start_date: string
           status: Database["public"]["Enums"]["trip_status"]
+          terms: string | null
           title: string
           type: Database["public"]["Enums"]["trip_type"]
         }
@@ -345,8 +347,10 @@ export type Database = {
           image_url?: string | null
           location?: string | null
           price?: number
+          schedule?: Json
           start_date: string
           status?: Database["public"]["Enums"]["trip_status"]
+          terms?: string | null
           title: string
           type?: Database["public"]["Enums"]["trip_type"]
         }
@@ -359,8 +363,10 @@ export type Database = {
           image_url?: string | null
           location?: string | null
           price?: number
+          schedule?: Json
           start_date?: string
           status?: Database["public"]["Enums"]["trip_status"]
+          terms?: string | null
           title?: string
           type?: Database["public"]["Enums"]["trip_type"]
         }

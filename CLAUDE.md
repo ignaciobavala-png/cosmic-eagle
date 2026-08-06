@@ -28,7 +28,7 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 - `/nosotros` **implementado** con el mockup de Julia y copy real de la clienta (hero + propósito + metodología + Nuestra Visión)
 - `/viajes` **implementada sobre el mockup de Julia**: hero P1 (`hero-viajes.webp`) + grilla de `TripCard` (P4, la misma de la home) + banda de llamado P6 al pie. El CTA "Aplicar para un viaje" **ancla al listado** (`#proximos`), no linkea a un form: aplicar es siempre a *un* viaje concreto
 - `/contenidos` dejó de ser placeholder: hospeda **provisoriamente** la sección "Contenidos" que estaba en la home (mock, CTAs sin destino), hasta cerrar `docs/CONTENT_MAP.md` con Sofía
-- **Home parcialmente rediseñada**: hero sobre `PageHero` con el banner de Julia, carrusel "Portales de transformación" (`PortalsSection`) y "Próximos Retiros" **conectado a `trips` real** (antes eran dos tarjetas hardcodeadas con viajes inexistentes). Consultar Supabase desde la home la volvió dinámica (`ƒ`), ya no es prerender estático. Siguen mock `AboutSection`, `EbookSection` y `TestimonialsSection` (`ContentSection` se mudó a `/contenidos`)
+- **Home parcialmente rediseñada**: hero sobre `PageHero` con el banner de Julia, carrusel "Portales de transformación" (`PortalsSection`) y **dos bloques de viajes separados por tipo** — "Próximos Retiros" y "Próximas Ceremonias", los dos `TripsSection` con `trips` real (antes era una sola sección que los mezclaba, y antes de eso dos tarjetas hardcodeadas con viajes inexistentes). Cada bloque se omite entero si no hay viajes publicados de ese tipo. Consultar Supabase desde la home la volvió dinámica (`ƒ`), ya no es prerender estático. Siguen mock `AboutSection`, `EbookSection` y `TestimonialsSection` (`ContentSection` se mudó a `/contenidos`)
 - `pnpm build` (producción) verificado sin errores — listo para deployar en cuanto a código
 - `app/api/keep-alive/route.ts` + `vercel.json` (cron diario 12:00 UTC) armados para que Supabase free tier no pause el proyecto por inactividad. Protegido con `CRON_SECRET`
 - **Proyecto deployado en Vercel**: `cosmic-eagle` (org `ethoslogs-projects`), URL de producción `https://cosmic-eagle.vercel.app`. Env vars `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `CRON_SECRET` cargadas en Development/Preview/Production. **Repo de GitHub conectado al proyecto de Vercel** (vía GitHub App, no webhook clásico) — cada push a `main` deploya solo a producción, no hace falta correr `vercel --prod` a mano
@@ -58,7 +58,7 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 ```
 src/
 ├── app/
-│   ├── page.tsx                     # Home (6 secciones, 3 rediseñadas)
+│   ├── page.tsx                     # Home (7 secciones, 4 rediseñadas)
 │   ├── layout.tsx                    # Root layout (fuentes, metadata)
 │   ├── globals.css                   # Design system (colores, glass, scrollbar)
 │   ├── not-found.tsx                 # 404 custom
@@ -92,7 +92,7 @@ src/
 │   ├── PortalsSection.tsx     # "use client" — carrusel P8 de la home
 │   ├── HeroSection.tsx
 │   ├── AboutSection.tsx
-│   ├── RetreatsSection.tsx
+│   ├── TripsSection.tsx       # viajes de la home, uno por `type` (retiros / ceremonias)
 │   ├── ContentSection.tsx
 │   ├── EbookSection.tsx
 │   ├── TestimonialsSection.tsx
@@ -145,7 +145,7 @@ docs/
 - **Ojo con el rol del oro**: en el set confirmado `primary` es `#fff6eb` (blanco cálido), NO el oro. El oro son `primary-fixed-dim` (`#e3c37d` — headings, bordes, íconos, acentos) y `primary-container` (`#f9d78f` — CTA sólido, con `text-on-primary`). Los componentes ya usan esos tokens; no volver a mapear `text-primary` a "dorado"
 - El fondo **nunca es plano**: degradé vertical de documento completo (azul celeste `#0a2a52` arriba → negro `#05060a` en el pie) en `body`, más un campo de estrellas fijo de 5 capas en `body::before`. **Ojo**: `html` lleva `background-color` a propósito, para cortar la propagación del fondo de `body` al canvas — sin eso el degradé se dimensiona contra el viewport y el remate oscuro del pie no se ve nunca
 - **Primitivas del sistema** en `src/components/ui/`: `PageHero` (P1), `DocumentCard` (P2), `FeatureBlock` (P3, par asimétrico texto/imagen), `TripCard` (P4), `ClosingSection` + `FourPointStar` (P5), `CallBand` (P6), más `CtaLink` y `Reveal`. Salen del mockup de Julia y son con las que se componen las páginas narrativas — antes de escribir una sección nueva, revisar si ya existe la primitiva (catálogo completo de las 8 en `docs/RECORRIDO.md` §4). Falta construir P7 (header con dividers, lo pide `TestimonialsSection`) y P8 vive todavía dentro de `PortalsSection`
-- `Reveal` existe para que una sección con scroll reveal pueda seguir siendo Server Component: envuelve los hijos en el `motion.div` y deja el `"use client"` acotado al wrapper. Es lo que permitió que `RetreatsSection` consulte Supabase
+- `Reveal` existe para que una sección con scroll reveal pueda seguir siendo Server Component: envuelve los hijos en el `motion.div` y deja el `"use client"` acotado al wrapper. Es lo que permitió que `TripsSection` consulte Supabase
 - Fuentes: **Domine** (display/headings) + **Literata** (body), via `next/font/google`
 - Escala tipográfica como tokens `--text-*`: `text-display-lg`, `text-headline-lg/md`, `text-body-lg/md`, `text-label-sm` (labels en mayúscula con tracking)
 - Radios ajustados a la guía (4–8px para contenedores): `rounded-2xl` ahora es 8px, no 16px
@@ -160,7 +160,8 @@ docs/
 |---|---|---|
 | Hero | `HeroSection` | Titulo, subtitulo, 2 CTAs |
 | About | `AboutSection` | Texto + imagen con glow |
-| Retiros | `RetreatsSection` | Bento grid 2 cards (retiro + ceremonia) |
+| Retiros | `TripsSection type="retiro"` | Grilla P4 con `trips` reales (no mock) |
+| Ceremonias | `TripsSection type="ceremonia"` | Grilla P4 con `trips` reales (no mock) |
 | Contenidos | `ContentSection` | 3 cards con offset vertical |
 | E-Book | `EbookSection` | Maqueta 3D libro + features |
 | Testimonios | `TestimonialsSection` | 3 cards con estrellas |
@@ -222,8 +223,38 @@ propio, que **no** depende de tener el dominio.
 - Cupones e invitaciones: documentados en `docs/CRM.md` §5, **sin implementar**.
   Bloqueado porque la plataforma no cobra.
 
-Nota de data: hoy hay un solo viaje de prueba y quedó marcado como `ceremonia`,
-así que la solapa "Retiros" de `/viajes` se ve vacía. Es data, no un bug.
+### Sesión del 2026-08-06 — programa de ceremonias (MVP para la reunión)
+
+Estela mandó una foto de la slide 6 de 8 del flyer que hoy reparten por
+WhatsApp: "Programa" (grilla hora + actividad), el aporte en USD y un párrafo
+con las condiciones de reserva. La foto está en `~/Descargas/retiros.jpeg`,
+**fuera del repo**. Se implementó el MVP para mostrar en reunión que las
+ceremonias se programan solas, aparte de los retiros:
+
+- Migración `20260806153000_trip_program.sql`: `trips.schedule` (jsonb, array de
+  `{time, activity}`, con CHECK de que sea array) y `trips.terms` (texto libre de
+  las condiciones). **Elegido jsonb y no una tabla hija**: son ~6 filas que se
+  editan siempre juntas desde el mismo form.
+- `ScheduleEditor.tsx` en el admin: filas hora + actividad, agregar/quitar. Viaja
+  al server action como **un solo campo** con el JSON serializado, y el action lo
+  revalida con el mismo parser que usa la lectura (`src/lib/trip-schedule.ts`) y
+  lo guarda ordenado por hora.
+- `/viajes/[id]` muestra la sección "Programa" (se omite si no hay horarios) y el
+  aporte + condiciones al pie del panel lateral.
+- La home quedó partida en dos bloques por tipo (ver arriba).
+- La ceremonia de prueba "Equinoccio Galactico" quedó cargada con el programa del
+  flyer y pasó a ser de **un solo día** (`end_date = start_date`), que es lo que
+  dice el flyer: 11:00 a 21:00. Mismo cambio en `supabase/seed.sql`.
+
+**Ojo, el cobro sigue sin existir**: el flyer dice "pago del 50% para reservar
+cupo" y la web sólo *muestra* esa condición como texto. Es la misma pared que
+tiene bloqueados cupones e invitaciones (`docs/CRM.md` §5).
+
+**A validar en la reunión**: si las condiciones (seña, reembolso) son iguales
+para todos los viajes conviene sacarlas de `trips` y dejarlas fijas en la página;
+hoy se cargan por viaje, que es lo flexible pero obliga a reescribirlas cada vez.
+Faltan además las otras 7 slides del flyer para saber qué más comunican (qué
+incluye, quién facilita, requisitos previos).
 
 Lo próximo, en orden:
 
