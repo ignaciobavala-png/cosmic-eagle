@@ -46,6 +46,9 @@ export const TRIP_TYPES = [
     slug: "retiros",
     label: "Retiros",
     singular: "Retiro",
+    // El titulo va armado y no concatenado con "Proximos": "Proximos Retiros"
+    // pero "Proximas Ceremonias", el genero cambia.
+    upcoming: "Próximos Retiros",
     description: "Viajes de varios dias en grupo",
   },
   {
@@ -53,6 +56,7 @@ export const TRIP_TYPES = [
     slug: "ceremonias",
     label: "Ceremonias",
     singular: "Ceremonia",
+    upcoming: "Próximas Ceremonias",
     description: "Encuentros ceremoniales puntuales",
   },
 ] as const;

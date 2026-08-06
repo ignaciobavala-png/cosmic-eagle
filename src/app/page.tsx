@@ -2,7 +2,7 @@ import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { PortalsSection } from "@/components/PortalsSection";
 import { AboutSection } from "@/components/AboutSection";
-import { RetreatsSection } from "@/components/RetreatsSection";
+import { TripsSection } from "@/components/TripsSection";
 import { EbookSection } from "@/components/EbookSection";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { Footer } from "@/components/Footer";
@@ -16,7 +16,14 @@ export default function Home() {
         <HeroSection />
         <PortalsSection />
         <AboutSection />
-        <RetreatsSection />
+        <TripsSection
+          type="retiro"
+          subtitle="Experiencias inmersivas de varios días en espacios exclusivos."
+        />
+        <TripsSection
+          type="ceremonia"
+          subtitle="Encuentros ceremoniales de jornada completa, con programa y cupo definidos."
+        />
         <EbookSection />
         <TestimonialsSection />
       </main>

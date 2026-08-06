@@ -87,7 +87,7 @@ export default async function ViajesPage({
                 Calendario de viajes
               </span>
               <h2 className="mt-2 font-display text-headline-md sm:text-headline-lg text-on-surface">
-                {activeType ? `Próximas ${activeType.label}` : "Próximos Viajes"}
+                {activeType ? activeType.upcoming : "Próximos Viajes"}
               </h2>
             </div>
 
