@@ -8,6 +8,7 @@ import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { tripPlaceholderImage } from "@/lib/constants";
 import { parseSchedule, sortSchedule } from "@/lib/trip-schedule";
+import { tripTypeLabel } from "@/lib/trip-type";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -15,11 +16,6 @@ const STATUS_LABEL: Record<string, string> = {
   open: "Cupos disponibles",
   closed: "Cupo completo",
   completed: "Finalizado",
-};
-
-const TYPE_LABEL: Record<string, string> = {
-  retiro: "Retiro",
-  ceremonia: "Ceremonia",
 };
 
 const STATUS_CLASS: Record<string, string> = {
@@ -142,7 +138,7 @@ export default async function ViajePage({ params }: Props) {
             <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 md:p-10 z-20">
               <div className="mb-3 sm:mb-4 flex flex-wrap gap-2">
                 <span className="px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest inline-block backdrop-blur-md bg-primary-container/90 text-on-primary">
-                  {TYPE_LABEL[trip.type] ?? trip.type}
+                  {tripTypeLabel(trip.type)}
                 </span>
                 <span
                   className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest inline-block backdrop-blur-md border ${

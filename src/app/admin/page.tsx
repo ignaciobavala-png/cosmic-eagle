@@ -3,10 +3,12 @@ import {
   CalendarCheck2,
   ClipboardList,
   Compass,
+  Flame,
   Mail,
   UserCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { TRIP_TYPES, tripAdminPath, tripTypeLabel } from "@/lib/trip-type";
 
 const STATUS_LABEL: Record<string, string> = {
   pending_review: "Pendiente",
@@ -28,8 +30,10 @@ export default async function AdminDashboardPage() {
   const supabase = await createClient();
 
   const [
-    { count: openTrips },
-    { count: totalTrips },
+    { count: openRetiros },
+    { count: totalRetiros },
+    { count: openCeremonias },
+    { count: totalCeremonias },
     { count: pendingFirstTime },
     { count: pendingReturning },
     { count: approvedFirstTime },
@@ -42,8 +46,21 @@ export default async function AdminDashboardPage() {
     supabase
       .from("trips")
       .select("*", { count: "exact", head: true })
+      .eq("type", "retiro")
       .eq("status", "open"),
-    supabase.from("trips").select("*", { count: "exact", head: true }),
+    supabase
+      .from("trips")
+      .select("*", { count: "exact", head: true })
+      .eq("type", "retiro"),
+    supabase
+      .from("trips")
+      .select("*", { count: "exact", head: true })
+      .eq("type", "ceremonia")
+      .eq("status", "open"),
+    supabase
+      .from("trips")
+      .select("*", { count: "exact", head: true })
+      .eq("type", "ceremonia"),
     supabase
       .from("applications_first_time")
       .select("*", { count: "exact", head: true })
@@ -65,7 +82,7 @@ export default async function AdminDashboardPage() {
       .select("*", { count: "exact", head: true }),
     supabase
       .from("trips")
-      .select("id, title, start_date, end_date, capacity, status")
+      .select("id, title, start_date, end_date, capacity, status, type")
       .in("status", ["open", "closed"])
       .order("start_date", { ascending: true })
       .limit(4),
@@ -101,11 +118,18 @@ export default async function AdminDashboardPage() {
 
   const stats = [
     {
-      href: "/admin/viajes",
-      label: "Viajes activos",
-      value: openTrips ?? 0,
-      hint: `${totalTrips ?? 0} en total`,
+      href: TRIP_TYPES.retiro.adminPath,
+      label: "Retiros activos",
+      value: openRetiros ?? 0,
+      hint: `${totalRetiros ?? 0} en total`,
       icon: Compass,
+    },
+    {
+      href: TRIP_TYPES.ceremonia.adminPath,
+      label: "Ceremonias activas",
+      value: openCeremonias ?? 0,
+      hint: `${totalCeremonias ?? 0} en total`,
+      icon: Flame,
     },
     {
       href: "/admin/solicitudes?status=pending_review",
@@ -130,7 +154,9 @@ export default async function AdminDashboardPage() {
       icon: Mail,
     },
     {
-      href: "/admin/viajes",
+      href: upcomingTrips?.[0]
+        ? tripAdminPath(upcomingTrips[0].type)
+        : TRIP_TYPES.retiro.adminPath,
       label: "Próximo viaje",
       value: upcomingTrips?.[0] ? formatDate(upcomingTrips[0].start_date) : "—",
       hint: upcomingTrips?.[0]?.title ?? "sin viajes programados",
@@ -143,7 +169,7 @@ export default async function AdminDashboardPage() {
     <div>
       <h1 className="font-display text-3xl text-primary-fixed-dim mb-8">Dashboard</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
         {stats.map((card) => {
           const Icon = card.icon;
           return (
@@ -224,12 +250,20 @@ export default async function AdminDashboardPage() {
             <h2 className="font-display text-xl text-primary-fixed-dim">
               Próximos viajes
             </h2>
-            <Link
-              href="/admin/viajes"
-              className="text-xs text-secondary hover:underline"
-            >
-              Gestionar
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href={TRIP_TYPES.retiro.adminPath}
+                className="text-xs text-secondary hover:underline"
+              >
+                Retiros
+              </Link>
+              <Link
+                href={TRIP_TYPES.ceremonia.adminPath}
+                className="text-xs text-secondary hover:underline"
+              >
+                Ceremonias
+              </Link>
+            </div>
           </div>
 
           {!upcomingTrips || upcomingTrips.length === 0 ? (
@@ -249,7 +283,10 @@ export default async function AdminDashboardPage() {
                         {trip.title}
                       </p>
                       <p className="text-xs text-on-surface-variant">
-                        {formatDate(trip.start_date)} – {formatDate(trip.end_date)}
+                        {tripTypeLabel(trip.type)} ·{" "}
+                        {trip.start_date === trip.end_date
+                          ? formatDate(trip.start_date)
+                          : `${formatDate(trip.start_date)} – ${formatDate(trip.end_date)}`}
                       </p>
                     </div>
                     <span className="text-xs text-on-surface-variant shrink-0">

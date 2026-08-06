@@ -5,8 +5,19 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/lib/supabase/types";
 import { parseSchedule, sortSchedule } from "@/lib/trip-schedule";
+import { TRIP_TYPES, isTripType, tripAdminPath } from "@/lib/trip-type";
 
 export type TripFormState = { error: string | null };
+
+/**
+ * Retiros y ceremonias tienen listado propio en el admin y comparten el listado
+ * publico, asi que cualquier escritura invalida las tres rutas.
+ */
+function revalidateTripPaths() {
+  revalidatePath(TRIP_TYPES.retiro.adminPath);
+  revalidatePath(TRIP_TYPES.ceremonia.adminPath);
+  revalidatePath("/viajes");
+}
 
 /**
  * El programa llega como un unico campo con el JSON que arma ScheduleEditor.
@@ -46,7 +57,7 @@ function parseTripForm(formData: FormData) {
     typeof capacity !== "string" ||
     !capacity ||
     typeof status !== "string" ||
-    typeof type !== "string"
+    !isTripType(type)
   ) {
     return { error: "Completá los campos requeridos.", data: null } as const;
   }
@@ -75,7 +86,7 @@ function parseTripForm(formData: FormData) {
       capacity: Number(capacity),
       price: typeof price === "string" && price ? Number(price) : 0,
       status: status as Enums<"trip_status">,
-      type: type as Enums<"trip_type">,
+      type,
       terms: typeof terms === "string" && terms.trim() ? terms.trim() : null,
       schedule,
     },
@@ -152,9 +163,8 @@ export async function createTrip(
     .insert({ ...parsed.data, image_url: cover.url ?? null });
   if (error) return { error: `No se pudo crear el viaje: ${error.message}` };
 
-  revalidatePath("/admin/viajes");
-  revalidatePath("/viajes");
-  redirect("/admin/viajes");
+  revalidateTripPaths();
+  redirect(tripAdminPath(parsed.data.type));
 }
 
 export async function updateTrip(
@@ -169,29 +179,32 @@ export async function updateTrip(
 
   const { data: current } = await supabase
     .from("trips")
-    .select("image_url")
+    .select("image_url, type")
     .eq("id", id)
     .single();
 
   const cover = await uploadCover(supabase, formData, current?.image_url);
   if (cover.error) return { error: cover.error };
 
+  // El tipo no se edita: manda el que ya tiene el viaje en la base, no el que
+  // llego en el form. Un retiro no se convierte en ceremonia por un hidden.
+  const type = current?.type ?? parsed.data.type;
+
   // Sin archivo nuevo la portada queda como esta: no se pisa con null.
+  const values = { ...parsed.data, type };
   const { error } = await supabase
     .from("trips")
-    .update(cover.url ? { ...parsed.data, image_url: cover.url } : parsed.data)
+    .update(cover.url ? { ...values, image_url: cover.url } : values)
     .eq("id", id);
   if (error)
     return { error: `No se pudo actualizar el viaje: ${error.message}` };
 
-  revalidatePath("/admin/viajes");
-  revalidatePath("/viajes");
-  redirect("/admin/viajes");
+  revalidateTripPaths();
+  redirect(tripAdminPath(type));
 }
 
 export async function deleteTrip(id: string) {
   const supabase = await createClient();
   await supabase.from("trips").delete().eq("id", id);
-  revalidatePath("/admin/viajes");
-  revalidatePath("/viajes");
+  revalidateTripPaths();
 }

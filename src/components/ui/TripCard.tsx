@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { tripPlaceholderImage } from "@/lib/constants";
 import { formatDateRangeCompact } from "@/lib/format";
+import { isTripType, tripTypeLabel } from "@/lib/trip-type";
 
 export type TripCardData = {
   id: string;
@@ -21,11 +22,6 @@ export type TripCardData = {
 const STATUS_LABEL: Record<string, string> = {
   closed: "Cupo completo",
   completed: "Finalizado",
-};
-
-const TYPE_LABEL: Record<string, string> = {
-  retiro: "Retiro",
-  ceremonia: "Ceremonia",
 };
 
 /**
@@ -53,9 +49,9 @@ export function TripCard({ trip }: { trip: TripCardData }) {
         />
         <div className="absolute inset-0 bg-[#05102a]/20" />
         <div className="absolute left-4 top-4 flex flex-wrap gap-2">
-          {trip.type && TYPE_LABEL[trip.type] && (
+          {isTripType(trip.type) && (
             <span className="rounded-full bg-primary-container/90 px-3 py-1 text-label-sm uppercase text-on-primary backdrop-blur-md">
-              {TYPE_LABEL[trip.type]}
+              {tripTypeLabel(trip.type)}
             </span>
           )}
           {trip.location && (

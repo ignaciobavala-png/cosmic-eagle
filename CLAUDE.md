@@ -84,7 +84,9 @@ src/
 │   └── admin/                        # protegido por profiles.is_admin
 │       ├── layout.tsx                # guard + AdminNav
 │       ├── page.tsx                  # dashboard (stats + actividad reciente)
-│       ├── viajes/                   # CRUD de trips
+│       ├── retiros/                  # listado de trips type=retiro (usa viajes/TripsList)
+│       ├── ceremonias/               # listado de trips type=ceremonia (idem)
+│       ├── viajes/                   # CRUD de trips (form + actions). page.tsx redirige a /admin/retiros
 │       ├── suscriptores/             # lista del newsletter (solo lectura + copiar)
 │       └── solicitudes/              # revision, aprobar/rechazar/expirar (bloquea auto-revision)
 ├── components/
@@ -256,8 +258,49 @@ hoy se cargan por viaje, que es lo flexible pero obliga a reescribirlas cada vez
 Faltan además las otras 7 slides del flyer para saber qué más comunican (qué
 incluye, quién facilita, requisitos previos).
 
+### Sesión del 2026-08-06 (bis) — el admin separa retiros de ceremonias
+
+`/admin/viajes` era un único listado donde el tipo era un `<select>` al pie del
+form, cuyo texto de ayuda decía "define en qué solapa aparece". Eso no
+diferenciaba nada. Ahora:
+
+- **Dos secciones en el nav**: `/admin/retiros` y `/admin/ceremonias`. Son dos
+  `page.tsx` de tres líneas que comparten `viajes/TripsList.tsx` (mismo listado,
+  filtrado por `type`). **La tabla sigue siendo una sola** y no hay que partirla:
+  comparten fechas, cupo, portada, estado, solicitudes, revisión y CRM — separarla
+  duplicaría RLS, las vistas `my_applications_*` y el panel de revisión.
+- `/admin/viajes` quedó como redirect a `/admin/retiros`, para links viejos.
+- **El tipo se elige antes del form y no se edita**: se entra por "Nueva
+  ceremonia" (`/admin/viajes/nuevo?tipo=ceremonia`), viaja como hidden, y
+  `updateTrip` **relee el tipo de la base e ignora el del form** — un retiro no
+  se convierte en ceremonia por un campo oculto manipulado.
+- `src/lib/trip-type.ts` centraliza etiquetas, rutas y copy por tipo. Antes
+  `TYPE_LABEL` estaba copiado en tres archivos (admin, detalle público,
+  `TripCard`); los tres consumen ahora `tripTypeLabel`/`isTripType`.
+- El dashboard cuenta retiros y ceremonias por separado.
+
+**Lo que falta y depende de la reunión** — el form todavía pide lo mismo para los
+dos, y no debería:
+
+1. **¿Una ceremonia es siempre de un día?** Si sí, se le pide una sola fecha más
+   hora de inicio y fin (el flyer dice 11:00 a 21:00) y `end_date` se deriva. Hoy
+   hay que poner la misma fecha dos veces y **no hay campo de hora**.
+2. **¿Un retiro contiene ceremonias adentro?** No es cosmético: `/admin/crm`
+   cuenta solicitudes aprobadas **sin mirar el tipo del viaje** (no hace join con
+   `trips`), así que un retiro suma exactamente 1 al historial. Si adentro hay 3
+   ceremonias, el nivel de experiencia queda mal calculado. Ver `docs/CRM.md` §6.
+3. **¿El programa de un retiro va por jornada?** `trips.schedule` es hoy
+   `{time, activity}` plano: sirve para una ceremonia de un día, pero en un retiro
+   de varios días da una lista de horas sin decir de qué día son. Si va por
+   jornada hace falta agregar `day` y migrar — hoy hay un solo viaje con programa
+   cargado, así que el costo de hacerlo ahora es cero.
+
+También quedó pendiente de la lista anterior: "qué incluye" (traslado, comidas,
+alojamiento) no existe como campo y es típico de retiro, no de ceremonia.
+
 Lo próximo, en orden:
 
+0. **Adaptar el form por tipo**, con las tres respuestas de arriba.
 1. **Compresor a WebP del lado del cliente** en el input de portada del admin. **No es por storage** (el free tier de Supabase aguanta ~200 viajes con el tope de 5MB): es porque `next/image` transformando un PNG de 5MB en frío cuelga la primera visita, justo la que hace la clienta al revisar el viaje que acaba de cargar. Canvas nativo, sin dependencias. **Antes de escribirlo, leer el skill `client-side-image-compress` de brain-data**: ya tiene la implementación resuelta (`compressImage()`), incluidos los dos detalles que se hacen mal solos — la orientación EXIF (las fotos de celular salen rotadas) y el fallback al original si `toBlob` falla. De yapa, pasar por canvas borra el EXIF, incluida la geolocalización.
 2. Rediseñar las 3 secciones mock que quedan de la home: `AboutSection` (el asset `ICONO_ABOUTSECTION.png` es el único de la entrega de Julia sin convertir ni usar), `EbookSection` y `TestimonialsSection` — esta última es la que pide construir P7. En testimonios y en "Nuestra Esencia" **nuestro contenido es mejor que el del mockup** (personas reales vs. maqueta): se toma la forma de Julia, se conserva nuestro texto.
 3. `/preparacion`, que con las primitivas ya construidas es composición pura.

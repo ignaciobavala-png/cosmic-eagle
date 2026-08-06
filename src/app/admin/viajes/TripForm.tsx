@@ -3,14 +3,10 @@
 import { useActionState } from "react";
 import Image from "next/image";
 import type { Tables } from "@/lib/supabase/types";
+import type { TripType } from "@/lib/trip-type";
 import { parseSchedule } from "@/lib/trip-schedule";
 import { ScheduleEditor } from "./ScheduleEditor";
 import type { TripFormState } from "./actions";
-
-const TYPE_OPTIONS: { value: Tables<"trips">["type"]; label: string }[] = [
-  { value: "retiro", label: "Retiro" },
-  { value: "ceremonia", label: "Ceremonia" },
-];
 
 const STATUS_OPTIONS: { value: Tables<"trips">["status"]; label: string }[] = [
   { value: "draft", label: "Borrador" },
@@ -25,9 +21,17 @@ const labelClass = "text-sm text-on-surface-variant tracking-[0.02em]";
 
 export function TripForm({
   trip,
+  type,
   action,
 }: {
   trip?: Tables<"trips">;
+  /**
+   * El tipo se decide antes de entrar al form (por la seccion desde la que se
+   * crea) y no se edita despues: cambiarselo a un viaje que ya tiene solicitudes
+   * le cambia la naturaleza, no es un ajuste. Por eso viaja como hidden y el
+   * server igual lo relee de la base al actualizar.
+   */
+  type: TripType;
   action: (
     prevState: TripFormState,
     formData: FormData
@@ -42,6 +46,8 @@ export function TripForm({
       action={formAction}
       className="glass-card rounded-2xl p-5 md:p-8 flex flex-col gap-5 max-w-2xl"
     >
+      <input type="hidden" name="type" value={type} />
+
       <div className="flex flex-col gap-1.5">
         <label htmlFor="title" className={labelClass}>
           Título
@@ -190,44 +196,22 @@ export function TripForm({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="type" className={labelClass}>
-            Tipo
-          </label>
-          <select
-            id="type"
-            name="type"
-            defaultValue={trip?.type ?? "retiro"}
-            className={inputClass}
-          >
-            {TYPE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          <p className="text-xs text-on-surface-variant/70">
-            Define en qué solapa de /viajes aparece.
-          </p>
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="status" className={labelClass}>
-            Estado
-          </label>
-          <select
-            id="status"
-            name="status"
-            defaultValue={trip?.status ?? "draft"}
-            className={inputClass}
-          >
-            {STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
+      <div className="flex flex-col gap-1.5 sm:max-w-[50%] sm:pr-2">
+        <label htmlFor="status" className={labelClass}>
+          Estado
+        </label>
+        <select
+          id="status"
+          name="status"
+          defaultValue={trip?.status ?? "draft"}
+          className={inputClass}
+        >
+          {STATUS_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {state.error && (

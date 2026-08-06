@@ -150,6 +150,8 @@ Leer el archivo completo solo si la tarea actual lo requiere — esta lista es s
   Cuando un flujo público (sin login) crea una fila "dueña" (guest, invitado, registro) y después, en el mismo submit, sube archivos y/o inserta filas relacionadas (acompañante, adjuntos) — típico de un onboarding con invi…
 - **<details> donde solo un botón abre, y que se expanda a todo el ancho de la grilla** (`/home/nch/Escritorio/brain-data/skills/details-solo-el-boton-abre/SKILL.md`)
   Cuando hay que hacer un acordeón, una ficha ampliada o un "ver más" **sin JavaScript**, y aparece alguno de estos dos problemas: 1. El `<summary>` tiene contenido rico (título, descripción, un botón) y el cliente pide qu…
+- **Postgres congela el `SELECT *` de una view al crearla** (`/home/nch/Escritorio/brain-data/skills/postgres-view-select-star-congelado/SKILL.md`)
+  Cuando una view creada con `SELECT tabla.*` "no trae" columnas que sí existen en la tabla, o cuando un campo leído desde una view llega siempre `undefined` / `null` en el cliente sin ningún error.
 - **Postgres — MIN()/MAX() no existen para uuid y rompen la función en TODA llamada** (`/home/nch/Escritorio/brain-data/skills/postgres-min-max-no-existe-para-uuid/SKILL.md`)
   Al escribir cualquier función plpgsql o query que agregue una columna `uuid`, típicamente para "traer el id del grupo" en un `SELECT COUNT(*), MIN(algo_id)`.
 - **Supabase — Max Rows silencioso trunca queries sin paginar** (`/home/nch/Escritorio/brain-data/skills/supabase-max-rows-limit/SKILL.md`)
