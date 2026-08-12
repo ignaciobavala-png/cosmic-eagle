@@ -16,9 +16,6 @@
 const QUALITY = 0.82;
 
 export async function compressImage(file: File, maxPx = 1600): Promise<File> {
-  // Los SVG no se rasterizan: pasarlos por canvas los arruinaria.
-  if (file.type === "image/svg+xml") return file;
-
   try {
     return await toWebp(file, maxPx);
   } catch {

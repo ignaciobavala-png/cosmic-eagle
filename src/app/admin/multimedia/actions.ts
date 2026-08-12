@@ -89,13 +89,22 @@ export async function saveSlot(
       return { error: "El archivo tiene que ser una imagen." };
     }
 
+    // El bucket es publico y un SVG servido inline puede llevar script adentro.
+    // El bucket tambien lo rechaza por `allowed_mime_types`; esto es para que el
+    // mensaje diga algo util en vez del error crudo de Storage.
+    if (file.type === "image/svg+xml") {
+      return { error: "Los SVG no están permitidos. Subí JPG, PNG o WebP." };
+    }
+
     // Llega ya comprimida del browser; el tope es una red de contencion por si
     // la compresion no corrio (SVG, o el fallback al original).
     if (file.size > 5 * 1024 * 1024) {
       return { error: "La imagen no puede superar los 5MB." };
     }
 
-    const ext = file.type === "image/svg+xml" ? "svg" : "webp";
+    // Normalmente llega WebP del compresor, pero si la compresion fallo sube el
+    // original: la extension sale del tipo real, no se asume.
+    const ext = file.type.split("/")[1]?.replace("jpeg", "jpg") ?? "webp";
     // Nombre nuevo en cada subida a proposito: con un path fijo por slot la URL
     // no cambia y el CDN sigue sirviendo la imagen vieja despues de reemplazarla.
     const path = `${key}/${crypto.randomUUID()}.${ext}`;

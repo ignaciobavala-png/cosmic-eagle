@@ -33,12 +33,16 @@ export function AdminNav() {
             <span className="md:hidden">CE · Admin</span>
             <span className="hidden md:inline">Cosmic Eagle · Admin</span>
           </Link>
-          <ul className="hidden md:flex items-center gap-1">
+          {/* Inline recien en xl: con siete secciones la fila ya no entra al
+              lado del logo y las acciones en pantallas chicas de notebook, y
+              los links se montaban unos sobre otros. Igual lleva overflow por
+              si aparece una seccion mas. */}
+          <ul className="hidden min-w-0 xl:flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {LINKS.map((link) => (
-              <li key={link.href}>
+              <li key={link.href} className="shrink-0">
                 <Link
                   href={link.href}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium tracking-[0.02em] transition-colors ${
+                  className={`block whitespace-nowrap px-3 py-2 rounded-lg text-sm font-medium tracking-[0.02em] transition-colors ${
                     isActive(link.href)
                       ? "text-primary-fixed-dim bg-primary-container/10"
                       : "text-on-surface-variant hover:text-on-surface"
@@ -80,10 +84,10 @@ export function AdminNav() {
         </div>
       </nav>
 
-      {/* En mobile los links no caben en la barra: van en una fila propia con
-          scroll horizontal. Sin esto el admin no tenia forma de navegar entre
-          secciones desde el telefono. */}
-      <ul className="flex md:hidden items-center gap-1 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* Debajo de xl los links no caben en la barra: van en una fila propia
+          con scroll horizontal. Sin esto el admin no tenia forma de navegar
+          entre secciones desde el telefono. */}
+      <ul className="mx-auto flex max-w-6xl xl:hidden items-center gap-1 overflow-x-auto px-5 pb-2 md:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {LINKS.map((link) => (
           <li key={link.href} className="shrink-0">
             <Link
