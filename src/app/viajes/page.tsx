@@ -8,6 +8,7 @@ import { CallBand } from "@/components/ui/CallBand";
 import { Reveal } from "@/components/ui/Reveal";
 import { createClient } from "@/lib/supabase/server";
 import { IMAGES, TRIP_TYPES, tripTypeFromSlug } from "@/lib/constants";
+import { getSiteContent } from "@/lib/site-content";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -35,6 +36,7 @@ export default async function ViajesPage({
   searchParams: Promise<{ tipo?: string }>;
 }) {
   const activeType = tripTypeFromSlug((await searchParams).tipo);
+  const content = await getSiteContent();
 
   const supabase = await createClient();
   let query = supabase
@@ -62,7 +64,7 @@ export default async function ViajesPage({
       <Header />
       <main className="pt-16">
         <PageHero
-          image={IMAGES.heroViajes}
+          image={content("viajes.hero.image")}
           title="Retiros & Ceremonias"
           subtitle="Descubrí el viaje ideal para vos"
           actions={[

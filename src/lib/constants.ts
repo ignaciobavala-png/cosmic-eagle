@@ -12,6 +12,9 @@ export const IMAGES = {
   almas: "/img/almas-particulas.webp",
   nosotrosProposito: "/img/nosotros-proposito.webp",
   nosotrosMetodologia: "/img/nosotros-metodologia.webp",
+  portal1: "/img/portal-1.webp",
+  portal2: "/img/portal-2.webp",
+  portal3: "/img/portal-3.webp",
   about:
     "https://lh3.googleusercontent.com/aida-public/AB6AXuCBsQzvne_vdYJfpqGaSuVgIT87dSP0JNQ9ngN3TJAoGD1YsMnHyb7TkONENuBJV3mNcMqWXrIU_QQskTUtFRihvcTLdY3ixjZ24ynYHpvOb3-RfgFUUkSMrBX_zpZUZsVjTcHatxQEEbylnIxpcA3k61c2woLlXP6FWs366mecKHiYU9W_2ltPH_H9DK8ilRyOK2fBUhxjIt8H3-KQAp5vaGHVqcptiqOh5P4EvfOUyUWJd-e1CHmyOb6q-ui7YX5IHe6XCJYZ1DM",
   retreats:
@@ -118,21 +121,13 @@ export const FOOTER_COLUMNS = [
   },
 ] as const;
 
-// Carrusel "Portales de transformación" de la home. Los textos son de la
-// maqueta de Julia; si la clienta manda los definitivos, se reemplazan aca.
-export const PORTALS = [
-  {
-    image: "/img/portal-1.webp",
-    alt: "Figura humana ascendiendo por un haz de luz cósmica",
-  },
-  {
-    image: "/img/portal-2.webp",
-    alt: "Silueta envuelta en una nebulosa de partículas doradas",
-  },
-  {
-    image: "/img/portal-3.webp",
-    alt: "Portal de energía abriéndose sobre un cielo estrellado",
-  },
+// Carrusel "Portales de transformación" de la home. Las imagenes salen de
+// site-content (son editables desde /admin/multimedia), aca queda solo el texto
+// alternativo de cada una, que describe la composicion y no la foto puntual.
+export const PORTAL_ALTS = [
+  "Figura humana ascendiendo por un haz de luz cósmica",
+  "Silueta envuelta en una nebulosa de partículas doradas",
+  "Portal de energía abriéndose sobre un cielo estrellado",
 ];
 
 export const TESTIMONIALS = [

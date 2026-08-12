@@ -298,6 +298,31 @@ dos, y no debería:
 También quedó pendiente de la lista anterior: "qué incluye" (traslado, comidas,
 alojamiento) no existe como campo y es típico de retiro, no de ceremonia.
 
+### Sesión del 2026-08-12 — multimedia y textos editables desde el admin
+
+Nueva sección `/admin/multimedia`: la clienta y Sofía cambian imágenes y textos
+de las páginas públicas sin tocar código. Detalle completo en `docs/MULTIMEDIA.md`.
+
+- **El código declara qué slots existen** (`src/lib/site-content.ts`), la tabla
+  `site_content` guarda solo overrides. Sección nueva = agregar entradas al
+  registro, sin migración ni tocar la UI del admin. Sin fila, renderiza el asset
+  del repo.
+- Bucket `site-assets` (escritura solo admin) + compresor a WebP en el browser
+  (`src/lib/compress-image.ts`) — el punto 1 de "lo próximo" que estaba pendiente,
+  hecho acá. Falta aplicarlo también al input de portada de viajes.
+- **`updateTag` y no `revalidateTag`**: en Next 16 el segundo pide un `profile` y
+  sirve el valor viejo mientras revalida. Acá la clienta guarda y mira enseguida.
+- La lectura usa un cliente **sin cookies**: `unstable_cache` no admite `cookies()`
+  adentro del scope cacheado.
+- **Colores: decidido NO hacer editor libre.** Si hace falta, presets de paleta
+  completos en código, no ~50 pickers. Razonamiento en `docs/MULTIMEDIA.md`.
+
+Verificado: build de producción, render público con los valores por defecto, y
+las policies (probadas con `set role`: `anon` y un usuario logueado no admin no
+pueden escribir; el admin sí, y el trigger registra el autor). **Sin verificar
+end-to-end**: el guardado desde el panel logueado (subir imagen, ver el cambio en
+el sitio) — requiere iniciar sesión, que la hace Ignacio.
+
 Lo próximo, en orden:
 
 0. **Adaptar el form por tipo**, con las tres respuestas de arriba.

@@ -3,14 +3,24 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { PORTALS } from "@/lib/constants";
 
 /**
  * P8 — Carrusel de ovalos "Portales de transformacion". Tres imagenes
  * superpuestas: la activa al frente y nitida, las laterales atras, mas chicas y
  * atenuadas. Sin autoplay: el spec pide que cada interaccion sea intencional.
+ *
+ * El contenido llega por props: es client component por el carrusel, asi que no
+ * puede leer site-content por su cuenta.
  */
-export function PortalsSection() {
+export function PortalsSection({
+  title,
+  subtitle,
+  portals,
+}: {
+  title: string;
+  subtitle: string;
+  portals: { image: string; alt: string }[];
+}) {
   const [active, setActive] = useState(1);
 
   return (
@@ -23,23 +33,21 @@ export function PortalsSection() {
     >
       <div className="text-center">
         <h2 className="font-display text-headline-md md:text-headline-lg text-primary">
-          Portales de transformación
+          {title}
         </h2>
-        <p className="mt-3 text-body-md text-on-surface-variant">
-          para quienes buscan recordar su verdadero origen.
-        </p>
+        <p className="mt-3 text-body-md text-on-surface-variant">{subtitle}</p>
       </div>
 
       <div className="relative mt-10 flex h-[20rem] items-center justify-center sm:mt-14 sm:h-[26rem] md:h-[32rem]">
-        {PORTALS.map((portal, i) => {
+        {portals.map((portal, i) => {
           // -1 izquierda, 0 centro, 1 derecha
-          const raw = (i - active + PORTALS.length) % PORTALS.length;
-          const offset = raw === PORTALS.length - 1 ? -1 : raw;
+          const raw = (i - active + portals.length) % portals.length;
+          const offset = raw === portals.length - 1 ? -1 : raw;
           const isActive = offset === 0;
 
           return (
             <motion.button
-              key={portal.image}
+              key={i}
               type="button"
               onClick={() => setActive(i)}
               aria-label={
@@ -70,9 +78,9 @@ export function PortalsSection() {
       </div>
 
       <div className="mt-10 flex items-center justify-center gap-3">
-        {PORTALS.map((portal, i) => (
+        {portals.map((portal, i) => (
           <button
-            key={portal.image}
+            key={i}
             type="button"
             onClick={() => setActive(i)}
             aria-label={`Ir al portal ${i + 1}`}

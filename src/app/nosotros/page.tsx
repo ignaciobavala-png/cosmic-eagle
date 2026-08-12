@@ -6,7 +6,8 @@ import { PageHero } from "@/components/ui/PageHero";
 import { FeatureBlock } from "@/components/ui/FeatureBlock";
 import { DocumentCard } from "@/components/ui/DocumentCard";
 import { ClosingSection } from "@/components/ui/ClosingSection";
-import { IMAGES } from "@/lib/constants";
+import { renderTitle } from "@/components/HeroSection";
+import { getSiteContent } from "@/lib/site-content";
 
 export const metadata: Metadata = {
   title: "Nosotros | Cosmic Eagle",
@@ -19,22 +20,24 @@ export const metadata: Metadata = {
  * P1 hero -> P3+P2 proposito -> P3+P2 metodologia -> P5 cierre.
  * Los textos son los del mockup (contenido de la clienta), no se inventan.
  */
-export default function NosotrosPage() {
+export default async function NosotrosPage() {
+  const content = await getSiteContent();
+
   return (
     <>
       <Header />
       <main className="pt-16">
         <PageHero
-          image={IMAGES.almas}
-          title="Un espacio de luz y amor."
-          subtitle="+10 años acompañando transformaciones"
+          image={content("nosotros.hero.image")}
+          title={renderTitle(content("nosotros.hero.title"))}
+          subtitle={content("nosotros.hero.subtitle")}
           scrollHint="Conocenos"
           scrollTo="proposito"
         />
 
         <FeatureBlock
           id="proposito"
-          image={IMAGES.nosotrosProposito}
+          image={content("nosotros.proposito.image")}
           imageAlt="Círculo de ceremonia iluminado"
           imageSide="left"
           shape="oval"
@@ -52,7 +55,7 @@ export default function NosotrosPage() {
 
         <FeatureBlock
           id="metodologia"
-          image={IMAGES.nosotrosMetodologia}
+          image={content("nosotros.metodologia.image")}
           imageAlt="Hongo bioluminiscente en un entorno cósmico"
           imageSide="right"
         >
