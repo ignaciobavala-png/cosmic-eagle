@@ -1,0 +1,22 @@
+-- El programa pasa a admitir jornadas.
+--
+-- El documento de contenidos de Sofia describe el programa de un Viaje Cosmico
+-- (retiro) como una grilla Dia / Fecha / Actividad de 9 dias, no como la lista
+-- plana de horas que servia para una Sesion Cosmica (ceremonia, un solo dia).
+--
+-- Forma nueva de cada item: {"day": 3, "time": "15:00", "activity": "Sesion"}.
+--   - `day` es el numero de jornada (1 = start_date). Null o ausente en las
+--     ceremonias, que siguen siendo una lista de horas.
+--   - `time` pasa a ser opcional cuando hay `day`: en un retiro hay jornadas
+--     que son "Integracion" a secas, sin horario.
+--
+-- No hay datos que migrar: los items viejos {time, activity} son validos tal
+-- cual y se leen como jornada nula (ver src/lib/trip-schedule.ts).
+--
+-- La fecha de cada jornada no se guarda: se deriva de trips.start_date al
+-- mostrarla, asi correr la fecha del viaje no deja el programa desfasado.
+--
+-- El CHECK sigue siendo el mismo (que sea un array): la forma de cada item la
+-- valida el server action y la lectura tolera basura.
+comment on column public.trips.schedule is
+  'Programa del viaje: array de {day, time, activity}. `day` = numero de jornada (1 = start_date), null en ceremonias. `time` opcional cuando hay `day`. Ordenado por jornada y hora.';

@@ -129,6 +129,9 @@ public/
 ├── logo.png                    # logo oficial de la disenadora (914x267, alpha recortado)
 └── img/                        # assets de Julia convertidos a WebP (11.4 MB -> 267 KB)
 docs/
+├── EMAIL.md                    # Resend: mails que dispara la app (NO los de auth)
+├── AUTH_EMAIL.md               # Mails de Supabase Auth (reset de clave)
+├── consulta-sofia-acceso.txt   # Consulta pendiente sobre el "codigo de acceso"
 ├── CONTEXT.md                  # Requerimientos del cliente + decisiones de alcance
 ├── RECORRIDO.md                # El recorrido del negocio + las 8 primitivas visuales
 ├── DESIGN_ASSETS.md            # Carpeta de assets de Julia mapeada a las rutas
@@ -285,15 +288,12 @@ dos, y no debería:
 1. **¿Una ceremonia es siempre de un día?** Si sí, se le pide una sola fecha más
    hora de inicio y fin (el flyer dice 11:00 a 21:00) y `end_date` se deriva. Hoy
    hay que poner la misma fecha dos veces y **no hay campo de hora**.
-2. **¿Un retiro contiene ceremonias adentro?** No es cosmético: `/admin/crm`
-   cuenta solicitudes aprobadas **sin mirar el tipo del viaje** (no hace join con
-   `trips`), así que un retiro suma exactamente 1 al historial. Si adentro hay 3
-   ceremonias, el nivel de experiencia queda mal calculado. Ver `docs/CRM.md` §6.
-3. **¿El programa de un retiro va por jornada?** `trips.schedule` es hoy
-   `{time, activity}` plano: sirve para una ceremonia de un día, pero en un retiro
-   de varios días da una lista de horas sin decir de qué día son. Si va por
-   jornada hace falta agregar `day` y migrar — hoy hay un solo viaje con programa
-   cargado, así que el costo de hacerlo ahora es cero.
+2. ~~**¿Un retiro contiene ceremonias adentro?**~~ **RESUELTO 2026-08-15**: sí las
+   contiene (3 por retiro), pero **el conteo de experiencia es por viaje**: un
+   retiro suma 1, no 3. Ellas quieren "un viaje" como parámetro. O sea que el
+   cálculo de `/admin/crm` **ya era correcto** — no había bug.
+3. ~~**¿El programa de un retiro va por jornada?**~~ **HECHO 2026-08-15**, ver la
+   sesión de esa fecha más abajo.
 
 También quedó pendiente de la lista anterior: "qué incluye" (traslado, comidas,
 alojamiento) no existe como campo y es típico de retiro, no de ceremonia.
@@ -336,6 +336,98 @@ CTAs muertos que quedan: "Comprar Ahora" del e-book (no hay ruta ni checkout) y 
 Decisiones tomadas sola que hay que validar: el CTA **"Unirme al círculo"** del navbar apunta a `/cuenta?modo=registro` (con sesión se reemplaza por el avatar). El texto es de Julia pero **promete comunidad, que está fuera de alcance** (`docs/CONTEXT.md` §6) — confirmar con ellas. Los links del footer sin ruta (Blog, E-book, Privacidad, Términos, Soporte) se pintan apagados en vez de linkear a `#`.
 
 No urgente pero pendiente: `/contenidos` es la sección mock de la home mudada de lugar, no una página propia. `/preparacion` no existe todavía.
+
+### Sesión del 2026-08-15 — el boceto de Sofía, programa por jornada y Resend
+
+**Sofía mandó la estructura completa del sitio con todos los textos**:
+`web-cosmic-journey-ES.md`, en `~/Descargas`, **fuera del repo**. Es el documento
+más importante que entró hasta ahora. Traducción de nombres:
+
+| Sofía | Nosotros |
+|---|---|
+| Sesiones Cósmicas (1 día) | `type = ceremonia` |
+| Viajes Cósmicos (1 semana) | `type = retiro` |
+
+Trae en anexos los **textos completos de FAQs** (dos juegos, uno por tipo) y de
+**Privacidad y Confidencialidad**. Eso ya **no hay que pedirlo** — sacarlo de la
+lista de "contenido que falta" de `docs/CONTENT_MAP.md`.
+
+**Ojo con el nombre "Viajes"**: hoy `/viajes` es el paraguas de los dos tipos. En
+el vocabulario de Sofía, "Viaje Cósmico" nombra **solo al retiro**. Si se adopta su
+nomenclatura, el paraguas se queda sin nombre — hay que decidir (`/experiencias`,
+o partir en dos rutas). Sin resolver.
+
+Lo que confirmó Ignacio de ese documento:
+
+- **El conteo de experiencia es por viaje.** Un retiro tiene 3 ceremonias adentro
+  pero suma 1 al historial. El CRM ya lo hacía bien.
+- **El "código de acceso" queda EN REVISIÓN, no implementar.** Consulta escrita
+  para Sofía en `docs/consulta-sofia-acceso.txt`. Lo que sí se sabe: postularse ya
+  exige sesión (`viajes/[id]/solicitar/page.tsx`), así que el token siempre cae
+  sobre una cuenta que existe — **no es un login alternativo**. La duda es si
+  aporta algo por encima del botón "aprobar" que ya está en `/admin/solicitudes`.
+- **El cobro sigue sin resolverse.** Hay charla con la clienta la semana del
+  17/08 para presentarle opciones. Sigue bloqueando cupones, invitaciones y la
+  seña del 50%.
+
+**Programa por jornada (hecho).** Migración `20260815104000_trip_schedule_by_day.sql`
+(solo el comment: **no hubo datos que migrar**). `ScheduleItem` pasó a
+`{day, time, activity}`:
+
+- `day` = número de jornada, 1 = `start_date`. `null` en ceremonias, que siguen
+  siendo la lista plana de horas de siempre.
+- `time` es opcional **solo** cuando hay `day`: un retiro tiene jornadas que son
+  "Integración" a secas.
+- Los items viejos `{time, activity}` siguen siendo válidos y se leen como jornada
+  nula — por eso no hubo que tocar ningún viaje cargado.
+- **La fecha de cada jornada no se guarda, se deriva** de `start_date`
+  (`formatScheduleDay` en `format.ts`). Guardarla dejaría el programa desfasado en
+  cuanto se corra la fecha del viaje.
+- `ScheduleEditor` se bifurca por tipo: el retiro suma la columna Día con la fecha
+  derivada debajo, y las filas nuevas heredan la jornada de la anterior.
+- `start_date` en `TripForm` pasó a **controlado** para que esa fecha siga al campo.
+
+**Resend integrado, pero no manda nada todavía.** Ver `docs/EMAIL.md`. Faltan las
+tres cosas de ahí; la primera es el DNS. `sendEmail` sin `RESEND_API_KEY` loguea y
+devuelve `not_configured`, no falla.
+
+**Son dos canales distintos y se confunden fácil**: los mails de *auth* (reset de
+clave) los manda Supabase por SMTP, los de la *app* (aprobación) salen por el SDK
+de Resend. Misma cuenta, configuración separada.
+
+Cuatro decisiones que parecen rebuscadas y **no hay que "limpiar"** (salen de las
+skills `react-email-resend` y `email-boton-fondo-blanco-mobile` de brain-data):
+cliente lazy (a nivel de módulo **tumba el build de Vercel**, no solo el mail),
+`sendEmail` que nunca lanza, fondos con atributo `bgcolor` en `<table>` además del
+CSS (`bgcolor` **no existe** en los tipos de `<td>`), y metas `color-scheme` en el
+`<Head>`. Detalle completo en `docs/EMAIL.md`.
+
+**El dominio `cosmiceaglejourney.com` ya existe** (verificado por DNS): Cloudflare
++ MX de Google Workspace + un A a `5.181.161.73`, que es **el sitio viejo que este
+proyecto reemplaza**.
+
+- **Mandar mails NO depende del cutover**: se verifica un subdominio
+  (`mail.cosmiceaglejourney.com`) con TXT/DKIM propios, sin tocar el A ni el MX
+  raíz. El sitio viejo y el correo de ellas siguen intactos.
+- Fusionar el SPF si ya hay un `v=spf1` de Workspace: DNS respeta **uno solo**.
+- **El acceso al Cloudflare es el camino crítico** — misma llave para el mail ahora
+  y para mudar el sitio después. Pedirlo temprano.
+- Antes del cutover hace falta la **lista de URLs del sitio viejo** para redirigir
+  las indexadas (`redirects` en `next.config.ts`).
+- `docs/AUTH_EMAIL.md` decía "no hace falta el dominio, alcanza una casilla suelta":
+  **corregido**, eso no aplica a Resend, que exige dominio verificado.
+
+Lo próximo de este hilo, en orden:
+
+1. **Campos nuevos de `trips`** que pide el documento y no existen: país y ciudad
+   separados (hoy `location` es texto libre), **categoría** (mujeres / hombres /
+   mixto / avanzados), horarios de inicio y fin, tipo de establecimiento, qué
+   incluye, ubicación/mapa, llegadas y salidas, qué llevar, política de cancelación.
+2. **FAQs y Privacidad**, que ya vienen escritas en los anexos.
+3. Cablear `sendEmail` a `reviewApplication`, cuando esté el DNS.
+
+**Sin verificar end-to-end** (requiere sesión, la hace Ignacio): cargar un retiro
+con programa por jornada desde el panel y verlo en la página pública.
 
 ## No hacer
 

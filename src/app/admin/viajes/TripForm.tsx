@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Image from "next/image";
 import type { Tables } from "@/lib/supabase/types";
 import type { TripType } from "@/lib/trip-type";
@@ -40,6 +40,9 @@ export function TripForm({
   const [state, formAction, pending] = useActionState(action, {
     error: null,
   });
+  // Controlado (y no `defaultValue`) porque el editor del programa muestra a que
+  // fecha cae cada jornada, y tiene que seguir a este campo mientras se edita.
+  const [startDate, setStartDate] = useState(trip?.start_date ?? "");
 
   return (
     <form
@@ -126,7 +129,8 @@ export function TripForm({
             name="start_date"
             type="date"
             required
-            defaultValue={trip?.start_date ?? ""}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
             className={inputClass}
           />
         </div>
@@ -176,7 +180,11 @@ export function TripForm({
         </div>
       </div>
 
-      <ScheduleEditor defaultValue={parseSchedule(trip?.schedule)} />
+      <ScheduleEditor
+        defaultValue={parseSchedule(trip?.schedule)}
+        type={type}
+        startDate={startDate}
+      />
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="terms" className={labelClass}>

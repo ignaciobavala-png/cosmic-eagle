@@ -31,27 +31,30 @@ Cuándo deja de alcanzar:
 | Estela | Agregarla a la organización de Supabase (gratis, pero le da acceso al dashboard del proyecto) o SMTP propio |
 | Cualquier persona real usando el sitio | SMTP propio, sin vuelta |
 
-## Cuando haga falta el SMTP: que no haya dominio no bloquea nada
+## El SMTP: decidido Resend, y el dominio ya existe
 
-Un proveedor de mail ofrece dos formas de habilitar un remitente:
+**Actualizado 2026-08-15.** Esta sección decía que había que verificar una casilla
+suelta porque no había dominio. Las dos premisas cambiaron:
 
-- **Verificar un dominio** (registros DNS). Es lo mejor a futuro — permite
-  `no-reply@cosmiceagle.com` — pero necesita el dominio comprado.
-- **Verificar una sola dirección de remitente** (te mandan un mail con un link).
-  No necesita dominio: alcanza con un Gmail. Es lo que corresponde ahora.
+1. **El dominio existe**: `cosmiceaglejourney.com`, con DNS en Cloudflare y MX de
+   Google Workspace, apuntando al sitio viejo que este proyecto reemplaza.
+2. **Se eligió Resend**, que **no** ofrece verificación por casilla suelta: exige
+   dominio verificado, y sin eso solo entrega a la casilla dueña de la cuenta —
+   exactamente el problema del mailer de Supabase.
 
-Con la segunda opción los mails salen desde esa casilla (ej.
-`cosmiceagle.contacto@gmail.com`) y llegan a cualquier destinatario. La
-contra es que caen en spam más seguido que un dominio autenticado, y que el
-remitente que ve la persona es un Gmail. Para probar alcanza; **cuando esté el
-dominio se cambia solo la configuración SMTP, sin tocar código**.
+El plan quedó al revés de lo que decía este doc: se verifica el dominio, pero
+**un subdominio de envío** (`mail.cosmiceaglejourney.com`), no la raíz. Eso
+aísla la reputación del envío automático del correo humano de Workspace, y sobre
+todo **no toca el A record ni el MX raíz**: el sitio viejo y las casillas de ellas
+siguen funcionando igual. Se puede hacer hoy, sin esperar la mudanza a Vercel.
 
-**Ojo al elegir proveedor:** varios (Resend, entre ellos) en su modo sin dominio
-te dejan mandar *solo a tu propia dirección*, que reproduce exactamente el
-problema del mailer de Supabase. Antes de decidir hay que confirmar en el
-proveedor que la verificación por remitente único permita enviar a terceros.
-Brevo y Mailjet históricamente lo permiten; conviene verificar los términos
-actuales al crear la cuenta, porque esto cambia seguido.
+**Ojo con el SPF**: si el dominio ya tiene un TXT `v=spf1` de Workspace, no se
+agrega un segundo registro — DNS solo respeta uno por dominio. Se fusiona el
+`include:` de Resend en la línea existente.
+
+El detalle de la integración del lado del código está en `docs/EMAIL.md`. Acá
+importa solo esto: **los mails de auth no salen por el SDK de Resend**, salen por
+el SMTP de Supabase. Es la misma cuenta de Resend, pero configurada abajo.
 
 ## Configuración en el dashboard de Supabase
 
@@ -145,8 +148,10 @@ alguien más.
 
 ## Pendiente
 
-- Comprar el dominio y migrar el remitente de la casilla verificada a
-  `no-reply@<dominio>` con SPF/DKIM. Es solo cambiar el SMTP.
-- Decidir si el mail de "solicitud aprobada / rechazada" sale por acá o por otro
-  canal — eso es el pendiente de comunicación admin → usuario (`docs/ROLES.md`),
-  y **no** son mails de auth: Supabase Auth solo manda los suyos.
+- **Acceso al Cloudflare de `cosmiceaglejourney.com`** para verificar el
+  subdominio de envío en Resend. Es el camino crítico: sin eso el reset de
+  contraseña no le llega a nadie que no sea miembro de la organización de
+  Supabase. Es la misma llave que hace falta después para mudar el sitio.
+- Cargar el SMTP de Resend en el dashboard de Supabase (sección 1 de arriba).
+- El mail de "solicitud aprobada / rechazada" **no** es de auth: sale por el SDK
+  de Resend. Ver `docs/EMAIL.md`.

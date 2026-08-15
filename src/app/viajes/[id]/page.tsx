@@ -7,7 +7,8 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { tripPlaceholderImage } from "@/lib/constants";
-import { parseSchedule, sortSchedule } from "@/lib/trip-schedule";
+import { formatScheduleDay } from "@/lib/format";
+import { groupScheduleByDay, parseSchedule } from "@/lib/trip-schedule";
 import { tripTypeLabel } from "@/lib/trip-type";
 
 type Props = { params: Promise<{ id: string }> };
@@ -91,7 +92,7 @@ export default async function ViajePage({ params }: Props) {
 
   const solicitarHref = `/viajes/${trip.id}/solicitar`;
   const isOpen = trip.status === "open";
-  const schedule = sortSchedule(parseSchedule(trip.schedule));
+  const schedule = groupScheduleByDay(parseSchedule(trip.schedule));
 
   const details = [
     {
@@ -187,28 +188,44 @@ export default async function ViajePage({ params }: Props) {
                 ))}
               </dl>
 
-              {/* El "Programa" del flyer: hora + actividad, separados por una
-                  linea dorada. Sin horarios cargados no se muestra nada. */}
+              {/* El "Programa": en una ceremonia es la grilla hora + actividad
+                  del flyer; en un retiro va agrupado por jornada (Dia 1, Dia 2...),
+                  con la fecha derivada de la fecha de inicio. Sin actividades
+                  cargadas no se muestra nada. */}
               {schedule.length > 0 && (
                 <section className="mt-12">
                   <h2 className="font-display text-2xl text-primary-fixed-dim mb-5">
                     Programa
                   </h2>
-                  <ol className="glass-card rounded-2xl px-5 py-2 sm:px-6">
-                    {schedule.map((item, i) => (
-                      <li
-                        key={`${item.time}-${i}`}
-                        className="flex items-baseline gap-4 border-b border-primary-fixed-dim/20 py-4 last:border-b-0 sm:gap-6"
-                      >
-                        <span className="font-display text-lg sm:text-xl text-primary-fixed-dim tabular-nums shrink-0 w-16">
-                          {item.time}
-                        </span>
-                        <span className="text-on-surface leading-snug">
-                          {item.activity}
-                        </span>
-                      </li>
+                  <div className="flex flex-col gap-4">
+                    {schedule.map((group) => (
+                      <div key={group.day ?? "sin-jornada"}>
+                        {group.day !== null && (
+                          <h3 className="mb-2 flex items-baseline gap-2 text-label-sm uppercase tracking-[0.12em] text-primary-fixed-dim">
+                            Día {group.day}
+                            <span className="normal-case tracking-normal text-on-surface-variant/70">
+                              {formatScheduleDay(trip.start_date, group.day)}
+                            </span>
+                          </h3>
+                        )}
+                        <ol className="glass-card rounded-2xl px-5 py-2 sm:px-6">
+                          {group.items.map((item, i) => (
+                            <li
+                              key={`${item.time}-${i}`}
+                              className="flex items-baseline gap-4 border-b border-primary-fixed-dim/20 py-4 last:border-b-0 sm:gap-6"
+                            >
+                              <span className="font-display text-lg sm:text-xl text-primary-fixed-dim tabular-nums shrink-0 w-16">
+                                {item.time}
+                              </span>
+                              <span className="text-on-surface leading-snug">
+                                {item.activity}
+                              </span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
                     ))}
-                  </ol>
+                  </div>
                 </section>
               )}
             </div>

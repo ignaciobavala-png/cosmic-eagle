@@ -1,0 +1,110 @@
+CONSULTA PARA SOFIA — EL "CODIGO DE ACCESO"
+Fecha: 15/08/2026
+Contexto: documento "WEB COSMIC JOURNEY - Contenidos en español"
+
+
+DE DONDE SALE LA DUDA
+---------------------
+
+En el documento el codigo de acceso aparece cinco veces, siempre como la
+condicion para ver el detalle de una experiencia o entrar a los contenidos
+de Learn More. En la Home dice:
+
+  "Para acceder a los detalles se le deberia preguntar a la persona si ya
+   tiene una cuenta O codigo de acceso. Si no lo tiene, necesita llenar el
+   formulario de postulacion."
+
+Ese "cuenta O codigo" es lo que genera la duda: suena a dos caminos
+distintos para entrar.
+
+
+LO QUE YA SABEMOS DE COMO FUNCIONA HOY
+--------------------------------------
+
+En la web que esta construida, para postularse a una experiencia hay que
+tener cuenta si o si: el formulario de postulacion pide iniciar sesion
+antes de mostrarse.
+
+O sea que toda persona que se postula YA tiene cuenta. Entonces el codigo
+no puede ser una forma alternativa de entrar (esa persona ya puede entrar
+con su mail y contraseña): seria un permiso extra sobre una cuenta que ya
+existe.
+
+Y ademas hoy ya existe el mecanismo que da ese permiso: en el panel de
+administracion esta la lista de postulantes y, al lado de cada uno, los
+botones APROBAR y RECHAZAR. Aprobar es, en la practica, "darle acceso a
+esta persona".
+
+
+LA PREGUNTA
+-----------
+
+Si al aprobar a una persona el sistema ya le abre el acceso
+automaticamente, el codigo pasa a ser un paso de mas: hay que
+generarlo, mandarselo, que ella lo guarde, y si lo pierde escribirles a
+ustedes para que se lo manden de nuevo.
+
+Entonces: ¿para que quieren el codigo?
+
+Hay razones buenas para quererlo igual, y por eso preguntamos en vez de
+sacarlo:
+
+  a) Para que sirva FUERA de la web. Que se lo puedan mandar por WhatsApp
+     o mail y que funcione como comprobante de que fue aceptada.
+
+  b) Porque es un gesto que importa. Entregar una llave no es lo mismo
+     que aparecer aprobada en una lista. Si la ceremonia de darlo tiene
+     valor para ustedes, es motivo suficiente.
+
+  c) Porque quieren que la persona lo tenga que escribir. Un paso
+     deliberado, que la obliga a un acto consciente de entrar.
+
+  d) Para dar acceso a alguien que no se postulo por la web. Ojo que este
+     es el unico caso que cambia bastante el sistema: implicaria que el
+     codigo tambien sirva para crear la cuenta.
+
+
+LO QUE PROPONEMOS SI NO HAY PREFERENCIA
+---------------------------------------
+
+Que el acceso lo de la aprobacion, y que el codigo se genere igual y
+quede a la vista.
+
+En concreto: Sofia aprueba al postulante desde el panel, el sistema le
+genera ahi mismo un codigo unico ligado a esa persona (no sirve para
+otra), y queda en pantalla para copiar y mandarlo por donde quieran.
+
+La persona, cuando entra con su cuenta, ya ve todo sin tener que
+escribir nada. Pero el codigo existe, se puede mandar por afuera y
+cumple el rol de llave.
+
+Asi hay un solo mecanismo en vez de dos, no se puede quedar nadie
+afuera por haber perdido un codigo, y ustedes conservan el gesto de
+entregarlo.
+
+
+QUE NECESITAMOS QUE NOS DIGAN
+-----------------------------
+
+1. ¿La propuesta de arriba les sirve, o quieren que la persona tenga que
+   escribir el codigo si o si para entrar?
+
+2. ¿Necesitan poder darle acceso a alguien que NO se postulo por la web?
+   (el caso d)
+
+3. ¿El codigo abre todo, o hay niveles? En el documento, Learn More tiene
+   Fundamentos / Evolucion / Avanzado, y dice que los contenidos avanzados
+   son solo para algunos. Si es asi, un mismo codigo no alcanza: habria
+   que definir que abre cada uno.
+
+4. ¿El acceso vence? ¿Alguien aprobado para una experiencia en marzo
+   sigue viendo todo en diciembre, o el acceso se renueva por experiencia?
+
+
+MIENTRAS TANTO
+--------------
+
+Este tema queda en pausa hasta que respondan. No frena el resto: seguimos
+avanzando con el programa por jornada de los viajes, los campos nuevos de
+cada experiencia, y las FAQs y el texto de Privacidad que ya vinieron
+escritos en los anexos del documento.

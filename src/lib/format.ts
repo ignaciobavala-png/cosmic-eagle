@@ -27,3 +27,19 @@ export function formatDateRangeCompact(startDate: string, endDate: string) {
     ? `${day(start)} - ${day(end)} ${monthYear(end)}`
     : `${day(start)} ${monthYear(start)} - ${day(end)} ${monthYear(end)}`;
 }
+
+/**
+ * Fecha de una jornada del programa: "viernes 11". La jornada 1 es el dia de
+ * inicio del viaje, asi que se deriva sumando dias a `start_date` — el programa
+ * no guarda fechas propias (ver src/lib/trip-schedule.ts).
+ */
+export function formatScheduleDay(startDate: string, day: number) {
+  const date = parseDate(startDate);
+  date.setUTCDate(date.getUTCDate() + day - 1);
+
+  return date.toLocaleDateString("es-AR", {
+    weekday: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
