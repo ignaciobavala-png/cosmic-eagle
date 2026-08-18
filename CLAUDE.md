@@ -530,6 +530,12 @@ portada, categoría, texto) y salen publicados en `/contenidos` y
 - `ContentSection.tsx` y `CONTENT_CARDS` **borrados**: eran las tres tarjetas mock
   que ocupaban la página.
 
+Después, en la misma sesión: el carrusel de **Portales de transformación** pasó a
+**rotar solo** cada 5s (se frena con el puntero encima o el foco adentro, y
+`prefers-reduced-motion` lo deja quieto), y la **foto de "Sobre Cosmic Eagle"**
+pasó a ser editable desde Multimedia (slot `home.about.image`). De paso esa foto
+dejó de ser `<img>` y pasa por `next/image`.
+
 Esto **contradice a propósito** una decisión vieja de `docs/CONTENT_MAP.md`
 ("Biblioteca y Ciencia Almática no llevan backend todavía, un archivo de
 constantes alcanza"): lo que cambió no es la cantidad de material sino el

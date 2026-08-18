@@ -29,7 +29,7 @@ export default async function Home() {
           subtitle={content("home.portales.subtitle")}
           portals={portals}
         />
-        <AboutSection />
+        <AboutSection image={content("home.about.image")} />
         <TripsSection
           type="retiro"
           subtitle="Experiencias inmersivas de varios días en espacios exclusivos."

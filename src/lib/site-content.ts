@@ -117,6 +117,15 @@ export const SITE_GROUPS = [
         ratio: "3/4",
         maxPx: 1200,
       },
+      {
+        key: "home.about.image",
+        label: "Imagen de “Sobre Cosmic Eagle”",
+        help: "La foto que acompaña al texto “Un Camino de Evolución Consciente”, en el medio de la home. Se recorta cuadrada.",
+        type: "image",
+        fallback: IMAGES.about,
+        ratio: "1/1",
+        maxPx: 1200,
+      },
     ],
   },
   {

@@ -1,10 +1,16 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { IMAGES } from "@/lib/constants";
 import { ArrowRight } from "lucide-react";
 
-export function AboutSection() {
+/**
+ * La imagen llega por props y no de `IMAGES`: es editable desde
+ * /admin/multimedia (slot `home.about.image`). El componente es cliente por
+ * Framer Motion, asi que no puede leer site-content por su cuenta — la home se
+ * la pasa, igual que a `PortalsSection`.
+ */
+export function AboutSection({ image }: { image: string }) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 40 }}
@@ -51,11 +57,18 @@ export function AboutSection() {
         <div className="order-1 lg:order-2 relative aspect-square group">
           <div className="absolute inset-0 bg-nebula-glow rounded-3xl blur-3xl group-hover:blur-[60px] transition-all duration-700" />
           <div className="relative w-full h-full rounded-3xl overflow-hidden glass-card p-2 border border-primary-fixed-dim/20">
-            <img
-              src={IMAGES.about}
-              alt="Siluetas humanas conectadas con energía cósmica"
-              className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700"
-            />
+            {/* El wrapper existe para que `fill` respete el `p-2` del marco: un
+                absoluto se posiciona contra la caja de padding, asi que sin el
+                la foto tapa el borde de vidrio. */}
+            <div className="relative h-full w-full overflow-hidden rounded-2xl">
+              <Image
+                src={image}
+                alt="Siluetas humanas conectadas con energía cósmica"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+            </div>
           </div>
         </div>
       </div>
