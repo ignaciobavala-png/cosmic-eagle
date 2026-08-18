@@ -1,8 +1,17 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, CircleUser, ExternalLink, LogOut } from "lucide-react";
+import {
+  Bell,
+  Check,
+  ChevronDown,
+  CircleUser,
+  ExternalLink,
+  LogOut,
+  Menu,
+} from "lucide-react";
 import { logout } from "@/app/cuenta/actions";
 
 const LINKS = [
@@ -16,6 +25,11 @@ const LINKS = [
 ];
 
 /**
+ * Barra del panel. Las secciones van en **un desplegable y no en una fila**: con
+ * siete no entraban al lado del logo ni en desktop, y abajo de `xl` caian a una
+ * segunda fila con scroll horizontal, que esconde secciones sin avisar.
+ * El desplegable ademas deja lugar para las que vengan.
+ *
  * `unread` lo cuenta el layout (Server Component) y baja como prop: esta barra
  * es cliente por el `usePathname` y no puede consultar Supabase. El contador se
  * refresca cuando revalida el layout — por eso los actions de notificaciones
@@ -23,15 +37,43 @@ const LINKS = [
  */
 export function AdminNav({ unread = 0 }: { unread?: number }) {
   const pathname = usePathname();
+  // Se guarda EN QUE ruta se abrio el menu, no un booleano: asi navegar lo
+  // cierra solo (cambia `pathname` y deja de coincidir) sin un efecto que
+  // dispare un render extra en cada navegacion.
+  const [openedAt, setOpenedAt] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const open = openedAt === pathname;
 
   function isActive(href: string) {
     return href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
   }
 
+  const current = LINKS.find((link) => isActive(link.href));
+
+  // Click afuera y Escape. El menu tapa contenido, asi que tiene que poder
+  // cerrarse sin apuntarle al boton.
+  useEffect(() => {
+    if (!open) return;
+
+    function onPointerDown(event: PointerEvent) {
+      if (!menuRef.current?.contains(event.target as Node)) setOpenedAt(null);
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpenedAt(null);
+    }
+
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
   return (
     <header className="border-b border-parchment/10 bg-surface/80 backdrop-blur-xl">
       <nav className="flex items-center justify-between gap-3 px-5 md:px-8 h-16 max-w-6xl mx-auto">
-        <div className="flex min-w-0 items-center gap-6">
+        <div className="flex min-w-0 items-center gap-3 md:gap-5">
           <Link
             href="/admin"
             className="font-display text-base md:text-lg text-primary-fixed-dim whitespace-nowrap"
@@ -39,27 +81,60 @@ export function AdminNav({ unread = 0 }: { unread?: number }) {
             <span className="md:hidden">CE · Admin</span>
             <span className="hidden md:inline">Cosmic Eagle · Admin</span>
           </Link>
-          {/* Inline recien en xl: con siete secciones la fila ya no entra al
-              lado del logo y las acciones en pantallas chicas de notebook, y
-              los links se montaban unos sobre otros. Igual lleva overflow por
-              si aparece una seccion mas. */}
-          <ul className="hidden min-w-0 xl:flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {LINKS.map((link) => (
-              <li key={link.href} className="shrink-0">
-                <Link
-                  href={link.href}
-                  className={`block whitespace-nowrap px-3 py-2 rounded-lg text-sm font-medium tracking-[0.02em] transition-colors ${
-                    isActive(link.href)
-                      ? "text-primary-fixed-dim bg-primary-container/10"
-                      : "text-on-surface-variant hover:text-on-surface"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setOpenedAt(open ? null : pathname)}
+              aria-expanded={open}
+              aria-haspopup="menu"
+              className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium tracking-[0.02em] transition-colors ${
+                open
+                  ? "border-primary-fixed-dim/50 text-primary-fixed-dim bg-primary-container/10"
+                  : "border-outline-variant/60 text-on-surface-variant hover:text-on-surface"
+              }`}
+            >
+              <Menu size={16} className="shrink-0" />
+              {/* En mobile solo el icono: el nombre de la seccion se lee igual
+                  en el titulo de la pagina, abajo. */}
+              <span className="hidden sm:inline max-w-[10rem] truncate">
+                {current?.label ?? "Secciones"}
+              </span>
+              <ChevronDown
+                size={15}
+                className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            {open && (
+              <ul
+                role="menu"
+                className="absolute left-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-outline-variant/60 bg-surface-container-low p-1 shadow-xl shadow-black/40"
+              >
+                {LINKS.map((link) => {
+                  const active = isActive(link.href);
+                  return (
+                    <li key={link.href} role="none">
+                      <Link
+                        href={link.href}
+                        role="menuitem"
+                        className={`flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
+                          active
+                            ? "bg-primary-container/10 text-primary-fixed-dim"
+                            : "text-on-surface-variant hover:bg-primary-container/5 hover:text-on-surface"
+                        }`}
+                      >
+                        {link.label}
+                        {active && <Check size={14} className="shrink-0" />}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         </div>
+
         <div className="flex shrink-0 items-center gap-3 md:gap-4">
           <Link
             href="/admin/notificaciones"
@@ -107,26 +182,6 @@ export function AdminNav({ unread = 0 }: { unread?: number }) {
           </form>
         </div>
       </nav>
-
-      {/* Debajo de xl los links no caben en la barra: van en una fila propia
-          con scroll horizontal. Sin esto el admin no tenia forma de navegar
-          entre secciones desde el telefono. */}
-      <ul className="mx-auto flex max-w-6xl xl:hidden items-center gap-1 overflow-x-auto px-5 pb-2 md:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {LINKS.map((link) => (
-          <li key={link.href} className="shrink-0">
-            <Link
-              href={link.href}
-              className={`block whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium tracking-[0.02em] transition-colors ${
-                isActive(link.href)
-                  ? "text-primary-fixed-dim bg-primary-container/10"
-                  : "text-on-surface-variant"
-              }`}
-            >
-              {link.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
     </header>
   );
 }

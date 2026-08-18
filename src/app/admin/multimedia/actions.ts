@@ -9,6 +9,7 @@ import {
   isSlotKey,
   type Slot,
 } from "@/lib/site-content";
+import { uploadTripCover } from "@/lib/trip-cover";
 
 export type SlotState = { error: string | null };
 
@@ -167,5 +168,55 @@ export async function resetSlot(
   await removeStored(supabase, previous);
 
   revalidateSlot(key);
+  return { error: null };
+}
+
+/**
+ * Portada de un viaje. Vive en `trips.image_url` y no en `site_content`, asi que
+ * no pasa por `saveSlot`: es la misma seccion del panel pero otra tabla y otro
+ * bucket. La subida la comparte con el form del viaje (`@/lib/trip-cover`).
+ */
+export async function saveTripCover(
+  _prevState: SlotState,
+  formData: FormData
+): Promise<SlotState> {
+  const tripId = formData.get("trip_id");
+  if (typeof tripId !== "string" || !tripId) {
+    return { error: "Ese viaje no existe." };
+  }
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Elegí una imagen para subir." };
+  }
+
+  const supabase = await createClient();
+
+  // Se relee la portada actual de la base para poder borrarla despues: el
+  // cliente manda solo el id, nunca la URL a borrar.
+  const { data: trip } = await supabase
+    .from("trips")
+    .select("image_url")
+    .eq("id", tripId)
+    .single();
+
+  if (!trip) return { error: "Ese viaje no existe." };
+
+  const upload = await uploadTripCover(supabase, file, trip.image_url);
+  if (upload.error) return { error: upload.error };
+
+  const { error } = await supabase
+    .from("trips")
+    .update({ image_url: upload.url })
+    .eq("id", tripId);
+
+  if (error) return { error: `No se pudo guardar la portada: ${error.message}` };
+
+  // La portada se ve en los dos listados publicos, en el detalle y en el panel.
+  revalidatePath("/");
+  revalidatePath("/viajes");
+  revalidatePath(`/viajes/${tripId}`);
+  revalidatePath("/admin/multimedia");
+
   return { error: null };
 }

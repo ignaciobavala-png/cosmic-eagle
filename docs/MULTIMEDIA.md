@@ -50,6 +50,35 @@ Consecuencias buscadas:
   romper. El input recibe el archivo comprimido vía `DataTransfer` antes del
   submit. De yapa, pasar por canvas borra el EXIF (incluida la geolocalización).
 
+## Portadas de viaje (agregado el 2026-08-18)
+
+La última sección del panel es **"Portadas de viajes"**, y es la única que **no
+sale del registro de slots**: las portadas viven en `trips.image_url` y en el
+bucket `trip-images`, no en `site_content`.
+
+Está ahí igual porque para la clienta es "una imagen del sitio" y no tiene por qué
+saber que se guarda en otra tabla. Antes la única forma de cargarla era entrar a
+editar el viaje.
+
+- Lista todos los viajes ordenados por fecha, con su portada actual o "Sin portada".
+- Recorta a **16:9 en el browser** antes de subir y muestra la zona segura sobre la
+  preview, igual que el form del viaje. Las dos pantallas comparten
+  `src/lib/trip-cover.ts` — se extrajo justamente para no tener dos caminos de
+  subida que se separen con el tiempo. Ver `docs/PORTADAS.md`.
+- El cliente manda solo el `trip_id`: la URL de la portada que se reemplaza (y se
+  borra del bucket) la relee el server de la base.
+- No usa `updateTag` porque no toca `site_content`: revalida las rutas donde se ve
+  la portada (`/`, `/viajes`, el detalle y el propio panel).
+
+## La página es un acordeón (2026-08-18)
+
+Cada grupo es un `<details>` nativo, no un acordeón con estado de React: sin JS,
+accesible por teclado, y el navegador se encarga de todo. Con 16 slots más la
+lista de viajes, todo abierto era una tira de scroll.
+
+Abre solo el primer grupo. El renglón chico bajo cada título dice cuántos
+elementos tiene y cuántos están editados, para no tener que abrirlo a ver.
+
 ## Cuentas del free tier (medidas el 2026-08-12)
 
 - Buckets `avatars` y `trip-images`: 0 objetos. DB: 11 MB de 500 MB.

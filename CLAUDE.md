@@ -465,6 +465,43 @@ con y sin banderas) y borrados después, RLS probada con `set role` (`anon` y us
 no admin ven cero filas), advisors sin novedades. **Sin verificar end-to-end**
 (requiere sesión, la hace Ignacio): ver la campanita y marcar leído desde el panel.
 
+### Sesión del 2026-08-18 (bis) — experiencias 2026 cargadas y estándar de portadas
+
+**Las 6 experiencias del flyer están cargadas** con precio, descripción, programa y
+condiciones. Análisis del texto, decisiones y lo que quedó pendiente en
+**`docs/EXPERIENCIAS_2026.md`**. Lo que hay que recordar: Santiago se partió en dos
+ceremonias (3 y 4 de octubre son dos flyers distintos), el precio de Santiago es una
+**conversión aproximada de CLP a USD** que hay que confirmar, y quedaron dos viajes
+en `open` **sin ningún dato** porque no están en el documento (Ceremonia en Tulum
+del 7/11 y Ceremonia en Santiago del 5-6/12).
+
+**Estándar de portadas** (ver **`docs/PORTADAS.md`**): una sola imagen, guardada en
+16:9, recortada desde el centro por cada uso — 4:3 en la tarjeta, 21:9 en el banner
+del detalle. De ahí sale la regla de la **zona segura: el 75% central de los dos
+ejes**, que el form del admin dibuja sobre la preview.
+
+- `src/components/ui/TripCover.tsx` es **la única pieza que decide el recorte**.
+  Antes la tarjeta y el banner tenían cada uno su markup y su alto, y por eso se
+  veían distintos.
+- Los altos van por `aspect-ratio` y **no en píxeles**: con alto fijo el recorte
+  cambia con el ancho del viewport.
+- El recorte se hace **al subir** (`compressImage(file, maxPx, aspect)`, tercer
+  parámetro nuevo), no al mostrar: lo que la clienta ve en la preview es
+  literalmente lo que se guarda. Esto cierra el punto 1 de "lo próximo" del 12/08.
+- El banner del detalle pasó de `<img>` a `next/image` con `priority`: era la
+  imagen más grande de la página y la única sin optimizar.
+
+**UX del panel**: el nav de secciones pasó de fila horizontal a **desplegable**
+(con siete secciones ya no entraba, y abajo de `xl` caía a una segunda fila con
+scroll que escondía secciones sin avisar). `/admin/multimedia` pasó a **acordeón**
+(`<details>` nativo, sin estado de React) y sumó la sección **"Portadas de
+viajes"**: se sube la portada de cualquier viaje sin entrar a editarlo. Es la única
+sección del panel que no sale del registro de slots — vive en `trips.image_url`.
+Las dos pantallas que suben portada comparten `src/lib/trip-cover.ts`.
+
+**Sin verificar end-to-end** (requiere sesión, la hace Ignacio): el desplegable, el
+acordeón y subir una portada desde Multimedia.
+
 ## No hacer
 
 - No inventar cuentas de Supabase ni connection strings falsos
