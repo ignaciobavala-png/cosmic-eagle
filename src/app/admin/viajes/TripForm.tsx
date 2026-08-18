@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import Image from "next/image";
+import { useActionState, useRef, useState } from "react";
+import { compressImage } from "@/lib/compress-image";
+import { TRIP_COVER_ASPECT, TRIP_COVER_MAX_PX } from "@/lib/trip-cover";
 import type { Tables } from "@/lib/supabase/types";
 import type { TripType } from "@/lib/trip-type";
 import { parseSchedule } from "@/lib/trip-schedule";
@@ -44,6 +45,29 @@ export function TripForm({
   // fecha cae cada jornada, y tiene que seguir a este campo mientras se edita.
   const [startDate, setStartDate] = useState(trip?.start_date ?? "");
 
+  // Preview del recorte real, no del archivo original: lo que se ve aca es
+  // exactamente lo que se va a subir.
+  const [preview, setPreview] = useState<string | null>(null);
+  const [cropping, setCropping] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleCover(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setCropping(true);
+    const cover = await compressImage(file, TRIP_COVER_MAX_PX, TRIP_COVER_ASPECT);
+    setCropping(false);
+
+    // El input tiene que llevar el archivo recortado, no el original: es el que
+    // se sube cuando el form hace submit.
+    const transfer = new DataTransfer();
+    transfer.items.add(cover);
+    if (imageInputRef.current) imageInputRef.current.files = transfer.files;
+
+    setPreview(URL.createObjectURL(cover));
+  }
+
   return (
     <form
       action={formAction}
@@ -82,27 +106,36 @@ export function TripForm({
         <label htmlFor="image" className={labelClass}>
           Portada
         </label>
-        {trip?.image_url && (
-          <div className="relative aspect-[4/3] w-full max-w-48 overflow-hidden rounded-lg border border-outline-variant">
-            <Image
-              src={trip.image_url}
-              alt="Portada actual del viaje"
-              fill
-              sizes="192px"
-              className="object-cover"
+        {(preview || trip?.image_url) && (
+          <div className="relative aspect-[16/9] w-full max-w-64 overflow-hidden rounded-lg border border-outline-variant">
+            {/* <img> y no next/image: la preview local es un blob: y el
+                optimizador no lo puede resolver (mismo caso que SlotEditor). */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={preview ?? trip!.image_url!}
+              alt={preview ? "Portada nueva, ya recortada" : "Portada actual del viaje"}
+              className="h-full w-full object-cover"
             />
+            {/* Guia de zona segura: lo que quede fuera del 75% central se pierde
+                en alguno de los dos recortes (tarjeta 4:3 o banner 21:9). */}
+            <div className="pointer-events-none absolute inset-x-[12.5%] inset-y-[12.5%] border border-dashed border-primary-fixed-dim/60" />
           </div>
         )}
         <input
+          ref={imageInputRef}
           id="image"
           name="image"
           type="file"
           accept="image/*"
+          onChange={handleCover}
           className={`${inputClass} file:mr-4 file:rounded-md file:border-0 file:bg-primary-container file:px-3 file:py-1 file:text-on-primary`}
         />
         <p className="text-xs text-on-surface-variant/70">
-          Apaisada, hasta 5MB. {trip?.image_url && "Si no elegís una, se mantiene la actual. "}
-          Sin portada se usa una imagen genérica.
+          {cropping
+            ? "Recortando…"
+            : "Se recorta sola a 16:9 desde el centro y se convierte a WebP. Dejá lo importante dentro del recuadro punteado: es lo que se ve en todos los tamaños. "}
+          {!cropping && trip?.image_url && "Si no elegís una, se mantiene la actual. "}
+          {!cropping && "Sin portada se usa una imagen genérica."}
         </p>
       </div>
 

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/lib/supabase/types";
 import { parseSchedule, sortSchedule } from "@/lib/trip-schedule";
 import { TRIP_TYPES, isTripType, tripAdminPath } from "@/lib/trip-type";
+import { uploadTripCover } from "@/lib/trip-cover";
 
 export type TripFormState = { error: string | null };
 
@@ -93,17 +94,12 @@ function parseTripForm(formData: FormData) {
   } as const;
 }
 
-const BUCKET = "trip-images";
-const PUBLIC_PREFIX = `/storage/v1/object/public/${BUCKET}/`;
-
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
 /**
- * Sube la portada si vino un archivo nuevo. Devuelve `undefined` cuando no hay
- * archivo, para poder distinguir "no tocar la portada" de "portada vacia".
- * La escritura del bucket esta restringida a admin por RLS (ver la migracion
- * 20260731182000_trip_cover_image.sql), asi que no hace falta chequear el rol
- * aca de nuevo: si no es admin, el upload falla.
+ * Envuelve `uploadTripCover` para el form del viaje, donde la portada es un
+ * campo mas del formulario y puede no venir. Devuelve `url: undefined` cuando
+ * no hay archivo, para distinguir "no tocar la portada" de "portada vacia".
  */
 async function uploadCover(
   supabase: SupabaseClient,
@@ -114,36 +110,7 @@ async function uploadCover(
 
   if (!(file instanceof File) || file.size === 0) return { error: null };
 
-  if (!file.type.startsWith("image/")) {
-    return { error: "La portada debe ser una imagen." };
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    return { error: "La portada no puede superar los 5MB." };
-  }
-
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const path = `${crypto.randomUUID()}.${ext}`;
-
-  const { error } = await supabase.storage
-    .from(BUCKET)
-    .upload(path, file, { contentType: file.type });
-
-  if (error) {
-    return { error: "No se pudo subir la portada. Probá de nuevo." };
-  }
-
-  // Reemplazo: borra la anterior para que el bucket no crezca sin limite.
-  if (currentUrl?.includes(PUBLIC_PREFIX)) {
-    const oldPath = currentUrl.split(PUBLIC_PREFIX)[1]?.split("?")[0];
-    if (oldPath) await supabase.storage.from(BUCKET).remove([oldPath]);
-  }
-
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from(BUCKET).getPublicUrl(path);
-
-  return { error: null, url: publicUrl };
+  return uploadTripCover(supabase, file, currentUrl);
 }
 
 export async function createTrip(

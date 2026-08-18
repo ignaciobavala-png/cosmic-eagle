@@ -15,9 +15,20 @@
 
 const QUALITY = 0.82;
 
-export async function compressImage(file: File, maxPx = 1600): Promise<File> {
+/**
+ * `aspect` (ancho / alto) recorta la imagen a esa proporcion **desde el centro**
+ * antes de escalar. Se usa para las portadas de viaje: se guarda una sola imagen
+ * en 16:9 y cada lugar del sitio recorta desde ahi (ver docs/PORTADAS.md). Sin
+ * `aspect` la imagen conserva su proporcion original, que es lo que quiere el
+ * panel de multimedia, donde cada slot tiene la suya.
+ */
+export async function compressImage(
+  file: File,
+  maxPx = 1600,
+  aspect?: number
+): Promise<File> {
   try {
-    return await toWebp(file, maxPx);
+    return await toWebp(file, maxPx, aspect);
   } catch {
     // Formato raro, canvas sin contexto, imagen corrupta: sube el original.
     // Peor que comprimido, mejor que un error que la clienta no puede resolver.
@@ -25,7 +36,7 @@ export async function compressImage(file: File, maxPx = 1600): Promise<File> {
   }
 }
 
-function toWebp(file: File, maxPx: number): Promise<File> {
+function toWebp(file: File, maxPx: number, aspect?: number): Promise<File> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -35,6 +46,26 @@ function toWebp(file: File, maxPx: number): Promise<File> {
 
       let { width, height } = img;
       if (!width || !height) return reject(new Error("dimensiones vacías"));
+
+      // Recorte centrado a la proporcion pedida. Se calcula sobre la imagen
+      // original (`sx/sy/sw/sh` de drawImage) y no escalando el canvas: escalar
+      // deformaria, que es justo lo que hay que evitar.
+      let sx = 0;
+      let sy = 0;
+      let sw = width;
+      let sh = height;
+
+      if (aspect) {
+        if (width / height > aspect) {
+          sw = Math.round(height * aspect);
+          sx = Math.round((width - sw) / 2);
+        } else {
+          sh = Math.round(width / aspect);
+          sy = Math.round((height - sh) / 2);
+        }
+        width = sw;
+        height = sh;
+      }
 
       if (width > maxPx || height > maxPx) {
         if (width >= height) {
@@ -52,7 +83,7 @@ function toWebp(file: File, maxPx: number): Promise<File> {
 
       const ctx = canvas.getContext("2d");
       if (!ctx) return reject(new Error("sin contexto 2d"));
-      ctx.drawImage(img, 0, 0, width, height);
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, width, height);
 
       canvas.toBlob(
         (blob) => {

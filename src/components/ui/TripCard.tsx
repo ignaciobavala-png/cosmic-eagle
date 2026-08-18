@@ -1,9 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { tripPlaceholderImage } from "@/lib/constants";
 import { formatDateRangeCompact } from "@/lib/format";
 import { isTripType, tripTypeLabel } from "@/lib/trip-type";
+import { TripCover } from "./TripCover";
 
 export type TripCardData = {
   id: string;
@@ -29,9 +28,8 @@ const STATUS_LABEL: Record<string, string> = {
  * serif, descripcion y pie con label FECHA + accion circular.
  * Se repite en la home y en /viajes (el listado todavia usa su propio markup).
  *
- * La portada sale de `image_url` (subida por el admin). Si el viaje no tiene,
- * cae en tripPlaceholderImage, estable por hash del id para que coincida con
- * el detalle del viaje.
+ * La portada la resuelve `TripCover`, que es quien decide el recorte (ver
+ * docs/PORTADAS.md).
  */
 export function TripCard({ trip }: { trip: TripCardData }) {
   return (
@@ -39,14 +37,7 @@ export function TripCard({ trip }: { trip: TripCardData }) {
       href={`/viajes/${trip.id}`}
       className="group flex flex-col overflow-hidden rounded-2xl glass-card transition-colors duration-300 hover:border-primary-fixed-dim/35"
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden">
-        <Image
-          src={trip.image_url ?? tripPlaceholderImage(trip.id)}
-          alt=""
-          fill
-          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover transition-transform duration-1000 group-hover:scale-105"
-        />
+      <TripCover tripId={trip.id} imageUrl={trip.image_url} variant="card">
         <div className="absolute inset-0 bg-[#05102a]/20" />
         <div className="absolute left-4 top-4 flex flex-wrap gap-2">
           {isTripType(trip.type) && (
@@ -65,7 +56,7 @@ export function TripCard({ trip }: { trip: TripCardData }) {
             {STATUS_LABEL[trip.status]}
           </span>
         )}
-      </div>
+      </TripCover>
 
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <h3 className="font-display text-headline-md text-on-surface">

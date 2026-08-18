@@ -6,7 +6,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
-import { tripPlaceholderImage } from "@/lib/constants";
+import { TripCover } from "@/components/ui/TripCover";
 import { formatScheduleDay } from "@/lib/format";
 import { groupScheduleByDay, parseSchedule } from "@/lib/trip-schedule";
 import { tripTypeLabel } from "@/lib/trip-type";
@@ -129,13 +129,14 @@ export default async function ViajePage({ params }: Props) {
             Todos los viajes
           </Link>
 
-          <div className="relative h-[240px] sm:h-[280px] md:h-[400px] rounded-3xl overflow-hidden glass-card mb-10">
+          <TripCover
+            tripId={trip.id}
+            imageUrl={trip.image_url}
+            variant="banner"
+            priority
+            className="rounded-3xl glass-card mb-10"
+          >
             <div className="absolute inset-0 bg-gradient-to-t from-void-black via-void-black/40 to-transparent z-10" />
-            <img
-              src={trip.image_url ?? tripPlaceholderImage(trip.id)}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-            />
             <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 md:p-10 z-20">
               <div className="mb-3 sm:mb-4 flex flex-wrap gap-2">
                 <span className="px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest inline-block backdrop-blur-md bg-primary-container/90 text-on-primary">
@@ -156,7 +157,7 @@ export default async function ViajePage({ params }: Props) {
                 <p className="text-on-surface-variant mt-2">{trip.location}</p>
               )}
             </div>
-          </div>
+          </TripCover>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
             <div>
