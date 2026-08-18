@@ -279,6 +279,51 @@ export type Database = {
           },
         ]
       }
+      articles: {
+        Row: {
+          body: string
+          category: Database["public"]["Enums"]["article_category"]
+          cover_url: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          published_at: string | null
+          slug: string
+          status: Database["public"]["Enums"]["article_status"]
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          body: string
+          category?: Database["public"]["Enums"]["article_category"]
+          cover_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published_at?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["article_status"]
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          body?: string
+          category?: Database["public"]["Enums"]["article_category"]
+          cover_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published_at?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["article_status"]
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       consents: {
         Row: {
           application_first_time_id: string | null
@@ -547,6 +592,8 @@ export type Database = {
         | "application_health_flag"
         | "email_failed"
       application_status: "pending_review" | "approved" | "rejected" | "expired"
+      article_category: "biblioteca" | "ciencia" | "testimonios"
+      article_status: "draft" | "published"
       trip_status: "draft" | "open" | "closed" | "completed"
       trip_type: "retiro" | "ceremonia"
     }
@@ -682,6 +729,8 @@ export const Constants = {
         "email_failed",
       ],
       application_status: ["pending_review", "approved", "rejected", "expired"],
+      article_category: ["biblioteca", "ciencia", "testimonios"],
+      article_status: ["draft", "published"],
       trip_status: ["draft", "open", "closed", "completed"],
       trip_type: ["retiro", "ceremonia"],
     },

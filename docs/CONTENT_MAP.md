@@ -36,8 +36,8 @@ ayuda al SEO).
 | 1. Cosmic Eagle (quiénes somos, Estela, metodología, FAQ) | `/nosotros` | placeholder — falta texto de la clienta |
 | 2. Experiencias (ceremonias, retiros, calendario, cómo postular) | `/viajes`, `/viajes/[id]`, `/viajes/[id]/solicitar` | **ya construido** |
 | 3. Preparación e Integración | `/preparacion` | **única ruta nueva a construir** |
-| 4. Biblioteca | `/contenidos` (categoría del hub) | placeholder — falta contenido |
-| 5. Ciencia Almática | `/contenidos` (categoría del hub) | placeholder — falta contenido |
+| 4. Biblioteca | `/contenidos` (categoría del hub) | **hub construido** (2026-08-18) — falta el contenido |
+| 5. Ciencia Almática | `/contenidos` (categoría del hub) | **hub construido** (2026-08-18) — falta el contenido |
 | 6. Testimonios | `/contenidos` (categoría) + bloque ya existente en la home | componente ya existe |
 
 Nav resultante: **Inicio · Nosotros · Experiencias · Preparación · Contenidos · Mi Cuenta**.
@@ -62,9 +62,11 @@ le quitan secciones, se le da una nav donde cada link responde una de *sus* preg
   (`#alimentacion`, `#contraindicaciones`, `#microdosis`…), no diez subpáginas. Además es
   la página que el formulario de solicitud y el consentimiento pueden linkear como
   lectura previa — resuelve dos pendientes con una pieza.
-- **Biblioteca y Ciencia Almática no llevan backend todavía**: 20 recursos y ~10 conceptos
-  no justifican tablas ni CMS ni CRUD de admin. Un archivo de constantes tipado alcanza, y
-  migrarlo a Supabase después es trivial si el shape queda bien definido desde el principio.
+- ~~**Biblioteca y Ciencia Almática no llevan backend todavía**~~ **REVERTIDO 2026-08-18**: se
+  construyó la tabla `articles` + CRUD en `/admin/contenidos` (ver `docs/CONTENIDOS.md`). Lo
+  que cambió el criterio no es la cantidad de material sino el requerimiento: la clienta tiene
+  que poder cargar textos e imágenes **sin tocar código ni deployar**, y un archivo de
+  constantes obliga a un deploy por cada corrección.
 
 ## Contenido que hay que pedirle a Sofía / Estela
 

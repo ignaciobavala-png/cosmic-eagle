@@ -183,6 +183,37 @@ export const SITE_GROUPS = [
       },
     ],
   },
+  {
+    id: "contenidos",
+    title: "Contenidos",
+    href: "/contenidos",
+    slots: [
+      {
+        key: "contenidos.hero.image",
+        label: "Imagen de portada",
+        help: "Banner de arriba de la biblioteca de contenidos.",
+        type: "image",
+        fallback: IMAGES.almas,
+        ratio: "16/9",
+        maxPx: 1920,
+      },
+      {
+        key: "contenidos.hero.title",
+        label: "Título de portada",
+        help: "El texto grande sobre el banner de Contenidos.",
+        type: "text",
+        fallback: "Contenidos",
+      },
+      {
+        key: "contenidos.hero.subtitle",
+        label: "Bajada de portada",
+        help: "La frase corta debajo del título de Contenidos.",
+        type: "text",
+        fallback:
+          "Lecturas, ciencia almática y testimonios para acompañar el camino.",
+      },
+    ],
+  },
 ] as const satisfies readonly SlotGroup[];
 
 export type SlotKey = (typeof SITE_GROUPS)[number]["slots"][number]["key"];

@@ -27,8 +27,8 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 - **Assets de diseño de Julia recibidos (2026-07-30)**: ver `docs/DESIGN_ASSETS.md` (mapeo de la carpeta a las rutas) y `docs/RECORRIDO.md` (el recorrido del negocio + las 8 primitivas visuales del sistema). La carpeta original está en `~/Descargas/frontend_eagle`, **fuera del repo**
 - `/nosotros` **implementado** con el mockup de Julia y copy real de la clienta (hero + propósito + metodología + Nuestra Visión)
 - `/viajes` **implementada sobre el mockup de Julia**: hero P1 (`hero-viajes.webp`) + grilla de `TripCard` (P4, la misma de la home) + banda de llamado P6 al pie. El CTA "Aplicar para un viaje" **ancla al listado** (`#proximos`), no linkea a un form: aplicar es siempre a *un* viaje concreto
-- `/contenidos` dejó de ser placeholder: hospeda **provisoriamente** la sección "Contenidos" que estaba en la home (mock, CTAs sin destino), hasta cerrar `docs/CONTENT_MAP.md` con Sofía
-- **Home parcialmente rediseñada**: hero sobre `PageHero` con el banner de Julia, carrusel "Portales de transformación" (`PortalsSection`) y **dos bloques de viajes separados por tipo** — "Próximos Retiros" y "Próximas Ceremonias", los dos `TripsSection` con `trips` real (antes era una sola sección que los mezclaba, y antes de eso dos tarjetas hardcodeadas con viajes inexistentes). Cada bloque se omite entero si no hay viajes publicados de ese tipo. Consultar Supabase desde la home la volvió dinámica (`ƒ`), ya no es prerender estático. Siguen mock `AboutSection`, `EbookSection` y `TestimonialsSection` (`ContentSection` se mudó a `/contenidos`)
+- `/contenidos` es el **hub de contenidos real** (2026-08-18): hero P1 + filtro por categoría + grilla de artículos de la tabla `articles`, con detalle en `/contenidos/[slug]`. Los carga la clienta desde `/admin/contenidos` (ver `docs/CONTENIDOS.md`). Reemplazó a la sección mock que se había mudado de la home
+- **Home parcialmente rediseñada**: hero sobre `PageHero` con el banner de Julia, carrusel "Portales de transformación" (`PortalsSection`) y **dos bloques de viajes separados por tipo** — "Próximos Retiros" y "Próximas Ceremonias", los dos `TripsSection` con `trips` real (antes era una sola sección que los mezclaba, y antes de eso dos tarjetas hardcodeadas con viajes inexistentes). Cada bloque se omite entero si no hay viajes publicados de ese tipo. Consultar Supabase desde la home la volvió dinámica (`ƒ`), ya no es prerender estático. Siguen mock `AboutSection`, `EbookSection` y `TestimonialsSection` (`ContentSection` se borró al construir `/contenidos` de verdad)
 - `pnpm build` (producción) verificado sin errores — listo para deployar en cuanto a código
 - `app/api/keep-alive/route.ts` + `vercel.json` (cron diario 12:00 UTC) armados para que Supabase free tier no pause el proyecto por inactividad. Protegido con `CRON_SECRET`
 - **Proyecto deployado en Vercel**: `cosmic-eagle` (org `ethoslogs-projects`), URL de producción `https://cosmic-eagle.vercel.app`. Env vars `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `CRON_SECRET` cargadas en Development/Preview/Production. **Repo de GitHub conectado al proyecto de Vercel** (vía GitHub App, no webhook clásico) — cada push a `main` deploya solo a producción, no hace falta correr `vercel --prod` a mano
@@ -63,7 +63,9 @@ src/
 │   ├── globals.css                   # Design system (colores, glass, scrollbar)
 │   ├── not-found.tsx                 # 404 custom
 │   ├── nosotros/page.tsx             # implementado (mockup de Julia + copy real)
-│   ├── contenidos/page.tsx           # provisorio: la seccion mock que estaba en la home
+│   ├── contenidos/
+│   │   ├── page.tsx                  # hub: hero + filtro por categoria + grilla de articles
+│   │   └── [slug]/page.tsx           # detalle publico del articulo
 │   ├── api/keep-alive/route.ts       # ping a `trips`, cron diario via vercel.json
 │   ├── viajes/
 │   │   ├── page.tsx                  # P1 + grilla P4 + P6, conectado a `trips` real
@@ -87,6 +89,7 @@ src/
 │       ├── retiros/                  # listado de trips type=retiro (usa viajes/TripsList)
 │       ├── ceremonias/               # listado de trips type=ceremonia (idem)
 │       ├── viajes/                   # CRUD de trips (form + actions). page.tsx redirige a /admin/retiros
+│       ├── contenidos/               # CRUD de articles (form + actions), portada a site-assets
 │       ├── suscriptores/             # lista del newsletter (solo lectura + copiar)
 │       └── solicitudes/              # revision, aprobar/rechazar/expirar (bloquea auto-revision)
 ├── components/
@@ -129,6 +132,7 @@ public/
 ├── logo.png                    # logo oficial de la disenadora (914x267, alpha recortado)
 └── img/                        # assets de Julia convertidos a WebP (11.4 MB -> 267 KB)
 docs/
+├── CONTENIDOS.md               # Articulos editables: /admin/contenidos -> /contenidos
 ├── EMAIL.md                    # Resend: mails que dispara la app (NO los de auth)
 ├── AUTH_EMAIL.md               # Mails de Supabase Auth (reset de clave)
 ├── consulta-sofia-acceso.txt   # Consulta pendiente sobre el "codigo de acceso"
@@ -329,13 +333,13 @@ Lo próximo, en orden:
 1. **Compresor a WebP del lado del cliente** en el input de portada del admin. **No es por storage** (el free tier de Supabase aguanta ~200 viajes con el tope de 5MB): es porque `next/image` transformando un PNG de 5MB en frío cuelga la primera visita, justo la que hace la clienta al revisar el viaje que acaba de cargar. Canvas nativo, sin dependencias. **Antes de escribirlo, leer el skill `client-side-image-compress` de brain-data**: ya tiene la implementación resuelta (`compressImage()`), incluidos los dos detalles que se hacen mal solos — la orientación EXIF (las fotos de celular salen rotadas) y el fallback al original si `toBlob` falla. De yapa, pasar por canvas borra el EXIF, incluida la geolocalización.
 2. Rediseñar las 3 secciones mock que quedan de la home: `AboutSection` (el asset `ICONO_ABOUTSECTION.png` es el único de la entrega de Julia sin convertir ni usar), `EbookSection` y `TestimonialsSection` — esta última es la que pide construir P7. En testimonios y en "Nuestra Esencia" **nuestro contenido es mejor que el del mockup** (personas reales vs. maqueta): se toma la forma de Julia, se conserva nuestro texto.
 3. `/preparacion`, que con las primitivas ya construidas es composición pura.
-4. `/contenidos` de verdad, cuando cierre `docs/CONTENT_MAP.md` con Sofía: hoy es la sección mock de la home mudada de lugar.
+4. ~~`/contenidos` de verdad~~ **HECHO 2026-08-18**, ver `docs/CONTENIDOS.md`. Falta el contenido en sí: la clienta tiene que cargar los artículos.
 
 CTAs muertos que quedan: "Comprar Ahora" del e-book (no hay ruta ni checkout) y "Leer Más" de `AboutSection` (probablemente vaya a `/nosotros`).
 
 Decisiones tomadas sola que hay que validar: el CTA **"Unirme al círculo"** del navbar apunta a `/cuenta?modo=registro` (con sesión se reemplaza por el avatar). El texto es de Julia pero **promete comunidad, que está fuera de alcance** (`docs/CONTEXT.md` §6) — confirmar con ellas. Los links del footer sin ruta (Blog, E-book, Privacidad, Términos, Soporte) se pintan apagados en vez de linkear a `#`.
 
-No urgente pero pendiente: `/contenidos` es la sección mock de la home mudada de lugar, no una página propia. `/preparacion` no existe todavía.
+No urgente pero pendiente: `/preparacion` no existe todavía.
 
 ### Sesión del 2026-08-15 — el boceto de Sofía, programa por jornada y Resend
 
@@ -501,6 +505,41 @@ Las dos pantallas que suben portada comparten `src/lib/trip-cover.ts`.
 
 **Sin verificar end-to-end** (requiere sesión, la hace Ignacio): el desplegable, el
 acordeón y subir una portada desde Multimedia.
+
+### Sesión del 2026-08-18 (ter) — /contenidos deja de ser mock
+
+Nueva sección `/admin/contenidos`: la clienta carga artículos (título, bajada,
+portada, categoría, texto) y salen publicados en `/contenidos` y
+`/contenidos/[slug]`. Detalle y decisiones en **`docs/CONTENIDOS.md`**.
+
+- Migración `20260818160000_articles.sql`: tabla `articles` + enums
+  `article_category` (biblioteca / ciencia / testimonios, las tres del hub de
+  `docs/CONTENT_MAP.md`) y `article_status` (draft / published).
+- **El borrador no sale de la base**: la policy pública es
+  `using (status = 'published')` y el admin ve todo por una segunda policy. Es a
+  propósito distinto de `trips`, donde el filtro de borradores lo hace cada
+  página y hay que acordarse.
+- **No es `site_content`**: ahí el código declara cuántos slots hay; acá la
+  cantidad de artículos la decide la clienta. Lo que sí es slot es el hero de
+  `/contenidos` (imagen + título + bajada), que se edita desde Multimedia.
+- El cuerpo es **texto plano con dos reglas** (línea en blanco = párrafo, `## ` =
+  subtítulo) y se renderiza como texto dentro de `<p>`/`<h2>`. Nada de HTML del
+  formulario: no hay sanitizador en el proyecto y sería un XSS almacenado.
+- Las portadas van al bucket `site-assets` bajo `articles/`, recortadas a 16:9 en
+  el browser con el mismo `compressImage` de las portadas de viaje.
+- `ContentSection.tsx` y `CONTENT_CARDS` **borrados**: eran las tres tarjetas mock
+  que ocupaban la página.
+
+Esto **contradice a propósito** una decisión vieja de `docs/CONTENT_MAP.md`
+("Biblioteca y Ciencia Almática no llevan backend todavía, un archivo de
+constantes alcanza"): lo que cambió no es la cantidad de material sino el
+requerimiento — cargar contenido sin tocar código ni deployar.
+
+Verificado: build de producción y las policies con `set role` (`anon` y un
+usuario no admin ven solo publicados y no pueden escribir; el admin ve borradores
+y escribe, y el trigger sella `published_at` y el autor). **Sin verificar
+end-to-end** (requiere sesión, la hace Ignacio): cargar y publicar un artículo
+desde el panel.
 
 ## No hacer
 

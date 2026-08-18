@@ -172,29 +172,3 @@ export const EBOOK_FEATURES = [
   },
 ];
 
-export const CONTENT_CARDS = [
-  {
-    title: "Procesos de Integración",
-    description:
-      "Introducción a estados ampliados de conciencia y viajes cósmicos. Herramientas para aterrizar la experiencia.",
-    image: "integration" as keyof typeof IMAGES,
-    accent: "primary" as const,
-    offset: false,
-  },
-  {
-    title: "Investigación",
-    description:
-      "Herramientas y profundización en la tecnología de la conciencia humana. Avances científicos y espirituales.",
-    image: "research" as keyof typeof IMAGES,
-    accent: "secondary" as const,
-    offset: true,
-  },
-  {
-    title: "Evolución del Conocimiento",
-    description:
-      "Un paso más allá de lo básico, la arquitectura energética del ser humano y su proceso evolutivo.",
-    image: "evolution" as keyof typeof IMAGES,
-    accent: "primary" as const,
-    offset: false,
-  },
-];

@@ -20,13 +20,14 @@ const LINKS = [
   { href: "/admin/ceremonias", label: "Ceremonias" },
   { href: "/admin/solicitudes", label: "Solicitudes" },
   { href: "/admin/multimedia", label: "Multimedia" },
+  { href: "/admin/contenidos", label: "Contenidos" },
   { href: "/admin/crm", label: "CRM" },
   { href: "/admin/suscriptores", label: "Suscriptores" },
 ];
 
 /**
  * Barra del panel. Las secciones van en **un desplegable y no en una fila**: con
- * siete no entraban al lado del logo ni en desktop, y abajo de `xl` caian a una
+ * ocho no entran al lado del logo ni en desktop, y abajo de `xl` caian a una
  * segunda fila con scroll horizontal, que esconde secciones sin avisar.
  * El desplegable ademas deja lugar para las que vengan.
  *
