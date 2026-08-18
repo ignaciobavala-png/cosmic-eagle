@@ -191,59 +191,33 @@ html {
    Sin esto el degrade se dimensionaria contra el viewport y no contra el alto
    del documento, y el remate oscuro del pie nunca se veria. */
 html {
-  /* Acompana al color de los extremos del degrade animado del body: es lo que se
-     ve al hacer overscroll, fuera de la caja del documento. */
-  background-color: #001f5c;
+  background-color: #05060a;
 }
 
-/* PRUEBA (2026-08-18): degrade animado en diagonal, en reemplazo del degrade
-   vertical fijo "Midnight Celestial". El anterior esta en el historial de git
-   (commit anterior a este) por si hay que volver.
-   Ojo: el punto mas claro del ciclo (#00ccff) es un cian fuerte, y el texto del
-   sitio es claro — durante esa fase del ciclo la lectura pierde contraste. */
+/* Midnight Celestial: el fondo nunca es plano. Degrade vertical de documento
+   completo, del azul celeste del hero al negro del pie, tal como el mockup. */
 body {
   position: relative;
   color: #e5e2db;
   font-family: var(--font-body, "Literata", serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Que ocupe toda la pantalla aunque la pagina sea corta. */
-  min-height: 100vh;
-  background-color: #001f5c;
-  background-image: linear-gradient(
-    -45deg,
-    #001f5c,
-    #0066cc,
-    #00ccff,
-    #0066cc,
-    #001f5c
-  );
-  /* El degrade se dibuja 4x mas grande que el area y se desplaza: eso es lo que
-     da el movimiento, no una transicion de colores. */
-  background-size: 400% 400%;
+  background-color: #05060a;
+  background-image:
+    radial-gradient(
+      110rem 55rem at 50% -8%,
+      rgba(0, 121, 178, 0.26),
+      transparent 60%
+    ),
+    linear-gradient(
+      180deg,
+      #0a2a52 0%,
+      #071c3f 20%,
+      #051230 42%,
+      #060b1a 68%,
+      #05060a 100%
+    );
   background-repeat: no-repeat;
-  animation: gradientShift 15s ease infinite;
-}
-
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* Un fondo que se mueve sin parar es justo lo que esta preferencia pide cortar:
-   queda el degrade quieto, con los mismos colores. */
-@media (prefers-reduced-motion: reduce) {
-  body {
-    animation: none;
-    background-position: 0% 50%;
-  }
 }
 
 /* Campo de estrellas: tres capas de puntos tileados a distinta densidad y
