@@ -506,7 +506,11 @@ Las dos pantallas que suben portada comparten `src/lib/trip-cover.ts`.
 **Sin verificar end-to-end** (requiere sesión, la hace Ignacio): el desplegable, el
 acordeón y subir una portada desde Multimedia.
 
-### Sesión del 2026-08-18 (ter) — /contenidos deja de ser mock
+### Sesión del 2026-08-18 (ter) — contenidos editables, portales que giran y una prueba de fondo revertida
+
+Todo lo de abajo está **mergeado a `main` y deployado a producción**.
+
+#### 1. `/contenidos` dejó de ser mock
 
 Nueva sección `/admin/contenidos`: la clienta carga artículos (título, bajada,
 portada, categoría, texto) y salen publicados en `/contenidos` y
@@ -518,10 +522,13 @@ portada, categoría, texto) y salen publicados en `/contenidos` y
 - **El borrador no sale de la base**: la policy pública es
   `using (status = 'published')` y el admin ve todo por una segunda policy. Es a
   propósito distinto de `trips`, donde el filtro de borradores lo hace cada
-  página y hay que acordarse.
+  página y hay que acordarse en cada ruta nueva.
 - **No es `site_content`**: ahí el código declara cuántos slots hay; acá la
   cantidad de artículos la decide la clienta. Lo que sí es slot es el hero de
   `/contenidos` (imagen + título + bajada), que se edita desde Multimedia.
+- `published_at` lo **sella el trigger** la primera vez que se publica y no se
+  vuelve a tocar: corregir una coma de un texto viejo no debería mandarlo arriba
+  del listado.
 - El cuerpo es **texto plano con dos reglas** (línea en blanco = párrafo, `## ` =
   subtítulo) y se renderiza como texto dentro de `<p>`/`<h2>`. Nada de HTML del
   formulario: no hay sanitizador en el proyecto y sería un XSS almacenado.
@@ -530,22 +537,59 @@ portada, categoría, texto) y salen publicados en `/contenidos` y
 - `ContentSection.tsx` y `CONTENT_CARDS` **borrados**: eran las tres tarjetas mock
   que ocupaban la página.
 
-Después, en la misma sesión: el carrusel de **Portales de transformación** pasó a
-**rotar solo** cada 5s (se frena con el puntero encima o el foco adentro, y
-`prefers-reduced-motion` lo deja quieto), y la **foto de "Sobre Cosmic Eagle"**
-pasó a ser editable desde Multimedia (slot `home.about.image`). De paso esa foto
-dejó de ser `<img>` y pasa por `next/image`.
-
 Esto **contradice a propósito** una decisión vieja de `docs/CONTENT_MAP.md`
 ("Biblioteca y Ciencia Almática no llevan backend todavía, un archivo de
 constantes alcanza"): lo que cambió no es la cantidad de material sino el
-requerimiento — cargar contenido sin tocar código ni deployar.
+requerimiento — cargar contenido sin tocar código ni deployar. Anotado también
+allá.
 
-Verificado: build de producción y las policies con `set role` (`anon` y un
-usuario no admin ven solo publicados y no pueden escribir; el admin ve borradores
-y escribe, y el trigger sella `published_at` y el autor). **Sin verificar
-end-to-end** (requiere sesión, la hace Ignacio): cargar y publicar un artículo
-desde el panel.
+#### 2. Los portales de la home giran solos
+
+`PortalsSection` ya animaba, pero solo al tocarlo. Ahora rota en círculo cada 5s.
+
+- Se frena mientras el puntero está encima o el foco adentro (`onFocusCapture`,
+  porque el foco cae en los botones y no en el contenedor), cada avance o click
+  reinicia la espera, y `prefers-reduced-motion` corta el giro automático.
+- El óvalo que cambia de lado al cerrar la vuelta **no se desliza por el medio**:
+  se repone del otro extremo con un fundido (`x: { duration: 0 }` + keyframes de
+  opacidad). Con click suelto casi no se notaba; girando solo pasaba cada vuelta.
+- **Ojo**: la posición anterior se guarda como **estado**, junto al índice
+  activo, y no en un `useRef`. Se lee durante el render para saber quién cambió
+  de lado, y leer un ref ahí rompe la pureza del render — el lint del compilador
+  de React lo rechaza con "Cannot access refs during render". Es el mismo error
+  al que se va cualquiera que quiera comparar "valor anterior vs actual".
+
+#### 3. La foto de "Sobre Cosmic Eagle" se edita desde Multimedia
+
+Era la única imagen grande de la home clavada en `IMAGES`. Slot nuevo
+`home.about.image` (recorte 1:1, el contenedor es cuadrado); `AboutSection`
+recibe la imagen por props, como `PortalsSection`, porque es cliente por Framer
+Motion. Sin migración: el registro de slots vive en el código.
+
+De paso pasó de `<img>` a `next/image`. El wrapper nuevo alrededor del
+`<Image fill>` **no sobra**: un absoluto se posiciona contra la caja de padding,
+así que sin él la foto tapaba el `p-2` del marco de vidrio.
+
+#### 4. Fondo animado: probado en producción y revertido
+
+Se probó reemplazar el degradé vertical fijo del `body` por uno diagonal animado
+(`#001f5c → #0066cc → #00ccff`, ciclo de 15s). Se pusheó a producción a pedido,
+no gustó, y se revirtió en el commit siguiente — `globals.css` quedó byte a byte
+como estaba. El intento está en el commit `949d6d2` por si se retoma la idea del
+movimiento: lo que hay que resolver ahí es el pico de `#00ccff`, que deja sin
+contraste al texto claro del sitio durante esa fase del ciclo.
+
+#### Verificado y sin verificar
+
+Verificado: build de producción en cada paso, `tsc` y lint limpios en lo tocado,
+y las policies de `articles` probadas con `set role` — `anon` y un usuario
+logueado no admin ven solo los publicados y no pueden escribir; el admin ve
+borradores, escribe, y el trigger registra autor y sella la fecha de publicación.
+Advisors sin novedades. Filas de prueba borradas.
+
+**Sin verificar end-to-end** (requiere sesión de admin, la hace Ignacio): cargar
+y publicar un artículo con portada desde el panel, subir la foto nueva de "Sobre
+Cosmic Eagle", y ver el carrusel girando en el sitio en vivo.
 
 ## No hacer
 
