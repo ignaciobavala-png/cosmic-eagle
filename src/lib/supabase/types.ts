@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notifications: {
+        Row: {
+          application_first_time_id: string | null
+          application_returning_id: string | null
+          body: string | null
+          created_at: string
+          href: string | null
+          id: string
+          kind: Database["public"]["Enums"]["admin_notification_kind"]
+          read_at: string | null
+          read_by: string | null
+          title: string
+          trip_id: string | null
+        }
+        Insert: {
+          application_first_time_id?: string | null
+          application_returning_id?: string | null
+          body?: string | null
+          created_at?: string
+          href?: string | null
+          id?: string
+          kind: Database["public"]["Enums"]["admin_notification_kind"]
+          read_at?: string | null
+          read_by?: string | null
+          title: string
+          trip_id?: string | null
+        }
+        Update: {
+          application_first_time_id?: string | null
+          application_returning_id?: string | null
+          body?: string | null
+          created_at?: string
+          href?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["admin_notification_kind"]
+          read_at?: string | null
+          read_by?: string | null
+          title?: string
+          trip_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_notifications_application_first_time_id_fkey"
+            columns: ["application_first_time_id"]
+            isOneToOne: false
+            referencedRelation: "applications_first_time"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_notifications_application_first_time_id_fkey"
+            columns: ["application_first_time_id"]
+            isOneToOne: false
+            referencedRelation: "my_applications_first_time"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_notifications_application_returning_id_fkey"
+            columns: ["application_returning_id"]
+            isOneToOne: false
+            referencedRelation: "applications_returning"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_notifications_application_returning_id_fkey"
+            columns: ["application_returning_id"]
+            isOneToOne: false
+            referencedRelation: "my_applications_returning"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_notifications_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       applications_first_time: {
         Row: {
           age: number
@@ -464,6 +542,10 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      admin_notification_kind:
+        | "application_new"
+        | "application_health_flag"
+        | "email_failed"
       application_status: "pending_review" | "approved" | "rejected" | "expired"
       trip_status: "draft" | "open" | "closed" | "completed"
       trip_type: "retiro" | "ceremonia"
@@ -594,6 +676,11 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      admin_notification_kind: [
+        "application_new",
+        "application_health_flag",
+        "email_failed",
+      ],
       application_status: ["pending_review", "approved", "rejected", "expired"],
       trip_status: ["draft", "open", "closed", "completed"],
       trip_type: ["retiro", "ceremonia"],

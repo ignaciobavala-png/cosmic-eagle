@@ -3,9 +3,10 @@ import { BaseLayout, CtaButton, Paragraph, Title } from "./BaseLayout";
 /**
  * Aviso de que una solicitud fue aprobada.
  *
- * **Todavia no esta cableado a ningun flujo**: `reviewApplication` aprueba sin
- * mandar nada. Se conecta cuando este verificado el dominio en Resend — hasta
- * entonces el sandbox solo entrega a la casilla dueña de la cuenta.
+ * Lo dispara `reviewApplication` cuando el admin aprieta "Aprobar", solo en la
+ * transicion a `approved`. **Igual no sale nada hasta verificar el dominio en
+ * Resend**: hasta entonces el sandbox solo entrega a la casilla dueña de la
+ * cuenta, y el fallo queda anotado en /admin/notificaciones.
  *
  * No dice nada del codigo de acceso a proposito: ese mecanismo esta en revision
  * (ver `docs/consulta-sofia-acceso.txt`).

@@ -30,7 +30,10 @@ Para que salga un mail hacen falta tres cosas, en orden:
    dominio verificado. Un subdominio y no la raíz, para no tocar el MX de
    Workspace ni el A record del sitio viejo. Ojo de fusionar el SPF si ya existe.
 2. Cargar las variables de entorno (abajo) en `.env.local` y en Vercel.
-3. Cablear el envío al flujo que corresponda — hoy no está enganchado a ninguno.
+3. ~~Cablear el envío al flujo que corresponda~~ **HECHO el 2026-08-18**: aprobar
+   una solicitud manda `SolicitudAprobada`. Ver `docs/NOTIFICACIONES.md`. Falta
+   igual el punto 1, así que todavía no sale nada — pero ahora el "no salió"
+   queda anotado en la casilla interna del panel en vez de perderse en los logs.
 
 ## Variables de entorno
 
@@ -47,7 +50,7 @@ Para que salga un mail hacen falta tres cosas, en orden:
 |---|---|
 | `src/lib/email/resend.ts` | Cliente y `sendEmail`. No lanza nunca |
 | `src/emails/BaseLayout.tsx` | Marco común: paleta del sitio, `Title`, `Paragraph`, `CtaButton` |
-| `src/emails/SolicitudAprobada.tsx` | Primer template. **Sin cablear** |
+| `src/emails/SolicitudAprobada.tsx` | Primer template. Cableado a `reviewApplication` |
 
 Previsualizar sin mandar nada: `pnpm email` (abre en `localhost:3001`, con hot
 reload de los templates).

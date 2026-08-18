@@ -429,6 +429,42 @@ Lo próximo de este hilo, en orden:
 **Sin verificar end-to-end** (requiere sesión, la hace Ignacio): cargar un retiro
 con programa por jornada desde el panel y verlo en la página pública.
 
+### Sesión del 2026-08-18 — flujo de inscripción de Sofía, mail de aprobación y casilla interna
+
+Sofía mandó `flujo-inscripcion-cosmic-eagle.md` (en `~/Descargas`, **fuera del
+repo**): los 9 pasos del proceso manual de inscripción que hoy hacen por WhatsApp.
+Comparación completa contra el código en **`docs/FLUJO_INSCRIPCION.md`**, que además
+cruza ese documento con el boceto de estructura (`web-cosmic-journey-ES.md`, que **no
+es nuevo**, entró el 15/08). Resumen: coinciden 2 de 9 pasos, faltan 5 enteros
+(pago, saldo, preparación, consentimiento, logística, integración) y **el orden no
+es el mismo** — en su proceso el pago va antes del formulario de salud.
+
+Dato que sale del cruce: el anexo de Privacidad aclara que el **código de acceso es
+un gate de contenido por nivel de experiencia**, no un login ni un reemplazo del
+botón "aprobar". Responde en parte `docs/consulta-sofia-acceso.txt`.
+
+Implementado (ver **`docs/NOTIFICACIONES.md`**):
+
+- **El mail de aprobación quedó cableado.** `reviewApplication` manda
+  `SolicitudAprobada` sólo en la transición a `approved` (relee el estado anterior
+  para no remandar), después del update y sin poder tumbar la aprobación. **Sigue
+  sin salir hasta verificar el dominio en Resend**, pero ahora el "no salió" se
+  registra en la casilla interna en vez de morir en los logs de Vercel.
+- **Casilla de avisos internos**: migración `20260818130000_admin_notifications.sql`,
+  campanita con contador en el nav y `/admin/notificaciones`. Tres tipos:
+  solicitud nueva, solicitud que **requiere revisión manual** por salud, y mail
+  fallido. Los dos primeros los escribe un **trigger `security definer`** (el
+  postulante no puede escribir en esa tabla), el tercero el código.
+- La regla de "requiere revisión manual" (`health_condition || substance_use ||
+  trauma`, o `new_treatment`) ahora está escrita **dos veces**: en el trigger y en
+  `needsManualReview` del detalle. Están comentadas cruzadas; si cambia una, cambia
+  la otra.
+
+Verificado: build de producción, trigger probado con inserts reales (los dos tipos,
+con y sin banderas) y borrados después, RLS probada con `set role` (`anon` y usuario
+no admin ven cero filas), advisors sin novedades. **Sin verificar end-to-end**
+(requiere sesión, la hace Ignacio): ver la campanita y marcar leído desde el panel.
+
 ## No hacer
 
 - No inventar cuentas de Supabase ni connection strings falsos

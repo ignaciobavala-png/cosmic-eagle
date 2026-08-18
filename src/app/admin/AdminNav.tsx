@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CircleUser, ExternalLink, LogOut } from "lucide-react";
+import { Bell, CircleUser, ExternalLink, LogOut } from "lucide-react";
 import { logout } from "@/app/cuenta/actions";
 
 const LINKS = [
@@ -15,7 +15,13 @@ const LINKS = [
   { href: "/admin/suscriptores", label: "Suscriptores" },
 ];
 
-export function AdminNav() {
+/**
+ * `unread` lo cuenta el layout (Server Component) y baja como prop: esta barra
+ * es cliente por el `usePathname` y no puede consultar Supabase. El contador se
+ * refresca cuando revalida el layout — por eso los actions de notificaciones
+ * llaman `revalidatePath("/admin", "layout")` y no solo la pagina.
+ */
+export function AdminNav({ unread = 0 }: { unread?: number }) {
   const pathname = usePathname();
 
   function isActive(href: string) {
@@ -55,6 +61,24 @@ export function AdminNav() {
           </ul>
         </div>
         <div className="flex shrink-0 items-center gap-3 md:gap-4">
+          <Link
+            href="/admin/notificaciones"
+            aria-label={
+              unread > 0 ? `Notificaciones (${unread} sin leer)` : "Notificaciones"
+            }
+            className={`relative transition-colors ${
+              isActive("/admin/notificaciones")
+                ? "text-primary-fixed-dim"
+                : "text-on-surface-variant hover:text-primary-fixed-dim"
+            }`}
+          >
+            <Bell size={20} />
+            {unread > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-error text-[10px] font-bold leading-4 text-center text-on-surface">
+                {unread > 9 ? "9+" : unread}
+              </span>
+            )}
+          </Link>
           <Link
             href="/cuenta?vista=viajero"
             aria-label="Mi perfil"
