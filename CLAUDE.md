@@ -654,7 +654,10 @@ invitaciones y cupones de `docs/CRM.md` §5.
 **Las preguntas del filtro son provisorias**: son las de Viajer@s, redactadas en neutro
 para que le sirvan a un primerizo. Sofía describe un filtro de 3 preguntas con encuadre de
 adicciones/bipolaridad/depresión severa que **no existe como Google Form** — sin eso, no se
-puede cerrar el texto.
+puede cerrar el texto. Consulta escrita en `docs/consulta-sofia-filtro-corto.txt` (la manda
+Ignacio). La pregunta que importa de ese archivo: **si el encuadre es excluyente o
+informativo**, porque hoy nadie queda afuera sin que Estela lo lea y automatizarlo sería un
+rechazo sin intervención humana.
 
 Verificado: `tsc`, lint (los 2 errores de `multimedia/SlotEditor.tsx` son previos y no se
 tocaron), build de producción, y el flujo entero probado con `set role` sobre la base real

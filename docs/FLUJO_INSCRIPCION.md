@@ -40,7 +40,12 @@ la revisión de Estela y retomar recién en el consentimiento, pero queda partid
    ceremonia"* y *"¿cuántas ceremonias has realizado con Estela previamente?"*. Si es el
    primer paso de todos, a un primerizo esas dos no le aplican. Falta saber si se reescribe
    el encabezado para que sirva a los dos, o si el primerizo entra por otra puerta.
-2. **Sofía habla de un filtro de 3 preguntas, no de 4**, y menciona un texto de encuadre
+2. **Sofía habla de un filtro de 3 preguntas, no de 4** — consulta escrita para mandarle en
+   `docs/consulta-sofia-filtro-corto.txt` (19/08). Además de las preguntas textuales, ahí se
+   le pregunta lo que nadie definió: si el encuadre de adicciones / bipolaridad / depresión
+   severa es **excluyente o informativo**. Hoy la web no rechaza a nadie sin que Estela lo
+   lea, y automatizar eso sería un rechazo que la persona recibe sin intervención humana.
+   Texto original de la duda:, y menciona un texto de encuadre
    (adicciones, bipolaridad, depresión severa) que no aparece en ningún Google Form
    relevado. Falta confirmar si su filtro corto **es** el formulario de Viajer@s o es otra
    cosa que todavía no existe.

@@ -1,0 +1,116 @@
+CONSULTA PARA SOFIA — EL FILTRO CORTO DE 3 PREGUNTAS
+Fecha: 19/08/2026
+Contexto: documento "Flujo de inscripcion Cosmic Eagle" (pasos 3 y 4)
+
+
+LO QUE YA QUEDO RESUELTO
+------------------------
+
+El orden de la inscripcion quedo confirmado y la web ya esta construida
+asi:
+
+  registro -> filtro corto -> revision de Estela -> pago
+           -> formulario de salud completo -> consentimiento -> logistica
+
+Lo importante del cambio: los dos formularios de salud que ya existian
+dejaron de ser alternativas y pasaron a ser dos momentos distintos.
+
+  * El FILTRO CORTO lo llena todo el mundo, primerizos y recurrentes, y
+    es lo que Estela lee para decidir.
+
+  * El FORMULARIO COMPLETO (el largo, el de 18 campos) llega despues del
+    pago, cuando la persona ya esta adentro. Es el que sirve para
+    preparar la ceremonia, no para decidir si entra.
+
+Eso ya esta funcionando en la web.
+
+
+DONDE NOS FRENAMOS
+------------------
+
+En el paso 3 el documento habla de un filtro de 3 preguntas, y menciona
+un texto de encuadre previo sobre adicciones, bipolaridad y depresion
+severa.
+
+Ese filtro no aparece en ninguno de los seis formularios de Google que
+nos pasaron. Los revisamos uno por uno: hay tres formularios en dos
+idiomas cada uno (salud primeriza, "Viajer@s"/Travelers, y
+consentimiento), y ninguno es el filtro de 3 preguntas.
+
+Lo mas parecido que existe es el formulario de "Viajer@s", que es corto
+y pregunta:
+
+  1. Empezaste algun tratamiento medico o psiquiatrico nuevo desde tu
+     ultima ceremonia
+  2. Estas atravesando estres o ansiedad con frecuencia
+  3. Tema o intencion que queres trabajar
+  4. Cuantas ceremonias hiciste con Estela
+
+Asi que la duda es simple: ¿el filtro de 3 preguntas ES el formulario
+de Viajer@s, o es otra cosa que todavia no existe escrita en ningun
+lado?
+
+
+QUE PUSIMOS MIENTRAS TANTO
+--------------------------
+
+Para no frenar todo, la web esta usando las preguntas de Viajer@s como
+filtro corto, con dos ajustes:
+
+  * El texto esta reescrito en neutro. El original pregunta "desde tu
+    ultima ceremonia", que a alguien que nunca ceremonio no le aplica, y
+    ahora este formulario lo llenan tambien los primerizos.
+
+  * "Cuantas ceremonias hiciste con Estela" ahora admite el cero, que es
+    justamente como el sistema sabe que es primeriza y que mas adelante
+    le va a tener que pedir el formulario largo.
+
+Esto es provisorio y esta marcado como tal. Cambiarlo no cuesta nada
+todavia: son campos nuevos que no tienen ni una respuesta cargada.
+Cuanto antes lo definamos, mas barato es.
+
+
+QUE NECESITAMOS QUE NOS DIGAN
+-----------------------------
+
+1. Las 3 preguntas, textuales. Si ya estan escritas en algun lado,
+   alcanza con que nos pasen eso. Si no existen todavia, las escribimos
+   nosotros a partir de Viajer@s y ustedes las corrigen — pero la
+   redaccion final tiene que ser de ustedes, no nuestra.
+
+2. El texto de encuadre (adicciones, bipolaridad, depresion severa):
+   ¿va antes de las preguntas, como aviso a leer? ¿Nos lo pasan tal cual
+   quieren que aparezca?
+
+3. Sobre ese encuadre, la pregunta de fondo: ¿es informativo o es
+   excluyente?
+
+   Es decir: si una persona marca que si, ¿queda directamente afuera, o
+   igual pasa a revision de Estela y ella decide caso por caso?
+
+   Hoy la web hace lo segundo: nadie queda afuera automaticamente,
+   Estela lee todas las solicitudes. Si quieren que alguna respuesta
+   corte el proceso sola, hay que decirlo explicitamente, porque es un
+   rechazo que la persona recibe sin que ningun humano lo haya mirado.
+
+4. ¿El filtro le pregunta lo mismo a un primerizo que a alguien que ya
+   ceremonio? Puede ser que si (mas simple, una sola puerta) o puede ser
+   que al primerizo haya que preguntarle algo mas. Lo que no funciona es
+   el texto actual de Viajer@s tal cual, porque da por hecho que hubo
+   una ceremonia anterior.
+
+5. ¿Pedimos telefono en este primer paso? Hoy lo pedimos como opcional.
+   Si el contacto por WhatsApp es parte del proceso, conviene que sea
+   obligatorio desde el arranque.
+
+
+LO QUE NO DEPENDE DE ESTO
+-------------------------
+
+El resto del flujo ya esta construido y no espera esta respuesta: el
+filtro corto funciona, la revision funciona, el formulario de salud
+completo funciona y se abre solo cuando corresponde.
+
+Lo unico que falta ademas de esto es el pago, que sigue sin definirse
+con que proveedor se hace. Mientras tanto Estela lo registra a mano
+desde el panel y eso habilita el paso siguiente.
