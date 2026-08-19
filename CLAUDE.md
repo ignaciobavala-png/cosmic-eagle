@@ -651,13 +651,7 @@ es nuevo (Estela marca el pago a mano). Dashboard, CRM y `/cuenta` pasaron a la 
 se nota más porque es el que habilita la etapa 2. `payment_status` tiene `waived` para las
 invitaciones y cupones de `docs/CRM.md` §5.
 
-**Las preguntas del filtro son provisorias**: son las de Viajer@s, redactadas en neutro
-para que le sirvan a un primerizo. Sofía describe un filtro de 3 preguntas con encuadre de
-adicciones/bipolaridad/depresión severa que **no existe como Google Form** — sin eso, no se
-puede cerrar el texto. Consulta escrita en `docs/consulta-sofia-filtro-corto.txt` (la manda
-Ignacio). La pregunta que importa de ese archivo: **si el encuadre es excluyente o
-informativo**, porque hoy nadie queda afuera sin que Estela lo lea y automatizarlo sería un
-rechazo sin intervención humana.
+~~**Las preguntas del filtro son provisorias**~~ — **CERRADO el mismo día**, ver abajo.
 
 Verificado: `tsc`, lint (los 2 errores de `multimedia/SlotEditor.tsx` son previos y no se
 tocaron), build de producción, y el flujo entero probado con `set role` sobre la base real
@@ -668,6 +662,33 @@ aviso. Filas de prueba borradas (todo volvió a cero).
 
 **Sin verificar end-to-end** (requiere sesión, la hace Ignacio): postularse desde el sitio,
 aprobar y marcar el pago desde el panel, y completar el formulario de salud.
+
+### Sesión del 2026-08-19 (bis) — el filtro corto quedó con el texto real de Sofía
+
+Sofía contestó `docs/consulta-sofia-filtro-corto.txt` (la respuesta textual quedó pegada al
+pie de ese archivo). Migración `20260819194408_screening_questions_sofia.sql` + reescritura
+de `ScreeningForm.tsx`. Detalle en `docs/FLUJO_INSCRIPCION.md` §"El filtro corto definitivo".
+
+- **Lo que más importa no es el texto: el encuadre es INFORMATIVO, no excluyente.** *"Nada
+  de lo que nos cuentes cierra la puerta de entrada"*. O sea que no hay ni va a haber
+  rechazo automático: marcar una casilla sube la solicitud al tope de la casilla de avisos
+  y decide Estela. Eso confirma lo que el código ya hacía — no hubo que cambiar la lógica.
+- Las tres preguntas reemplazan a `new_treatment` / `stress_anxiety` (las de Viajer@s, que
+  estaban puestas como provisorias): ahora son `serious_illness` (enfermedad grave),
+  `mental_health_treatment` (tratamiento psiquiátrico o psicológico, actual o pasado) y
+  `current_medication` (medicación en curso, incluidos suplementos y hierbas), cada una con
+  su `_detail`, **obligatorio cuando la respuesta es sí**.
+- Se dropearon las columnas viejas en vez de migrarlas: la tabla seguía en **cero filas**.
+- `stress_anxiety` salió del filtro (la pregunta 2 lo cubre); sigue en el formulario extenso.
+- **El encuadre y las tres preguntas son copy de la clienta, literal** — está en tuteo, a
+  diferencia del voseo del resto del sitio, y no se reescribe sin consultar.
+- El trigger `private.notify_new_application` y `needsManualReview` marcan ahora las tres.
+  Siguen siendo la misma regla escrita dos veces, comentadas cruzadas.
+- **Sigue una sola pregunta sin responder de la consulta**: si el teléfono debería ser
+  obligatorio en este primer paso. Hoy es opcional.
+
+Verificado: `tsc`, build de producción, y el trigger probado con un insert real (marcó las
+dos banderas correctas); fila de prueba borrada, todo volvió a cero. Advisors sin novedades.
 
 ## No hacer
 

@@ -2,6 +2,10 @@ CONSULTA PARA SOFIA — EL FILTRO CORTO DE 3 PREGUNTAS
 Fecha: 19/08/2026
 Contexto: documento "Flujo de inscripcion Cosmic Eagle" (pasos 3 y 4)
 
+*** RESPONDIDA el 19/08/2026 — ver la respuesta al pie. ***
+*** Ya implementada: migracion 20260819194408 + ScreeningForm.tsx. ***
+*** Queda sin responder solo el punto 5 (telefono obligatorio o no). ***
+
 
 LO QUE YA QUEDO RESUELTO
 ------------------------
@@ -114,3 +118,66 @@ completo funciona y se abre solo cuando corresponde.
 Lo unico que falta ademas de esto es el pago, que sigue sin definirse
 con que proveedor se hace. Mientras tanto Estela lo registra a mano
 desde el panel y eso habilita el paso siguiente.
+
+
+===========================================================================
+RESPUESTA DE SOFIA (19/08/2026), TEXTUAL
+===========================================================================
+
+Hola! Que bueno que quieras ser parte de este espacio. Te compartimos
+algunas cosas antes de avanzar.
+
+Este es un espacio orientado a la expansion de conciencia, el desarrollo
+humano y los procesos evolutivos.
+
+No esta enfocado en el tratamiento directo de adicciones al alcohol o a
+otras sustancias, trastorno bipolar, depresion severa, enfermedades
+cronicas o autoinmunes, ni reemplaza un tratamiento medico, psicologico
+o psiquiatrico.
+
+En estos casos, la participacion debera ser evaluada previamente y,
+cuando corresponda, podra requerir el acompanamiento de un profesional o
+terapeuta especializado que pueda sostener el proceso de manera adecuada
+y segura.
+
+Por eso nos gustaria que nos cuentes:
+
+1. Tienes o has tenido alguna enfermedad grave? (cardiaca, neurologica,
+   epilepsia, hepatica, oncologica, autoinmune u otra)
+
+2. Estas o has estado en tratamiento psiquiatrico o psicologico? Por que
+   motivo y hace cuanto?
+
+3. Estas en algun tratamiento medico actualmente? Que medicamentos
+   tomas, con o sin receta? Incluye antidepresivos, ansioliticos,
+   analgesicos, suplementos y hierbas.
+
+Te pedimos responder con la mayor honestidad y detalle posible. Esta
+informacion es confidencial y su unico proposito es cuidarte. Nada de lo
+que nos cuentes cierra la puerta de entrada: solo nos permite saber que
+cuidados necesita tu proceso, y conversarlo contigo con calma.
+
+Gracias!
+
+
+QUE CONTESTA DE LO QUE PREGUNTAMOS
+----------------------------------
+
+1. Las 3 preguntas: si, textuales. Arriba.
+
+2. El encuadre: si, y va ANTES de las preguntas. Asi quedo en la web.
+
+3. Informativo o excluyente: INFORMATIVO. "Nada de lo que nos cuentes
+   cierra la puerta de entrada". Es la respuesta que importaba: nadie
+   queda afuera automaticamente, Estela lee todas las solicitudes. La web
+   ya funcionaba asi, no hubo que cambiar nada de la logica.
+
+4. Mismo filtro para primerizos y recurrentes: si, es uno solo. Su texto
+   no da por hecho ninguna ceremonia previa. De Viajer@s quedo una sola
+   pregunta, "cuantas ceremonias hiciste con Estela", que admite el cero
+   y sirve para saber si mas adelante hay que pedirle el formulario
+   extenso.
+
+5. Telefono obligatorio: NO CONTESTO. Sigue opcional. Si el contacto por
+   WhatsApp es parte del proceso, conviene volverlo obligatorio: es un
+   cambio de una linea.

@@ -76,12 +76,17 @@ export default async function SolicitudDetallePage({
     ? application.health_form_first_time[0]
     : application.health_form_first_time;
 
-  // Espejo de la regla del trigger `private.notify_health_form` (migración
-  // 20260819180444). Si cambia una, cambia la otra: es la misma regla escrita
-  // dos veces porque una corre en Postgres y la otra en React.
+  // Espejo de la regla de los triggers `private.notify_new_application`
+  // (migración 20260819194408, las 3 preguntas de Sofía) y
+  // `private.notify_health_form` (20260819180444). Si cambia una, cambia la
+  // otra: es la misma regla escrita dos veces porque una corre en Postgres y la
+  // otra en React. Marcar NO es rechazar: el encuadre del filtro es
+  // informativo, Estela lee todas.
   const needsManualReview = health
     ? health.health_condition || health.substance_use || health.trauma
-    : application.new_treatment;
+    : application.serious_illness ||
+      application.mental_health_treatment ||
+      application.current_medication;
 
   return (
     <div className="max-w-3xl">
@@ -113,7 +118,7 @@ export default async function SolicitudDetallePage({
           <p className="text-error text-sm font-medium">
             {health
               ? "Requiere revisión manual obligatoria: el formulario de salud declara condición de salud, uso de sustancias o trauma."
-              : "Requiere revisión manual obligatoria: declara un tratamiento médico o psiquiátrico en curso."}
+              : "Requiere revisión manual obligatoria: el filtro declara una enfermedad grave, un tratamiento psiquiátrico o psicológico, o medicación en curso."}
           </p>
         </div>
       )}
@@ -150,15 +155,19 @@ export default async function SolicitudDetallePage({
           value={application.previous_ceremonies}
         />
         <BoolField
-          label="Tratamiento médico o psiquiátrico"
-          value={application.new_treatment}
-          detail={application.new_treatment_detail}
+          label="Enfermedad grave (actual o pasada)"
+          value={application.serious_illness}
+          detail={application.serious_illness_detail}
         />
         <BoolField
-          label="Estrés / ansiedad"
-          value={application.stress_anxiety}
-          detail={application.stress_anxiety_detail}
-          flagIfTrue={false}
+          label="Tratamiento psiquiátrico o psicológico"
+          value={application.mental_health_treatment}
+          detail={application.mental_health_treatment_detail}
+        />
+        <BoolField
+          label="Tratamiento médico / medicación en curso"
+          value={application.current_medication}
+          detail={application.current_medication_detail}
         />
         <Field label="Tema a trabajar" value={application.theme} />
         <Field label="Comentario" value={application.comment} />

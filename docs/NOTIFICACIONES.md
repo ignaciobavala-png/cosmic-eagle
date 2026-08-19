@@ -59,10 +59,15 @@ Decisiones:
   aviso más importante cuando marca algo: la persona ya está adentro del viaje.
 - **La regla de "requiere revisión manual" está escrita dos veces**: en los
   triggers (SQL) y en el detalle de la solicitud (`needsManualReview`, React). Al
-  revisar sólo se conoce `new_treatment` del filtro; `health_condition ||
+  revisar sólo se conocen las tres del filtro (`serious_illness ||
+  mental_health_treatment || current_medication`); `health_condition ||
   substance_use || trauma` llega recién con el formulario extenso. Si cambia una,
   cambia la otra — están comentadas cruzadas. No se unificó porque una corre en
   Postgres y la otra en el browser.
+- **Marcar no es rechazar.** Sofía confirmó el 19/08/2026 que el encuadre del
+  filtro es informativo: *"nada de lo que nos cuentes cierra la puerta de
+  entrada"*. Una solicitud marcada sube al tope de la casilla y nada más; sigue
+  siendo Estela la que decide, y no hay ningún camino que rechace solo.
 - **Leído es global, no por admin.** Una sola columna `read_at`/`read_by`. Con dos
   o tres personas mirando la misma casilla alcanza; si aparecen admins con
   alcances distintos, esto pasa a ser `admin_notification_reads (notification_id,

@@ -7,24 +7,44 @@ const inputClass =
   "bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors";
 const labelClass = "text-sm text-on-surface-variant tracking-[0.02em]";
 
-function BoolQuestion({ name, label }: { name: string; label: string }) {
+/**
+ * Cada pregunta del filtro es abierta ("¿por qué motivo y hace cuánto?"), pero
+ * se guarda como sí/no + detalle: el booleano es lo que le deja al trigger
+ * marcar la solicitud como "requiere revisión manual" sin leer prosa. Por eso
+ * el detalle es obligatorio cuando la respuesta es sí.
+ */
+function Question({
+  name,
+  label,
+  hint,
+  placeholder,
+}: {
+  name: string;
+  label: string;
+  hint?: string;
+  placeholder: string;
+}) {
   const [checked, setChecked] = useState(false);
   return (
     <div className="flex flex-col gap-2 py-4 border-b border-outline-variant/40 last:border-0">
-      <label className="flex items-center gap-3 text-on-surface cursor-pointer">
+      <label className="flex items-start gap-3 text-on-surface cursor-pointer">
         <input
           type="checkbox"
           name={name}
           onChange={(e) => setChecked(e.target.checked)}
-          className="w-4 h-4 accent-primary-fixed-dim"
+          className="w-4 h-4 mt-1 shrink-0 accent-primary-fixed-dim"
         />
-        {label}
+        <span>{label}</span>
       </label>
+      {hint && (
+        <p className="text-xs text-on-surface-variant pl-7">{hint}</p>
+      )}
       {checked && (
         <textarea
           name={`${name}_detail`}
-          placeholder="Contanos más..."
-          rows={2}
+          required
+          placeholder={placeholder}
+          rows={3}
           className={inputClass}
         />
       )}
@@ -35,11 +55,12 @@ function BoolQuestion({ name, label }: { name: string; label: string }) {
 /**
  * El filtro corto: lo llenan todos, primerizos y recurrentes.
  *
- * Las preguntas salen del formulario "Viajer@s" de Estela, que es el único
- * filtro corto relevado, pero el texto está redactado en neutro porque acá
- * también entra alguien que nunca ceremonió. Sofía describe un filtro de tres
- * preguntas con un encuadre distinto (adicciones, bipolaridad, depresión
- * severa) que no existe como formulario: si lo confirma, esto se reescribe.
+ * El encuadre y las tres preguntas son el texto que mandó Sofía el 19/08/2026,
+ * literal. No reescribirlo sin consultar: es copy de la clienta.
+ *
+ * Ojo con lo que dice ese texto: "nada de lo que nos cuentes cierra la puerta
+ * de entrada". El encuadre es INFORMATIVO, no excluyente — ninguna respuesta
+ * rechaza sola, todas las solicitudes las lee Estela.
  */
 export function ScreeningForm({
   tripId,
@@ -58,6 +79,29 @@ export function ScreeningForm({
       action={formAction}
       className="glass-card rounded-2xl p-6 md:p-8 flex flex-col gap-2 max-w-2xl"
     >
+      <div className="flex flex-col gap-3 text-on-surface-variant text-sm leading-relaxed border-b border-outline-variant/40 pb-6 mb-2">
+        <p className="text-on-surface">
+          Qué bueno que quieras ser parte de este espacio. Te compartimos
+          algunas cosas antes de avanzar.
+        </p>
+        <p>
+          Este es un espacio orientado a la expansión de conciencia, el
+          desarrollo humano y los procesos evolutivos.
+        </p>
+        <p>
+          No está enfocado en el tratamiento directo de adicciones al alcohol o
+          a otras sustancias, trastorno bipolar, depresión severa, enfermedades
+          crónicas o autoinmunes, ni reemplaza un tratamiento médico,
+          psicológico o psiquiátrico.
+        </p>
+        <p>
+          En estos casos, la participación deberá ser evaluada previamente y,
+          cuando corresponda, podrá requerir el acompañamiento de un profesional
+          o terapeuta especializado que pueda sostener el proceso de manera
+          adecuada y segura.
+        </p>
+      </div>
+
       <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
         Datos personales
       </h2>
@@ -100,21 +144,34 @@ export function ScreeningForm({
       </div>
 
       <h2 className="font-display text-xl text-primary-fixed-dim mt-4 mb-1">
-        Antes de seguir
+        Por eso nos gustaría que nos cuentes
       </h2>
-      <p className="text-xs text-on-surface-variant mb-2">
-        Son unas pocas preguntas para saber cómo estás llegando. Si la solicitud
-        avanza, más adelante te vamos a pedir un formulario de salud completo.
-      </p>
 
-      <BoolQuestion
-        name="new_treatment"
-        label="¿Estás haciendo algún tratamiento médico o psiquiátrico?"
+      <Question
+        name="serious_illness"
+        label="¿Tienes o has tenido alguna enfermedad grave?"
+        hint="Cardíaca, neurológica, epilepsia, hepática, oncológica, autoinmune u otra."
+        placeholder="Contanos cuál y cuándo."
       />
-      <BoolQuestion
-        name="stress_anxiety"
-        label="¿Estás atravesando estrés, angustia o ansiedad con frecuencia?"
+      <Question
+        name="mental_health_treatment"
+        label="¿Estás o has estado en tratamiento psiquiátrico o psicológico?"
+        hint="Si es así, contanos por qué motivo y hace cuánto."
+        placeholder="Motivo y hace cuánto tiempo."
       />
+      <Question
+        name="current_medication"
+        label="¿Estás en algún tratamiento médico actualmente?"
+        hint="Qué medicamentos tomás, con o sin receta. Incluí antidepresivos, ansiolíticos, analgésicos, suplementos y hierbas."
+        placeholder="Medicamentos, suplementos y hierbas."
+      />
+
+      <p className="text-sm text-on-surface-variant leading-relaxed py-4 border-b border-outline-variant/40">
+        Te pedimos responder con la mayor honestidad y detalle posible. Esta
+        información es confidencial y su único propósito es cuidarte. Nada de lo
+        que nos cuentes cierra la puerta de entrada: solo nos permite saber qué
+        cuidados necesita tu proceso, y conversarlo contigo con calma.
+      </p>
 
       <div className="flex flex-col gap-1.5 py-4">
         <label className={labelClass}>

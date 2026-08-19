@@ -36,19 +36,17 @@ la revisión de Estela y retomar recién en el consentimiento, pero queda partid
 
 ### Lo que hay que definir antes de escribir código
 
-1. **El form corto está redactado para recurrentes.** Pregunta *"desde tu última
-   ceremonia"* y *"¿cuántas ceremonias has realizado con Estela previamente?"*. Si es el
-   primer paso de todos, a un primerizo esas dos no le aplican. Falta saber si se reescribe
-   el encabezado para que sirva a los dos, o si el primerizo entra por otra puerta.
-2. **Sofía habla de un filtro de 3 preguntas, no de 4** — consulta escrita para mandarle en
-   `docs/consulta-sofia-filtro-corto.txt` (19/08). Además de las preguntas textuales, ahí se
-   le pregunta lo que nadie definió: si el encuadre de adicciones / bipolaridad / depresión
-   severa es **excluyente o informativo**. Hoy la web no rechaza a nadie sin que Estela lo
-   lea, y automatizar eso sería un rechazo que la persona recibe sin intervención humana.
-   Texto original de la duda:, y menciona un texto de encuadre
-   (adicciones, bipolaridad, depresión severa) que no aparece en ningún Google Form
-   relevado. Falta confirmar si su filtro corto **es** el formulario de Viajer@s o es otra
-   cosa que todavía no existe.
+1. ~~**El form corto está redactado para recurrentes.**~~ **RESUELTO el 19/08/2026**: el
+   texto de Sofía no da por hecho ninguna ceremonia previa, así que le sirve igual a un
+   primerizo. Es una sola puerta para todos. Sobrevive de Viajer@s una sola pregunta,
+   "cuántas ceremonias hiciste con Estela", que admite el cero y es lo que decide si
+   después del pago le toca el formulario extenso.
+2. ~~**Sofía habla de un filtro de 3 preguntas, no de 4.**~~ **RESPONDIDO el 19/08/2026**:
+   mandó el encuadre y las tres preguntas textuales, ya implementadas (ver "El filtro corto
+   definitivo" abajo). Lo que importa de su respuesta es la duda de fondo: el encuadre es
+   **informativo, no excluyente** — *"nada de lo que nos cuentes cierra la puerta de
+   entrada"*. O sea que sigue sin haber rechazo automático y todas las solicitudes las lee
+   Estela, que es lo que la web ya hacía.
 3. ~~**El modelo de datos asume un formulario por solicitud.**~~ **HECHO el 2026-08-19**,
    ver "El modelo de dos etapas" abajo.
 
@@ -97,7 +95,7 @@ formulario extenso. `payment_status` tiene tres valores (`pending`, `paid`, `wai
 |---|---|---|---|
 | 1 | Contacto inicial | **Distinto**. No hay formulario de contacto ni botón "me interesa". El equivalente es postularse, que ya exige cuenta | `viajes/[id]/page.tsx` |
 | 2 | Envío de info general + ficha del evento | **Parcial**. La ficha vive en la página del viaje (descripción, programa, aporte, condiciones). No hay descarga de PDF ni envío automático por mail | `viajes/[id]/page.tsx`, `trips.schedule` / `trips.terms` |
-| 3 | Filtro de salud de 3 preguntas | **HECHO el 2026-08-19** como primer paso de todos, con las preguntas de Viajer@s (las de Sofía no existen como formulario) | `solicitar/ScreeningForm.tsx` |
+| 3 | Filtro de salud de 3 preguntas | **HECHO el 2026-08-19**, con el encuadre y las tres preguntas textuales que mandó Sofía ese mismo día | `solicitar/ScreeningForm.tsx` |
 | 4 | Evaluación del filtro (punto de decisión) | **Existe, pero manual siempre**. `pending_review` → admin aprueba/rechaza. No hay avance automático cuando todas las respuestas son negativas | `admin/solicitudes/actions.ts` |
 | 5 | Link de pago (total o reserva) | **Parcial.** La web no cobra, pero el pago ya es un estado de la solicitud y el admin lo registra a mano; sin eso no se habilita el paso siguiente | `admin/solicitudes/PaymentControls.tsx` |
 | 5b | Pago del saldo, recordatorios, estados | **No existe.** No hay estados de pago ni fecha de corte | — |
@@ -122,17 +120,56 @@ formulario extenso. `payment_status` tiene tres valores (`pending`, `paid`, `wai
   campos médicos del panel del viajero. Falta la política escrita — pero el anexo de
   Privacidad que mandó Sofía en `web-cosmic-journey-ES.md` ya la cubre en parte.
 
+## El filtro corto definitivo (19/08/2026)
+
+Sofía respondió `docs/consulta-sofia-filtro-corto.txt` con el texto completo, y es lo que
+está en `solicitar/ScreeningForm.tsx`, literal. Migración
+`20260819194408_screening_questions_sofia.sql`.
+
+El encuadre va **arriba**, antes de preguntar nada: el espacio está orientado a la
+expansión de conciencia y **no** al tratamiento directo de adicciones, trastorno bipolar,
+depresión severa ni enfermedades crónicas o autoinmunes, y no reemplaza un tratamiento
+médico, psicológico o psiquiátrico. En esos casos la participación se evalúa antes y puede
+requerir el acompañamiento de un profesional.
+
+Las tres preguntas:
+
+1. ¿Tienes o has tenido alguna enfermedad grave? (cardíaca, neurológica, epilepsia,
+   hepática, oncológica, autoinmune u otra)
+2. ¿Estás o has estado en tratamiento psiquiátrico o psicológico? ¿Por qué motivo y hace
+   cuánto?
+3. ¿Estás en algún tratamiento médico actualmente? ¿Qué medicamentos tomas, con o sin
+   receta? Incluye antidepresivos, ansiolíticos, analgésicos, suplementos y hierbas.
+
+Y el cierre, que es la respuesta a la pregunta de fondo: *"Nada de lo que nos cuentes
+cierra la puerta de entrada: solo nos permite saber qué cuidados necesita tu proceso, y
+conversarlo contigo con calma."*
+
+Lo que eso implica en el código, y que **no hay que "mejorar" después**:
+
+- **Ninguna respuesta rechaza sola.** No hay avance ni corte automático; marcar una
+  casilla sube la solicitud al tope de la casilla de avisos y nada más. Decide Estela.
+- **Se guardan como sí/no + detalle** (`serious_illness`, `mental_health_treatment`,
+  `current_medication`, cada una con su `_detail`). Las preguntas son abiertas, pero el
+  booleano es lo que le deja al trigger marcar "requiere revisión manual" sin leer prosa.
+  El detalle es obligatorio cuando la respuesta es sí.
+- **`stress_anxiety` salió del filtro**: no está en el texto de Sofía y la pregunta 2 lo
+  cubre. Sigue existiendo en el formulario extenso, que es de donde venía.
+- El texto es copy de la clienta: no reescribirlo sin consultar. Está en tuteo, distinto
+  del voseo del resto del sitio, a propósito.
+
+Sigue sin respuesta una sola cosa de la consulta: **si el teléfono debería ser obligatorio**
+en este primer paso. Hoy es opcional.
+
 ## Las tres diferencias de fondo
 
 1. ~~**El orden no coincide.**~~ **RESUELTO el 2026-08-19**, ver la sección "El orden
    definitivo" arriba. Se adopta el orden del proceso manual: el pago va en el medio,
    entre la revisión de Estela y el formulario de salud extenso. La web hoy hace lo
    contrario y hay que darla vuelta.
-2. **Ella pide dos filtros de salud, la web tiene uno.** El filtro corto de 3 preguntas
-   sirve para no pedirle 18 campos a alguien que todavía no confirmó interés. Se puede
-   implementar como primer paso del mismo formulario o dejar sólo el largo. Ojo: el
-   texto largo de encuadre del paso 3 (adicciones, bipolaridad, depresión severa) **no
-   está en ningún lado de la web** y conviene mostrarlo antes de las preguntas.
+2. ~~**Ella pide dos filtros de salud, la web tiene uno.**~~ **RESUELTO el 2026-08-19**:
+   son las dos etapas, y el encuadre de adicciones / bipolaridad / depresión severa se
+   muestra arriba de las tres preguntas, antes de que la persona conteste nada.
 3. **Después de aprobar, la web no acompaña.** Los pasos 6, 7 y 9 —preparación,
    consentimiento, logística, integración— son hoy cero código. Es el mismo hueco que
    marca `docs/FLUJO_USUARIO.md`: ser viajero aprobado casi no cambia nada.
@@ -176,8 +213,8 @@ algunos puntos **no dicen lo mismo**.
 
 La contradicción del formulario de salud **quedó confirmada el 2026-08-19**: "el
 formulario de salud antes de ser aceptado" de las FAQs es el filtro corto, y el extenso es
-posterior al pago. Lo que sigue sin cerrar es si ese filtro corto es el formulario de
-Viajer@s (4 preguntas) o el de 3 preguntas de Sofía, que no existe como Google Form.
+posterior al pago. Ese mismo día Sofía mandó el texto del filtro corto y quedó cerrado
+también eso: no es el formulario de Viajer@s, es un texto propio de tres preguntas.
 
 ### Donde se refuerzan
 

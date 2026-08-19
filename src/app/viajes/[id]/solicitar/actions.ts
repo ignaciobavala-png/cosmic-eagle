@@ -45,10 +45,16 @@ export async function submitApplication(
     email,
     phone: str(formData, "phone") || null,
     previous_ceremonies: Number(previous_ceremonies),
-    new_treatment: bool(formData, "new_treatment"),
-    new_treatment_detail: str(formData, "new_treatment_detail") || null,
-    stress_anxiety: bool(formData, "stress_anxiety"),
-    stress_anxiety_detail: str(formData, "stress_anxiety_detail") || null,
+    // Las tres preguntas de Sofía (19/08/2026). Ninguna rechaza sola: el
+    // encuadre es informativo, todas las solicitudes las lee Estela.
+    serious_illness: bool(formData, "serious_illness"),
+    serious_illness_detail: str(formData, "serious_illness_detail") || null,
+    mental_health_treatment: bool(formData, "mental_health_treatment"),
+    mental_health_treatment_detail:
+      str(formData, "mental_health_treatment_detail") || null,
+    current_medication: bool(formData, "current_medication"),
+    current_medication_detail:
+      str(formData, "current_medication_detail") || null,
     theme: str(formData, "theme") || null,
     comment: str(formData, "comment") || null,
   });

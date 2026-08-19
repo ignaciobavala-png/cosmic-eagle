@@ -79,11 +79,13 @@ export type Database = {
         Row: {
           comment: string | null
           created_at: string
+          current_medication: boolean
+          current_medication_detail: string | null
           email: string
           full_name: string
           id: string
-          new_treatment: boolean
-          new_treatment_detail: string | null
+          mental_health_treatment: boolean
+          mental_health_treatment_detail: string | null
           paid_at: string | null
           payment_reference: string | null
           payment_status: Database["public"]["Enums"]["payment_status"]
@@ -91,9 +93,9 @@ export type Database = {
           previous_ceremonies: number
           reviewed_at: string | null
           reviewed_by: string | null
+          serious_illness: boolean
+          serious_illness_detail: string | null
           status: Database["public"]["Enums"]["application_status"]
-          stress_anxiety: boolean
-          stress_anxiety_detail: string | null
           theme: string | null
           trip_id: string
           user_id: string
@@ -101,11 +103,13 @@ export type Database = {
         Insert: {
           comment?: string | null
           created_at?: string
+          current_medication: boolean
+          current_medication_detail?: string | null
           email: string
           full_name: string
           id?: string
-          new_treatment: boolean
-          new_treatment_detail?: string | null
+          mental_health_treatment: boolean
+          mental_health_treatment_detail?: string | null
           paid_at?: string | null
           payment_reference?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"]
@@ -113,9 +117,9 @@ export type Database = {
           previous_ceremonies?: number
           reviewed_at?: string | null
           reviewed_by?: string | null
+          serious_illness: boolean
+          serious_illness_detail?: string | null
           status?: Database["public"]["Enums"]["application_status"]
-          stress_anxiety: boolean
-          stress_anxiety_detail?: string | null
           theme?: string | null
           trip_id: string
           user_id: string
@@ -123,11 +127,13 @@ export type Database = {
         Update: {
           comment?: string | null
           created_at?: string
+          current_medication?: boolean
+          current_medication_detail?: string | null
           email?: string
           full_name?: string
           id?: string
-          new_treatment?: boolean
-          new_treatment_detail?: string | null
+          mental_health_treatment?: boolean
+          mental_health_treatment_detail?: string | null
           paid_at?: string | null
           payment_reference?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"]
@@ -135,9 +141,9 @@ export type Database = {
           previous_ceremonies?: number
           reviewed_at?: string | null
           reviewed_by?: string | null
+          serious_illness?: boolean
+          serious_illness_detail?: string | null
           status?: Database["public"]["Enums"]["application_status"]
-          stress_anxiety?: boolean
-          stress_anxiety_detail?: string | null
           theme?: string | null
           trip_id?: string
           user_id?: string
