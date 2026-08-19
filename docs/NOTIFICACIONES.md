@@ -41,8 +41,8 @@ Tres tipos de aviso (`admin_notification_kind`):
 
 | Tipo | Cuándo | Quién lo escribe |
 |---|---|---|
-| `application_new` | Llegó una solicitud sin banderas | Trigger en Postgres |
-| `application_health_flag` | Llegó una solicitud que declara condición de salud, uso de sustancias, trauma o tratamiento nuevo | Trigger en Postgres |
+| `application_new` | Llegó una solicitud, o se completó un formulario de salud, sin banderas | Trigger en Postgres |
+| `application_health_flag` | Lo mismo, pero declarando algo a revisar | Trigger en Postgres |
 | `email_failed` | Un mail de la app no salió | El código, al fallar el envío |
 
 Decisiones:
@@ -52,11 +52,17 @@ Decisiones:
   `admin_notifications`. El trigger es `security definer` justamente para eso, y
   además garantiza que el aviso exista pase por donde pase el insert (form, seed,
   SQL a mano).
-- **La regla de "requiere revisión manual" está escrita dos veces**: en el trigger
-  (SQL) y en el detalle de la solicitud (`needsManualReview`, React). Es
-  `health_condition || substance_use || trauma` para primerizos y `new_treatment`
-  para recurrentes. Si cambia una, cambia la otra — están comentadas cruzadas.
-  No se unificó porque una corre en Postgres y la otra en el browser.
+- **Hay DOS momentos que avisar, no uno** (desde el modelo de dos etapas del
+  2026-08-19). `private.notify_new_application` dispara con el filtro corto, que es
+  lo que Estela revisa; `private.notify_health_form` dispara cuando llega el
+  formulario extenso, que es **posterior a aprobar y pagar**. El segundo es el
+  aviso más importante cuando marca algo: la persona ya está adentro del viaje.
+- **La regla de "requiere revisión manual" está escrita dos veces**: en los
+  triggers (SQL) y en el detalle de la solicitud (`needsManualReview`, React). Al
+  revisar sólo se conoce `new_treatment` del filtro; `health_condition ||
+  substance_use || trauma` llega recién con el formulario extenso. Si cambia una,
+  cambia la otra — están comentadas cruzadas. No se unificó porque una corre en
+  Postgres y la otra en el browser.
 - **Leído es global, no por admin.** Una sola columna `read_at`/`read_by`. Con dos
   o tres personas mirando la misma casilla alcanza; si aparecen admins con
   alcances distintos, esto pasa a ser `admin_notification_reads (notification_id,
@@ -79,5 +85,8 @@ Decisiones:
 - **No manda mail al admin.** El aviso vive en el panel. Si Estela quiere
   enterarse sin entrar, el paso siguiente es un mail diario de resumen — no uno
   por solicitud.
-- **No avisa nada más**: consentimiento, pagos y material de integración no
-  existen todavía, así que no hay avisos para ellos.
+- **No avisa el pago.** `payment_status` lo marca el admin a mano desde el detalle
+  de la solicitud, así que no hay nada que avisarle: es él quien lo carga. Cuando
+  haya pasarela, el webhook sí va a necesitar su aviso.
+- **No avisa nada más**: consentimiento y material de integración no existen
+  todavía, así que no hay avisos para ellos.

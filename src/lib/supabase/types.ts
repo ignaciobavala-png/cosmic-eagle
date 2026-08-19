@@ -16,8 +16,7 @@ export type Database = {
     Tables: {
       admin_notifications: {
         Row: {
-          application_first_time_id: string | null
-          application_returning_id: string | null
+          application_id: string | null
           body: string | null
           created_at: string
           href: string | null
@@ -29,8 +28,7 @@ export type Database = {
           trip_id: string | null
         }
         Insert: {
-          application_first_time_id?: string | null
-          application_returning_id?: string | null
+          application_id?: string | null
           body?: string | null
           created_at?: string
           href?: string | null
@@ -42,8 +40,7 @@ export type Database = {
           trip_id?: string | null
         }
         Update: {
-          application_first_time_id?: string | null
-          application_returning_id?: string | null
+          application_id?: string | null
           body?: string | null
           created_at?: string
           href?: string | null
@@ -56,31 +53,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "admin_notifications_application_first_time_id_fkey"
-            columns: ["application_first_time_id"]
+            foreignKeyName: "admin_notifications_application_id_fkey"
+            columns: ["application_id"]
             isOneToOne: false
-            referencedRelation: "applications_first_time"
+            referencedRelation: "applications"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "admin_notifications_application_first_time_id_fkey"
-            columns: ["application_first_time_id"]
+            foreignKeyName: "admin_notifications_application_id_fkey"
+            columns: ["application_id"]
             isOneToOne: false
-            referencedRelation: "my_applications_first_time"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "admin_notifications_application_returning_id_fkey"
-            columns: ["application_returning_id"]
-            isOneToOne: false
-            referencedRelation: "applications_returning"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "admin_notifications_application_returning_id_fkey"
-            columns: ["application_returning_id"]
-            isOneToOne: false
-            referencedRelation: "my_applications_returning"
+            referencedRelation: "my_applications"
             referencedColumns: ["id"]
           },
           {
@@ -92,186 +75,76 @@ export type Database = {
           },
         ]
       }
-      applications_first_time: {
+      applications: {
         Row: {
-          age: number
-          allergies: boolean
-          allergies_detail: string | null
           comment: string | null
-          country: string
-          created_at: string
-          email: string
-          fears: boolean
-          fears_detail: string | null
-          first_time_plants: boolean
-          full_name: string
-          has_themes: boolean
-          health_condition: boolean
-          health_condition_detail: string | null
-          height: string
-          id: string
-          occupation: string
-          phone: string
-          plants_detail: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
-          spiritual_practice: boolean
-          spiritual_practice_detail: string | null
-          status: Database["public"]["Enums"]["application_status"]
-          stress_anxiety: boolean
-          stress_anxiety_detail: string | null
-          substance_use: boolean
-          substance_use_detail: string | null
-          themes_detail: string | null
-          trauma: boolean
-          trauma_detail: string | null
-          trip_id: string
-          user_id: string
-          weight: string
-        }
-        Insert: {
-          age: number
-          allergies: boolean
-          allergies_detail?: string | null
-          comment?: string | null
-          country: string
-          created_at?: string
-          email: string
-          fears: boolean
-          fears_detail?: string | null
-          first_time_plants: boolean
-          full_name: string
-          has_themes: boolean
-          health_condition: boolean
-          health_condition_detail?: string | null
-          height: string
-          id?: string
-          occupation: string
-          phone: string
-          plants_detail?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          spiritual_practice: boolean
-          spiritual_practice_detail?: string | null
-          status?: Database["public"]["Enums"]["application_status"]
-          stress_anxiety: boolean
-          stress_anxiety_detail?: string | null
-          substance_use: boolean
-          substance_use_detail?: string | null
-          themes_detail?: string | null
-          trauma: boolean
-          trauma_detail?: string | null
-          trip_id: string
-          user_id: string
-          weight: string
-        }
-        Update: {
-          age?: number
-          allergies?: boolean
-          allergies_detail?: string | null
-          comment?: string | null
-          country?: string
-          created_at?: string
-          email?: string
-          fears?: boolean
-          fears_detail?: string | null
-          first_time_plants?: boolean
-          full_name?: string
-          has_themes?: boolean
-          health_condition?: boolean
-          health_condition_detail?: string | null
-          height?: string
-          id?: string
-          occupation?: string
-          phone?: string
-          plants_detail?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          spiritual_practice?: boolean
-          spiritual_practice_detail?: string | null
-          status?: Database["public"]["Enums"]["application_status"]
-          stress_anxiety?: boolean
-          stress_anxiety_detail?: string | null
-          substance_use?: boolean
-          substance_use_detail?: string | null
-          themes_detail?: string | null
-          trauma?: boolean
-          trauma_detail?: string | null
-          trip_id?: string
-          user_id?: string
-          weight?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "applications_first_time_trip_id_fkey"
-            columns: ["trip_id"]
-            isOneToOne: false
-            referencedRelation: "trips"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      applications_returning: {
-        Row: {
-          ceremony_date: string | null
           created_at: string
           email: string
           full_name: string
           id: string
           new_treatment: boolean
           new_treatment_detail: string | null
+          paid_at: string | null
+          payment_reference: string | null
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          phone: string | null
           previous_ceremonies: number
-          purpose: string
           reviewed_at: string | null
           reviewed_by: string | null
           status: Database["public"]["Enums"]["application_status"]
           stress_anxiety: boolean
           stress_anxiety_detail: string | null
-          theme: string
+          theme: string | null
           trip_id: string
           user_id: string
         }
         Insert: {
-          ceremony_date?: string | null
+          comment?: string | null
           created_at?: string
           email: string
           full_name: string
           id?: string
           new_treatment: boolean
           new_treatment_detail?: string | null
-          previous_ceremonies: number
-          purpose: string
+          paid_at?: string | null
+          payment_reference?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          phone?: string | null
+          previous_ceremonies?: number
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["application_status"]
           stress_anxiety: boolean
           stress_anxiety_detail?: string | null
-          theme: string
+          theme?: string | null
           trip_id: string
           user_id: string
         }
         Update: {
-          ceremony_date?: string | null
+          comment?: string | null
           created_at?: string
           email?: string
           full_name?: string
           id?: string
           new_treatment?: boolean
           new_treatment_detail?: string | null
+          paid_at?: string | null
+          payment_reference?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          phone?: string | null
           previous_ceremonies?: number
-          purpose?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["application_status"]
           stress_anxiety?: boolean
           stress_anxiety_detail?: string | null
-          theme?: string
+          theme?: string | null
           trip_id?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "applications_returning_trip_id_fkey"
+            foreignKeyName: "applications_trip_id_fkey"
             columns: ["trip_id"]
             isOneToOne: false
             referencedRelation: "trips"
@@ -326,8 +199,7 @@ export type Database = {
       }
       consents: {
         Row: {
-          application_first_time_id: string | null
-          application_returning_id: string | null
+          application_id: string
           confirmations: Json
           consent_version: string
           created_at: string
@@ -338,8 +210,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          application_first_time_id?: string | null
-          application_returning_id?: string | null
+          application_id: string
           confirmations: Json
           consent_version: string
           created_at?: string
@@ -350,8 +221,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          application_first_time_id?: string | null
-          application_returning_id?: string | null
+          application_id?: string
           confirmations?: Json
           consent_version?: string
           created_at?: string
@@ -363,31 +233,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "consents_application_first_time_id_fkey"
-            columns: ["application_first_time_id"]
+            foreignKeyName: "consents_application_id_fkey"
+            columns: ["application_id"]
             isOneToOne: false
-            referencedRelation: "applications_first_time"
+            referencedRelation: "applications"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "consents_application_first_time_id_fkey"
-            columns: ["application_first_time_id"]
+            foreignKeyName: "consents_application_id_fkey"
+            columns: ["application_id"]
             isOneToOne: false
-            referencedRelation: "my_applications_first_time"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "consents_application_returning_id_fkey"
-            columns: ["application_returning_id"]
-            isOneToOne: false
-            referencedRelation: "applications_returning"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "consents_application_returning_id_fkey"
-            columns: ["application_returning_id"]
-            isOneToOne: false
-            referencedRelation: "my_applications_returning"
+            referencedRelation: "my_applications"
             referencedColumns: ["id"]
           },
           {
@@ -395,6 +251,111 @@ export type Database = {
             columns: ["trip_id"]
             isOneToOne: false
             referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_form_first_time: {
+        Row: {
+          age: number
+          allergies: boolean
+          allergies_detail: string | null
+          application_id: string
+          comment: string | null
+          country: string
+          created_at: string
+          fears: boolean
+          fears_detail: string | null
+          first_time_plants: boolean
+          has_themes: boolean
+          health_condition: boolean
+          health_condition_detail: string | null
+          height: string
+          id: string
+          occupation: string
+          plants_detail: string | null
+          spiritual_practice: boolean
+          spiritual_practice_detail: string | null
+          stress_anxiety: boolean
+          stress_anxiety_detail: string | null
+          substance_use: boolean
+          substance_use_detail: string | null
+          themes_detail: string | null
+          trauma: boolean
+          trauma_detail: string | null
+          weight: string
+        }
+        Insert: {
+          age: number
+          allergies: boolean
+          allergies_detail?: string | null
+          application_id: string
+          comment?: string | null
+          country: string
+          created_at?: string
+          fears: boolean
+          fears_detail?: string | null
+          first_time_plants: boolean
+          has_themes: boolean
+          health_condition: boolean
+          health_condition_detail?: string | null
+          height: string
+          id?: string
+          occupation: string
+          plants_detail?: string | null
+          spiritual_practice: boolean
+          spiritual_practice_detail?: string | null
+          stress_anxiety: boolean
+          stress_anxiety_detail?: string | null
+          substance_use: boolean
+          substance_use_detail?: string | null
+          themes_detail?: string | null
+          trauma: boolean
+          trauma_detail?: string | null
+          weight: string
+        }
+        Update: {
+          age?: number
+          allergies?: boolean
+          allergies_detail?: string | null
+          application_id?: string
+          comment?: string | null
+          country?: string
+          created_at?: string
+          fears?: boolean
+          fears_detail?: string | null
+          first_time_plants?: boolean
+          has_themes?: boolean
+          health_condition?: boolean
+          health_condition_detail?: string | null
+          height?: string
+          id?: string
+          occupation?: string
+          plants_detail?: string | null
+          spiritual_practice?: boolean
+          spiritual_practice_detail?: string | null
+          stress_anxiety?: boolean
+          stress_anxiety_detail?: string | null
+          substance_use?: boolean
+          substance_use_detail?: string | null
+          themes_detail?: string | null
+          trauma?: boolean
+          trauma_detail?: string | null
+          weight?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_form_first_time_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: true
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_form_first_time_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: true
+            referencedRelation: "my_applications"
             referencedColumns: ["id"]
           },
         ]
@@ -518,63 +479,43 @@ export type Database = {
       }
     }
     Views: {
-      my_applications_first_time: {
+      my_applications: {
         Row: {
+          consent_submitted: boolean | null
           created_at: string | null
+          health_form_submitted: boolean | null
           id: string | null
+          is_first_time: boolean | null
+          payment_status: Database["public"]["Enums"]["payment_status"] | null
           reviewed_at: string | null
           status: Database["public"]["Enums"]["application_status"] | null
           trip_id: string | null
         }
         Insert: {
+          consent_submitted?: never
           created_at?: string | null
+          health_form_submitted?: never
           id?: string | null
+          is_first_time?: never
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
           reviewed_at?: string | null
           status?: Database["public"]["Enums"]["application_status"] | null
           trip_id?: string | null
         }
         Update: {
+          consent_submitted?: never
           created_at?: string | null
+          health_form_submitted?: never
           id?: string | null
+          is_first_time?: never
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
           reviewed_at?: string | null
           status?: Database["public"]["Enums"]["application_status"] | null
           trip_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "applications_first_time_trip_id_fkey"
-            columns: ["trip_id"]
-            isOneToOne: false
-            referencedRelation: "trips"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      my_applications_returning: {
-        Row: {
-          created_at: string | null
-          id: string | null
-          reviewed_at: string | null
-          status: Database["public"]["Enums"]["application_status"] | null
-          trip_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string | null
-          reviewed_at?: string | null
-          status?: Database["public"]["Enums"]["application_status"] | null
-          trip_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string | null
-          reviewed_at?: string | null
-          status?: Database["public"]["Enums"]["application_status"] | null
-          trip_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "applications_returning_trip_id_fkey"
+            foreignKeyName: "applications_trip_id_fkey"
             columns: ["trip_id"]
             isOneToOne: false
             referencedRelation: "trips"
@@ -594,6 +535,7 @@ export type Database = {
       application_status: "pending_review" | "approved" | "rejected" | "expired"
       article_category: "biblioteca" | "ciencia" | "testimonios"
       article_status: "draft" | "published"
+      payment_status: "pending" | "paid" | "waived"
       trip_status: "draft" | "open" | "closed" | "completed"
       trip_type: "retiro" | "ceremonia"
     }

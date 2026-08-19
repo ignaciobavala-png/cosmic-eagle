@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { submitReturningApplication, type ApplicationFormState } from "./actions";
+import { submitApplication, type ApplicationFormState } from "./actions";
 
 const inputClass =
   "bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors";
@@ -32,7 +32,16 @@ function BoolQuestion({ name, label }: { name: string; label: string }) {
   );
 }
 
-export function ReturningForm({
+/**
+ * El filtro corto: lo llenan todos, primerizos y recurrentes.
+ *
+ * Las preguntas salen del formulario "Viajer@s" de Estela, que es el único
+ * filtro corto relevado, pero el texto está redactado en neutro porque acá
+ * también entra alguien que nunca ceremonió. Sofía describe un filtro de tres
+ * preguntas con un encuadre distinto (adicciones, bipolaridad, depresión
+ * severa) que no existe como formulario: si lo confirma, esto se reescribe.
+ */
+export function ScreeningForm({
   tripId,
   defaultEmail,
 }: {
@@ -42,7 +51,7 @@ export function ReturningForm({
   const [state, formAction, pending] = useActionState<
     ApplicationFormState,
     FormData
-  >(submitReturningApplication.bind(null, tripId), { error: null });
+  >(submitApplication.bind(null, tripId), { error: null });
 
   return (
     <form
@@ -69,48 +78,56 @@ export function ReturningForm({
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Ceremonias previas</label>
+          <label className={labelClass}>Teléfono (opcional)</label>
+          <input name="phone" type="tel" className={inputClass} />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>
+            Ceremonias que hiciste con Estela
+          </label>
           <input
             name="previous_ceremonies"
             type="number"
-            min={1}
+            min={0}
+            defaultValue={0}
             required
             className={inputClass}
           />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Última ceremonia (opcional)</label>
-          <input name="ceremony_date" type="date" className={inputClass} />
+          <span className="text-xs text-on-surface-variant">
+            Si es tu primera vez, dejá el 0.
+          </span>
         </div>
       </div>
 
       <h2 className="font-display text-xl text-primary-fixed-dim mt-4 mb-1">
-        Actualización de salud
+        Antes de seguir
       </h2>
       <p className="text-xs text-on-surface-variant mb-2">
-        Ya tenemos tu historial de salud. Sólo necesitamos saber si algo
-        cambió desde tu última ceremonia.
+        Son unas pocas preguntas para saber cómo estás llegando. Si la solicitud
+        avanza, más adelante te vamos a pedir un formulario de salud completo.
       </p>
 
       <BoolQuestion
         name="new_treatment"
-        label="¿Empezaste algún tratamiento médico nuevo desde tu última ceremonia?"
+        label="¿Estás haciendo algún tratamiento médico o psiquiátrico?"
       />
       <BoolQuestion
         name="stress_anxiety"
-        label="¿Estás atravesando estrés o ansiedad con frecuencia?"
+        label="¿Estás atravesando estrés, angustia o ansiedad con frecuencia?"
       />
 
       <div className="flex flex-col gap-1.5 py-4">
         <label className={labelClass}>
-          Tema o intención que querés trabajar
+          Tema o intención que querés trabajar (opcional)
         </label>
-        <textarea name="theme" required rows={2} className={inputClass} />
+        <textarea name="theme" rows={2} className={inputClass} />
       </div>
 
       <div className="flex flex-col gap-1.5 py-2">
-        <label className={labelClass}>Propósito de tu participación</label>
-        <textarea name="purpose" required rows={2} className={inputClass} />
+        <label className={labelClass}>
+          Algo más que quieras compartir (opcional)
+        </label>
+        <textarea name="comment" rows={2} className={inputClass} />
       </div>
 
       {state.error && (

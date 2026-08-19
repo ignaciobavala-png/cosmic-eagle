@@ -1,29 +1,70 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
-import { FirstTimeForm } from "./FirstTimeForm";
-import { ReturningForm } from "./ReturningForm";
+import { ScreeningForm } from "./ScreeningForm";
 
-const STATUS_MESSAGE: Record<string, { title: string; body: string }> = {
-  pending_review: {
-    title: "Tu solicitud está en revisión",
-    body: "Nuestro equipo la está evaluando. Te vamos a avisar apenas tengamos una respuesta.",
-  },
-  approved: {
-    title: "Tu solicitud fue aprobada",
-    body: "Ya sos parte de este viaje. Pronto vas a recibir el consentimiento informado para completar antes de la ceremonia.",
-  },
-  rejected: {
-    title: "Tu solicitud no fue aprobada para este viaje",
-    body: "Podés postularte a otro viaje más adelante.",
-  },
-  expired: {
-    title: "Tu aprobación para este viaje fue invalidada",
-    body: "Contactanos si creés que esto es un error.",
-  },
-};
+type Step = { title: string; body: string; cta?: { href: string; label: string } };
+
+/**
+ * El estado que ve el postulante después de mandar el filtro corto. No es sólo
+ * "en revisión / aprobada": el flujo sigue después de aprobar (pago, formulario
+ * extenso, consentimiento), así que cada estado dice cuál es el paso siguiente.
+ */
+function nextStep(
+  tripId: string,
+  app: {
+    status: string | null;
+    payment_status: string | null;
+    is_first_time: boolean | null;
+    health_form_submitted: boolean | null;
+  }
+): Step {
+  if (app.status === "rejected") {
+    return {
+      title: "Tu solicitud no fue aprobada para este viaje",
+      body: "Podés postularte a otro viaje más adelante.",
+    };
+  }
+
+  if (app.status === "expired") {
+    return {
+      title: "Tu aprobación para este viaje fue invalidada",
+      body: "Contactanos si creés que esto es un error.",
+    };
+  }
+
+  if (app.status !== "approved") {
+    return {
+      title: "Tu solicitud está en revisión",
+      body: "Estela la está leyendo. Te vamos a avisar apenas tengamos una respuesta, y ahí seguimos con la reserva del cupo.",
+    };
+  }
+
+  // Aprobada. El pago todavía no se hace en la web: lo coordina Estela y lo
+  // marca a mano desde el panel (no hay pasarela elegida).
+  if (app.payment_status === "pending") {
+    return {
+      title: "Tu solicitud fue aprobada",
+      body: "Para reservar tu cupo falta la seña. Te vamos a escribir con los datos del pago; en cuanto quede registrado seguimos con el formulario de salud.",
+    };
+  }
+
+  if (app.is_first_time && !app.health_form_submitted) {
+    return {
+      title: "Cupo reservado",
+      body: "Queda un paso importante: el formulario de salud completo, que es lo que nos permite preparar la ceremonia y cuidar tu proceso.",
+      cta: { href: `/viajes/${tripId}/salud`, label: "Completar el formulario de salud" },
+    };
+  }
+
+  return {
+    title: "Estás dentro de este viaje",
+    body: "Ya tenemos todo lo que necesitábamos por ahora. Vamos a escribirte con la preparación previa y los datos de logística.",
+  };
+}
 
 export default async function SolicitarPage({
   params,
@@ -47,34 +88,16 @@ export default async function SolicitarPage({
 
   if (!trip) notFound();
 
-  const [
-    { data: myFirstTime },
-    { data: myReturning },
-    { count: approvedFirstTime },
-    { count: approvedReturning },
-  ] = await Promise.all([
-    supabase
-      .from("my_applications_first_time")
-      .select("id, status")
-      .eq("trip_id", id),
-    supabase
-      .from("my_applications_returning")
-      .select("id, status")
-      .eq("trip_id", id),
-    supabase
-      .from("applications_first_time")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("status", "approved"),
-    supabase
-      .from("applications_returning")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("status", "approved"),
-  ]);
+  // La solicitud propia se lee por la vista: la tabla base no le devuelve
+  // ninguna fila al postulante, ni siquiera las suyas.
+  const { data: applications } = await supabase
+    .from("my_applications")
+    .select("id, status, payment_status, is_first_time, health_form_submitted")
+    .eq("trip_id", id)
+    .order("created_at", { ascending: false });
 
-  const existing = [...(myFirstTime ?? []), ...(myReturning ?? [])][0];
-  const isReturning = (approvedFirstTime ?? 0) + (approvedReturning ?? 0) > 0;
+  const existing = applications?.[0];
+  const step = existing ? nextStep(id, existing) : null;
 
   return (
     <>
@@ -91,25 +114,29 @@ export default async function SolicitarPage({
             <p className="text-on-surface-variant">{trip.location}</p>
           </div>
 
-          {trip.status !== "open" ? (
+          {step ? (
+            <div className="glass-card rounded-2xl p-6">
+              <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
+                {step.title}
+              </h2>
+              <p className="text-on-surface-variant">{step.body}</p>
+              {step.cta && (
+                <Link
+                  href={step.cta.href}
+                  className="inline-block mt-5 bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg px-5 py-2.5 hover:bg-primary-fixed transition-colors"
+                >
+                  {step.cta.label}
+                </Link>
+              )}
+            </div>
+          ) : trip.status !== "open" ? (
             <div className="glass-card rounded-2xl p-6">
               <p className="text-on-surface-variant">
                 Este viaje no está recibiendo solicitudes en este momento.
               </p>
             </div>
-          ) : existing ? (
-            <div className="glass-card rounded-2xl p-6">
-              <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
-                {STATUS_MESSAGE[existing.status ?? "pending_review"].title}
-              </h2>
-              <p className="text-on-surface-variant">
-                {STATUS_MESSAGE[existing.status ?? "pending_review"].body}
-              </p>
-            </div>
-          ) : isReturning ? (
-            <ReturningForm tripId={id} defaultEmail={user.email} />
           ) : (
-            <FirstTimeForm tripId={id} defaultEmail={user.email} />
+            <ScreeningForm tripId={id} defaultEmail={user.email} />
           )}
         </div>
       </main>

@@ -18,10 +18,31 @@ type Application = {
   id: string;
   trip_id: string;
   status: string;
+  payment_status: string;
+  is_first_time: boolean;
+  health_form_submitted: boolean;
   created_at: string;
-  type: "primerizo" | "recurrente";
   trip: { title: string; location: string | null; start_date: string; end_date: string } | null;
 };
+
+/**
+ * Qué le falta a esta solicitud. El flujo no termina en "aprobada": después
+ * viene el pago, el formulario de salud extenso y el consentimiento (ver
+ * docs/FLUJO_INSCRIPCION.md), así que la tabla dice el paso siguiente en vez
+ * de repetir el estado.
+ */
+function pendingStep(a: Application): { label: string; href?: string } {
+  if (a.status === "pending_review") return { label: "Esperando revisión" };
+  if (a.status !== "approved") return { label: "—" };
+  if (a.payment_status === "pending") return { label: "Falta la seña" };
+  if (a.is_first_time && !a.health_form_submitted) {
+    return {
+      label: "Completar formulario de salud",
+      href: `/viajes/${a.trip_id}/solicitar`,
+    };
+  }
+  return { label: "Al día" };
+}
 
 function formatDate(iso: string) {
   return new Date(`${iso}T00:00:00Z`).toLocaleDateString("es-AR", {
@@ -84,7 +105,7 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
             <thead>
               <tr className="border-b border-outline-variant text-left text-on-surface-variant">
                 <th className="px-4 py-3 font-medium">Viaje</th>
-                <th className="px-4 py-3 font-medium">Tipo</th>
+                <th className="px-4 py-3 font-medium">Paso siguiente</th>
                 <th className="px-4 py-3 font-medium">Fecha</th>
                 <th className="px-4 py-3 font-medium">Estado</th>
               </tr>
@@ -92,13 +113,27 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
             <tbody>
               {applications.map((a) => (
                 <tr
-                  key={`${a.type}-${a.id}`}
+                  key={a.id}
                   className="border-b border-outline-variant/40 last:border-0"
                 >
                   <td className="px-4 py-3 text-on-surface font-medium">
                     {a.trip?.title ?? "—"}
                   </td>
-                  <td className="px-4 py-3 text-on-surface-variant capitalize">{a.type}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">
+                    {(() => {
+                      const step = pendingStep(a);
+                      return step.href ? (
+                        <Link
+                          href={step.href}
+                          className="text-primary-fixed-dim underline"
+                        >
+                          {step.label}
+                        </Link>
+                      ) : (
+                        step.label
+                      );
+                    })()}
+                  </td>
                   <td className="px-4 py-3 text-on-surface-variant">
                     {formatDateTime(a.created_at)}
                   </td>

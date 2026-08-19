@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { reviewApplication, type ApplicationTable } from "./actions";
+import { reviewApplication } from "./actions";
 import type { Enums } from "@/lib/supabase/types";
 
 const OPTIONS: { status: Enums<"application_status">; label: string; className: string }[] = [
@@ -23,11 +23,9 @@ const OPTIONS: { status: Enums<"application_status">; label: string; className: 
 ];
 
 export function ReviewButtons({
-  table,
   id,
   currentStatus,
 }: {
-  table: ApplicationTable;
   id: string;
   currentStatus: Enums<"application_status">;
 }) {
@@ -42,7 +40,7 @@ export function ReviewButtons({
           disabled={isPending}
           onClick={() =>
             startTransition(async () => {
-              await reviewApplication(table, id, opt.status);
+              await reviewApplication(id, opt.status);
             })
           }
           className={`px-4 py-2.5 rounded-lg text-sm font-medium tracking-[0.02em] border transition-colors disabled:opacity-60 ${opt.className}`}

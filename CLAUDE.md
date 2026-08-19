@@ -15,14 +15,14 @@ Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estel
 - Bucket de Storage `avatars` (público, RLS por carpeta `{user_id}/...`) para foto de perfil, subida desde `/cuenta` con `AvatarUpload.tsx` + server action `updateAvatar`
 - Auth funcionando en `/cuenta`: login + **registro** (email/password, toggle `?modo=registro`). Diseño: sin confirmación por mail — el gate real de acceso es la aprobación manual del admin. **Ojo**: el toggle "Confirm email" del dashboard de Supabase (Authentication → Sign In/Providers → Email) tenía este comportamiento activado por defecto y rompía el login (`email_not_confirmed` se mostraba como "Email o contraseña incorrectos"); se pidió desactivarlo — **verificar que siga desactivado** si vuelve a aparecer este síntoma. Login redirige directo a `/admin` si `profiles.is_admin`
 - **Recuperación de contraseña implementada** (rama `dashboard`): `/cuenta/recuperar` → mail → `/auth/confirm` (canjea `token_hash` por sesión) → `/cuenta/nueva-clave`. Ver `docs/AUTH_EMAIL.md`. **Ojo**: falta configurar las plantillas y las redirect URLs en el dashboard, sin eso el mail no llega a ningún lado. El mailer que trae Supabase **solo entrega a miembros de la organización**, así que sirve para probar con la cuenta de Ignacio pero a la clienta no le llega nada: para eso hace falta SMTP propio. No hace falta tener el dominio: alcanza con un proveedor que verifique una casilla suelta. Las plantillas de mail hay que pasarlas a `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=...`; el `{{ .ConfirmationURL }}` default usa PKCE y se rompe si el mail se abre en otro dispositivo
-- `/cuenta` logueado muestra **tarjeta de perfil** (avatar editable + nombre + email) y **panel de viajero**: viajes aprobados + tabla de "Mis solicitudes" con estado (via `my_applications_first_time`/`my_applications_returning` + `trips`, sin exponer datos de salud)
+- `/cuenta` logueado muestra **tarjeta de perfil** (avatar editable + nombre + email) y **panel de viajero**: viajes aprobados + tabla de "Mis solicitudes" con estado (via la vista `my_applications` + `trips`, sin exponer datos de salud; la columna "Paso siguiente" dice qué le falta a cada solicitud)
 - Navbar (`Header.tsx`) muestra avatar + primer nombre en el link "Mi Cuenta" cuando hay sesión (fetch client-side, se actualiza con `onAuthStateChange`). Usa el **logo oficial** (`public/logo.png`, via `next/image`) en desktop, drawer mobile y footer. **No hay link "Inicio"**: al home se llega tocando el logo, tanto en el navbar como en la cabecera del drawer
 - `/viajes` conectado a la tabla `trips` real (ya no es mock). La tarjeta entera linkea al detalle
 - `/viajes/[id]` es la **página pública de detalle del viaje** (no requiere sesión): portada, estado, descripción y datos (fechas, duración, lugar, cupo, aporte) + `generateMetadata`. El CTA cambia según sesión: sin usuario va a `/cuenta?next=/viajes/{id}/solicitar`, con usuario va directo al form; si el viaje está `closed`/`completed` muestra aviso. **Ojo**: la policy `trips_select_public` deja leer *todos* los trips a `anon`, incluidos los `draft` — el filtro de borradores se hace en la página (404), no en RLS. Cualquier ruta pública nueva que lea `trips` tiene que filtrar igual
 - Imagen de portada: `trips.image_url` + bucket `trip-images` (público, escritura solo admin via `private.is_admin()`), subida desde el form del admin (`uploadCover` en `admin/viajes/actions.ts`). Las tres lecturas (home, `/viajes`, detalle) hacen `trip.image_url ?? tripPlaceholderImage(trip.id)`, así que un viaje sin portada sigue funcionando. **Ojo**: `next.config.ts` tiene que listar el hostname de Supabase en `remotePatterns` o `next/image` rechaza las portadas — falla en runtime, no en build
 - **Ojo con los grants de columna** (bug corregido el 2026-07-31, migración `20260731210000_fix_profiles_is_admin_grant.sql`): `revoke update (col) on tabla from authenticated` **no hace nada** si el rol tiene `UPDATE` a nivel tabla — Postgres avisa por WARNING y sigue. Así quedó abierta durante días una escalada de privilegios: con la policy `profiles_update_own` cualquier usuario logueado podía `update profiles set is_admin = true where id = auth.uid()` desde el browser. La forma correcta es `revoke update on <tabla> from authenticated` y después `grant update (<columnas permitidas>)`. Aplica a cualquier columna sensible que se agregue más adelante
 - **Ojo con los buckets públicos**: una policy de SELECT abierta sobre `storage.objects` **no** hace falta para leer por URL (esa lectura no pasa por RLS) y lo único que habilita es listar el bucket entero (advisor `lint 0025`). En `trip-images` el SELECT está restringido a admin, que igual lo necesita porque el upsert de Storage exige INSERT + SELECT + UPDATE. `avatars` todavía arrastra la policy abierta, pendiente de corregir igual
-- Formulario de solicitud de salud funcionando en `/viajes/[id]/solicitar` (primerizo/recurrente, elegido segun historial de aprobaciones del usuario)
+- **La inscripción tiene dos etapas** (2026-08-19): `/viajes/[id]/solicitar` es el filtro corto que llenan todos, y `/viajes/[id]/salud` es el formulario extenso, que sólo se abre con la solicitud **aprobada y el pago registrado**. Antes eran dos formularios alternativos elegidos por historial. Ver `docs/FLUJO_INSCRIPCION.md`
 - Panel de admin funcionando en `/admin` (protegido por `profiles.is_admin`): dashboard, CRUD de viajes, revisión de solicitudes (aprobar/rechazar/expirar). Un admin no puede aprobar/rechazar su propia solicitud (guard en `reviewApplication` + oculto en la UI)
 - **Assets de diseño de Julia recibidos (2026-07-30)**: ver `docs/DESIGN_ASSETS.md` (mapeo de la carpeta a las rutas) y `docs/RECORRIDO.md` (el recorrido del negocio + las 8 primitivas visuales del sistema). La carpeta original está en `~/Descargas/frontend_eagle`, **fuera del repo**
 - `/nosotros` **implementado** con el mockup de Julia y copy real de la clienta (hero + propósito + metodología + Nuestra Visión)
@@ -71,11 +71,14 @@ src/
 │   │   ├── page.tsx                  # P1 + grilla P4 + P6, conectado a `trips` real
 │   │   └── [id]/
 │   │       ├── page.tsx              # detalle PUBLICO del viaje (sin login)
-│   │       └── solicitar/
-│   │           ├── page.tsx          # elige form primerizo/recurrente segun historial
-│   │           ├── FirstTimeForm.tsx     # "use client"
-│   │           ├── ReturningForm.tsx     # "use client"
-│   │           └── actions.ts            # submitFirstTimeApplication / submitReturningApplication
+│   │       ├── solicitar/            # ETAPA 1 + pantalla de estado del postulante
+│   │       │   ├── page.tsx          # filtro corto, o en que paso quedo la solicitud
+│   │       │   ├── ScreeningForm.tsx     # "use client"
+│   │       │   └── actions.ts            # submitApplication
+│   │       └── salud/                # ETAPA 2, solo aprobada + pagada
+│   │           ├── page.tsx          # gate; cualquier otro estado vuelve a solicitar/
+│   │           ├── HealthForm.tsx        # "use client"
+│   │           └── actions.ts            # submitHealthForm
 │   ├── cuenta/
 │   │   ├── page.tsx                  # login/registro (?modo=registro) + panel de viajero
 │   │   ├── LoginForm.tsx             # "use client", soporta ?next=, ojito password
@@ -91,7 +94,12 @@ src/
 │       ├── viajes/                   # CRUD de trips (form + actions). page.tsx redirige a /admin/retiros
 │       ├── contenidos/               # CRUD de articles (form + actions), portada a site-assets
 │       ├── suscriptores/             # lista del newsletter (solo lectura + copiar)
-│       └── solicitudes/              # revision, aprobar/rechazar/expirar (bloquea auto-revision)
+│       └── solicitudes/              # revision + registro del pago a mano
+│           ├── page.tsx              # listado unico (ya no hay dos tablas)
+│           ├── [id]/page.tsx         # filtro + formulario de salud si ya llego
+│           ├── ReviewButtons.tsx     # aprobar/rechazar/expirar (bloquea auto-revision)
+│           ├── PaymentControls.tsx   # marcar pagado / sin cargo / sin pagar
+│           └── actions.ts            # reviewApplication / markPayment
 ├── components/
 │   ├── Header.tsx             # "use client" — nav desktop + drawer mobile
 │   ├── PortalsSection.tsx     # "use client" — carrusel P8 de la home
@@ -590,6 +598,73 @@ Advisors sin novedades. Filas de prueba borradas.
 **Sin verificar end-to-end** (requiere sesión de admin, la hace Ignacio): cargar
 y publicar un artículo con portada desde el panel, subir la foto nueva de "Sobre
 Cosmic Eagle", y ver el carrusel girando en el sitio en vivo.
+
+### Sesión del 2026-08-19 — el modelo de datos de la inscripción en dos etapas
+
+Migración `20260819180444_two_stage_applications.sql`, aplicada y verificada contra
+producción. Sale del orden que confirmó Ignacio (`docs/FLUJO_INSCRIPCION.md`):
+
+```
+registro → filtro corto → revisión de Estela → pago
+        → formulario de salud extenso → consentimiento → logística
+```
+
+`applications_first_time` / `applications_returning` eran **alternativas** (se elegía una
+según el historial). Ahora son **etapas**:
+
+```
+applications                 filtro corto + estado + revisión + pago
+  ├─ health_form_first_time  el extenso, posterior al pago
+  └─ consents                sin UI todavía
+```
+
+- **Se eligió padre + hijos y no "una fila que se completa"** por seguridad: cada etapa es
+  un INSERT nuevo, así que el postulante nunca necesita UPDATE sobre una fila con datos
+  médicos. La otra opción obligaba a abrir ese UPDATE y blindarlo con grants por columna.
+- Se dropearon las tablas viejas en vez de migrarlas: estaban en **cero filas**.
+- **Ojo, el revoke de UPDATE también alcanza al admin**, que es `authenticated` como todos:
+  `revoke update on applications` lo dejó sin poder aprobar hasta devolverle por `grant
+  update (status, reviewed_by, reviewed_at, payment_status, paid_at, payment_reference)`.
+  Efecto lateral bueno: las respuestas del filtro son inmutables para todo el mundo.
+- El insert de la etapa 2 lo autoriza `private.owns_approved_application()`
+  (`security definer`): chequear la propiedad exige leer `applications`, donde el
+  postulante no tiene SELECT. Mismo patrón que `is_admin()`.
+- **`consents` y `admin_notifications` perdieron el par de FKs + CHECK** y ahora cuelgan de
+  un solo `application_id`. Ese par se filtraba a todos lados (el `[type]` de la ruta del
+  admin, el CRM, el dashboard).
+- La vista `my_applications` reemplaza a las dos `my_applications_*` y suma
+  `payment_status`, `is_first_time`, `health_form_submitted` y `consent_submitted`. Sigue
+  siendo `security_invoker = false` (el advisor `lint 0010` la marca a propósito, igual que
+  a las dos anteriores) y **revocada para `anon`**.
+- **No existe `health_form_returning`**: con el filtro cubriendo lo que pedía Viajer@s, un
+  recurrente no tiene etapa 2 conocida. Si aparece, es una tabla hermana.
+- Dos triggers de aviso en vez de uno: uno con el filtro (lo que Estela revisa) y otro con
+  el formulario extenso, que llega **después** de aprobar. Ver `docs/NOTIFICACIONES.md`.
+
+En el código: `ScreeningForm` (etapa 1) y `HealthForm` en `/viajes/[id]/salud` (etapa 2)
+reemplazan a `ReturningForm`/`FirstTimeForm`; `/viajes/[id]/solicitar` pasó a ser también
+la pantalla de estado y dice el paso siguiente; `/admin/solicitudes/[type]/[id]` quedó en
+`/admin/solicitudes/[id]`, con el formulario de salud abajo del filtro; `PaymentControls`
+es nuevo (Estela marca el pago a mano). Dashboard, CRM y `/cuenta` pasaron a la tabla única.
+
+**El pago sigue sin pasarela**: es el único escalón del flujo que la web no hace, y ahora
+se nota más porque es el que habilita la etapa 2. `payment_status` tiene `waived` para las
+invitaciones y cupones de `docs/CRM.md` §5.
+
+**Las preguntas del filtro son provisorias**: son las de Viajer@s, redactadas en neutro
+para que le sirvan a un primerizo. Sofía describe un filtro de 3 preguntas con encuadre de
+adicciones/bipolaridad/depresión severa que **no existe como Google Form** — sin eso, no se
+puede cerrar el texto.
+
+Verificado: `tsc`, lint (los 2 errores de `multimedia/SlotEditor.tsx` son previos y no se
+tocaron), build de producción, y el flujo entero probado con `set role` sobre la base real
+— insert del filtro, invisibilidad de la tabla base para el propio postulante, update
+bloqueado, etapa 2 rechazada antes de aprobar y aceptada después, otro usuario rechazado,
+`anon` sin acceso a la vista, índice único parcial, y los dos triggers escribiendo el
+aviso. Filas de prueba borradas (todo volvió a cero).
+
+**Sin verificar end-to-end** (requiere sesión, la hace Ignacio): postularse desde el sitio,
+aprobar y marcar el pago desde el panel, y completar el formulario de salud.
 
 ## No hacer
 

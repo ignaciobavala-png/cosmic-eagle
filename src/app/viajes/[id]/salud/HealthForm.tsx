@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { submitFirstTimeApplication, type ApplicationFormState } from "./actions";
+import { submitHealthForm, type HealthFormState } from "./actions";
 
 const inputClass =
   "bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors";
@@ -40,17 +40,17 @@ function BoolQuestion({
   );
 }
 
-export function FirstTimeForm({
+export function HealthForm({
   tripId,
-  defaultEmail,
+  applicationId,
 }: {
   tripId: string;
-  defaultEmail?: string;
+  applicationId: string;
 }) {
-  const [state, formAction, pending] = useActionState<
-    ApplicationFormState,
-    FormData
-  >(submitFirstTimeApplication.bind(null, tripId), { error: null });
+  const [state, formAction, pending] = useActionState<HealthFormState, FormData>(
+    submitHealthForm.bind(null, tripId, applicationId),
+    { error: null }
+  );
 
   return (
     <form
@@ -58,14 +58,10 @@ export function FirstTimeForm({
       className="glass-card rounded-2xl p-6 md:p-8 flex flex-col gap-2 max-w-2xl"
     >
       <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
-        Datos personales
+        Tus datos
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Nombre completo</label>
-          <input name="full_name" type="text" required className={inputClass} />
-        </div>
         <div className="flex flex-col gap-1.5">
           <label className={labelClass}>Edad</label>
           <input name="age" type="number" min={18} required className={inputClass} />
@@ -86,20 +82,6 @@ export function FirstTimeForm({
           <label className={labelClass}>Ocupación</label>
           <input name="occupation" type="text" required className={inputClass} />
         </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Email</label>
-          <input
-            name="email"
-            type="email"
-            required
-            defaultValue={defaultEmail}
-            className={inputClass}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Teléfono</label>
-          <input name="phone" type="tel" required className={inputClass} />
-        </div>
       </div>
 
       <h2 className="font-display text-xl text-primary-fixed-dim mt-4 mb-1">
@@ -107,8 +89,7 @@ export function FirstTimeForm({
       </h2>
       <p className="text-xs text-on-surface-variant mb-2">
         Esta información es confidencial y sólo la revisa el equipo médico y de
-        contención. Cualquier respuesta afirmativa requiere revisión manual
-        antes de aprobar tu solicitud.
+        contención. Sirve para preparar la ceremonia y acompañarte mejor.
       </p>
 
       <BoolQuestion
@@ -164,7 +145,7 @@ export function FirstTimeForm({
         disabled={pending}
         className="mt-2 bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-fixed transition-colors disabled:opacity-60"
       >
-        {pending ? "Enviando..." : "Enviar solicitud"}
+        {pending ? "Enviando..." : "Enviar formulario"}
       </button>
     </form>
   );

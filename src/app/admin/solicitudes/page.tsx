@@ -16,6 +16,12 @@ const STATUS_CLASS: Record<string, string> = {
   expired: "bg-outline-variant/30 text-on-surface-variant border-outline/40",
 };
 
+const PAYMENT_LABEL: Record<string, string> = {
+  pending: "Sin pagar",
+  paid: "Pagado",
+  waived: "Sin cargo",
+};
+
 const FILTERS: { value: string; label: string }[] = [
   { value: "pending_review", label: "Pendientes" },
   { value: "approved", label: "Aprobadas" },
@@ -42,35 +48,18 @@ export default async function AdminSolicitudesPage({
 
   const supabase = await createClient();
 
-  let firstTimeQuery = supabase
-    .from("applications_first_time")
-    .select("id, full_name, status, created_at, trip_id, trips(title)")
-    .order("created_at", { ascending: false });
-  let returningQuery = supabase
-    .from("applications_returning")
-    .select("id, full_name, status, created_at, trip_id, trips(title)")
+  let query = supabase
+    .from("applications")
+    .select(
+      "id, full_name, status, payment_status, previous_ceremonies, created_at, trip_id, trips(title)"
+    )
     .order("created_at", { ascending: false });
 
   if (status !== "all") {
-    firstTimeQuery = firstTimeQuery.eq(
-      "status",
-      status as Enums<"application_status">
-    );
-    returningQuery = returningQuery.eq(
-      "status",
-      status as Enums<"application_status">
-    );
+    query = query.eq("status", status as Enums<"application_status">);
   }
 
-  const [{ data: firstTime }, { data: returning }] = await Promise.all([
-    firstTimeQuery,
-    returningQuery,
-  ]);
-
-  const applications = [
-    ...(firstTime ?? []).map((a) => ({ ...a, type: "primerizo" as const })),
-    ...(returning ?? []).map((a) => ({ ...a, type: "recurrente" as const })),
-  ].sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+  const { data: applications } = await query;
 
   return (
     <div>
@@ -92,7 +81,7 @@ export default async function AdminSolicitudesPage({
         ))}
       </div>
 
-      {applications.length === 0 ? (
+      {!applications || applications.length === 0 ? (
         <p className="text-on-surface-variant">No hay solicitudes en este estado.</p>
       ) : (
         <div className="glass-card rounded-2xl overflow-x-auto">
@@ -101,7 +90,8 @@ export default async function AdminSolicitudesPage({
               <tr className="border-b border-outline-variant text-left text-on-surface-variant">
                 <th className="px-5 py-3 font-medium">Nombre</th>
                 <th className="px-5 py-3 font-medium">Viaje</th>
-                <th className="px-5 py-3 font-medium">Tipo</th>
+                <th className="px-5 py-3 font-medium">Experiencia</th>
+                <th className="px-5 py-3 font-medium">Pago</th>
                 <th className="px-5 py-3 font-medium">Fecha</th>
                 <th className="px-5 py-3 font-medium">Estado</th>
                 <th className="px-5 py-3 font-medium text-right">Ver</th>
@@ -110,7 +100,7 @@ export default async function AdminSolicitudesPage({
             <tbody>
               {applications.map((app) => (
                 <tr
-                  key={`${app.type}-${app.id}`}
+                  key={app.id}
                   className="border-b border-outline-variant/40 last:border-0"
                 >
                   <td className="px-5 py-4 text-on-surface font-medium">
@@ -119,8 +109,13 @@ export default async function AdminSolicitudesPage({
                   <td className="px-5 py-4 text-on-surface-variant">
                     {app.trips?.title ?? "—"}
                   </td>
-                  <td className="px-5 py-4 text-on-surface-variant capitalize">
-                    {app.type}
+                  <td className="px-5 py-4 text-on-surface-variant">
+                    {app.previous_ceremonies === 0
+                      ? "Primera vez"
+                      : `${app.previous_ceremonies} previas`}
+                  </td>
+                  <td className="px-5 py-4 text-on-surface-variant">
+                    {PAYMENT_LABEL[app.payment_status] ?? app.payment_status}
                   </td>
                   <td className="px-5 py-4 text-on-surface-variant">
                     {formatDateTime(app.created_at)}
@@ -134,7 +129,7 @@ export default async function AdminSolicitudesPage({
                   </td>
                   <td className="px-5 py-4 text-right">
                     <Link
-                      href={`/admin/solicitudes/${app.type}/${app.id}`}
+                      href={`/admin/solicitudes/${app.id}`}
                       className="text-secondary hover:underline"
                     >
                       Ver detalle

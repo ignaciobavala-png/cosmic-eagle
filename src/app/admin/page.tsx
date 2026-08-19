@@ -34,14 +34,11 @@ export default async function AdminDashboardPage() {
     { count: totalRetiros },
     { count: openCeremonias },
     { count: totalCeremonias },
-    { count: pendingFirstTime },
-    { count: pendingReturning },
-    { count: approvedFirstTime },
-    { count: approvedReturning },
+    { count: pendingCount },
+    { count: approvedCount },
     { count: subscribers },
     { data: upcomingTrips },
-    { data: pendingApplicationsFirstTime },
-    { data: pendingApplicationsReturning },
+    { data: recentApplications },
   ] = await Promise.all([
     supabase
       .from("trips")
@@ -62,19 +59,11 @@ export default async function AdminDashboardPage() {
       .select("*", { count: "exact", head: true })
       .eq("type", "ceremonia"),
     supabase
-      .from("applications_first_time")
+      .from("applications")
       .select("*", { count: "exact", head: true })
       .eq("status", "pending_review"),
     supabase
-      .from("applications_returning")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "pending_review"),
-    supabase
-      .from("applications_first_time")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "approved"),
-    supabase
-      .from("applications_returning")
+      .from("applications")
       .select("*", { count: "exact", head: true })
       .eq("status", "approved"),
     supabase
@@ -87,34 +76,12 @@ export default async function AdminDashboardPage() {
       .order("start_date", { ascending: true })
       .limit(4),
     supabase
-      .from("applications_first_time")
-      .select("id, full_name, created_at, trips(title)")
-      .eq("status", "pending_review")
-      .order("created_at", { ascending: false })
-      .limit(5),
-    supabase
-      .from("applications_returning")
-      .select("id, full_name, created_at, trips(title)")
+      .from("applications")
+      .select("id, full_name, previous_ceremonies, created_at, trips(title)")
       .eq("status", "pending_review")
       .order("created_at", { ascending: false })
       .limit(5),
   ]);
-
-  const pendingCount = (pendingFirstTime ?? 0) + (pendingReturning ?? 0);
-  const approvedCount = (approvedFirstTime ?? 0) + (approvedReturning ?? 0);
-
-  const recentApplications = [
-    ...(pendingApplicationsFirstTime ?? []).map((a) => ({
-      ...a,
-      type: "primerizo" as const,
-    })),
-    ...(pendingApplicationsReturning ?? []).map((a) => ({
-      ...a,
-      type: "recurrente" as const,
-    })),
-  ]
-    .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
-    .slice(0, 5);
 
   const stats = [
     {
@@ -134,15 +101,15 @@ export default async function AdminDashboardPage() {
     {
       href: "/admin/solicitudes?status=pending_review",
       label: "Solicitudes pendientes",
-      value: pendingCount,
+      value: pendingCount ?? 0,
       hint: "esperando revisión",
       icon: ClipboardList,
-      highlight: pendingCount > 0,
+      highlight: (pendingCount ?? 0) > 0,
     },
     {
       href: "/admin/solicitudes?status=approved",
       label: "Aprobaciones vigentes",
-      value: approvedCount,
+      value: approvedCount ?? 0,
       hint: "acceso al panel de viajero",
       icon: UserCheck,
     },
@@ -215,16 +182,16 @@ export default async function AdminDashboardPage() {
             </Link>
           </div>
 
-          {recentApplications.length === 0 ? (
+          {!recentApplications || recentApplications.length === 0 ? (
             <p className="text-on-surface-variant text-sm">
               No hay solicitudes pendientes.
             </p>
           ) : (
             <ul className="flex flex-col divide-y divide-outline-variant/40">
               {recentApplications.map((app) => (
-                <li key={`${app.type}-${app.id}`} className="py-3">
+                <li key={app.id} className="py-3">
                   <Link
-                    href={`/admin/solicitudes/${app.type}/${app.id}`}
+                    href={`/admin/solicitudes/${app.id}`}
                     className="flex items-center justify-between gap-4 group"
                   >
                     <div className="min-w-0">
@@ -232,7 +199,10 @@ export default async function AdminDashboardPage() {
                         {app.full_name}
                       </p>
                       <p className="text-xs text-on-surface-variant truncate">
-                        {app.trips?.title ?? "—"} · {app.type}
+                        {app.trips?.title ?? "—"} ·{" "}
+                        {app.previous_ceremonies === 0
+                          ? "primera vez"
+                          : `${app.previous_ceremonies} previas`}
                       </p>
                     </div>
                     <span className="text-[10px] uppercase font-bold tracking-widest text-secondary shrink-0">

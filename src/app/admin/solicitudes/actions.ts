@@ -8,15 +8,7 @@ import { SolicitudAprobada } from "@/emails/SolicitudAprobada";
 import { formatDateRangeCompact } from "@/lib/format";
 import type { Enums } from "@/lib/supabase/types";
 
-export type ApplicationTable = "applications_first_time" | "applications_returning";
-
-const SLUG_BY_TABLE: Record<ApplicationTable, string> = {
-  applications_first_time: "primerizo",
-  applications_returning: "recurrente",
-};
-
 export async function reviewApplication(
-  table: ApplicationTable,
   id: string,
   status: Enums<"application_status">
 ) {
@@ -29,7 +21,7 @@ export async function reviewApplication(
   // mail si alguien vuelve a apretar "Aprobar" sobre una solicitud ya aprobada,
   // y de paso trae los datos del mail en la misma consulta.
   const { data: application } = await supabase
-    .from(table)
+    .from("applications")
     .select("user_id, full_name, email, status, trip_id, trips(title, start_date, end_date)")
     .eq("id", id)
     .single();
@@ -39,7 +31,7 @@ export async function reviewApplication(
   }
 
   const { error } = await supabase
-    .from(table)
+    .from("applications")
     .update({
       status,
       reviewed_by: user?.id ?? null,
@@ -51,13 +43,11 @@ export async function reviewApplication(
     throw new Error(`No se pudo actualizar la solicitud: ${error.message}`);
   }
 
-  // El mail sale después del update y sin `await` bloqueante sobre el resultado:
-  // si Resend falla, la aprobación ya está hecha en la base. Solo se manda al
-  // aprobar, y solo en la transición: un segundo click no vuelve a escribirle a
-  // la persona.
+  // El mail sale después del update: si Resend falla, la aprobación ya está
+  // hecha en la base. Solo se manda al aprobar, y solo en la transición: un
+  // segundo click no vuelve a escribirle a la persona.
   if (status === "approved" && application && application.status !== "approved") {
     await notifyApproved({
-      table,
       id,
       nombre: application.full_name,
       email: application.email,
@@ -67,18 +57,45 @@ export async function reviewApplication(
   }
 
   revalidatePath("/admin/solicitudes");
-  revalidatePath(`/admin/solicitudes/${SLUG_BY_TABLE[table]}/${id}`);
+  revalidatePath(`/admin/solicitudes/${id}`);
+}
+
+/**
+ * El pago lo registra Estela a mano: no hay pasarela elegida todavía (ver
+ * docs/FLUJO_INSCRIPCION.md). Es el escalón que habilita la etapa 2, así que
+ * mientras no exista el cobro automático esto es lo que destraba el flujo.
+ */
+export async function markPayment(
+  id: string,
+  paymentStatus: Enums<"payment_status">,
+  reference: string
+) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("applications")
+    .update({
+      payment_status: paymentStatus,
+      paid_at: paymentStatus === "pending" ? null : new Date().toISOString(),
+      payment_reference: reference.trim() || null,
+    })
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(`No se pudo registrar el pago: ${error.message}`);
+  }
+
+  revalidatePath("/admin/solicitudes");
+  revalidatePath(`/admin/solicitudes/${id}`);
 }
 
 async function notifyApproved({
-  table,
   id,
   nombre,
   email,
   tripId,
   trip,
 }: {
-  table: ApplicationTable;
   id: string;
   nombre: string;
   email: string;
@@ -112,6 +129,6 @@ async function notifyApproved({
       result.reason === "not_configured"
         ? `Resend todavía no está configurado (falta RESEND_API_KEY). Escribile a ${email} a mano.`
         : `Resend rechazó el envío a ${email}: ${result.error ?? "sin detalle"}.`,
-    href: `/admin/solicitudes/${SLUG_BY_TABLE[table]}/${id}`,
+    href: `/admin/solicitudes/${id}`,
   });
 }

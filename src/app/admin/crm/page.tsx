@@ -104,24 +104,36 @@ export default async function AdminCrmPage({
   const query = await searchParams;
   const supabase = await createClient();
 
-  const [{ data: profiles }, { data: firstTime }, { data: returning }] =
+  const [{ data: profiles }, { data: applications }, { data: healthForms }] =
     await Promise.all([
       supabase
         .from("profiles")
         .select("id, full_name, email, avatar_url, is_admin, created_at")
         .order("created_at", { ascending: false }),
       supabase
-        .from("applications_first_time")
-        .select("user_id, status, country, created_at"),
-      supabase
-        .from("applications_returning")
+        .from("applications")
         .select("user_id, status, previous_ceremonies, created_at"),
+      supabase
+        .from("health_form_first_time")
+        .select("country, created_at, applications(user_id)"),
     ]);
 
   const contacts = buildContacts({
     profiles: profiles ?? [],
-    firstTime: firstTime ?? [],
-    returning: returning ?? [],
+    applications: applications ?? [],
+    // El pais cuelga del formulario extenso; se aplana el join acá para que
+    // `buildContacts` no dependa de la forma que devuelve PostgREST.
+    healthForms: (healthForms ?? []).flatMap((h) =>
+      h.applications
+        ? [
+            {
+              user_id: h.applications.user_id,
+              country: h.country,
+              created_at: h.created_at,
+            },
+          ]
+        : []
+    ),
   });
 
   function countBy(predicate: (c: Contact) => boolean) {

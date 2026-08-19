@@ -57,8 +57,10 @@ export default async function CuentaPage({
     id: string;
     trip_id: string;
     status: string;
+    payment_status: string;
+    is_first_time: boolean;
+    health_form_submitted: boolean;
     created_at: string;
-    type: "primerizo" | "recurrente";
     trip: { title: string; location: string | null; start_date: string; end_date: string } | null;
   }[] = [];
 
@@ -77,23 +79,35 @@ export default async function CuentaPage({
     // ?next= pendiente siempre gana, para no romper un flujo a medias.
     if (data?.is_admin && vista !== "viajero") redirect(next || "/admin");
 
-    const [{ data: firstTime }, { data: returning }] = await Promise.all([
-      supabase
-        .from("my_applications_first_time")
-        .select("id, trip_id, status, created_at")
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("my_applications_returning")
-        .select("id, trip_id, status, created_at")
-        .order("created_at", { ascending: false }),
-    ]);
+    // La vista es lo único que el postulante puede leer de sus solicitudes: la
+    // tabla base no le devuelve ninguna fila, ni las propias.
+    const { data: mine } = await supabase
+      .from("my_applications")
+      .select(
+        "id, trip_id, status, payment_status, is_first_time, health_form_submitted, created_at"
+      )
+      .order("created_at", { ascending: false });
 
-    const raw = [
-      ...(firstTime ?? []).map((a) => ({ ...a, type: "primerizo" as const })),
-      ...(returning ?? []).map((a) => ({ ...a, type: "recurrente" as const })),
-    ].filter(
-      (a): a is typeof a & { id: string; trip_id: string; status: string; created_at: string } =>
-        a.id !== null && a.trip_id !== null && a.status !== null && a.created_at !== null
+    // Todas las columnas de una vista son nullable para el tipo generado; acá
+    // ninguna lo es de verdad, así que se descartan las filas incompletas.
+    const raw = (mine ?? []).flatMap((a) =>
+      a.id !== null &&
+      a.trip_id !== null &&
+      a.status !== null &&
+      a.payment_status !== null &&
+      a.created_at !== null
+        ? [
+            {
+              id: a.id,
+              trip_id: a.trip_id,
+              status: a.status,
+              payment_status: a.payment_status,
+              is_first_time: a.is_first_time ?? false,
+              health_form_submitted: a.health_form_submitted ?? false,
+              created_at: a.created_at,
+            },
+          ]
+        : []
     );
 
     const tripIds = [...new Set(raw.map((a) => a.trip_id))];

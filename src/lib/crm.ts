@@ -48,14 +48,23 @@ export const RELATIONSHIP_STATES = [
 
 export type RelationshipState = (typeof RELATIONSHIP_STATES)[number]["value"];
 
-type ApplicationRow = {
+export type ApplicationRow = {
   user_id: string;
   status: Enums<"application_status">;
+  previous_ceremonies: number;
   created_at: string;
 };
 
-export type FirstTimeRow = ApplicationRow & { country: string };
-export type ReturningRow = ApplicationRow & { previous_ceremonies: number };
+/**
+ * El pais vive en el formulario de salud extenso (etapa 2), no en la solicitud:
+ * el filtro corto no lo pide. La pagina aplana el join para no tener que
+ * conocer la forma que devuelve PostgREST aca adentro.
+ */
+export type HealthFormRow = {
+  user_id: string;
+  country: string;
+  created_at: string;
+};
 
 export type ProfileRow = {
   id: string;
@@ -95,31 +104,27 @@ function countCeremonies(approved: number, declared: number) {
 
 export function buildContacts({
   profiles,
-  firstTime,
-  returning,
+  applications,
+  healthForms,
 }: {
   profiles: ProfileRow[];
-  firstTime: FirstTimeRow[];
-  returning: ReturningRow[];
+  applications: ApplicationRow[];
+  healthForms: HealthFormRow[];
 }): Contact[] {
   return profiles.map((profile) => {
-    const own = {
-      firstTime: firstTime.filter((a) => a.user_id === profile.id),
-      returning: returning.filter((a) => a.user_id === profile.id),
-    };
-    const all = [...own.firstTime, ...own.returning];
+    const all = applications.filter((a) => a.user_id === profile.id);
 
     const approved = all.filter((a) => a.status === "approved").length;
-    const declared = own.returning.reduce(
+    const declared = all.reduce(
       (max, a) => Math.max(max, a.previous_ceremonies),
       0
     );
 
-    // El pais solo existe en el formulario largo; el corto no lo pide.
     const country =
-      [...own.firstTime].sort((a, b) =>
-        b.created_at.localeCompare(a.created_at)
-      )[0]?.country ?? null;
+      healthForms
+        .filter((h) => h.user_id === profile.id)
+        .sort((a, b) => b.created_at.localeCompare(a.created_at))[0]?.country ??
+      null;
 
     const state: RelationshipState = approved
       ? "viajero"
