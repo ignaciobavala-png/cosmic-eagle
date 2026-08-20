@@ -384,6 +384,53 @@ se cerraron el 20/08.
 
 ---
 
+## 8.b Paso 2 hecho — la home compuesta (20/08)
+
+La página está armada de arriba a abajo y verificada en desktop (1440) y mobile (390) con
+capturas reales. Lo que se resolvió mientras se componía:
+
+### Cuatro correcciones que no se veían hasta renderizar
+
+1. **El fondo de "Voces de Luz" no aparecía.** Estaba en `-z-10`, y eso no funciona en este
+   sitio: `body` pinta su propio degradé **después** de los descendientes de z negativo del
+   contexto raíz, así que la imagen quedaba tapada por el fondo de la página (y además
+   `body::before`, el campo de estrellas, ya vive en `z-index: -1`). Regla para cualquier
+   sección con imagen de fondo: envoltorio en `z-0` y contenido en `z-10`, **nunca z
+   negativo**.
+2. **El reflejo dorado salía dos veces.** `cuatro-promesas.webp` y `voces-de-luz.webp` son
+   la misma composición partida en dos slides: apiladas repetían el reflejo con una costura
+   recta en el medio. Se sacó la imagen de fondo de "Voces de Luz" —el degradé del `body` ya
+   trae el azul correcto— y se le puso máscara de desvanecido al pie de las promesas.
+   `voces-de-luz.webp` queda **sin usar** en `public/img/home/`.
+3. **El zoom del hero le comía la cabeza a la figura.** Escalaba desde el centro y la
+   cabeza está cerca del borde superior. `transform-origin: center 28%`.
+4. **Las frases de la derecha caían a una palabra por línea.** La sangría estaba como
+   `padding` en porcentaje, que se descuenta del ancho del propio párrafo. Va como `margin`
+   sobre una caja de ancho fijo.
+
+### Decisiones de composición
+
+- El título de "La humanidad" va en **dos tamaños** (el nombre en `display-lg`, la
+  continuación en `headline-lg`): con los dos en el tamaño grande la segunda línea no
+  entraba y el bloque caía en tres renglones.
+- La **geometría sagrada va en SVG**, no como imagen: es geometría pura, pesa unos cientos
+  de bytes, se dibuja nítida en cualquier pantalla y toma el color del bloque.
+- El **degradé del footer** (`#05125a` → `#0079b2`, muestreado del slide) también en CSS.
+- El CTA de "La humanidad" es **azul sólido sobre el dorado**, invirtiendo los roles de
+  color del sistema. No inventa colores: es el mismo `#05125a` de la base.
+
+### Componentes que quedaron sin uso
+
+`PortalsSection`, `AboutSection`, `EbookSection`, `TripsSection` y `ContentSection` ya no
+los importa nadie. **No se borraron a propósito**: `PortalsSection` es de la semana pasada y
+podría mudarse a `/nosotros`, y el e-book todavía no tiene destino (preguntas 3 y 4 de §9).
+`TripsSection` es la que sale por la decisión de §4. Cuando esas preguntas se cierren, se
+borran las que no se muden — junto con `PORTAL_ALTS` y `EBOOK_FEATURES` en `constants.ts`.
+
+**La home volvió a ser prerender estático** (`○` en el build), como se esperaba en §4.
+
+---
+
 ## 9. Preguntas abiertas para Julia / Sofía / Estela
 
 1. ~~¿Dónde van los viajes?~~ **RESUELTO**: van en la sección de viajes, ver §4.

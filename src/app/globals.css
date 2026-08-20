@@ -193,7 +193,9 @@
 
 @utility animate-hero-zoom {
   animation: hero-zoom 8000ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
-  transform-origin: center;
+  /* El origen va arriba y no al centro: la figura tiene la cabeza cerca del
+     borde superior, y escalando desde el centro se le sale del recorte. */
+  transform-origin: center 28%;
   will-change: transform;
 }
 

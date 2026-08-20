@@ -16,16 +16,21 @@ import Image from "next/image";
  * Toma exactamente cuatro frases: es la composicion del mockup, no una grilla
  * generica.
  *
+ * La sangria va como MARGEN sobre una caja de ancho fijo, no como padding: el
+ * padding se descuenta del ancho del propio parrafo y las frases de la derecha
+ * terminaban cayendo a una palabra por linea. Por lo mismo la caja lleva `w-` y
+ * no `max-w-`, y `justify-self-start` para que la grilla no la estire.
+ *
  * Ojo con las clases de posicion: van en una tabla por indice y NO como dos
- * condiciones encadenadas. Tailwind resuelve el conflicto entre
- * `justify-self-center` y `justify-self-end` por el orden en la hoja generada, no
- * por el orden en que se escriben — el mismo problema documentado en `CtaLink`.
+ * condiciones encadenadas. Tailwind resuelve el conflicto entre dos utilidades
+ * de la misma familia por el orden en la hoja generada, no por el orden en que
+ * se escriben — el mismo problema documentado en `CtaLink`.
  */
 const PLACEMENT = [
-  "md:justify-self-end md:text-right", // 0 — izquierda, fila de arriba (hacia el centro)
-  "md:justify-self-start md:text-left", // 1 — derecha, fila de arriba (hacia el centro)
-  "md:justify-self-start md:text-left", // 2 — izquierda, fila de abajo (al borde)
-  "md:justify-self-end md:text-right", // 3 — derecha, fila de abajo (al borde)
+  "md:ml-[14%]", // 0 — izquierda, fila de arriba
+  "md:ml-[26%]", // 1 — derecha, fila de arriba
+  "md:ml-0", //     2 — izquierda, fila de abajo (contra el margen)
+  "md:ml-[52%]", // 3 — derecha, fila de abajo (contra el margen)
 ] as const;
 
 export function ImageStatements({
@@ -41,7 +46,9 @@ export function ImageStatements({
 }) {
   return (
     <section id={id} className="relative w-full overflow-hidden">
-      <div className="relative aspect-[16/10] w-full md:absolute md:inset-0 md:aspect-auto">
+      {/* La mascara desvanece el ultimo tramo para que la imagen no corte a filo
+          recto contra la seccion siguiente, mismo criterio que `PageHero`. */}
+      <div className="relative aspect-[16/10] w-full [mask-image:linear-gradient(to_bottom,#000_0%,#000_62%,rgba(0,0,0,0.6)_84%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_62%,rgba(0,0,0,0.6)_84%,transparent_100%)] md:absolute md:inset-0 md:aspect-auto">
         <Image
           src={image}
           alt={imageAlt}
@@ -51,11 +58,14 @@ export function ImageStatements({
         />
       </div>
 
-      <div className="relative mx-auto grid w-full max-w-narrative grid-cols-1 gap-6 px-margin-mobile py-12 md:min-h-[44rem] md:grid-cols-2 md:content-center md:gap-x-8 md:gap-y-32 md:px-margin-desktop md:py-section">
+      {/* Sin `max-w-narrative`: en el mockup las frases se apoyan en el margen de
+          la pagina, no en el ancho narrativo. El tope evita que en pantallas muy
+          anchas queden a kilometros de la figura. */}
+      <div className="relative mx-auto grid w-full max-w-[100rem] grid-cols-1 gap-6 px-margin-mobile py-12 md:min-h-[44rem] md:grid-cols-2 md:content-center md:gap-y-28 md:px-margin-desktop md:py-section">
         {statements.map((text, i) => (
           <p
             key={text}
-            className={`text-body-md text-on-surface [text-shadow:0_1px_14px_rgba(0,0,0,0.55)] md:max-w-[17rem] ${PLACEMENT[i]}`}
+            className={`text-body-md text-on-surface [text-shadow:0_1px_14px_rgba(0,0,0,0.55)] md:w-[16rem] md:justify-self-start ${PLACEMENT[i]}`}
           >
             {text}
           </p>
