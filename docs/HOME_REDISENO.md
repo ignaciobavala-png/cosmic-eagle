@@ -58,27 +58,26 @@ foto completa y el plan. **Nada de esto está implementado todavía.**
 
 ---
 
-## 4. La pregunta que bloquea todo: ¿dónde quedan los viajes?
+## 4. Dónde van los viajes — RESUELTO (20/08, Ignacio)
 
-La home actual muestra **Próximos Retiros** y **Próximas Ceremonias** leyendo `trips` de
-Supabase — es lo único de la home que no es decorativo y es el camino de entrada al
-embudo de inscripción (`/viajes/[id]` → `/viajes/[id]/solicitar`). El mockup **no tiene
-ninguna sección de viajes**: el único CTA es "Unirme al círculo" (registro) y "Acceso
-comunidad".
+**Los viajes salen de la home y viven en la sección de viajes**, cada uno en su tipo:
+retiros y ceremonias, como ya funciona hoy en `/viajes`. La home nueva es **puramente
+narrativa** y no consulta `trips`.
 
-Tres lecturas posibles, hay que preguntar antes de tocar nada:
+Consecuencias:
 
-- **(a)** Julia todavía no maquetó esa sección y viene en los slides sueltos.
-- **(b)** La decisión es que la home sea puramente narrativa y los viajes vivan solo en
-  `/experiencias`.
-- **(c)** La home cambia de función: capta al registro primero, muestra viajes después de
-  loguearse.
-
-Si es (b) o (c), hay que verificar que `/experiencias` quede linkeada desde arriba y que
-no se pierda tráfico al detalle de cada viaje (hoy los links de la home son la ruta más
-corta al form).
-
----
+- Se borran las dos `TripsSection` de `src/app/page.tsx`. Era lo único no decorativo que
+  quedaba en la home.
+- **El único camino al embudo de inscripción pasa a ser el navbar.** Antes desde la home se
+  llegaba en un click a `/viajes/[id]` y de ahí a `/viajes/[id]/solicitar`; ahora son dos
+  saltos. Hay que asegurarse de que "Experiencias" quede bien visible en el nav — es la
+  entrada al negocio.
+- **Efecto lateral bueno**: la home deja de consultar Supabase y vuelve a ser prerender
+  estático (hoy es dinámica, `ƒ`, justamente por esa consulta). Se sirve entera desde el
+  CDN, no gasta egress del free tier y carga más rápido. Sumado a §6, la home nueva es más
+  liviana que la actual pese a tener cuatro imágenes grandes.
+- La ruta **sigue siendo `/viajes`**; lo que cambia es la etiqueta del nav, que pasa a
+  "Experiencias" según el mockup. No hace falta redirect ni tocar links existentes.
 
 ## 5. Especificación de cada bloque (confirmada por Ignacio, 20/08)
 
@@ -252,9 +251,7 @@ sí tiene detalle.
 - `Homepage_redesign_example.png` y **todos** los slides sueltos, incluido el de
   PRODUCCION, lo tienen en **degradé dorado con botón sólido azul**.
 
-Todo lo demás de la página es idéntico entre los dos composites. **Se toma el dorado**,
-que es lo que llegó en PRODUCCION, pero conviene confirmarlo con Julia: el nombre
-"correcciones" sugiere que esa versión era posterior.
+Todo lo demás de la página es idéntico entre los dos composites. **Va el dorado** (confirmado por Ignacio el 20/08).
 
 Efecto lateral bueno si queda el dorado: el botón sólido azul sobre fondo dorado invierte
 los roles de color del sistema, pero **no inventa colores** — es el mismo `#05125A` de la
@@ -382,15 +379,15 @@ preview URL propia** — esa es la que se revisa antes de mergear.
 | 5 | Verificación: `tsc`, lint, `pnpm build`, mobile de los bloques absolutos (hero, 4 promesas, frase), y **medición del peso real** de la home contra la meta de §6.3 | todo |
 | 6 | Preview de Vercel + revisión con Ignacio → recién ahí, merge a `main` | paso 5 |
 
-**Sigue bloqueante la pregunta 1 de §9**: dónde quedan los viajes en la home nueva. Los
-pasos 0 a 2 se pueden hacer sin esa respuesta; el paso 3 y el merge, no.
+Ya no queda nada bloqueante: las dos definiciones que faltaban (§4 y el dorado de §6.1.d)
+se cerraron el 20/08.
 
 ---
 
 ## 9. Preguntas abiertas para Julia / Sofía / Estela
 
-1. **¿Dónde van los viajes en la home nueva?** (§4) — bloquea el paso 3 y el merge.
-2. ¿"Experiencias" es solo la etiqueta del navbar o también la URL?
+1. ~~¿Dónde van los viajes?~~ **RESUELTO**: van en la sección de viajes, ver §4.
+2. ~~¿"Experiencias" es la URL?~~ **RESUELTO**: solo la etiqueta, la ruta sigue en `/viajes`.
 3. ¿El carrusel de portales se borra o se muda a otra página?
 4. ¿El e-book sale de la home definitivamente? ¿Vive en algún lado?
 5. Los testimonios del mockup (Valeria/Uruguay, Claudia/Chile, Andrew/Inglaterra) — ¿son
