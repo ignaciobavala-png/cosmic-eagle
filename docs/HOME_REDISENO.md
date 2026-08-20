@@ -145,6 +145,122 @@ inusable en mobile y con riesgo real de reventar cuotas.
 - Referencia: la entrega original de Julia pasó de 11,4 MB a 267 KB con este mismo
   tratamiento (ver `public/img/`).
 
+### 6.1.b Estructura de la entrega de Julia — `example/` y `produccion/`
+
+Julia entrega **dos carpetas con el mismo listado de archivos**:
+
+| Carpeta | Contenido | Para qué |
+|---|---|---|
+| `example/` | los slides **con** texto y botones | referencia exacta: dónde va cada palabra, con qué tamaño y alineación |
+| `produccion/` | los mismos slides **sin** texto ni botones (solo fondo) | lo que se convierte y entra al sitio |
+
+**El nombre de archivo tiene que ser idéntico en las dos carpetas** — es lo que permite
+parear una con otra sin adivinar. Numerados por orden de aparición en la página:
+
+```
+01-hero   02-frase   03-humanidad   04-promesas   05-voces   06-cierre
+```
+
+**La carpeta vive fuera del repo**, como la entrega original (`~/Descargas/frontend_eagle`).
+Al repo entra **solo `produccion/`, ya convertido a WebP**, en `public/img/home/`.
+
+Motivo: todo lo que está en `public/` se deploya. Los PNG con texto son material de
+trabajo, no del sitio — meterlos ahí sumaría ~7 MB que nadie va a ver, copiados en cada
+build y en el historial de git para siempre.
+
+Si se quiere dejar la referencia versionada, la opción barata es guardar en `docs/mockups/`
+una versión **reducida** de los `example/` (1000 px de ancho, WebP, ~80 KB cada uno). Eso
+no pesa y sobrevive a que se borre la carpeta de Descargas.
+
+### 6.1.c Inventario de la entrega recibida (20/08, `~/Descargas/EXAMPLE` y `PRODUCCION`)
+
+| EXAMPLE (con texto) | PRODUCCION (sin texto) | Estado |
+|---|---|---|
+| `nav bar.png` 1440×84 | — (+ `LOGO.png` 1207×433) | ✅ no hace falta asset: es color sólido + logo |
+| `hero.png` 1440×800 | `hero.jpg` **2590×1429** | ✅ y en mejor resolución |
+| `About_Section.png` 1440×800 | `frase manifiesto.png` 1440×800 | ✅ **pero cambia de nombre**: son el mismo bloque |
+| `la humanidad.png` 1440×800 | `la humanidad.png` 1440×800 | ✅ |
+| `cuatro promesas.png` 1440×800 | `cuatro promesas.png` 1456×816 | ✅ llegó el 20/08 a la raíz de Descargas, no adentro de `PRODUCCION/` |
+| `voces de luz.png` 1440×800 | `voces de luz.png` 1440×800 | ✅ |
+| `imagen de cierre.png` 1440×800 | `imagen de cierre.png` **2109×1049** | ✅ mejor resolución |
+| `banda dorada.png` 1440×138 | **falta** | ⚠️ se puede hacer en CSS + SVG, ver abajo |
+| `footer.png` 1440×270 | `footer.png` 1440×270 | ✅ |
+| `backgroundcolor_#05125A.png` | — | referencia de color base: **`#05125A`** |
+
+**La máscara de la frase manifiesto tiene alfa real** (verificado: alfa 0 en las esquinas,
+254 en el centro). Es el óvalo de luz que va **encima** del fondo de la página. Confirma
+§5.2: se convierte a WebP con alpha, nunca a JPG.
+
+#### Tres de los siete "assets" no son imágenes, son degradés
+
+Al convertirlos quedó a la vista: `footer.png` pesa **2 KB** en WebP y `la humanidad.png`
+**6 KB**. Son degradés planos. Reproducirlos con `linear-gradient` en CSS es más liviano
+todavía (0 bytes, 0 requests), escala a cualquier ancho sin pixelarse y no arrastra un
+`<img>` que posicionar. Lo mismo la **banda dorada** (degradé + 3 estrellas en SVG), que es
+justamente la que falta en PRODUCCION — **no hace falta pedirla**.
+
+Arte real hay solo cuatro: **hero, frase manifiesto (máscara), cuatro promesas y cierre.**
+
+#### Medición de la conversión (prueba hecha, `quality=80`, tope de 1920 px de ancho)
+
+```
+frase manifiesto   932 KB -> 177 KB (alpha)
+hero.jpg           509 KB -> 184 KB   2590x1429 -> 1920x1059
+imagen de cierre  2765 KB -> 234 KB   2109x1049 -> 1920x955
+voces de luz       742 KB ->  30 KB   (candidato a CSS)
+la humanidad       901 KB ->   6 KB   (candidato a CSS)
+footer             236 KB ->   2 KB   (candidato a CSS)
+LOGO                39 KB ->  14 KB
+------------------------------------------------
+TOTAL             5,98 MB -> 647 KB
+```
+
+Descontando los degradés que pasan a CSS y sumando "cuatro promesas" (estimado ~200 KB),
+el presupuesto real de imágenes de la home queda en **~800 KB**, de los cuales **solo el
+hero (184 KB) bloquea el primer pantallazo**. Muy por debajo de la meta de §6.3.
+
+### 6.1.e Conversión hecha — `public/img/home/`
+
+Los 7 assets de PRODUCCION ya están convertidos y commiteados. `quality=80`, `method=6`,
+tope de 1920 px de ancho (no se hace upscale de los que vienen más chicos):
+
+```
+hero               2590x1429 -> 1920x1059    509 KB -> 183,6 KB
+frase-manifiesto   1440x800  -> 1440x800     932 KB -> 177,5 KB  (alpha verificado)
+cierre             2109x1049 -> 1920x955   2.765 KB -> 234,3 KB
+cuatro-promesas    1456x816  -> 1456x816   1.517 KB -> 105,0 KB
+voces-de-luz       1440x800  -> 1440x800     742 KB ->  30,1 KB
+humanidad          1440x800  -> 1440x800     901 KB ->   5,9 KB
+footer             1440x270  -> 1440x270     236 KB ->   1,7 KB
+------------------------------------------------------------------
+TOTAL                                       7,42 MB -> 738 KB
+```
+
+Verificado que el alfa de `frase-manifiesto.webp` sobrevivió a la conversión (0 en las
+esquinas, 255 en el centro): sigue siendo una máscara, no un rectángulo negro.
+
+**Nota de resolución**: `frase-manifiesto`, `voces-de-luz`, `humanidad` y `footer` quedaron
+a 1440 px porque el original no da más. En los tres últimos no importa (son degradés) y en
+la máscara tampoco (es un glow difuso, el upscale es invisible). El único que conviene
+pedir más grande si se ve blando en pantalla grande es **`cuatro-promesas` (1456 px)**, que
+sí tiene detalle.
+
+### 6.1.d Dos versiones del bloque "La humanidad" — cuál vale
+
+- El composite que se mapeó primero (`Homepage_correcciones(1).png`, ya no está en
+  Descargas) tenía ese bloque en **crema `#FDF6EE` con botón ghost de borde**.
+- `Homepage_redesign_example.png` y **todos** los slides sueltos, incluido el de
+  PRODUCCION, lo tienen en **degradé dorado con botón sólido azul**.
+
+Todo lo demás de la página es idéntico entre los dos composites. **Se toma el dorado**,
+que es lo que llegó en PRODUCCION, pero conviene confirmarlo con Julia: el nombre
+"correcciones" sugiere que esa versión era posterior.
+
+Efecto lateral bueno si queda el dorado: el botón sólido azul sobre fondo dorado invierte
+los roles de color del sistema, pero **no inventa colores** — es el mismo `#05125A` de la
+base. El bloque sigue rompiendo la regla del fondo oscuro (§3.4) y sigue necesitando
+`LightSection`.
+
 ### 6.2 Dónde se guardan — esto es lo que decide el gasto
 **Los fondos fijos de layout van al repo (`public/img/`), no a Supabase Storage.** Es la
 regla que ya tiene el proyecto, y acá aparece el número que la justifica:
