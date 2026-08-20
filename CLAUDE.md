@@ -690,6 +690,60 @@ de `ScreeningForm.tsx`. Detalle en `docs/FLUJO_INSCRIPCION.md` §"El filtro cort
 Verificado: `tsc`, build de producción, y el trigger probado con un insert real (marcó las
 dos banderas correctas); fila de prueba borrada, todo volvió a cero. Advisors sin novedades.
 
+### Sesión del 2026-08-20 — la home rediseñada (rama `home_rediseño`, sin mergear)
+
+Julia entregó el rediseño completo de la home. Está implementado entero en la rama
+**`home_rediseño`**, verificado en local y **sin pushear** — no hay nada en producción.
+Mapa, plan, decisiones y lo que queda abierto en **`docs/HOME_REDISENO.md`**.
+
+La home pasó a ser **puramente narrativa**: hero de imagen pura con zoom lento → frase
+manifiesto partida en dos → bloque dorado "La humanidad" → cuatro promesas sobre imagen →
+"Voces de Luz" → banner de cierre → banda dorada → footer a 3 columnas.
+
+Lo que hay que recordar de esta sesión:
+
+- **Los viajes salieron de la home** (decisión de Ignacio). Viven en `/viajes`, cada uno en
+  su tipo. Efecto lateral bueno: la home dejó de consultar `trips` y **volvió a ser
+  prerender estático** (`○`), se sirve del CDN y no gasta egress.
+- **"Experiencias" reemplaza a "Viajes" en el navbar**, lo que cierra el problema de
+  nomenclatura abierto el 15/08. **Cambia la etiqueta, NO la ruta**: `/viajes` sigue igual,
+  sin redirect.
+- **Entrega en dos carpetas, `EXAMPLE` (con texto) y `PRODUCCION` (sin texto)**, fuera del
+  repo. La regla que salió de ahí: **Julia exporta solo la capa de fondo**; texto, botones,
+  cards y avatares se rehacen en HTML. Un texto quemado en el WebP no se edita, no se
+  traduce, no se indexa — y la frase manifiesto directamente no se podría animar. Única
+  excepción, el logotipo.
+- **Tres de los siete assets resultaron ser degradés, no arte**: "La humanidad", la banda
+  dorada y el fondo del footer se hacen con `linear-gradient` (pesan cero y no se pixelan).
+  Los extremos del dorado son `#f9d78f` y `#b3964b`, o sea el token `primary-container` y
+  la base del `glass-card`: Julia trabajó dentro de la paleta. La geometría sagrada va en
+  SVG. **Arte real hay cuatro**: hero, la máscara de la frase, cuatro promesas y el cierre —
+  7,42 MB de PNG quedaron en 738 KB de WebP.
+- **Ojo con los `z-index` negativos en secciones con imagen de fondo.** `body` pinta su
+  degradé **después** de los descendientes de z negativo del contexto raíz (y `body::before`,
+  el campo de estrellas, ya vive en `z-index: -1`), así que un `-z-10` deja la imagen tapada
+  por el fondo de la página. Va envoltorio en `z-0` y contenido en `z-10`.
+- **`cuatro-promesas.webp` y `voces-de-luz.webp` son la misma composición partida en dos
+  slides**: apiladas repetían el reflejo dorado con una costura recta. `voces-de-luz.webp`
+  quedó **sin usar**.
+- **El zoom del hero va en CSS y no en Framer Motion**: así la sección sigue siendo Server
+  Component y no arrastra JS para animar la imagen del LCP. `transform-origin: center 28%`,
+  porque desde el centro le comía la cabeza a la figura.
+- **El grupo "Inicio" del registro de slots se reescribió.** Queda **una fila huérfana en
+  `site_content`**: `home.about.image`, la foto de "Sobre Cosmic Eagle" del 18/08 — esa
+  sección no existe en la home nueva. No se borró: si el bloque se muda, el slot vuelve y la
+  foto reaparece.
+- **`HeroSection` se borró**; `renderTitle` se mudó a `PageHero`.
+- **Quedaron cinco componentes sin uso** (`PortalsSection`, `AboutSection`, `EbookSection`,
+  `TripsSection`, `ContentSection`), a la espera de decidir cuáles se mudan y cuáles se
+  borran.
+- Primitivas nuevas en `src/components/ui/`: `ImmersiveHero`, `QuoteBand`, `LightSection`,
+  `ImageStatements`, `GoldDivider` y **`SectionHeading` (P7)**, que era la única primitiva
+  del sistema que faltaba desde la entrega original de Julia.
+
+**Sin verificar end-to-end** (requiere sesión de admin): que `/admin/multimedia` liste los
+slots nuevos y que subir una imagen desde ahí cambie la home.
+
 ## No hacer
 
 - No inventar cuentas de Supabase ni connection strings falsos

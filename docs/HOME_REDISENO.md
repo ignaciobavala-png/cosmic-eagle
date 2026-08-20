@@ -492,6 +492,39 @@ otra página el slot vuelve y la foto reaparece.
    (registro), que es a donde apunta "Unirme al círculo"? Sigue pendiente que la comunidad
    está fuera de alcance (`docs/CONTEXT.md` §6).
 7. ¿La banda dorada y el bloque claro se repiten en las otras páginas o son solo de la home?
-9. ¿El desplegable Retiros/Ceremonias del navbar se queda o se saca? Por ahora se queda (§8.c).
-10. ¿"La humanidad" y los testimonios tienen que ser editables desde el panel? Hoy están en código (§8.c).
 8. ¿Hacemos `/privacidad` en esta tanda? El texto ya está escrito (§7).
+9. ¿El desplegable Retiros/Ceremonias del navbar se queda o se saca? Por ahora se queda (§8.c).
+10. ¿"La humanidad" y los testimonios tienen que ser editables desde el panel? Hoy están en
+    código (§8.c).
+11. ¿Se corrigió bien "evolcando" → "evocando" en el testimonio de Claudia? (§8.b)
+
+---
+
+## 10. Estado de la rama `home_rediseño`
+
+Seis commits, **revisados en local y aprobados por Ignacio el 20/08**. Sin push: la rama no
+existe todavía en GitHub y no hay nada en producción.
+
+```
+docs: mapa y plan del rediseno de la home
+feat: los assets de la home nueva, convertidos a WebP
+docs: cierran las dos definiciones que faltaban del rediseno
+feat: las primitivas del rediseno de la home
+feat: la home compuesta con el diseno nuevo
+feat: los slots de Multimedia de la home nueva, y limpieza del navbar
+```
+
+Verificado en cada paso: `tsc`, lint (los 2 errores de `admin/multimedia/SlotEditor.tsx`
+son previos y no se tocaron), `pnpm build`, y capturas reales de la página renderizada en
+1440 y en 390.
+
+**Sin verificar end-to-end** (requiere sesión de admin, la hace Ignacio): que el grupo
+"Inicio" de `/admin/multimedia` liste los slots nuevos y que subir una imagen desde ahí
+cambie la home.
+
+### Lo que falta antes de mergear
+
+1. Responder las preguntas abiertas de §9 — ninguna bloquea el código, pero la 3, la 4 y la
+   9 deciden qué se borra y qué se muda.
+2. Borrar o mudar los cinco componentes que quedaron sin uso (§8.b).
+3. Push de la rama → preview de Vercel → revisión de Estela y Sofía → merge a `main`.
