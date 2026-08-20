@@ -431,6 +431,55 @@ borran las que no se muden — junto con `PORTAL_ALTS` y `EBOOK_FEATURES` en `co
 
 ---
 
+## 8.c Pasos 3 y 4 hechos (20/08)
+
+### Paso 3 — navbar y footer
+
+Casi todo ya había entrado con el paso 2. Lo que quedó revisado:
+
+- **El navbar coincide con el mockup sin tocarlo**: `Header` ya filtra `/cuenta` del menú
+  de escritorio y muestra el CTA "Unirme al círculo" cuando no hay sesión (con sesión lo
+  reemplaza por el avatar). Es exactamente `NOSOTROS · EXPERIENCIAS · CONTENIDOS` + CTA.
+- **El desplegable Retiros/Ceremonias SE MANTIENE**, aunque el mockup no lo dibuje. Es una
+  decisión del 05/08 con motivo escrito, afecta a todas las páginas, y un mockup de la home
+  no muestra estados de hover: no alcanza como evidencia para sacarlo. Si se decide
+  sacarlo, es un cambio de una línea en `NAV_LINKS`.
+- **`HeroSection` se borró.** Ya no lo usaba nadie y encima referenciaba slots que dejaron
+  de existir. Su único export vivo, `renderTitle`, se mudó a `PageHero`, que es de donde
+  siempre fue: es el renderer del título de P1, no de aquella sección.
+
+### Paso 4 — los slots de Multimedia
+
+El grupo "Inicio" de `src/lib/site-content.ts` se reescribió para la home nueva:
+
+| Slot | Qué edita |
+|---|---|
+| `home.hero.image` | la portada grande (16/9) |
+| `home.frase.left` / `.right` | las dos mitades de la frase manifiesto |
+| `home.promesas.image` | el fondo de la figura en meditación (16/9) |
+| `home.promesas.1` … `.4` | las cuatro frases |
+| `home.cierre.image` | la imagen ancha del final (21/9) |
+
+- **La página sigue siendo `○` (estático)** con los slots conectados: `getSiteContent` lee
+  con `unstable_cache` y un cliente sin cookies. Verificado en el build.
+- **La máscara de la frase NO es slot** a propósito: no es una foto sino una capa de
+  atmósfera con transparencia calzada al degradé del fondo. Cambiarla por una imagen
+  cualquiera rompería el efecto en vez de personalizarlo.
+- **El copy de "La humanidad" y los testimonios siguen en `constants.ts`.** Son bloques
+  largos (título a dos pesos, tres párrafos, tres citas con nombre y país) y hacerlos
+  editables pide una pantalla distinta a la de un campo por texto — más parecida a
+  `/admin/contenidos` que a Multimedia. Queda como trabajo aparte.
+- **El tipado de los slots pagó solo**: al sacar `home.hero.title` y `home.hero.subtitle`,
+  `tsc` marcó al instante el componente muerto que todavía los leía.
+
+**Ojo, hay un override cargado que queda huérfano.** `site_content` tiene una sola fila:
+`home.about.image`, la foto de "Sobre Cosmic Eagle" que se subió el 18/08. Esa sección no
+existe en la home nueva, así que la foto deja de mostrarse. **No se borró nada**: la fila
+sigue en la tabla y el archivo en el bucket `site-assets`, así que si el bloque se muda a
+otra página el slot vuelve y la foto reaparece.
+
+---
+
 ## 9. Preguntas abiertas para Julia / Sofía / Estela
 
 1. ~~¿Dónde van los viajes?~~ **RESUELTO**: van en la sección de viajes, ver §4.
@@ -443,4 +492,6 @@ borran las que no se muden — junto con `PORTAL_ALTS` y `EBOOK_FEATURES` en `co
    (registro), que es a donde apunta "Unirme al círculo"? Sigue pendiente que la comunidad
    está fuera de alcance (`docs/CONTEXT.md` §6).
 7. ¿La banda dorada y el bloque claro se repiten en las otras páginas o son solo de la home?
+9. ¿El desplegable Retiros/Ceremonias del navbar se queda o se saca? Por ahora se queda (§8.c).
+10. ¿"La humanidad" y los testimonios tienen que ser editables desde el panel? Hoy están en código (§8.c).
 8. ¿Hacemos `/privacidad` en esta tanda? El texto ya está escrito (§7).

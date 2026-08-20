@@ -88,3 +88,22 @@ export function PageHero({
     </section>
   );
 }
+
+/**
+ * Cada salto de linea del texto cargado es un quiebre de titulo en desktop. En
+ * mobile se ignora y deja que el titulo fluya, que es como venia antes de que el
+ * copy fuera editable.
+ *
+ * Vivia en `HeroSection`, que se borro con el rediseno de la home; el helper es
+ * de P1, no de aquella seccion.
+ */
+export function renderTitle(title: string) {
+  const lines = title.split("\n");
+
+  return lines.map((line, i) => (
+    <span key={i}>
+      {i > 0 && <br className="hidden md:block" />}
+      {i > 0 ? ` ${line}` : line}
+    </span>
+  ));
+}
