@@ -1,0 +1,286 @@
+# Rediseño de la home — mockup de Julia (20/08/2026)
+
+Fuente: `Homepage_correcciones(1).png` (1440 x 5292), en `~/Descargas`, **fuera del
+repo**. Julia va a mandar los slides por separado; este documento es el mapa de la
+foto completa y el plan. **Nada de esto está implementado todavía.**
+
+---
+
+## 1. Mapa del mockup, de arriba a abajo
+
+| # | Franja (px @1440) | Sección | Qué hay |
+|---|---|---|---|
+| 0 | 0–56 | **Navbar** | Logo + `NOSOTROS · EXPERIENCIAS · CONTENIDOS` + CTA sólido dorado "UNIRME AL CÍRCULO →" |
+| 1 | 56–830 | **Hero** | Imagen full-bleed (figura de partículas mirando arriba). **Sin título y sin CTA.** Al pie, cue "DESCUBRIR" + chevron |
+| 2 | 830–1570 | **Frase manifiesto** | Fondo azul con glow radial central, una sola línea centrada: *"Cuando el alma está lista, el camino aparece."* |
+| 3 | 1630–2420 | **"La humanidad"** — bloque claro | **Fondo crema** (`#FDF6EE` aprox). Título en dos pesos: **La humanidad** / está recordando su verdadera naturaleza. 3 párrafos (el 3º en negrita). Botón ghost "ACCESO COMUNIDAD". A la derecha, ilustración de **geometría sagrada dorada** (racimo de círculos tipo semilla de la vida) |
+| 4 | 2420–3200 | **Cuatro promesas** | Figura meditando full-bleed, 4 textos flotando en las esquinas: *Despierta nuevas capacidades internas · Expande tu camino personal · Desbloquea tu conexión con lo divino · Contribuye a la evolución colectiva* |
+| 5 | 3350–4300 | **Voces de Luz** | Título + label con dividers "LO QUE DICEN NUESTROS VIAJEROS". 3 cards de testimonio (glass) con avatar de inicial, nombre y país: Valeria/Uruguay, Claudia/Chile, Andrew/Inglaterra |
+| 6 | 4300–4990 | **Imagen de cierre** | Full-bleed, figura de partículas. Sin texto encima |
+| 7 | 4990–5080 | **Banda dorada** | Franja sólida dorada con 3 estrellas de 4 puntas dentro de círculos, centradas |
+| 8 | 5080–5292 | **Footer** | Logo + `EXPLORAR` (Nosotros, Experiencias, Contenidos) + `LEGAL` (Privacidad, Términos de Servicio, Contacto, Soporte) + `SINTONIZA` (newsletter) |
+
+---
+
+## 2. Contra la home de hoy (`src/app/page.tsx`)
+
+| Hoy | En el mockup | Qué implica |
+|---|---|---|
+| `HeroSection` (título + subtítulo + 2 CTAs) | Hero **solo imagen** + "DESCUBRIR" | Se cae el copy del hero. ¿Dónde entra el CTA principal? |
+| `PortalsSection` (carrusel que gira, hecho el 18/08) | **no está** | ¿Se borra, se muda a `/nosotros` o Julia lo manda en un slide aparte? |
+| `AboutSection` (foto + texto, imagen editable desde Multimedia) | Reemplazado por el bloque claro "La humanidad" | El slot `home.about.image` puede quedar sin uso o mutar a la geometría |
+| **`TripsSection type="retiro"` + `type="ceremonia"`** (datos reales de Supabase) | **no están** | **El punto más grave**: hoy la home es la vitrina de los viajes publicados. Ver §4 |
+| `EbookSection` | **no está** | El CTA "Comprar Ahora" ya estaba muerto; esto lo confirma como fuera de la home |
+| `TestimonialsSection` (mock, 3 cards con estrellas) | "Voces de Luz", 3 cards con país | Mismo componente, otra forma: sin estrellas, con avatar de inicial y país |
+| — | **Frase manifiesto**, **Cuatro promesas**, **Imagen de cierre**, **Banda dorada** | Cuatro bloques nuevos |
+| Footer 4 columnas | Footer **3 columnas** + newsletter | Cambia el orden y los rótulos |
+
+---
+
+## 3. Lo que el mockup decide sin decirlo
+
+1. **"EXPERIENCIAS" reemplaza a "Viajes" en el navbar.** Esto cierra el problema de
+   nomenclatura abierto el 15/08: en el vocabulario de Sofía "Viaje Cósmico" es solo el
+   retiro, y el paraguas se había quedado sin nombre. El paraguas se llama
+   **Experiencias**. Falta decidir si la ruta pasa a `/experiencias` (con redirect de
+   `/viajes`) o si solo cambia la etiqueta.
+2. **No hay desplegable Retiros/Ceremonias** en el navbar del mockup. Hoy sí lo hay
+   (`NAV_LINKS`, sesión del 05/08).
+3. **No aparece "Mi Cuenta"** en el navbar — solo el CTA "Unirme al círculo". Con sesión
+   iniciada hoy ese CTA se reemplaza por el avatar; hay que confirmar que sigue así.
+4. **El fondo deja de ser siempre oscuro.** El bloque "La humanidad" es crema con texto
+   azul marino. Rompe la regla actual de `globals.css` (degradé azul→negro de documento
+   completo + campo de estrellas en `body::before`). Necesita una primitiva de sección
+   invertida, no un parche.
+5. **Assets nuevos que hay que pedirle a Julia**: la geometría sagrada dorada, la estrella
+   de 4 puntas de la banda, y las 4 imágenes full-bleed (hero, meditando, cierre, y el
+   fondo de Voces de Luz) en calidad final. Hoy `public/img/` no tiene ninguna.
+
+---
+
+## 4. La pregunta que bloquea todo: ¿dónde quedan los viajes?
+
+La home actual muestra **Próximos Retiros** y **Próximas Ceremonias** leyendo `trips` de
+Supabase — es lo único de la home que no es decorativo y es el camino de entrada al
+embudo de inscripción (`/viajes/[id]` → `/viajes/[id]/solicitar`). El mockup **no tiene
+ninguna sección de viajes**: el único CTA es "Unirme al círculo" (registro) y "Acceso
+comunidad".
+
+Tres lecturas posibles, hay que preguntar antes de tocar nada:
+
+- **(a)** Julia todavía no maquetó esa sección y viene en los slides sueltos.
+- **(b)** La decisión es que la home sea puramente narrativa y los viajes vivan solo en
+  `/experiencias`.
+- **(c)** La home cambia de función: capta al registro primero, muestra viajes después de
+  loguearse.
+
+Si es (b) o (c), hay que verificar que `/experiencias` quede linkeada desde arriba y que
+no se pierda tráfico al detalle de cada viaje (hoy los links de la home son la ruta más
+corta al form).
+
+---
+
+## 5. Especificación de cada bloque (confirmada por Ignacio, 20/08)
+
+### 5.1 Hero — zoom in lento
+- Imagen full-bleed, **sin título ni CTA**, con el cue "DESCUBRIR" + chevron al pie.
+- Animación: `scale(1) → scale(1.1)`, **delay 200 ms, duración 8000 ms**, una sola vez al
+  cargar (no en loop, no ligada al scroll).
+- Se hace con `transform` (lo maneja el compositor). **No** animar `width`/`height` ni
+  `background-size`: eso repinta cada frame y se come el LCP justo en el primer pantallazo.
+- El contenedor lleva `overflow: hidden` — la imagen crece hacia afuera del recorte.
+- `prefers-reduced-motion: reduce` → sin zoom, imagen fija.
+- El cue "DESCUBRIR" hace scroll suave al bloque 2.
+
+### 5.2 Frase manifiesto — entrada partida en dos
+- La frase se parte en **dos mitades**:
+  - izquierda: entra **de abajo hacia arriba**, `opacity 0 → 1`
+  - derecha: entra **de arriba hacia abajo**, `opacity 0 → 1`
+  - las dos terminan alineadas en el centro, en una sola línea.
+- Dispara al entrar en viewport (`whileInView`, una sola vez).
+- El corte de la frase es una decisión de diseño, no automática: *"Cuando el alma está
+  lista, | el camino aparece."* — se guarda como dos strings, no se parte por índice.
+- **En mobile la frase cae a dos líneas**: la animación tiene que seguir leyéndose (mitad
+  de arriba entra desde arriba, mitad de abajo desde abajo). Se verifica en el paso 5.
+- Julia manda el slide como **máscara de sombra (overlay con transparencia)** — o sea un
+  PNG con alpha que va **encima** del fondo, no un fondo opaco. Ese PNG conserva el canal
+  alfa: se convierte a **WebP con alpha**, nunca a JPG.
+- `prefers-reduced-motion` → aparece sin desplazamiento, solo el fundido.
+
+### 5.3 "La humanidad" — bloque claro
+- El slide se copia **completo y literal**: título a dos pesos, los 3 párrafos, la
+  geometría dorada. El copy es de la clienta, no se reescribe.
+- El botón **"ACCESO COMUNIDAD" lleva al login**: `/cuenta`. (Si la intención es que el
+  visitante nuevo se registre, el destino correcto sería `/cuenta?modo=registro`, que es a
+  donde ya apunta "Unirme al círculo" del navbar — **confirmar cuál de los dos**.)
+- Es el único bloque de fondo claro: ver §3.4, necesita primitiva propia.
+
+### 5.4 Cuatro promesas
+Se copia tal cual. En mobile los 4 textos no pueden quedar en las esquinas: pasan a lista
+debajo de la imagen.
+
+### 5.5 Voces de Luz
+Se copia tal cual — son **testimonios**. Detalle útil: `TESTIMONIALS` en
+`src/lib/constants.ts` **ya tiene la forma exacta** que pide el mockup
+(`quote / name / location / initial`); cambian los nombres y el estilo de la card (sin
+estrellas), no la estructura de datos.
+
+### 5.6 Banner de cierre → banda dorada → footer
+Ese es el orden final: imagen full-bleed de cierre, después la banda dorada con las 3
+estrellas, y al pie el footer.
+
+---
+
+## 6. Peso de los slides y consumo del plan gratuito
+
+El mockup que mandó Julia pesa **6,9 MB en un solo PNG de 1440×5292**. Si las 4 imágenes
+full-bleed llegan en PNG a esa densidad, la home sin tratar arrancaría en **20–30 MB**:
+inusable en mobile y con riesgo real de reventar cuotas.
+
+### 6.1 Tratamiento de los assets (paso obligatorio, antes de escribir la sección)
+- **PNG → WebP** y redimensionar a **1920 px de ancho máximo** (el mockup viene a 1440, no
+  hace falta más). Calidad 75–82. Esperado: **6,9 MB → 200–350 KB por imagen.**
+- La **excepción es la máscara de sombra de la frase manifiesto**: lleva transparencia, así
+  que va a WebP **con alpha** (no a JPG, que la aplana contra negro).
+- Referencia: la entrega original de Julia pasó de 11,4 MB a 267 KB con este mismo
+  tratamiento (ver `public/img/`).
+
+### 6.2 Dónde se guardan — esto es lo que decide el gasto
+**Los fondos fijos de layout van al repo (`public/img/`), no a Supabase Storage.** Es la
+regla que ya tiene el proyecto, y acá aparece el número que la justifica:
+
+| | Supabase free | Vercel free |
+|---|---|---|
+| Egress / ancho de banda | **5 GB/mes**, compartido con toda la API | ~100 GB/mes |
+| Quién lo consume | cada lectura de imagen **y** cada query de la app | solo assets |
+
+Servir 4 imágenes de ~300 KB desde Storage son **1,2 MB por visita**: a las ~4.000 visitas
+el proyecto se queda sin egress **y con él se cae también la app**, porque el mismo cupo
+paga las queries de `trips`, el login y el panel. Desde `public/` el costo para Supabase es
+**cero**.
+
+Compromiso con Multimedia: los slots de `site-content` siguen existiendo para que la
+clienta pueda cambiar una imagen, pero el **valor por defecto es el asset del repo**. Sin
+fila en `site_content` no hay ni una request a Storage. El override es la excepción, no el
+camino normal.
+
+### 6.3 Entrega en el browser
+- `next/image` en todas: sirve AVIF/WebP según el navegador y cachea largo.
+- **Solo la del hero lleva `priority`**; el resto `loading="lazy"`. Es el LCP de la página.
+- `sizes` correcto en cada una (son full-bleed: `100vw`), para que no baje la variante de
+  2× en un celular.
+- `placeholder="blur"` con un `blurDataURL` chico en el hero: durante los 8 s de zoom no
+  puede haber un rectángulo vacío.
+- **Ojo con el plan free de Vercel**: tiene tope de imágenes fuente transformadas. Se
+  controla teniendo **pocas imágenes distintas** (4 fijas) y no generando variantes de más.
+- Ninguna de las 4 imágenes se duplica en dos archivos por recorte: se recorta con CSS
+  (`object-position`), como ya hace `TripCover`.
+
+**Meta**: home nueva **por debajo de 1,5 MB** de transferencia en la primera visita, y casi
+0 en la segunda (todo cacheado en el CDN de Vercel).
+
+---
+
+### 6.4 Qué se exporta y qué se rehace en HTML (regla del paso 0)
+
+**Julia exporta solo la capa de fondo. Todo lo que sea texto, botón o link se rehace en
+HTML encima.** Se le pide cada slide con las capas de contenido escondidas, más los textos
+aparte y la referencia de dónde va cada uno.
+
+Un texto quemado en el WebP **no es editable**: no se puede cambiar desde
+`/admin/multimedia`, no lo indexa Google, no lo lee un lector de pantalla, no entra en el
+`es.json`/`en.json` del paso de i18n, se ve borroso en pantallas retina, no hace reflow en
+mobile (escala junto con la imagen) y encima pesa más, porque el detalle de las letras
+castiga la compresión. Para corregir una coma habría que volver a Julia y reexportar.
+
+Un botón dibujado en la imagen es peor todavía: **no se puede clickear**, no tiene hover,
+no toma foco con el teclado y no navega a ningún lado. Es una foto de un botón.
+
+Además hay un caso donde no existe la opción: la **frase manifiesto** (§5.2) se parte en
+dos mitades que entran desde arriba y desde abajo por separado. Eso solo se puede animar si
+son dos nodos de texto reales.
+
+- **Sale del slide**: títulos, párrafos, las 4 promesas, los testimonios, "ACCESO
+  COMUNIDAD", "UNIRME AL CÍRCULO", el cue "DESCUBRIR".
+- **Queda en la imagen**: fondo, figura, partículas, degradés, la máscara de sombra.
+- **Las cards de testimonio también son HTML**, no un recorte del slide: tienen que
+  **crecer con el texto** (en el mockup los tres testimonios ya miden distinto) y pasar a
+  una columna en mobile. Es la utilidad `glass-card` que ya existe en `globals.css`.
+- **El cuadrado del avatar del testimonio** se hace como *contenedor*, no como una letra
+  suelta: hoy muestra la inicial (`TESTIMONIALS.initial`, que es lo que dibuja el mockup),
+  y el día que haya fotos reales de los viajeros pasa a ser un `<Image>` adentro del mismo
+  box, sin tocar el layout. Mismo patrón que el avatar del navbar.
+- **Única excepción — el logotipo** COSMIC EAGLE: ahí la tipografía *es* la marca, no es
+  contenido. Va como imagen con `alt`, como ya está resuelto con `public/logo.png`.
+
+Regla corta: **si tiene texto adentro, o cambia de alto según el contenido, es HTML.** La
+imagen es solo lo que va detrás de todo.
+
+De Julia, además del fondo, hace falta la **referencia de estilo** de cada pieza que
+rehacemos: opacidad y borde de la card, radio de esquina, color y tracking de los botones.
+
+Los botones ya existen en código: `CtaLink` tiene las dos variantes del mockup (sólida
+dorada y ghost de borde). De Julia hace falta la referencia de estilo — color de borde,
+radio, tracking del texto en mayúscula — para verificar que coincidan, no el botón
+exportado.
+
+---
+
+## 7. Los links del footer, mapeados contra el sitio actual
+
+Footer del mockup vs. rutas que existen hoy:
+
+| Columna | Link del mockup | Ruta | Estado |
+|---|---|---|---|
+| Explorar | Nosotros | `/nosotros` | ✅ existe |
+| Explorar | Experiencias | `/viajes` (¿→ `/experiencias`?) | ✅ existe, ver §3.1 |
+| Explorar | Contenidos | `/contenidos` | ✅ existe |
+| Legal | Privacidad | `/privacidad` | ⚠️ **no existe la ruta, pero el texto sí**: viene en el anexo del boceto de Sofía (`web-cosmic-journey-ES.md`, 15/08). Es una página de composición pura |
+| Legal | Términos de Servicio | — | ❌ no hay ruta **ni texto**. Queda apagado |
+| Legal | Contacto | `mailto:` actual o `/contacto` | ⚠️ hoy es un `mailto:`. Decidir si se hace página |
+| Legal | Soporte | — | ❌ no hay ruta ni definición. Queda apagado |
+| Sintoniza | (newsletter) | `NewsletterForm` | ✅ funciona, no se toca |
+
+Cambios contra `FOOTER_COLUMNS` (`src/lib/constants.ts`): **se caen "Retiros", "E-book" y
+"Blog"**; entran "Experiencias" y "Contenidos". Los links sin ruta se siguen pintando
+apagados, que es lo que ya hace `Footer.tsx` con `href: null` — no se linkea a `#`.
+
+---
+
+## 8. Plan de trabajo
+
+**Todo va en una rama nueva, `home_rediseño`**, y no se sube a `main` hasta revisarlo
+juntos. Ojo: `main` está conectado a Vercel y deploya solo, pero **la rama va a generar una
+preview URL propia** — esa es la que se revisa antes de mergear.
+
+> Nota menor: la `ñ` en el nombre de rama funciona en git, pero se escapa feo en URLs y en
+> algunas herramientas. Sugerencia: `home-rediseno`. Si preferís la ñ, va la ñ.
+
+| Paso | Qué | Depende de |
+|---|---|---|
+| 0 | Crear la rama. Recibir la carpeta de slides, convertir a WebP y dimensionar (§6.1) | la carpeta de Julia |
+| 1 | Primitivas nuevas en `src/components/ui/`: `QuoteBand` (§5.2), `LightSection` (§3.4), `ImageStatements` (§5.4), **P7** (header con dividers, pendiente desde la entrega original), `GoldDivider` | paso 0 |
+| 2 | Secciones de arriba a abajo: hero → frase → "La humanidad" → 4 promesas → Voces de Luz → cierre + banda | paso 1 |
+| 3 | Navbar (`Viajes` → `Experiencias`) y footer a 3 columnas con el mapeo de §7 | decisión §3.1 |
+| 4 | Slots de Multimedia para las 4 imágenes, con default en el repo (§6.2) | paso 2 |
+| 5 | Verificación: `tsc`, lint, `pnpm build`, mobile de los bloques absolutos (hero, 4 promesas, frase), y **medición del peso real** de la home contra la meta de §6.3 | todo |
+| 6 | Preview de Vercel + revisión con Ignacio → recién ahí, merge a `main` | paso 5 |
+
+**Sigue bloqueante la pregunta 1 de §9**: dónde quedan los viajes en la home nueva. Los
+pasos 0 a 2 se pueden hacer sin esa respuesta; el paso 3 y el merge, no.
+
+---
+
+## 9. Preguntas abiertas para Julia / Sofía / Estela
+
+1. **¿Dónde van los viajes en la home nueva?** (§4) — bloquea el paso 3 y el merge.
+2. ¿"Experiencias" es solo la etiqueta del navbar o también la URL?
+3. ¿El carrusel de portales se borra o se muda a otra página?
+4. ¿El e-book sale de la home definitivamente? ¿Vive en algún lado?
+5. Los testimonios del mockup (Valeria/Uruguay, Claudia/Chile, Andrew/Inglaterra) — ¿son
+   reales y publicables con nombre y país? Los de hoy son otros (Valentina, Pablo…).
+6. "ACCESO COMUNIDAD" va al login (§5.3). ¿A `/cuenta` (login) o a `/cuenta?modo=registro`
+   (registro), que es a donde apunta "Unirme al círculo"? Sigue pendiente que la comunidad
+   está fuera de alcance (`docs/CONTEXT.md` §6).
+7. ¿La banda dorada y el bloque claro se repiten en las otras páginas o son solo de la home?
+8. ¿Hacemos `/privacidad` en esta tanda? El texto ya está escrito (§7).
