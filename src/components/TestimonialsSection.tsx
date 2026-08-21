@@ -36,20 +36,26 @@ export function TestimonialsSection({ id }: { id?: string }) {
           franja: queda el campo azul, que es lo que levanta el bloque del negro
           del pie de la pagina, sin repetir el dorado.
 
-          La mascara remata las dos puntas: entra desvanecida (asi engancha con
-          el desvanecido del pie de las promesas, en vez de arrancar con un filo)
-          y sale desvanecida contra el banner de cierre. Ojo con los porcentajes:
+          La mascara entra desvanecida (asi engancha con el desvanecido del pie de
+          las promesas, en vez de arrancar con un filo). Ojo con los porcentajes:
           se miden sobre el ENVOLTORIO, que es un 30% mas alto que la seccion, asi
           que el borde de arriba de la seccion cae recien en el 23% de la mascara
           — arrancar el degrade en 0% dejaba la imagen ya medio opaca justo en ese
           borde, que es la costura que se queria evitar.
+
+          ABAJO NO se desvanece (`#000 100%`): sale con filo recto contra el borde
+          de la seccion. Antes salia en `transparent`, y como `ClosingBanner`
+          ademas ENTRA desvanecido, entre los dos quedaba una franja sin imagen
+          donde asomaba el degrade del `body` — que a esta altura del documento ya
+          va por `#060b1a`, o sea negro. El filo no se ve porque el banner sube con
+          `-mt` y lo tapa justo donde ya es opaco: los dos se cruzan.
 
           Ojo con el `z-index`: no puede ser negativo. `body` pinta su propio
           degrade despues de los descendientes de z negativo del contexto raiz (y
           `body::before`, el campo de estrellas, ya vive en `z-index: -1`), asi
           que un `-z-10` deja la imagen tapada por el fondo de la pagina. Va
           envoltorio en `z-0` y contenido en `z-10`. */}
-      <div className="absolute inset-x-0 -top-[30%] bottom-0 z-0 [mask-image:linear-gradient(to_bottom,transparent_0%,transparent_23%,rgba(0,0,0,0.5)_33%,#000_45%,#000_86%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,transparent_23%,rgba(0,0,0,0.5)_33%,#000_45%,#000_86%,transparent_100%)]">
+      <div className="absolute inset-x-0 -top-[30%] bottom-0 z-0 [mask-image:linear-gradient(to_bottom,transparent_0%,transparent_23%,rgba(0,0,0,0.5)_33%,#000_45%,#000_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,transparent_23%,rgba(0,0,0,0.5)_33%,#000_45%,#000_100%)]">
         <Image
           src={IMAGES.homeVoces}
           alt=""
