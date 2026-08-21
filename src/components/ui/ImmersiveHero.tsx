@@ -45,7 +45,13 @@ export function ImmersiveHero({
             fill
             priority={priority}
             sizes="100vw"
-            className="object-cover"
+            /* `object-top` y no el centro por defecto: la figura tiene la
+               cabeza pegada al borde superior de la foto, y en un viewport
+               ancho y bajo (1920x870, por ejemplo) la caja del hero queda mas
+               apaisada que la imagen — el recorte de `cover` se lleva la misma
+               franja de arriba y de abajo, y arriba esta la cabeza. Anclando
+               arriba, todo el recorte cae en el pie, que es cielo. */
+            className="object-cover object-top"
           />
         </div>
       </div>
