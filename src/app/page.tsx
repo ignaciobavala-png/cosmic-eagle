@@ -44,9 +44,10 @@ export default async function Home() {
   return (
     <>
       <Header />
-      <main>
-        {/* Sin `pt-16`: el hero va debajo del navbar a propósito, que es
-            translúcido y se apoya sobre la imagen, como en el mockup. */}
+      {/* El navbar dejó de ser translúcido (asset `navbar.png` del 20/08: es una
+          banda opaca), así que el hero ya no le pasa por debajo — arranca justo
+          abajo, como en el mockup. De ahí el `pt`, que antes no estaba. */}
+      <main className="pt-16 lg:pt-21">
         <ImmersiveHero
           image={content("home.hero.image")}
           imageAlt="Figura de partículas mirando hacia el cosmos"

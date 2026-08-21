@@ -25,7 +25,7 @@ export default async function NosotrosPage() {
   return (
     <>
       <Header />
-      <main className="pt-16">
+      <main className="pt-16 lg:pt-21">
         <PageHero
           image={content("nosotros.hero.image")}
           title={renderTitle(content("nosotros.hero.title"))}

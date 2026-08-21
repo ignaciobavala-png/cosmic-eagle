@@ -129,7 +129,7 @@ export default async function CuentaPage({
   return (
     <>
       <Header />
-      <main className="pt-16 min-h-screen flex items-center justify-center">
+      <main className="pt-16 lg:pt-21 min-h-screen flex items-center justify-center">
         {user ? (
           <div className="px-5 w-full max-w-3xl flex flex-col items-center gap-4 py-12">
             <AvatarUpload

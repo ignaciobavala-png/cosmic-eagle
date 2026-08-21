@@ -47,9 +47,13 @@ export function PageHero({
           sizes="100vw"
           className="object-cover"
         />
-        {/* Tinte azul + oscurecido arriba (para el navbar) */}
+        {/* Tinte azul + oscurecido al pie, para asentar el titulo.
+            El oscurecido de arriba se saco cuando el navbar paso a ser una
+            banda opaca (asset del 20/08): ya no se apoya sobre la imagen, asi
+            que esa franja no daba legibilidad a nada y dejaba un corte oscuro
+            justo abajo del azul del navbar. */}
         <div className="absolute inset-0 bg-[#05102a]/35" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05060a]/70 via-transparent to-[#05060a]/45" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#05060a]/45" />
       </div>
 
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-margin-mobile md:px-margin-desktop text-center">

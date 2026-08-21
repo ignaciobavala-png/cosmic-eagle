@@ -62,7 +62,7 @@ export default async function ViajesPage({
   return (
     <>
       <Header />
-      <main className="pt-16">
+      <main className="pt-16 lg:pt-21">
         <PageHero
           image={content("viajes.hero.image")}
           title="Retiros & Ceremonias"

@@ -48,8 +48,6 @@ export function ImmersiveHero({
             className="object-cover"
           />
         </div>
-        {/* Oscurecido de la franja superior, para que el navbar siga legible */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05060a]/60 via-transparent to-transparent" />
       </div>
 
       {scrollHint && scrollTo && (

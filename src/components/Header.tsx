@@ -83,11 +83,21 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 bg-[#05060a]/70 backdrop-blur-xl border-b border-primary-fixed-dim/12">
+      {/* El fondo sale del asset `navbar.png` de Julia (1440x84): no es arte
+          sino un degrade horizontal, plano en #05125a hasta el 31% del ancho y
+          despues rampa hasta #026fab. Se hace en CSS por lo mismo que la banda
+          dorada y "La humanidad" (docs/HOME_REDISENO.md §6.1): pesa cero, no se
+          pixela y acompana cualquier ancho de viewport. Es la misma familia de
+          degrade que ya usa el footer, pero al reves de arriba a abajo.
+
+          Ojo: el navbar paso a ser OPACO. Antes era vidrio y el hero le pasaba
+          por debajo; en el mockup es una banda solida y el contenido arranca
+          abajo. Por eso cada `main` compensa con `pt-16 lg:pt-21`. */}
+      <header className="fixed top-0 w-full z-50 bg-[linear-gradient(to_right,#05125a_0%,#05125a_31%,#026fab_100%)]">
         {/* La barra horizontal arranca en lg, no en md: entre 768 y 1024 el
             logo + los 3 links + "Unirme al circulo" no entran y el CTA termina
             pisando el logo. Hasta 1024 manda el drawer, que entra siempre. */}
-        <nav className="flex items-center justify-between gap-4 px-margin-mobile lg:px-margin-desktop h-16 w-full max-w-narrative mx-auto">
+        <nav className="flex items-center justify-between gap-4 px-margin-mobile lg:px-margin-desktop h-16 lg:h-21 w-full max-w-narrative mx-auto">
           <Link href="/" className="shrink-0">
             <Image
               src={IMAGES.logo}
@@ -96,7 +106,7 @@ export function Header() {
               height={267}
               priority
               sizes="(min-width: 1024px) 280px, 220px"
-              className="h-9 lg:h-11 w-auto object-contain"
+              className="h-9 lg:h-14 w-auto object-contain"
             />
           </Link>
 
@@ -178,7 +188,7 @@ export function Header() {
               <div className="hidden lg:flex">
                 <CtaLink
                   href="/cuenta?modo=registro"
-                  className="whitespace-nowrap px-5 py-2"
+                  className="whitespace-nowrap rounded-xl px-5 py-2"
                 >
                   Unirme al círculo
                   <ArrowRight size={14} />
