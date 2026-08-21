@@ -1,4 +1,5 @@
-import { HOME_COPY, TESTIMONIALS } from "@/lib/constants";
+import Image from "next/image";
+import { HOME_COPY, IMAGES, TESTIMONIALS } from "@/lib/constants";
 import { Reveal } from "./ui/Reveal";
 import { SectionHeading } from "./ui/SectionHeading";
 
@@ -6,7 +7,7 @@ import { SectionHeading } from "./ui/SectionHeading";
  * "Voces de Luz" — los testimonios de la home.
  *
  * Reescrita sobre el mockup del rediseno: encabezado P7 (`SectionHeading`) y
- * tarjetas de vidrio sobre la imagen de fondo. Antes eran tres cards con cinco
+ * tarjetas de vidrio sobre el slide de fondo. Antes eran tres cards con cinco
  * estrellas y un borde de color alternado, que no estan en el diseno nuevo.
  *
  * Las tarjetas son HTML y no un recorte del slide: tienen que crecer con el texto
@@ -25,19 +26,40 @@ export function TestimonialsSection({ id }: { id?: string }) {
       id={id}
       className="relative w-full overflow-hidden"
     >
-      {/* Sin imagen de fondo: `voces-de-luz.webp` y `cuatro-promesas.webp` son la
-          misma composicion partida en dos slides, asi que apiladas repetian el
-          reflejo dorado con una costura recta en el medio. El fondo lo pone el
-          degrade del `body`, que ya trae el azul correcto. Tampoco lleva un halo
-          propio: cualquier fondo que arranque en el borde superior de la seccion
-          vuelve a dibujar la costura, que es justamente lo que se quiso sacar.
+      {/* El fondo es `voces-de-luz.webp`, el slide de Julia para esta seccion.
 
-          Si alguna vez se vuelve a poner una imagen aca, ojo con el `z-index`: no
-          puede ser negativo. `body` pinta su propio degrade despues de los
-          descendientes de z negativo del contexto raiz (y `body::before`, el campo
-          de estrellas, ya vive en `z-index: -1`), asi que un `-z-10` la deja
-          tapada por el fondo de la pagina. */}
-      <div className="mx-auto w-full max-w-narrative px-margin-mobile pt-24 pb-20 md:px-margin-desktop md:pt-[9rem] md:pb-section">
+          El slide trae el polvo dorado en su borde SUPERIOR, y ese dorado es el
+          mismo plano que "Cuatro promesas" ya dibuja en su pie: apilados tal
+          cual, el reflejo salia dos veces con una costura recta en el medio. Por
+          eso el envoltorio arranca un 30% MAS ARRIBA que la seccion (`-top-[30%]`
+          contra `bottom-0`) y el `overflow-hidden` de la seccion se come esa
+          franja: queda el campo azul, que es lo que levanta el bloque del negro
+          del pie de la pagina, sin repetir el dorado.
+
+          La mascara remata las dos puntas: entra desvanecida (asi engancha con
+          el desvanecido del pie de las promesas, en vez de arrancar con un filo)
+          y sale desvanecida contra el banner de cierre. Ojo con los porcentajes:
+          se miden sobre el ENVOLTORIO, que es un 30% mas alto que la seccion, asi
+          que el borde de arriba de la seccion cae recien en el 23% de la mascara
+          — arrancar el degrade en 0% dejaba la imagen ya medio opaca justo en ese
+          borde, que es la costura que se queria evitar.
+
+          Ojo con el `z-index`: no puede ser negativo. `body` pinta su propio
+          degrade despues de los descendientes de z negativo del contexto raiz (y
+          `body::before`, el campo de estrellas, ya vive en `z-index: -1`), asi
+          que un `-z-10` deja la imagen tapada por el fondo de la pagina. Va
+          envoltorio en `z-0` y contenido en `z-10`. */}
+      <div className="absolute inset-x-0 -top-[30%] bottom-0 z-0 [mask-image:linear-gradient(to_bottom,transparent_0%,transparent_23%,rgba(0,0,0,0.5)_33%,#000_45%,#000_86%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,transparent_23%,rgba(0,0,0,0.5)_33%,#000_45%,#000_86%,transparent_100%)]">
+        <Image
+          src={IMAGES.homeVoces}
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover object-bottom"
+        />
+      </div>
+
+      <div className="relative z-10 mx-auto w-full max-w-narrative px-margin-mobile pt-24 pb-20 md:px-margin-desktop md:pt-[9rem] md:pb-section">
         <Reveal>
           <SectionHeading
             title={HOME_COPY.voces.title}
