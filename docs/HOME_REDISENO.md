@@ -482,6 +482,13 @@ otra página el slot vuelve y la foto reaparece.
 
 ## 9. Preguntas abiertas para Julia / Sofía / Estela
 
+Versión en castellano llano, ordenada por destinatario y lista para mandar, en
+`~/Escritorio/consultas-home-rediseno-2026-08-20.txt` (**fuera del repo**). Acá queda la
+versión técnica.
+
+**Las que frenan el cierre son la 3, la 4 y la 9**: de ellas sale qué código se borra.
+
+
 1. ~~¿Dónde van los viajes?~~ **RESUELTO**: van en la sección de viajes, ver §4.
 2. ~~¿"Experiencias" es la URL?~~ **RESUELTO**: solo la etiqueta, la ruta sigue en `/viajes`.
 3. ¿El carrusel de portales se borra o se muda a otra página?
@@ -497,6 +504,9 @@ otra página el slot vuelve y la foto reaparece.
 10. ¿"La humanidad" y los testimonios tienen que ser editables desde el panel? Hoy están en
     código (§8.c).
 11. ¿Se corrigió bien "evolcando" → "evocando" en el testimonio de Claudia? (§8.b)
+12. `cuatro-promesas.webp` llegó a 1456 px de ancho, contra 1920 del resto. Es la única de
+    las cuatro imágenes de arte por debajo del tope; si se ve blanda en pantalla grande,
+    pedírsela más grande a Julia (§6.1.e).
 
 ---
 
