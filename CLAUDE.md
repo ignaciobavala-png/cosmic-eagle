@@ -744,6 +744,33 @@ Lo que hay que recordar de esta sesión:
 **Sin verificar end-to-end** (requiere sesión de admin): que `/admin/multimedia` liste los
 slots nuevos y que subir una imagen desde ahí cambie la home.
 
+### Sesión del 2026-08-20 (bis) — el navbar de producción
+
+Julia mandó `navbar.png` (en `~/Descargas`, **fuera del repo**), la pieza que faltaba del
+rediseño. Detalle en `docs/HOME_REDISENO.md` §8.d.
+
+- **El navbar dejó de ser vidrio oscuro**: es una banda **opaca** con degradé horizontal
+  `#05125a → #026fab` (plano hasta el 31% del ancho). Va en CSS, como el footer y "La
+  humanidad" — el asset no se guarda.
+- Al ser opaco, el hero ya no le pasa por debajo: **todos los `main` llevan
+  `pt-16 lg:pt-21`**, incluida la home, que era la única sin offset. Si aparece una página
+  nueva, ese `pt` va sí o sí o el navbar le tapa el arranque.
+- La barra pasó a 84 px en escritorio (`h-16 lg:h-21`) y el logo a `h-9 lg:h-14`.
+- Se sacaron los oscurecidos superiores de `ImmersiveHero` y `PageHero`: existían para que
+  el navbar translúcido fuera legible sobre la imagen y ahora sólo dejaban una banda oscura
+  abajo del azul.
+
+- **"Voces de Luz" recuperó el fondo `voces-de-luz.webp`**, que había quedado sin usar: sin
+  imagen la sección caía en el tramo negro del degradé del `body`. El polvo dorado del
+  slide (el que se repetía con el pie de "Cuatro promesas") se clipea corriendo el
+  envoltorio un 30% arriba de la sección. Detalle en `docs/HOME_REDISENO.md` §8.e.
+- **El hero de la home va `object-top`**, no centrado: en 1920×870 la caja queda más
+  apaisada que la foto y `cover` centrado le cortaba la cabeza a la figura, que está pegada
+  al borde superior de la imagen. Anclado arriba el recorte cae todo en el pie.
+
+Verificado: `tsc`, lint, build de producción (la home sigue `○`) y capturas reales de
+`/` y `/nosotros` en 1440×900, 1920×870, 2560×1100 y 390×844.
+
 ## No hacer
 
 - No inventar cuentas de Supabase ni connection strings falsos

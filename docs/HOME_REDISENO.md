@@ -175,7 +175,7 @@ no pesa y sobrevive a que se borre la carpeta de Descargas.
 
 | EXAMPLE (con texto) | PRODUCCION (sin texto) | Estado |
 |---|---|---|
-| `nav bar.png` 1440×84 | — (+ `LOGO.png` 1207×433) | ✅ no hace falta asset: es color sólido + logo |
+| `nav bar.png` 1440×84 | `navbar.png` 1440×84 (llegó el 20/08 a la noche, a la raíz de Descargas) + `LOGO.png` 1207×433 | ✅ no hace falta asset: es **degradé horizontal** + logo, ver §8.d |
 | `hero.png` 1440×800 | `hero.jpg` **2590×1429** | ✅ y en mejor resolución |
 | `About_Section.png` 1440×800 | `frase manifiesto.png` 1440×800 | ✅ **pero cambia de nombre**: son el mismo bloque |
 | `la humanidad.png` 1440×800 | `la humanidad.png` 1440×800 | ✅ |
@@ -185,6 +185,11 @@ no pesa y sobrevive a que se borre la carpeta de Descargas.
 | `banda dorada.png` 1440×138 | **falta** | ⚠️ se puede hacer en CSS + SVG, ver abajo |
 | `footer.png` 1440×270 | `footer.png` 1440×270 | ✅ |
 | `backgroundcolor_#05125A.png` | — | referencia de color base: **`#05125A`** |
+
+El `navbar.png` de PRODUCCION corrige lo que decía este inventario antes de recibirlo: el
+fondo **no es color sólido**, es un degradé horizontal (medido pixel a pixel: plano en
+`#05125a` hasta el 31% del ancho, después rampa hasta `#026fab` en el borde derecho). Sigue
+sin hacer falta el asset — es el cuarto degradé de la entrega, ver §8.d.
 
 **La máscara de la frase manifiesto tiene alfa real** (verificado: alfa 0 en las esquinas,
 254 en el centro). Es el óvalo de luz que va **encima** del fondo de la página. Confirma
@@ -199,6 +204,9 @@ todavía (0 bytes, 0 requests), escala a cualquier ancho sin pixelarse y no arra
 justamente la que falta en PRODUCCION — **no hace falta pedirla**.
 
 Arte real hay solo cuatro: **hero, frase manifiesto (máscara), cuatro promesas y cierre.**
+(Con el `navbar.png` que llegó a la noche los degradés pasaron a ser **cuatro**: footer,
+"La humanidad", banda dorada y navbar. La proporción no cambia: lo único que se descarga
+son esas cuatro imágenes de arte.)
 
 #### Medición de la conversión (prueba hecha, `quality=80`, tope de 1920 px de ancho)
 
@@ -399,9 +407,10 @@ capturas reales. Lo que se resolvió mientras se componía:
    negativo**.
 2. **El reflejo dorado salía dos veces.** `cuatro-promesas.webp` y `voces-de-luz.webp` son
    la misma composición partida en dos slides: apiladas repetían el reflejo con una costura
-   recta en el medio. Se sacó la imagen de fondo de "Voces de Luz" —el degradé del `body` ya
-   trae el azul correcto— y se le puso máscara de desvanecido al pie de las promesas.
-   `voces-de-luz.webp` queda **sin usar** en `public/img/home/`.
+   recta en el medio. En el momento se sacó la imagen de fondo de "Voces de Luz" y se le
+   puso máscara de desvanecido al pie de las promesas. **Corregido el 20/08 a la noche**
+   (§8.e): sin imagen la sección quedaba negra contra el pie del degradé del `body`, que no
+   es lo que muestra el mockup. `voces-de-luz.webp` **está en uso**, recortado.
 3. **El zoom del hero le comía la cabeza a la figura.** Escalaba desde el centro y la
    cabeza está cerca del borde superior. `transform-origin: center 28%`.
 4. **Las frases de la derecha caían a una palabra por línea.** La sangría estaba como
@@ -477,6 +486,69 @@ El grupo "Inicio" de `src/lib/site-content.ts` se reescribió para la home nueva
 existe en la home nueva, así que la foto deja de mostrarse. **No se borró nada**: la fila
 sigue en la tabla y el archivo en el bucket `site-assets`, así que si el bloque se muda a
 otra página el slot vuelve y la foto reaparece.
+
+---
+
+## 8.d El navbar de producción (20/08, a la noche)
+
+Julia mandó `navbar.png` (1440×84) a la raíz de `~/Descargas`. Era la pieza que faltaba, y
+**cambia una decisión**: el navbar no era vidrio oscuro sino una banda azul opaca.
+
+- **El fondo se hace en CSS**, como el footer y "La humanidad": medido sobre el PNG, es
+  `linear-gradient(to right,#05125a 0%,#05125a 31%,#026fab 100%)` — plano en el azul base
+  del sistema (el mismo `#05125A` del archivo de referencia de color) hasta un tercio del
+  ancho, y de ahí una rampa lineal al celeste. Es la misma familia que ya usaba
+  `Footer.tsx`, girada 180°: arriba arranca oscuro a la izquierda, abajo el footer también.
+- **El navbar pasó de translúcido a opaco.** Antes era `bg-[#05060a]/70 backdrop-blur-xl` y
+  el hero le pasaba por debajo. En el mockup es una banda sólida y el contenido arranca
+  abajo, así que cada `main` compensa con `pt-16 lg:pt-21` — incluida la home, que era la
+  única que no tenía offset.
+- **La barra creció a 84 px en escritorio** (`h-16 lg:h-21`), que es el alto del asset, y el
+  logo con ella (`h-9 lg:h-14`). La proporción logo/barra del mockup es la misma que ya
+  tenía el header (0,69), así que sólo hubo que escalar.
+- **Se cayeron dos oscurecidos que existían sólo para el navbar**: la franja superior de
+  `ImmersiveHero` y la de `PageHero`. Ya no se apoya nada sobre la imagen; lo que hacían
+  ahora era cortar con una banda oscura justo abajo del azul del navbar. El scrim de abajo
+  de `PageHero` se queda: ese sí asienta el título.
+- **El CTA del navbar va `rounded-xl`** (12 px) y no con el radio del sistema (8 px): medido
+  sobre el mockup, la píldora tiene los bordes más redondeados que el resto de los botones.
+  Es un override local, `CtaLink` no cambió.
+- Se descartó `PRODUCCION/LOGO.png` (1207×433): es el mismo logo que `public/logo.png` pero
+  con el alfa sin recortar.
+
+**El hero quedó anclado arriba** (`object-cover object-top`). Al mirarlo en una pantalla
+ancha y baja (1920×870) el navbar parecía comerle la cabeza a la figura, pero el que
+recortaba era el propio hero: la caja es más apaisada que la foto (2,51 contra 1,81), y
+`cover` centrado se lleva la misma franja arriba que abajo — arriba está la cabeza, pegada
+al borde de la imagen. Anclado arriba, todo el recorte cae en el pie, que es cielo.
+Verificado en 1440×900, 1920×870, 2560×1100 y 390×844. Ojo si mañana se cambia la foto
+desde Multimedia: la ayuda del slot pide "figura hacia el centro", y esta no lo está.
+
+Lo que el navbar de Julia **no** dibuja y se mantiene igual: el desplegable de Experiencias
+(§8.c) y el avatar con sesión iniciada, que reemplaza al CTA.
+
+---
+
+## 8.e "Voces de Luz" recupera su fondo (20/08, a la noche)
+
+La sección estaba sin imagen desde la corrección 2 de §8.b, y a esa altura de la página el
+degradé del `body` ya está casi en negro: las tarjetas de vidrio flotaban sobre un fondo
+oscuro que no es el del mockup. Se volvió a poner `voces-de-luz.webp`, resolviendo el
+problema original en vez de esquivarlo:
+
+- **El envoltorio de la imagen arranca un 30% más arriba que la sección** (`-top-[30%]` con
+  `bottom-0`) y el `overflow-hidden` se come esa franja. El polvo dorado vive en el borde
+  superior del slide, así que queda clipeado: entra el campo azul, que es lo que levanta el
+  bloque, y no se repite el reflejo que ya dibuja "Cuatro promesas" en su pie.
+- **Los porcentajes de la máscara se miden sobre el envoltorio, no sobre la sección.** Como
+  el envoltorio es un 30% más alto, el borde de arriba de la sección cae en el 23% de la
+  máscara: arrancar el degradé en `transparent 0%` dejaba la imagen ya medio opaca justo en
+  ese borde y volvía a dibujar la costura. La máscara queda plana en transparente hasta el
+  23% y recién ahí sube.
+- Vale la regla de §8.b: envoltorio en `z-0`, contenido en `z-10`, **nunca z negativo**.
+
+Verificado con capturas de la página entera en 1440 y 390: sin costura contra las promesas
+arriba, y desvanecido contra el banner de cierre abajo.
 
 ---
 
