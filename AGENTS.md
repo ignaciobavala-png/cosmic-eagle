@@ -34,6 +34,23 @@ concordancias que se cuelan al escribir rápido ("sola", "lista", "preparada").
 
 Tuteo con voseo, registro directo, sin formalismos.
 
+## Cómo entregar lo que se produce
+
+**Los entregables van como archivos locales, en la ruta que él pida.** Si pide
+"dejámelo en el escritorio", eso es el entregable completo — no hay que
+complementarlo publicándolo en ningún lado.
+
+**No publicar artifacts ni subir nada a un servicio externo sin preguntar.**
+Dicho por Ignacio el 19/08/2026, después de que se publicara un instructivo para
+un cliente suyo sin consultarlo. El razonamiento de que "un link se comparte más
+cómodo que un adjunto" puede ser cierto, pero **cómo se distribuye material de
+un cliente es decisión de él, no del agente**, y publicar manda contenido a un
+servicio externo. Si parece que un link ayudaría, se ofrece y se espera el sí.
+
+Corolario práctico: un HTML que se va a mandar por WhatsApp conviene que sea
+**liviano**. Un logo PNG embebido en base64 infla el archivo ~1,33x sobre el peso
+del PNG (75 KB → 100 KB). Preferir SVG embebido o tipografía.
+
 ## Stack por defecto para nuevos proyectos
 
 ```
@@ -66,17 +83,34 @@ en vez de Next.js+Supabase+Vercel. Para arrancar cualquiera de los dos: scaffold
 - `@/*` como path alias (apunta a `./*` o `./src/*`)
 - **No subir binarios a git/GitHub** (fonts, imágenes pesadas, videos, PDFs): no se comprimen, no se pueden diffear, inflan el clone para siempre aunque se borren después, y hay límites duros de tamaño en GitHub. Para assets de proyecto usar Supabase Storage o Vercel Blob y referenciar por URL. Excepción: binarios chicos e imprescindibles para el build (ej. un logo o una fuente puntual) pueden ir directo al repo.
 
+## Herramientas propias (~/bin)
+
+Los scripts viven en `~/bin`, **fuera del vault** (nunca se suben a GitHub). Acá va
+lo mínimo para saber que existen; el detalle completo está en [[areas/sistema-agente]].
+
+- **`recibo`** — genera recibos de pago en HTML + PDF con el formato estándar de
+  Ignacio (número, "Recibí de", monto en letras, "En concepto de", tabla
+  total/seña/saldo, disclaimer "No válido como factura"). Usar cuando pidan emitir
+  un recibo o seña de un cobro:
+  `recibo --cliente "Escuela Sónica" --suma 200 --total 650 --moneda USD --concepto "Seña ..."`.
+  El número auto-incrementa y los montos pasan a letras en español (pesos/dólares).
+
 ## ESLint
 
-Usar flat config (`eslint.config.mjs`):
+Usar flat config (`eslint.config.mjs`) con la config nativa de Next 16
+(`FlatCompat` legacy rompe con `eslint-config-next@16`):
+
 ```js
-import { dirname } from "path"
-import { fileURLToPath } from "url"
-import { FlatCompat } from "@eslint/eslintrc"
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-const compat = new FlatCompat({ baseDirectory: __dirname })
-const eslintConfig = [...compat.extends("next/core-web-vitals", "next/typescript")]
+import { defineConfig, globalIgnores } from "eslint/config"
+import nextVitals from "eslint-config-next/core-web-vitals"
+import nextTs from "eslint-config-next/typescript"
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+])
+
 export default eslintConfig
 ```
 
@@ -106,6 +140,8 @@ Esto es un índice, no el contenido. Leer el archivo completo solo si la tarea a
   Al definir tipos para API responses, props de componentes, Server Actions, datos de Supabase, o cuando TS…
 - `client-side-image-compress` — **Comprimir imágenes client-side antes de subir al storage**
   Siempre que se implemente un uploader de imágenes (flyers, avatares, fondos, productos, etc.). Sin…
+- `cms-listas-claves-numeradas` — **Listas de contenido con claves numeradas — el admin edita pero no deja agregar ni borrar**
+  Cuando un CMS propio guarda una **lista** como filas sueltas con clave numerada (`includes_1`, `includes_2`…
 - `tailwindcss-mobile-first` — **Tailwind CSS v4 — configuración y patrones mobile-first**
   Al configurar Tailwind v4 en un proyecto nuevo, definir tokens de diseño, o implementar layouts responsivos.
 - `vercel-dominio-cert-sin-emitir` — **Dominio agregado en Vercel antes de que exista el DNS: queda verified pero sin certificado, y no reintenta**
@@ -124,8 +160,6 @@ Esto es un índice, no el contenido. Leer el archivo completo solo si la tarea a
   Al agregar un widget de preguntas frecuentes / asistente virtual a un sitio, cuando la respuesta debe estar…
 - `jeeliz-web-ar-tryon` — **Jeeliz FaceFilter + Three.js — Web AR try-on**
   ## Cuando usarla Al integrar el face tracker Jeeliz FaceFilter con Three.js en una app React (Vite) para…
-- `cms-listas-claves-numeradas` — **Listas de contenido con claves numeradas — el admin edita pero no deja agregar ni borrar**
-  Cuando un CMS propio guarda una **lista** como filas sueltas con clave numerada (`includes_1`, `includes_2`…
 - `nextjs-persistent-shell-nav` — **Navegación con shell persistente (route group + framer-motion)**
   Cuando querés que la navegación entre páginas se sienta como **un mismo espacio que muta** (sensación "redes…
 - `vercel-react-best-practices` — **Vercel + React — performance y patrones críticos**
@@ -138,14 +172,14 @@ Esto es un índice, no el contenido. Leer el archivo completo solo si la tarea a
   Cada vez que un componente propio arme su `class` concatenando una base fija con un `className` que recibe…
 - `input-file-hidden-click-ios-webview` — **\"El botón de subir foto no hace nada\" — input file con display:none + .click() por JS**
   Cuando el cliente/usuario reporta que **aprieta "Subir foto" y no pasa nada**: no abre el selector de…
+- `scaffold-nextjs-supabase` — **Scaffold Next.js 16 + Supabase (kickstart)**
+  Al arrancar cualquier proyecto nuevo. En vez de re-hacer el setup a mano y re-debuggear los mismos bugs…
 - `hover-touch-tailwind-v4` — **Hover en touch — Tailwind v4 ya lo protege, tu CSS a mano no**
   Al hacer tarjetas, grillas de servicios o cualquier elemento con efecto de hover que también se va a ver en…
 - `emailjs-smtp-gmail-app-password` — **Reconectar un formulario EmailJS al SMTP de Gmail (app password + variables mudas)**
   Un formulario de contacto que envía con EmailJS desde el navegador y hay que sacarlo del SMTP de un hosting…
 - `duplicados-por-formato-de-nombre` — **Duplicados por formato de nombre y el mailto que los enmascara**
   Cuando una tabla de personas tiene duplicados después de importar desde Google Sheets / Excel, o cuando el…
-- `scaffold-nextjs-supabase` — **Scaffold Next.js 16 + Supabase (kickstart)**
-  Al arrancar cualquier proyecto nuevo. En vez de re-hacer el setup a mano y re-debuggear los mismos bugs…
 - `agente-ia-operaciones-vs-escrituras` — **Agente IA — operaciones de negocio vs escrituras de tabla**
   Al darle a un agente LLM la capacidad de escribir en una base de datos de negocio. Aplica en cuanto el…
 - `checkout-referencia-externa-huerfana` — **Bug silencioso — referencia externa huérfana al reintentar un pago**
@@ -166,6 +200,8 @@ Esto es un índice, no el contenido. Leer el archivo completo solo si la tarea a
   Cuando el cliente/admin reporta: **"edito, pongo guardar, dice guardado, y sigue apareciendo lo viejo.…
 - `inputs-decimales-coma-es-ar` — **Inputs decimales en es-AR — coma como separador y estado string**
   Siempre que un formulario React/Next.js tenga campos numéricos con decimales (dimensiones, peso, precios…
+- `columna-orden-empatada` — **Columna `orden` sin unicidad — cada consulta desempata distinto y "mover" no mueve**
+  Cuando el cliente o el tester reporta que **el orden que ve en el admin no es el que se ve en el sitio**, o…
 - `ruta-publica-sirve-bucket-entero` — **Archivo privado nuevo en un bucket que ya tenía ruta pública — la ruta vieja lo sirve**
   Cuando se agrega un **tipo de archivo nuevo** (comprobantes de pago, DNI, contratos, exports) a un…
 - `soft-delete-filtro-incompleto` — **Soft delete sin filtrar `active` en todas las lecturas**
@@ -196,6 +232,8 @@ Esto es un índice, no el contenido. Leer el archivo completo solo si la tarea a
   Cuando una tabla "pierde" datos después de cada sync/importación y no hay ningún error en los logs.…
 - `email-boton-fondo-blanco-mobile` — **Botón de mail con fondo blanco en el celular — bgcolor y color-scheme**
   Un mail HTML se ve bien en escritorio pero en el celular un botón (o cualquier bloque de color) aparece con…
+- `z-index-negativo-fondo-body` — **El z-index negativo desaparece detrás del fondo del body**
+  Cuando una imagen o capa de fondo puesta con `z-index: -1` / `-z-10` **no se ve**, y el sitio tiene un…
 - `claude-md-symlink-agents-sobreescrito` — **CLAUDE.md como symlink a AGENTS.md — la doc del proyecto se borra sola**
   Al documentar cualquier proyecto que tenga `AGENTS.md` generado por `brain-agents-inject` Cuando aparece un…
 - `grid-hairlines-responsive-nth-child` — **Grillas con hairlines responsivas — reaplicar bordes en cada media query**
@@ -208,8 +246,6 @@ Esto es un índice, no el contenido. Leer el archivo completo solo si la tarea a
   Cambiaste el Site URL / Redirect URLs de Supabase y querés confirmar que quedó bien, sin registrar un usuario…
 - `overflow-clip-vs-hidden-scroll-horizontal` — **Scroll horizontal en mobile — overflow-x-clip vs overflow-hidden**
   Cuando en el teléfono **toda la página se mueve para los costados** y no se encuentra el culpable, o cuando…
-- `lista-cms-rango-fijo-de-claves` — **Lista editable desde el admin renderizada con un rango fijo de claves**
-  Cuando el contenido editable vive en una tabla clave/valor (`site_content` con `key` = `includes_1`…
 - `supabase-conexion-cli` — **Conectar Supabase CLI con PAT**
   El PAT de Supabase es **por cuenta**, no por proyecto. Un solo token sirve para todos los proyectos de la…
 - `credencial-solo-con-pago-confirmado` — **La credencial se emite con el pago confirmado, no al iniciar el checkout**
@@ -218,6 +254,8 @@ Esto es un índice, no el contenido. Leer el archivo completo solo si la tarea a
   Siempre. Esta skill es un guard automático: cada vez que se use cualquier herramienta MCP de Supabase, se…
 - `astro-partial-htmx-doctype` — **Fragmentos de htmx en Astro — sin `export const partial = true` viene con doctype**
   Al crear cualquier ruta de Astro cuyo destino sea que htmx (o un `fetch` + `innerHTML`) inserte el resultado…
+- `email-list-unsubscribe` — **List-Unsubscribe y baja en un click (RFC 8058)**
+  Al armar cualquier envío masivo o de newsletter (Resend, SES, Postmark…), antes del primer envío real.…
 - `logo-png-padding-alpha` — **Logo PNG que se ve chico — padding alfa dentro del archivo**
   Cuando ponés un logo que mandó un diseñador (PNG/WebP con transparencia) en un navbar, footer o card, lo…
 - `filtro-sobre-la-misma-tabla-no-dos-secciones` — **Cuando el cliente pide "dos secciones", casi siempre es un filtro sobre la misma tabla**
@@ -269,9 +307,6 @@ Estas no coinciden con el stack por tags, pero las skills de arriba las citan. S
 - `webhook-idempotencia-orden-registro` — **Webhooks de pago — registrar el evento DESPUÉS de aplicarlo, no antes**
   Al escribir el webhook de cualquier pasarela (Mercado Pago, Stripe, MODO) que tenga una tabla de eventos con…
   _citada por `astro-checkorigin-content-type`_
-- `panel-admin-fetch-sin-res-ok` — **El panel que ignora `res.ok` convierte un error del backend en "el botón no hace nada**
-  Al escribir o revisar cualquier panel de administración con `fetch` a mano (sin React Query / SWR), y sobre…
-  _citada por `soft-delete-filtro-incompleto`_
 - `cloudflare-d1-migrations` — **Cloudflare D1 — Migraciones y patrones SQLite**
   Cualquier proyecto con Cloudflare D1 (SQLite) que necesite migraciones de schema, especialmente cambios que…
   _citada por `cloudflare-wrangler-deploy`_
@@ -281,6 +316,9 @@ Estas no coinciden con el stack por tags, pero las skills de arriba las citan. S
 - `desglose-precios-cerrar-contra-total` — **Desglose de precios guardados — despejar contra el total, no recalcular la cascada**
   Cuando hay que **mostrar el desglose** (subtotal / IVA / descuentos / envío) de un pedido o factura **ya…
   _citada por `regla-de-negocio-duplicada-en-n-lugares`_
+- `panel-admin-fetch-sin-res-ok` — **El panel que ignora `res.ok` convierte un error del backend en "el botón no hace nada**
+  Al escribir o revisar cualquier panel de administración con `fetch` a mano (sin React Query / SWR), y sobre…
+  _citada por `columna-orden-empatada`_
 - `mercadopago-checkout-descuentos` — **Mercado Pago Checkout Pro — descuentos por línea sin ítems negativos**
   Cuando un checkout con Mercado Pago (Checkout Pro / preferences) tiene descuentos (por volumen, por código…
   _citada por `mercadopago-webhooks-notification-url`_
