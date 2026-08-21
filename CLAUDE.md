@@ -771,6 +771,25 @@ rediseño. Detalle en `docs/HOME_REDISENO.md` §8.d.
 Verificado: `tsc`, lint, build de producción (la home sigue `○`) y capturas reales de
 `/` y `/nosotros` en 1440×900, 1920×870, 2560×1100 y 390×844.
 
+**El rediseño está en producción desde el 21/08.** La rama `home_rediseño` se mergeó a
+`main` con merge commit (`ac833ba`), se pusheó y se borró: `main` es de nuevo la única
+rama. El sitio en vivo (`https://cosmic-eagle.vercel.app`) sirve la home nueva; `/`,
+`/nosotros`, `/viajes`, `/contenidos` y `/cuenta` responden 200 y una ruta inexistente
+404. Estado completo de la rama y lo que quedó abierto en `docs/HOME_REDISENO.md` §10.
+
+**Lo primero al retomar** — dos verificaciones que piden sesión de admin y quedaron
+pendientes a propósito (las hace Ignacio):
+
+1. Que el grupo "Inicio" de `/admin/multimedia` liste los slots nuevos de la home y que
+   subir una imagen desde ahí la cambie en el sitio.
+2. Las que venían de antes: la campanita de avisos, el acordeón de Multimedia y subir una
+   portada de viaje desde ahí.
+
+Y **cuatro componentes quedaron sin uso** (`PortalsSection`, `AboutSection`, `EbookSection`,
+`TripsSection`), con sus cuatro entradas de `IMAGES` y dos assets de 8 KB que terminaron
+resueltos en CSS. No se borraron a propósito: la decisión de §9 del doc puede mudarlos a
+`/preparacion` o a otra página.
+
 ## No hacer
 
 - No inventar cuentas de Supabase ni connection strings falsos
