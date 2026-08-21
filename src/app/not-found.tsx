@@ -6,7 +6,7 @@ export default function NotFound() {
   return (
     <>
       <Header />
-      <main className="pt-16 min-h-screen flex items-center justify-center overflow-hidden relative">
+      <main className="pt-16 lg:pt-21 min-h-screen flex items-center justify-center overflow-hidden relative">
         <div className="absolute inset-0 bg-nebula-glow blur-[120px] opacity-30" />
 
         <div className="relative z-10 text-center px-5 flex flex-col items-center">

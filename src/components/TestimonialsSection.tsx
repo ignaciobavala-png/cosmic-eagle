@@ -1,56 +1,101 @@
-"use client";
+import Image from "next/image";
+import { HOME_COPY, IMAGES, TESTIMONIALS } from "@/lib/constants";
+import { Reveal } from "./ui/Reveal";
+import { SectionHeading } from "./ui/SectionHeading";
 
-import { motion } from "framer-motion";
-import { TESTIMONIALS } from "@/lib/constants";
-import { Star } from "lucide-react";
-
-export function TestimonialsSection() {
+/**
+ * "Voces de Luz" — los testimonios de la home.
+ *
+ * Reescrita sobre el mockup del rediseno: encabezado P7 (`SectionHeading`) y
+ * tarjetas de vidrio sobre el slide de fondo. Antes eran tres cards con cinco
+ * estrellas y un borde de color alternado, que no estan en el diseno nuevo.
+ *
+ * Las tarjetas son HTML y no un recorte del slide: tienen que crecer con el texto
+ * (los tres testimonios miden distinto) y caer a una columna en mobile.
+ *
+ * El avatar es un CONTENEDOR, no una letra suelta: hoy muestra la inicial, y el
+ * dia que haya fotos reales de los viajeros pasa a ser un `<Image>` adentro del
+ * mismo box, sin tocar el layout. Mismo patron que el avatar del navbar.
+ *
+ * Dejo de ser client component: el scroll reveal lo aporta `Reveal`, que aisla el
+ * `"use client"` en el wrapper.
+ */
+export function TestimonialsSection({ id }: { id?: string }) {
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.8 }}
-      className="py-20 md:py-24 px-margin-mobile md:px-margin-desktop"
+    <section
+      id={id}
+      className="relative w-full overflow-hidden"
     >
-      <div className="max-w-narrative mx-auto text-center">
-        <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block mb-2">
-          Clientes
-        </span>
-        <h2 className="font-display text-[32px] md:text-[40px] md:leading-[48px] font-medium text-primary-fixed-dim mb-16">
-          Lo que dicen Nuestros Viajeros
-        </h2>
+      {/* El fondo es `voces-de-luz.webp`, el slide de Julia para esta seccion.
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((t, i) => (
-            <div
-              key={t.name}
-              className={`glass-card p-8 rounded-3xl text-left relative ${
-                i % 2 === 0
-                  ? "border-b-4 border-b-primary-fixed-dim/50"
-                  : "border-b-4 border-b-secondary/50"
-              }`}
-            >
-              <div className="flex text-primary-fixed-dim mb-6 gap-0.5">
-                {Array.from({ length: 5 }).map((_, j) => (
-                  <Star key={j} size={16} fill="currentColor" />
-                ))}
-              </div>
-              <p className="text-white italic mb-8 leading-relaxed">
-                &ldquo;{t.quote}&rdquo;
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-surface-variant border border-primary-fixed-dim/20 flex items-center justify-center text-primary-fixed-dim font-bold">
-                  {t.initial}
-                </div>
-                <span className="text-xs font-medium tracking-[0.05em] text-on-surface-variant">
-                  {t.name} ({t.location})
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+          El slide trae el polvo dorado en su borde SUPERIOR, y ese dorado es el
+          mismo plano que "Cuatro promesas" ya dibuja en su pie: apilados tal
+          cual, el reflejo salia dos veces con una costura recta en el medio. Por
+          eso el envoltorio arranca un 30% MAS ARRIBA que la seccion (`-top-[30%]`
+          contra `bottom-0`) y el `overflow-hidden` de la seccion se come esa
+          franja: queda el campo azul, que es lo que levanta el bloque del negro
+          del pie de la pagina, sin repetir el dorado.
+
+          La mascara remata las dos puntas: entra desvanecida (asi engancha con
+          el desvanecido del pie de las promesas, en vez de arrancar con un filo)
+          y sale desvanecida contra el banner de cierre. Ojo con los porcentajes:
+          se miden sobre el ENVOLTORIO, que es un 30% mas alto que la seccion, asi
+          que el borde de arriba de la seccion cae recien en el 23% de la mascara
+          — arrancar el degrade en 0% dejaba la imagen ya medio opaca justo en ese
+          borde, que es la costura que se queria evitar.
+
+          Ojo con el `z-index`: no puede ser negativo. `body` pinta su propio
+          degrade despues de los descendientes de z negativo del contexto raiz (y
+          `body::before`, el campo de estrellas, ya vive en `z-index: -1`), asi
+          que un `-z-10` deja la imagen tapada por el fondo de la pagina. Va
+          envoltorio en `z-0` y contenido en `z-10`. */}
+      <div className="absolute inset-x-0 -top-[30%] bottom-0 z-0 [mask-image:linear-gradient(to_bottom,transparent_0%,transparent_23%,rgba(0,0,0,0.5)_33%,#000_45%,#000_86%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,transparent_23%,rgba(0,0,0,0.5)_33%,#000_45%,#000_86%,transparent_100%)]">
+        <Image
+          src={IMAGES.homeVoces}
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover object-bottom"
+        />
       </div>
-    </motion.section>
+
+      <div className="relative z-10 mx-auto w-full max-w-narrative px-margin-mobile pt-24 pb-20 md:px-margin-desktop md:pt-[9rem] md:pb-section">
+        <Reveal>
+          <SectionHeading
+            title={HOME_COPY.voces.title}
+            label={HOME_COPY.voces.label}
+          />
+
+          <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
+            {TESTIMONIALS.map((t) => (
+              <figure
+                key={t.name}
+                className="glass-card flex flex-col rounded-2xl p-7 text-left"
+              >
+                <blockquote className="font-display text-body-md leading-relaxed text-on-surface">
+                  &ldquo;{t.quote}&rdquo;
+                </blockquote>
+
+                {/* `mt-auto` alinea el pie de las tres tarjetas aunque las citas
+                    tengan largos distintos. */}
+                <figcaption className="mt-auto flex items-center gap-3 pt-8">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-variant/70 font-display text-primary-fixed-dim">
+                    {t.initial}
+                  </span>
+                  <span>
+                    <span className="block font-display text-body-md text-on-surface">
+                      {t.name}
+                    </span>
+                    <span className="block text-label-sm uppercase text-on-surface-variant/70">
+                      {t.location}
+                    </span>
+                  </span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </section>
   );
 }

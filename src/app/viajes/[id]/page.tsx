@@ -119,7 +119,7 @@ export default async function ViajePage({ params }: Props) {
   return (
     <>
       <Header />
-      <main className="pt-16 min-h-screen">
+      <main className="pt-16 lg:pt-21 min-h-screen">
         <div className="px-5 max-w-5xl mx-auto py-10 md:py-16">
           <Link
             href="/viajes"

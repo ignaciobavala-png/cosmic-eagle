@@ -23,7 +23,7 @@ export default async function NuevaClavePage() {
   return (
     <>
       <Header />
-      <main className="pt-16 min-h-screen flex items-center justify-center">
+      <main className="pt-16 lg:pt-21 min-h-screen flex items-center justify-center">
         <div className="text-center px-5 flex flex-col items-center gap-6 py-12">
           <div>
             <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary-fixed-dim mb-2">

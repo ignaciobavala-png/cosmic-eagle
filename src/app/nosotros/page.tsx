@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
-import { PageHero } from "@/components/ui/PageHero";
+import { PageHero, renderTitle } from "@/components/ui/PageHero";
 import { FeatureBlock } from "@/components/ui/FeatureBlock";
 import { DocumentCard } from "@/components/ui/DocumentCard";
 import { ClosingSection } from "@/components/ui/ClosingSection";
-import { renderTitle } from "@/components/HeroSection";
 import { getSiteContent } from "@/lib/site-content";
 
 export const metadata: Metadata = {
@@ -26,7 +25,7 @@ export default async function NosotrosPage() {
   return (
     <>
       <Header />
-      <main className="pt-16">
+      <main className="pt-16 lg:pt-21">
         <PageHero
           image={content("nosotros.hero.image")}
           title={renderTitle(content("nosotros.hero.title"))}

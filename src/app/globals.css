@@ -178,6 +178,36 @@
   animation: float 6s ease-in-out infinite;
 }
 
+/* Zoom lento del hero de la home: scale(1) -> scale(1.1) en 8s, con 200ms de
+   retraso. Va en CSS y no en Framer Motion a proposito: es la imagen del LCP, y
+   asi la seccion sigue siendo Server Component y no arrastra JS para animarse.
+   `both` mantiene la escala inicial durante el retraso y la final al terminar. */
+@keyframes hero-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@utility animate-hero-zoom {
+  animation: hero-zoom 8000ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
+  /* El origen va arriba y no al centro: la figura tiene la cabeza cerca del
+     borde superior, y escalando desde el centro se le sale del recorte. */
+  transform-origin: center 28%;
+  will-change: transform;
+}
+
+/* Las reglas sin `@layer` le ganan a las utilidades de Tailwind, que si estan
+   en capa. Por eso este bloque apaga las animaciones aunque se escriba antes. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-zoom,
+  .animate-float {
+    animation: none;
+  }
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: #e3c37d #0e0e0b;

@@ -12,6 +12,13 @@ export const IMAGES = {
   almas: "/img/almas-particulas.webp",
   nosotrosProposito: "/img/nosotros-proposito.webp",
   nosotrosMetodologia: "/img/nosotros-metodologia.webp",
+  // Rediseno de la home (docs/HOME_REDISENO.md). Los degrades de "La humanidad",
+  // la banda dorada y el fondo del footer NO estan aca: se hacen en CSS.
+  homeHero: "/img/home/hero.webp",
+  homeFraseMask: "/img/home/frase-manifiesto.webp",
+  homePromesas: "/img/home/cuatro-promesas.webp",
+  homeVoces: "/img/home/voces-de-luz.webp",
+  homeCierre: "/img/home/cierre.webp",
   portal1: "/img/portal-1.webp",
   portal2: "/img/portal-2.webp",
   portal3: "/img/portal-3.webp",
@@ -82,7 +89,12 @@ export type NavLink = {
 export const NAV_LINKS: NavLink[] = [
   { label: "Nosotros", href: "/nosotros", icon: "Info" },
   {
-    label: "Viajes",
+    // El mockup del rediseno lo llama "Experiencias", que ademas resuelve el
+    // problema de nomenclatura de docs/HOME_REDISENO.md §3.1: para Sofia "Viaje
+    // Cosmico" es solo el retiro, y el paraguas se habia quedado sin nombre.
+    // Cambia la etiqueta, NO la ruta: /viajes sigue igual y no hace falta
+    // redirect ni tocar los links existentes.
+    label: "Experiencias",
     href: "/viajes",
     icon: "Sparkles",
     // El desplegable no reemplaza al link: "Viajes" sigue yendo al listado
@@ -104,15 +116,16 @@ export const FOOTER_COLUMNS = [
   {
     title: "Explorar",
     links: [
-      { label: "Retiros", href: "/viajes" },
-      { label: "E-book", href: null },
-      { label: "Blog", href: null },
       { label: "Nosotros", href: "/nosotros" },
+      { label: "Experiencias", href: "/viajes" },
+      { label: "Contenidos", href: "/contenidos" },
     ],
   },
   {
     title: "Legal",
     links: [
+      // Privacidad no tiene ruta todavia, pero el texto SI existe: viene en el
+      // anexo del boceto de Sofia. Es composicion pura, ver docs/HOME_REDISENO.md §7.
       { label: "Privacidad", href: null },
       { label: "Términos de Servicio", href: null },
       { label: "Contacto", href: "mailto:contacto@cosmiceaglejourney.com" },
@@ -130,29 +143,77 @@ export const PORTAL_ALTS = [
   "Portal de energía abriéndose sobre un cielo estrellado",
 ];
 
+/**
+ * "Voces de Luz" — los tres testimonios del mockup del rediseno.
+ *
+ * Reemplazan a los tres anteriores (Valentina/Pablo/Sandra). Pendiente de
+ * confirmar que sean publicables con nombre y pais: es la pregunta 5 de
+ * docs/HOME_REDISENO.md §9.
+ *
+ * El texto es literal del mockup, con una sola correccion: decia "evolcando",
+ * que no es una palabra. Queda como "evocando".
+ */
 export const TESTIMONIALS = [
   {
     quote:
-      "Recuperé la conexión con mi esencia y mi ser superior. El viaje marcó un punto de inflexión en mi vida.",
-    name: "Valentina",
-    location: "Chile",
+      "Todavía me sorprende la experiencia. Fue el viaje más increíble de mi vida. Sigo descubriendo nuevas comprensiones y habilidades que se activaron ese día, además de recibir información valiosa a través de mis sueños y prácticas. Me siento inmensamente agradecida.",
+    name: "Valeria",
+    location: "Uruguay",
     initial: "V",
   },
   {
     quote:
-      "Fue un viaje muy profundo, luminoso y brillante. Me sentí bienvenido por una comunidad cósmica.",
-    name: "Pablo",
-    location: "Francia",
-    initial: "P",
+      "Fue un regalo que cambió mi vida para siempre, evocando una sensación de amor que me acompaña en cada desafío diario. Accedí a un mundo que intuía, abriéndome a una maravillosa realidad oculta.",
+    name: "Claudia",
+    location: "Chile",
+    initial: "C",
   },
   {
     quote:
-      "Me he sentido más ligera, libre y muy empoderada. Fue una experiencia realmente hermosa.",
-    name: "Sandra",
-    location: "USA",
-    initial: "S",
+      "Un viaje interior memorable, donde experimenté directamente un amor profundo e incondicional. Me abrió las puertas a una nueva perspectiva del mundo, a comprender quién soy realmente y el rumbo que quiero darle a mi vida.",
+    name: "Andrew",
+    location: "Inglaterra",
+    initial: "A",
   },
 ];
+
+/**
+ * Copy de la home rediseñada. Es texto de la clienta, transcrito literal del
+ * mockup de Julia — no se reescribe sin consultar (esta en tuteo, a diferencia
+ * del voseo del resto del sitio, igual que el filtro corto de Sofia).
+ *
+ * Vive junto en un solo objeto porque es lo que va a entrar como bloque al
+ * `es.json` cuando se haga i18n.
+ */
+export const HOME_COPY = {
+  // El corte de la frase manifiesto es una decision de diseno: la primera mitad
+  // sube desde abajo y la segunda baja desde arriba (docs/HOME_REDISENO.md §5.2).
+  frase: {
+    left: "Cuando el alma está lista,",
+    right: "el camino aparece.",
+  },
+  humanidad: {
+    titleStrong: "La humanidad",
+    titleRest: "está recordando su verdadera naturaleza",
+    paragraphs: [
+      "Dentro de cada uno de nosotros habita una esencia vasta y divina: una conciencia superior que guía, ilumina y custodia la memoria de quienes realmente somos.",
+      "Conectarse con esta inteligencia es recordar nuestro origen: el de seres multidimensionales que han transitado a través de vidas y civilizaciones, llevando consigo sabiduría, conocimiento y un potencial inexplorado.",
+    ],
+    highlight:
+      "Únete a nosotros en un viaje para despertar y encarnar tu máximo potencial. Un espacio de conexión directa con la fuente, con el poder de la luz y con la sabiduría original.",
+    action: { label: "Acceso comunidad", href: "/cuenta" },
+  },
+  promesas: [
+    "Despierta nuevas capacidades internas",
+    "Expande tu camino personal",
+    "Desbloquea tu conexión con lo divino",
+    "Contribuye a la evolución colectiva",
+  ] as const,
+  voces: {
+    title: "Voces de Luz",
+    label: "Lo que dicen nuestros viajeros",
+  },
+} as const;
 
 export const EBOOK_FEATURES = [
   {
