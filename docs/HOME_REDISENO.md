@@ -582,10 +582,11 @@ versión técnica.
 
 ---
 
-## 10. Estado de la rama `home_rediseño`
+## 10. Estado de la rama `home_rediseño` — **mergeada a `main` el 21/08**
 
-Seis commits, **revisados en local y aprobados por Ignacio el 20/08**. Sin push: la rama no
-existe todavía en GitHub y no hay nada en producción.
+Doce commits, revisados en local y aprobados por Ignacio. La rama se mergeó a `main` con
+merge commit (`--no-ff`, así el hilo del rediseño queda legible en el historial), se pusheó
+y se borró: `main` es de nuevo la única rama.
 
 ```
 docs: mapa y plan del rediseno de la home
@@ -594,19 +595,34 @@ docs: cierran las dos definiciones que faltaban del rediseno
 feat: las primitivas del rediseno de la home
 feat: la home compuesta con el diseno nuevo
 feat: los slots de Multimedia de la home nueva, y limpieza del navbar
+docs: cierre de la sesion del rediseno de la home
+docs: las consultas pendientes, tambien en version para mandar
+feat: el navbar de produccion, opaco y con el degrade de Julia
+fix: el hero de la home se ancla arriba y no le corta la cabeza a la figura
+feat: "Voces de Luz" recupera su fondo
+docs: el navbar de produccion y el cierre del rediseno de la home
 ```
 
+**El push a `main` deploya solo a producción** (el repo está conectado al proyecto de
+Vercel por GitHub App), así que el rediseño sale en vivo con el merge. No hubo preview
+intermedio: la revisión fue en local, con capturas.
+
 Verificado en cada paso: `tsc`, lint (los 2 errores de `admin/multimedia/SlotEditor.tsx`
-son previos y no se tocaron), `pnpm build`, y capturas reales de la página renderizada en
-1440 y en 390.
+son previos y no se tocaron), `pnpm build` (la home sigue siendo `○`, prerender estático), y
+capturas reales de la página renderizada en 1440, 1920, 2560 y 390.
 
 **Sin verificar end-to-end** (requiere sesión de admin, la hace Ignacio): que el grupo
 "Inicio" de `/admin/multimedia` liste los slots nuevos y que subir una imagen desde ahí
 cambie la home.
 
-### Lo que falta antes de mergear
+### Lo que quedó pendiente después del merge
 
 1. Responder las preguntas abiertas de §9 — ninguna bloquea el código, pero la 3, la 4 y la
    9 deciden qué se borra y qué se muda.
-2. Borrar o mudar los cinco componentes que quedaron sin uso (§8.b).
-3. Push de la rama → preview de Vercel → revisión de Estela y Sofía → merge a `main`.
+2. **Cuatro componentes quedaron sin uso** (§8.b): `PortalsSection`, `AboutSection`,
+   `EbookSection` y `TripsSection`. No se borraron a propósito — la decisión de §9 puede
+   mudarlos a `/preparacion` o a otra página. Con ellos quedan sin uso cuatro entradas de
+   `IMAGES` (`heroHome`, `portal1`, `portal2`, `portal3`) y dos assets convertidos que
+   terminaron resueltos en CSS: `public/img/home/footer.webp` y `humanidad.webp` (8 KB
+   entre los dos).
+3. Revisión de Estela y Sofía sobre el sitio en producción.
