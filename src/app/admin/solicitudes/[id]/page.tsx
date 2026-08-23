@@ -3,6 +3,12 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ReviewButtons } from "../ReviewButtons";
 import { PaymentControls } from "../PaymentControls";
+import { AnswerList } from "../../AnswerList";
+import {
+  SCREENING_FIELDS,
+  HEALTH_FIELDS,
+  answersFor,
+} from "@/lib/health-history";
 
 const STATUS_LABEL: Record<string, string> = {
   pending_review: "Pendiente",
@@ -22,29 +28,6 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
     <div className="py-3 border-b border-outline-variant/40 last:border-0">
       <p className="text-xs text-on-surface-variant tracking-[0.02em] mb-1">{label}</p>
       <p className="text-on-surface">{value || "—"}</p>
-    </div>
-  );
-}
-
-function BoolField({
-  label,
-  value,
-  detail,
-  flagIfTrue = true,
-}: {
-  label: string;
-  value: boolean;
-  detail?: string | null;
-  flagIfTrue?: boolean;
-}) {
-  const flagged = flagIfTrue && value;
-  return (
-    <div className="py-3 border-b border-outline-variant/40 last:border-0">
-      <p className="text-xs text-on-surface-variant tracking-[0.02em] mb-1">{label}</p>
-      <p className={flagged ? "text-error font-medium" : "text-on-surface"}>
-        {value ? "Sí" : "No"}
-        {value && detail ? ` — ${detail}` : ""}
-      </p>
     </div>
   );
 }
@@ -148,45 +131,32 @@ export default async function SolicitudDetallePage({
         <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
           Filtro inicial
         </h2>
-        <Field label="Email" value={application.email} />
-        <Field label="Teléfono" value={application.phone} />
-        <Field
-          label="Ceremonias previas con Estela"
-          value={application.previous_ceremonies}
-        />
-        <BoolField
-          label="Enfermedad grave (actual o pasada)"
-          value={application.serious_illness}
-          detail={application.serious_illness_detail}
-        />
-        <BoolField
-          label="Tratamiento psiquiátrico o psicológico"
-          value={application.mental_health_treatment}
-          detail={application.mental_health_treatment_detail}
-        />
-        <BoolField
-          label="Tratamiento médico / medicación en curso"
-          value={application.current_medication}
-          detail={application.current_medication_detail}
-        />
-        <Field label="Tema a trabajar" value={application.theme} />
-        <Field label="Comentario" value={application.comment} />
-        <Field
-          label="Enviada"
-          value={new Date(application.created_at).toLocaleString("es-AR")}
-        />
-        {application.reviewed_at && (
+        <AnswerList answers={answersFor(SCREENING_FIELDS, application, null)}>
           <Field
-            label="Revisada"
-            value={new Date(application.reviewed_at).toLocaleString("es-AR")}
+            label="Enviada"
+            value={new Date(application.created_at).toLocaleString("es-AR")}
           />
-        )}
+          {application.reviewed_at && (
+            <Field
+              label="Revisada"
+              value={new Date(application.reviewed_at).toLocaleString("es-AR")}
+            />
+          )}
+        </AnswerList>
       </div>
 
       <div className="glass-card rounded-2xl p-6 md:p-8">
-        <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
-          Formulario de salud
-        </h2>
+        <div className="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+          <h2 className="font-display text-xl text-primary-fixed-dim">
+            Formulario de salud
+          </h2>
+          <Link
+            href={`/admin/crm/${application.user_id}`}
+            className="text-xs text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
+          >
+            Ver el historial de esta persona →
+          </Link>
+        </div>
 
         {!health ? (
           <p className="text-on-surface-variant text-sm">
@@ -195,67 +165,12 @@ export default async function SolicitudDetallePage({
           </p>
         ) : (
           <>
-            <Field label="Edad" value={health.age} />
-            <Field label="Altura" value={health.height} />
-            <Field label="Peso" value={health.weight} />
-            <Field label="País" value={health.country} />
-            <Field label="Ocupación" value={health.occupation} />
-            <BoolField
-              label="Condición de salud"
-              value={health.health_condition}
-              detail={health.health_condition_detail}
-            />
-            <BoolField
-              label="Estrés / ansiedad"
-              value={health.stress_anxiety}
-              detail={health.stress_anxiety_detail}
-              flagIfTrue={false}
-            />
-            <BoolField
-              label="Trauma"
-              value={health.trauma}
-              detail={health.trauma_detail}
-            />
-            <BoolField
-              label="Uso de sustancias"
-              value={health.substance_use}
-              detail={health.substance_use_detail}
-            />
-            <BoolField
-              label="Alergias"
-              value={health.allergies}
-              detail={health.allergies_detail}
-              flagIfTrue={false}
-            />
-            <BoolField
-              label="Práctica espiritual"
-              value={health.spiritual_practice}
-              detail={health.spiritual_practice_detail}
-              flagIfTrue={false}
-            />
-            <BoolField
-              label="Primera vez con plantas"
-              value={health.first_time_plants}
-              detail={health.plants_detail}
-              flagIfTrue={false}
-            />
-            <BoolField
-              label="Temas a trabajar"
-              value={health.has_themes}
-              detail={health.themes_detail}
-              flagIfTrue={false}
-            />
-            <BoolField
-              label="Miedos"
-              value={health.fears}
-              detail={health.fears_detail}
-              flagIfTrue={false}
-            />
-            <Field label="Comentario" value={health.comment} />
-            <Field
-              label="Enviado"
-              value={new Date(health.created_at).toLocaleString("es-AR")}
-            />
+            <AnswerList answers={answersFor(HEALTH_FIELDS, health, null)}>
+              <Field
+                label="Enviado"
+                value={new Date(health.created_at).toLocaleString("es-AR")}
+              />
+            </AnswerList>
           </>
         )}
       </div>

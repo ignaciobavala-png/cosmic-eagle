@@ -113,6 +113,50 @@ etiqueta manual.
 
 **Abierto:** confirmar esa lectura con Sofía.
 
+## 3.b Ficha de salud por persona (2026-08-23)
+
+Pedido de la reunión con Sofía y Juli: *"generar fichas de salud por usuario:
+armar historial de salud donde se acumulan las nuevas respuestas de formularios
+respondidos por el usuario"*.
+
+Implementado en `/admin/crm/[id]`. **No hizo falta migración**: el historial ya
+se acumulaba solo, repartido entre las dos etapas de la inscripción (ver
+`docs/FLUJO_INSCRIPCION.md`). Lo que no existía era una lectura por persona —
+todo se veía por solicitud, en `/admin/solicitudes/[id]`.
+
+La página tiene tres partes:
+
+1. **Aviso de atención** — las respuestas marcadas (enfermedad grave,
+   tratamiento psiquiátrico, medicación, condición de salud, trauma, sustancias)
+   según lo último declarado. Es el mismo criterio de los triggers de aviso.
+2. **Estado actual** — el último valor conocido de cada pregunta del formulario
+   extenso, sin tener que abrir entrega por entrega.
+3. **Historial** — cada entrega en orden, de la más nueva a la más vieja, con
+   las respuestas que **cambiaron** respecto de la anterior marcadas
+   ("antes decía: ..."). Ese diff es lo que convierte la lista en historial.
+
+Decisiones:
+
+- **El diff se calcula contra la entrega anterior del mismo tipo.** Comparar el
+  filtro corto con el formulario extenso sería comparar preguntas distintas.
+- **Las listas de preguntas se declaran una sola vez**, en
+  `src/lib/health-history.ts` (`SCREENING_FIELDS` / `HEALTH_FIELDS`), y las
+  consumen tanto esta ficha como el detalle de solicitud a través de
+  `src/app/admin/AnswerList.tsx`. Antes estaban escritas a mano en la página del
+  detalle; con dos pantallas mostrando las mismas ~20 preguntas se
+  desincronizaban solas (es el mismo problema que tuvo `TYPE_LABEL`).
+- **Sin tabla ni vista nueva.** El cruce se arma en memoria, igual que el resto
+  del CRM: si esto crece a miles de personas hay que mover el join a una vista,
+  y la nota de §3 aplica igual.
+- Las dos pantallas se enlazan cruzadas: de la ficha a cada solicitud, y del
+  detalle de solicitud al historial de la persona.
+
+**Ojo con §7**: esta pantalla junta en un solo lugar todo lo que la persona
+declaró sobre su salud. Es exactamente el dato sensible del que habla esa
+sección, y ahora está a un click desde el listado del CRM. La RLS ya lo limita a
+admin (las policies `*_admin_all`), pero cualquier rol intermedio que se agregue
+más adelante **no** puede heredar el acceso a `/admin/crm` sin pensar esto.
+
 ## 4. Canalización de comunicación
 
 El CRM define los segmentos; la comunicación es el canal que les habla. Son dos features

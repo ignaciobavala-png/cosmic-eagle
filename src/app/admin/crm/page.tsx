@@ -216,7 +216,7 @@ export default async function AdminCrmPage({
         </p>
       ) : (
         <div className="glass-card overflow-x-auto rounded-2xl">
-          <table className="w-full min-w-[46rem] text-sm">
+          <table className="w-full min-w-[54rem] text-sm">
             <thead>
               <tr className="border-b border-outline-variant text-left text-on-surface-variant">
                 <th className="px-5 py-3 font-medium">Persona</th>
@@ -225,6 +225,7 @@ export default async function AdminCrmPage({
                 <th className="px-5 py-3 font-medium">Ceremonias</th>
                 <th className="px-5 py-3 font-medium">Estado</th>
                 <th className="px-5 py-3 font-medium">Registro</th>
+                <th className="px-5 py-3 font-medium sr-only">Ficha</th>
               </tr>
             </thead>
             <tbody>
@@ -287,6 +288,14 @@ export default async function AdminCrmPage({
                   </td>
                   <td className="px-5 py-4 text-on-surface-variant">
                     {formatDate(contact.createdAt)}
+                  </td>
+                  <td className="px-5 py-4">
+                    <Link
+                      href={`/admin/crm/${contact.id}`}
+                      className="whitespace-nowrap text-xs text-on-surface-variant transition-colors hover:text-primary-fixed-dim"
+                    >
+                      Ficha de salud →
+                    </Link>
                   </td>
                 </tr>
               ))}
