@@ -152,22 +152,35 @@ export const SITE_GROUPS = [
         fallback: "+10 años acompañando transformaciones",
       },
       {
+        key: "nosotros.frase",
+        label: "Frase sobre la imagen",
+        help: "La frase corta que aparece sola, centrada sobre la foto a pantalla completa.",
+        type: "text",
+        fallback:
+          "El viaje comienza cuando dejamos de buscar afuera lo que siempre estuvo adentro.",
+      },
+      // Las dos keys de abajo son las de los bloques "Evolución Consciente" y
+      // "Metodología", que el rediseño de Julia elimina. Se REUSAN a proposito,
+      // con la misma key y otra etiqueta: asi la foto que la clienta ya subio
+      // desde el panel sigue apareciendo en la pagina nueva. Renombrarlas
+      // dejaria las filas huerfanas y la pagina con los assets del repo.
+      {
         key: "nosotros.proposito.image",
-        label: "Imagen de “Evolución Consciente”",
-        help: "La foto ovalada que acompaña al primer bloque de texto.",
+        label: "Imagen de la frase central",
+        help: "La foto a pantalla completa que va detrás de la frase. Se ve oscurecida, así que conviene una imagen atmosférica y no un retrato.",
         type: "image",
         fallback: IMAGES.nosotrosProposito,
-        ratio: "3/4",
-        maxPx: 1400,
+        ratio: "16/9",
+        maxPx: 1920,
       },
       {
         key: "nosotros.metodologia.image",
-        label: "Imagen de la metodología",
-        help: "La foto del segundo bloque, el que habla de cómo se trabaja.",
+        label: "Imagen de cierre",
+        help: "El fondo de la última pantalla, la del título “Un viaje hacia el Humano Luminoso”. Se ve tenue detrás del texto.",
         type: "image",
         fallback: IMAGES.nosotrosMetodologia,
-        ratio: "4/3",
-        maxPx: 1400,
+        ratio: "16/9",
+        maxPx: 1920,
       },
     ],
   },

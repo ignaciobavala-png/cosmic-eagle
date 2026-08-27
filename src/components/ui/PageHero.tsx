@@ -18,6 +18,7 @@ export function PageHero({
   scrollHint,
   scrollTo,
   priority = true,
+  height = "banner",
 }: {
   image: string;
   imageAlt?: string;
@@ -27,17 +28,35 @@ export function PageHero({
   scrollHint?: string;
   scrollTo?: string;
   priority?: boolean;
+  /**
+   * `banner` es el hero historico (82% del alto, con el pie desvanecido sobre
+   * el fondo de la pagina). `full` es el del rediseño de Julia: ocupa la
+   * pantalla entera y corta seco, porque debajo arranca una seccion opaca con
+   * su propio fondo y no hay degrade del `body` que dejar ver.
+   */
+  height?: "banner" | "full";
 }) {
+  const full = height === "full";
   return (
     // `svh` en mobile a proposito: con `vh` la barra del browser queda fuera de
     // la cuenta y el hint de scroll cae debajo del pliegue visible.
-    <section className="relative min-h-[30rem] h-[82svh] max-h-[52rem] w-full overflow-hidden md:min-h-[36rem] md:h-[82vh]">
+    <section
+      className={
+        full
+          ? "relative h-[100svh] min-h-[34rem] w-full overflow-hidden"
+          : "relative min-h-[30rem] h-[82svh] max-h-[52rem] w-full overflow-hidden md:min-h-[36rem] md:h-[82vh]"
+      }
+    >
       {/* La foto y sus tintes van juntos dentro de un grupo enmascarado: el borde
           inferior se desvanece a transparente y deja ver el degrade del `body`,
           en vez de cortar contra un negro que no coincide con el azul de la
           pagina. Sin la mascara el limite banner/seccion queda como una linea. */}
       <div
-        className="absolute inset-0 [mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)]"
+        className={
+          full
+            ? "absolute inset-0"
+            : "absolute inset-0 [mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)]"
+        }
       >
         <Image
           src={image}
