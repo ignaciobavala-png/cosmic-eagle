@@ -862,6 +862,112 @@ clip de 1,5 MB).
   `ClosingBanner`, más los cuatro de agosto. No se borraron: varios cargan el
   copy huérfano.
 
+### Sesión del 2026-08-27 (bis) — la pantalla de acceso de Julia
+
+Julia mandó `login.html` y `register.html` (en `~/Descargas`, **fuera del repo**).
+**Son el mismo archivo con el prefijo de las clases renombrado** (`login-` /
+`reg-`): un solo componente, `src/components/ui/AuthScreen.tsx`, con el copy y el
+formulario como props.
+
+- **Imagen a la izquierda, formulario a la derecha.** La imagen es una *tarjeta
+  flotante* (margen, esquinas, sombra) que se mete bajo el panel del formulario
+  con un margen derecho negativo. **En mobile no se muestra** (`hidden md:block`,
+  el breakpoint único de 768px de todo su diseño).
+- **La foto venía embebida en base64** dentro de los dos HTML (una costa
+  bioluminiscente, 816×1456). Extraída a `public/img/cuenta-acceso.webp`
+  (113 KB → 54 KB) y editable desde el panel: grupo **"Acceso"** nuevo en
+  `/admin/multimedia`, slot `cuenta.acceso.image`, recorte 9/16.
+- **El Ken Burns son DOS copias de la misma imagen**, no una: la segunda lleva
+  `animation-delay:-1s` y la que termina su acercamiento se funde con la que
+  recién arranca. Con una sola copia el ciclo de 6s saltaría a la vista.
+  `@keyframes kb-zoom` en globals.css. **Ojo con `prefers-reduced-motion`**: no
+  alcanza `animation:none`, porque la segunda copia se quedaría con la opacidad 0
+  del estado inicial tapando a la primera — hay que esconderla explícitamente.
+- **Todo lo que anima va en CSS** (`animate-kb-zoom`, `animate-auth-card`), así la
+  pantalla sigue siendo Server Component y el `"use client"` queda acotado al
+  formulario, que ya lo necesitaba por `useActionState`.
+- Los estilos de campo salieron a `src/app/cuenta/fields.ts` y los comparten los
+  **cuatro** formularios: ingreso, registro, recuperar y clave nueva. Las dos
+  últimas pantallas también pasaron al `AuthScreen`, porque quedaban descolgadas
+  a un click del login nuevo.
+- **La vista con sesión NO se rediseñó**: Julia solo mandó el estado deslogueado.
+
+Verificado: `tsc`, lint, build de producción y capturas reales de `/cuenta`,
+`/cuenta?modo=registro` y `/cuenta/recuperar` en 1440×900 y 390×844.
+
+**Sin verificar end-to-end** (requiere sesión de admin): subir una foto nueva al
+slot `cuenta.acceso.image` desde Multimedia y verla en la pantalla de acceso.
+
+### Sesión del 2026-08-27 (ter) — el motor de reveal, con la spec de Julia
+
+Julia dejó `spec_verificacion_sitio.html` (en `~/Descargas`, **fuera del repo**):
+el inventario exacto de selectores, umbrales, duraciones y delays sacado de los
+tres HTML aprobados. La auditoría cruzada quedó en
+`~/Escritorio/auditoria-animaciones-julia.html`. **Los tres HTML originales
+desaparecieron de Descargas** al llegar estos archivos — hay que pedírselos.
+
+`src/components/ui/Reveal.tsx` pasó de un fade fijo a los tres componentes del
+sistema: `Reveal` (contenedor observado), `RevealItem` (hijo de una cascada) y
+`RevealLine` (la línea dorada que crece). Antes **todo el sitio** revelaba con
+`once + margin:"-100px" + y:40 + 0.8s`, sin cascada. Ahora:
+
+| | Julia | Antes |
+|---|---|---|
+| disparo | umbral 0,22–0,40 del elemento | `margin:"-100px"`, apenas asoma |
+| cascada | 150ms entre título, línea, cuerpo, CTA | ninguna |
+| distancia | 24px (30 en frases, 40 en el manifiesto) | 40px siempre |
+| duración | 0,9s / 1,2s / 1,6s según bloque | 0,8s siempre |
+
+**Tres cosas que no son obvias y no hay que "simplificar":**
+
+1. **El observador se arma después de `load` + doble `rAF`.** Es el bug que ella
+   documentó en los tres archivos: el `IntersectionObserver` evalúa la
+   intersección **en el instante del `observe()`**, y si las fuentes o las
+   imágenes todavía no asentaron el layout puede creer que la sección ya está en
+   pantalla y disparar todo al cargar. Con `once` eso es **irreversible**.
+   Y la espera tiene que gatear el **observador**, no la salida: por eso a
+   `useInView` se le pasa una ref vacía hasta que está armado. Gatear solo la
+   salida no serviría — `useInView` ya habría quedado en `true` desde el montaje.
+2. **Se observa la SECCIÓN, no la columna de texto de adentro.** El umbral se
+   mide sobre lo observado: con el contenido centrado en una sección de pantalla
+   completa, un 0,3 sobre el bloque interno dispara muchísimo más tarde que el
+   mismo 0,3 sobre la sección (verificado: al 38% de la sección visible, con el
+   bloque interno observado seguía en 0). Además, observando la columna el
+   bloque **se apaga cuando todavía se lo ve**, porque la columna baja del
+   umbral antes que su último hijo salga de pantalla. De ahí `Reveal as="section"`
+   y la prop `reveal` de `CreamSection`.
+3. **`RevealLine` anima `scaleX` con `origin-left`, no `width`.** Se ve igual y
+   lo resuelve el compositor. **Ojo**: la línea crece en la home (70px) y en
+   `/nosotros` (64px), pero en `/viajes` y en "Salud y Seguridad" es **estática**
+   — así está en el código aprobado, la spec lo marca como intencional.
+
+**Reversibilidad: hay dos criterios y conviven a propósito.** La home es
+one-shot (`once` por defecto); `/nosotros` y `/viajes` son reversibles
+(`once={false}`), que es lo que hace `nosObserveToggle`/`expObserveToggle`. Está
+preguntado cuál gana.
+
+Otros arreglos que salen de la spec: **"Voces de Luz" perdió su animación de
+entrada** (en el código aprobado es el único bloque sin observer, el carrusel
+está siempre visible), `WordSequence` se rehízo con los siete elementos como
+hijos **directos** del contenedor —el escalón de Framer se reparte entre hijos
+directos, anidarlos daba dos tiempos en vez de siete— y sus retardos van de 0,1s
+a 1,2s.
+
+**Lo que sigue de la auditoría, sin hacer**: las fases 2 y 3 del scroll-story de
+la home (falta el "destilado" entero y el viaje de las keywords, y el tramo mide
+360vh contra 400vh), las alturas fijas en px (atmos 900, tecnología 900, cierre
+600 — hoy son `100svh`), "Nuestro propósito" palabra por palabra con
+`translateY(110%)`, los símbolos girando de `/nosotros` (los PNG ya están en
+`~/Descargas`), la flecha discover y la cartelera cerrada por defecto.
+
+Verificado con Chrome headless sobre el sitio corriendo, no a ojo: que al cargar
+el contenido está en 0 y aparece al llegar; que al 10% de sección visible **no**
+dispara y al 38% sí; que `/nosotros` revierte al subir y la home no; el orden de
+la cascada; que con `reduce motion` el contenido queda visible y sin observador;
+y un barrido de las tres páginas completas que confirma **cero elementos que
+queden invisibles**. Más `tsc`, lint (los 2 errores de `multimedia/SlotEditor.tsx`
+son previos) y build de producción.
+
 ## No hacer
 
 - No inventar cuentas de Supabase ni connection strings falsos
