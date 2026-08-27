@@ -304,3 +304,68 @@ reescribir en Framer Motion** — son problemas reales que se van a repetir. Fal
    que ya tenemos en los tres heros.
 9. ¿Se rehace página por página sobre la rama `refactoring` (Nosotros primero, que es la de
    menos riesgo) o las tres juntas? La home es la que está en producción y en las reuniones.
+
+---
+
+## 8. Estado de la implementación (rama `refactoring`, 27/08)
+
+**Las tres páginas están volcadas.** Nada pusheado ni deployado todavía.
+
+| Página | Commit | Estado |
+|---|---|---|
+| `/nosotros` | `c11fa4f` | completa |
+| `/viajes` | `bd6ba65` | completa |
+| `/` | este | completa |
+
+### Criterios que se aplicaron en las tres
+
+1. **Donde Julia puso video va la imagen que ya está cargada.** `MediaStatement`
+   pasa a `<video poster={image}>` sin tocar ninguna página cuando lleguen.
+2. **Las keys de los slots no cambian aunque cambie la sección.** Se reusaron
+   `nosotros.proposito.image`, `nosotros.metodologia.image`, `home.frase.left`,
+   `home.frase.right` y `home.promesas.image` con otra etiqueta en el panel, para
+   que lo que la clienta ya subió siga apareciendo. Slots nuevos:
+   `nosotros.frase`, `viajes.about.image`, `viajes.banner.image`,
+   `home.atmos.text`, `home.tecnologia.image`.
+3. **Ninguna imagen del repo quedó sin uso** salvo `frase-manifiesto.webp` (la
+   máscara de la frase, que el rediseño ya no necesita) y `portal-3.webp`.
+4. **Los rótulos Sesiones/Viajes van sólo en el copy de las páginas**, que es lo
+   que dice el mockup. El navbar y el panel siguen diciendo Ceremonias/Retiros
+   hasta que se confirme el cambio de nomenclatura (pregunta 5).
+5. **Todo lo que anima respeta `prefers-reduced-motion`**, que Julia no
+   contempló: los bloques con scroll largo se aplanan a texto normal.
+
+### La home vuelve a tener viajes, y sigue siendo estática
+
+Era el riesgo del punto 1 de §2. Se resolvió con **ISR**: la home lee los viajes
+con un **cliente sin cookies** (`src/lib/supabase/public.ts`, extraído del que ya
+usaba `site-content`) y declara `revalidate = 3600`. El build la sigue marcando
+`○` — se sirve del CDN y se revalida sola una vez por hora, así que publicar un
+viaje lo muestra en la home sin deploy y sin pegarle a Supabase en cada visita.
+
+Ojo: `createClient` (el de `supabase/server.ts`) lee `cookies()` y **vuelve
+dinámica cualquier página que lo use**. Para contenido público hay que usar el
+cliente sin cookies.
+
+### Componentes que quedaron sin uso
+
+`QuoteBand`, `ImageStatements`, `HumanitySection`, `GoldDivider`, `FeatureBlock`,
+`DocumentCard`, `CallBand`, `ClosingSection`/`ClosingBanner`, más los cuatro que
+ya estaban sin uso desde el 20/08 (`PortalsSection`, `AboutSection`,
+`EbookSection`, `TripsSection`, `TestimonialsBand` sí se usa).
+
+**No se borraron**: varios cargan copy de la clienta que el rediseño no reubica
+(`docs/COPY_HUERFANO.md`). Se limpian cuando esté decidido a dónde va ese texto.
+
+### Lo que falta
+
+- **Los tres videos y el patrón de símbolos de Nosotros.** Julia los dejó como
+  placeholder.
+- **`/contenidos`, `/cuenta` y el detalle de un viaje** no fueron rediseñados y
+  siguen con el sistema visual anterior. Conviven bien (comparten navbar, footer
+  y paleta), pero el corte se nota al pasar de una a otra.
+- **Las 7 preguntas** del HTML que se le mandó a Julia (`~/Escritorio/
+  consultas-julia-rediseno.html`): tipografía, navbar translúcido, copy huérfano,
+  nomenclatura, testimonios por tipo y el botón de la cuenta.
+- **Verificación visual**: no hay capturas. La extensión de Chrome no está
+  conectada en esta máquina; se verificó con `tsc`, lint y build de producción.

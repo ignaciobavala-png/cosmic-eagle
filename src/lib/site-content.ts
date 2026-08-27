@@ -1,6 +1,5 @@
-import { createServerClient } from "@supabase/ssr";
 import { unstable_cache } from "next/cache";
-import type { Database } from "./supabase/types";
+import { createPublicClient } from "./supabase/public";
 import { IMAGES } from "./constants";
 
 /**
@@ -64,61 +63,54 @@ export const SITE_GROUPS = [
       {
         key: "home.frase.left",
         label: "Frase · primera mitad",
-        help: "La frase suelta debajo de la portada se parte en dos: esta mitad entra desde abajo. Va con la coma al final.",
+        help: "La frase grande que ocupa toda la pantalla debajo de la portada: esta es la primera línea.",
         type: "text",
-        fallback: "Cuando el alma está lista,",
+        fallback: "Somos mucho más",
       },
       {
         key: "home.frase.right",
         label: "Frase · segunda mitad",
-        help: "La otra mitad de la misma frase; entra desde arriba. Las dos terminan juntas en el centro.",
+        help: "La segunda línea de la misma frase. Se muestra en blanco, debajo de la primera.",
         type: "text",
-        fallback: "el camino aparece.",
+        fallback: "que nuestra historia",
       },
+      // La key es la de "las cuatro promesas", que el rediseño elimina: se reusa
+      // para que la imagen que la clienta ya subio siga apareciendo en la
+      // pagina nueva, en vez de quedar huerfana. Los cuatro textos de esas
+      // promesas SI quedaron sin lugar (ver docs/COPY_HUERFANO.md).
       {
         key: "home.promesas.image",
-        label: "Imagen de las cuatro frases",
-        help: "El fondo de la figura en meditación. Las cuatro frases se acomodan alrededor, así que conviene que la figura quede centrada y con aire a los costados.",
+        label: "Imagen de la frase del medio",
+        help: "La foto a pantalla completa con una frase centrada encima, después del calendario.",
         type: "image",
         fallback: IMAGES.homePromesas,
         ratio: "16/9",
         maxPx: 1920,
       },
       {
-        key: "home.promesas.1",
-        label: "Frase 1 (arriba a la izquierda)",
-        help: "Primera de las cuatro frases sobre la imagen.",
+        key: "home.atmos.text",
+        label: "Frase sobre la imagen del medio",
+        help: "La frase corta que va centrada sobre esa foto.",
         type: "text",
-        fallback: "Despierta nuevas capacidades internas",
+        fallback:
+          "Un campo de conciencia mucho más amplio que la historia que contamos sobre nosotros.",
       },
       {
-        key: "home.promesas.2",
-        label: "Frase 2 (arriba a la derecha)",
-        help: "Segunda de las cuatro frases sobre la imagen.",
-        type: "text",
-        fallback: "Expande tu camino personal",
-      },
-      {
-        key: "home.promesas.3",
-        label: "Frase 3 (abajo a la izquierda)",
-        help: "Tercera de las cuatro frases sobre la imagen.",
-        type: "text",
-        fallback: "Desbloquea tu conexión con lo divino",
-      },
-      {
-        key: "home.promesas.4",
-        label: "Frase 4 (abajo a la derecha)",
-        help: "Cuarta de las cuatro frases sobre la imagen.",
-        type: "text",
-        fallback: "Contribuye a la evolución colectiva",
+        key: "home.tecnologia.image",
+        label: "Imagen de “Tecnología del Alma”",
+        help: "La foto vertical que acompaña al texto de Tecnología del Alma, sobre el fondo claro.",
+        type: "image",
+        fallback: IMAGES.portal2,
+        ratio: "4/5",
+        maxPx: 1400,
       },
       {
         key: "home.cierre.image",
         label: "Imagen de cierre",
-        help: "La foto ancha del final, justo antes de la franja dorada y el pie de página. Se recorta muy apaisada.",
+        help: "La foto del final, a pantalla completa, con la frase “Un viaje hacia el Humano Luminoso” encima.",
         type: "image",
         fallback: IMAGES.homeCierre,
-        ratio: "21/9",
+        ratio: "16/9",
         maxPx: 1920,
       },
     ],
@@ -266,25 +258,12 @@ export function isSlotKey(value: unknown): value is SlotKey {
 }
 
 /**
- * Cliente sin cookies a proposito: `unstable_cache` no admite leer `cookies()`
- * dentro del scope cacheado, y este contenido es publico (lo lee `anon` por
- * RLS), asi que no necesita la sesion del visitante.
- */
-function publicClient() {
-  return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => [], setAll: () => {} } }
-  );
-}
-
-/**
  * Una sola lectura de todos los overrides por request, cacheada hasta que el
  * panel guarda (revalidateTag). Sin esto cada seccion consultaria la base.
  */
 const readOverrides = unstable_cache(
   async (): Promise<Record<string, string>> => {
-    const { data, error } = await publicClient()
+    const { data, error } = await createPublicClient()
       .from("site_content")
       .select("key, value");
 
