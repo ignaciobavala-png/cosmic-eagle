@@ -11,22 +11,30 @@
  * pinta gris claro por defecto y sobre crema no se lee. Por eso la seccion fija
  * el color base en azul oscuro y los hijos heredan.
  *
- * `min-h-screen` con `svh` en mobile: en el mockup cada una de estas pantallas
- * ocupa el alto completo del viewport.
+ * `full` (el default) le da el alto completo del viewport y centra el contenido,
+ * que es como aparecen las pantallas de /nosotros en el mockup. En /viajes los
+ * bloques son mas largos que una pantalla y llevan una banda de ancho completo
+ * adentro, asi que van sin centrar: ahi se pasa `full={false}`.
  */
 export function CreamSection({
   children,
   id,
+  full = true,
   className = "",
 }: {
   children: React.ReactNode;
   id?: string;
+  full?: boolean;
   className?: string;
 }) {
   return (
     <section
       id={id}
-      className={`flex w-full items-center justify-center bg-[#fff6eb] px-margin-mobile py-20 text-[#05125a] md:px-margin-desktop md:py-24 min-h-[100svh] ${className}`}
+      className={`w-full bg-[#fff6eb] px-margin-mobile py-20 text-[#05125a] md:px-margin-desktop md:py-24 ${
+        full
+          ? "flex min-h-[100svh] items-center justify-center"
+          : "block"
+      } ${className}`}
     >
       {children}
     </section>

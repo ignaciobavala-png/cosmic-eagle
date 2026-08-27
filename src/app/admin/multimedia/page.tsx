@@ -105,6 +105,11 @@ export default async function AdminMultimediaPage() {
       <div className="space-y-4">
         {SITE_GROUPS.map((group, i) => {
           const edited = group.slots.filter((s) => overrides[s.key]).length;
+          // `as const` en SITE_GROUPS hace que `length` sea un literal (3 | 6 | 9),
+          // y comparar contra 1 seria un error de tipos si ningun grupo mide 1.
+          // El singular tiene que seguir funcionando si manana un grupo queda
+          // con un solo slot, asi que se compara como numero.
+          const total: number = group.slots.length;
 
           return (
             <Accordion
@@ -112,7 +117,7 @@ export default async function AdminMultimediaPage() {
               title={group.title}
               href={group.href}
               open={i === 0}
-              summary={`${group.slots.length} ${group.slots.length === 1 ? "elemento" : "elementos"}${
+              summary={`${total} ${total === 1 ? "elemento" : "elementos"}${
                 edited > 0 ? ` · ${edited} editado${edited === 1 ? "" : "s"}` : ""
               }`}
             >

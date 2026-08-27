@@ -18,14 +18,20 @@ export function MediaStatement({
   image,
   imageAlt = "",
   text,
+  children,
   id,
   veil = 0.45,
+  width = "narrow",
 }: {
   image: string;
   imageAlt?: string;
-  text: string;
+  /** Frase suelta, centrada y en serif. Es el uso corriente del bloque. */
+  text?: string;
+  /** Alternativa a `text` para varios parrafos (el "About" de /viajes). */
+  children?: React.ReactNode;
   id?: string;
   veil?: number;
+  width?: "narrow" | "prose";
 }) {
   return (
     <section
@@ -44,10 +50,17 @@ export function MediaStatement({
         className="absolute inset-0 bg-[#05125a]"
         style={{ opacity: veil }}
       />
-      <Reveal className="relative z-10 max-w-2xl px-margin-mobile text-center md:px-margin-desktop">
-        <p className="font-display text-headline-md text-primary md:text-headline-lg text-balance">
-          {text}
-        </p>
+      <Reveal
+        className={`relative z-10 px-margin-mobile md:px-margin-desktop ${
+          width === "prose" ? "max-w-3xl" : "max-w-2xl text-center"
+        }`}
+      >
+        {text && (
+          <p className="font-display text-headline-md text-primary md:text-headline-lg text-balance">
+            {text}
+          </p>
+        )}
+        {children}
       </Reveal>
     </section>
   );

@@ -99,9 +99,13 @@ export const NAV_LINKS: NavLink[] = [
     icon: "Sparkles",
     // El desplegable no reemplaza al link: "Viajes" sigue yendo al listado
     // completo, los hijos son atajos al mismo listado ya filtrado.
+    // Desde el rediseno de Julia (27/08) /viajes son dos bloques con ancla
+    // propia y ya no una grilla filtrada por `?tipo=`, asi que los hijos del
+    // desplegable apuntan al ancla de su bloque. Los rotulos siguen siendo
+    // Retiros/Ceremonias hasta que se confirme el cambio de nomenclatura.
     children: TRIP_TYPES.map((t) => ({
       label: t.label,
-      href: `/viajes?tipo=${t.slug}`,
+      href: `/viajes#${t.value === "ceremonia" ? "sesiones" : "viajes"}`,
       description: t.description,
     })),
   },

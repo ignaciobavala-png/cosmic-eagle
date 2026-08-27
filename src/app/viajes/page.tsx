@@ -3,61 +3,54 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { PageHero } from "@/components/ui/PageHero";
-import { TripCard } from "@/components/ui/TripCard";
-import { CallBand } from "@/components/ui/CallBand";
+import { MediaStatement } from "@/components/ui/MediaStatement";
+import { CreamSection } from "@/components/ui/CreamSection";
+import { Collapsible } from "@/components/ui/Collapsible";
+import { TripCarousel } from "@/components/ui/TripCarousel";
+import { TestimonialsBand } from "@/components/ui/TestimonialsBand";
 import { Reveal } from "@/components/ui/Reveal";
 import { createClient } from "@/lib/supabase/server";
-import { IMAGES, TRIP_TYPES, tripTypeFromSlug } from "@/lib/constants";
+import type { TripCardData } from "@/components/ui/TripCard";
 import { getSiteContent } from "@/lib/site-content";
-import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Retiros & Ceremonias | Cosmic Eagle",
+  title: "Experiencias | Cosmic Eagle",
   description:
-    "Calendario de viajes y ceremonias ancestrales. Descubrí el viaje ideal para vos.",
+    "Sesiones Cósmicas de un día y Viajes Cósmicos de una semana en portales sagrados. Calendario, testimonios e información de salud.",
 };
 
 /**
- * Composicion del mockup VIAJES de Julia: P1 hero -> grilla P4 -> P6 llamado.
+ * /viajes según el rediseño de Julia (`EXPERIENCIAS.html`, ver
+ * docs/REDISENO_JULIA_HTML.md §3).
  *
- * El listado usaba markup propio; ahora comparte TripCard con la home, asi que
- * una tarjeta de viaje se ve igual en los dos lugares.
+ * Dejó de ser una grilla con filtros: ahora son **dos bloques narrativos**, uno
+ * por tipo, cada uno con su calendario desplegable y sus testimonios. El
+ * desplegable del navbar apunta a las anclas `#sesiones` y `#viajes`, que es lo
+ * que reemplaza al viejo `?tipo=`.
  *
- * Filtra `draft` explicitamente (via el `in` de status): la policy
- * trips_select_public deja leer todos los trips a `anon`.
+ * Los títulos usan el vocabulario de Sofía ("Sesión Cósmica" = ceremonia,
+ * "Viaje Cósmico" = retiro) porque es el copy del mockup. **Los rótulos del
+ * navbar y del panel siguen diciendo Ceremonias/Retiros** hasta que Julia
+ * confirme si el cambio de nombre va en todo el sitio (pregunta 5 del 27/08).
  *
- * `?tipo=retiros|ceremonias` filtra por trips.type — es a donde apuntan los dos
- * hijos del desplegable "Viajes" del navbar. Un tipo desconocido cae en el
- * listado completo en vez de 404: es un filtro, no una ruta.
+ * Sigue filtrando `draft` en la consulta: la policy `trips_select_public` deja
+ * leer todos los trips a `anon`, incluidos los borradores.
  */
-export default async function ViajesPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ tipo?: string }>;
-}) {
-  const activeType = tripTypeFromSlug((await searchParams).tipo);
+export default async function ViajesPage() {
   const content = await getSiteContent();
 
   const supabase = await createClient();
-  let query = supabase
+  const { data } = await supabase
     .from("trips")
     .select(
       "id, title, description, location, start_date, end_date, status, image_url, type"
     )
-    .in("status", ["open", "closed"]);
+    .in("status", ["open", "closed"])
+    .order("start_date", { ascending: true });
 
-  if (activeType) query = query.eq("type", activeType.value);
-
-  const { data: trips } = await query.order("start_date", { ascending: true });
-
-  const filters = [
-    { label: "Todos", href: "/viajes", active: !activeType },
-    ...TRIP_TYPES.map((t) => ({
-      label: t.label,
-      href: `/viajes?tipo=${t.slug}`,
-      active: activeType?.slug === t.slug,
-    })),
-  ];
+  const trips = (data ?? []) as TripCardData[];
+  const ceremonias = trips.filter((t) => t.type === "ceremonia");
+  const retiros = trips.filter((t) => t.type === "retiro");
 
   return (
     <>
@@ -65,75 +58,160 @@ export default async function ViajesPage({
       <main className="pt-16 lg:pt-21">
         <PageHero
           image={content("viajes.hero.image")}
-          title="Retiros & Ceremonias"
-          subtitle="Descubrí el viaje ideal para vos"
-          actions={[
-            { label: "Explorar destinos", href: "#proximos", variant: "solid" },
-            {
-              label: "Nuestra metodología",
-              href: "/nosotros#metodologia",
-              variant: "ghost",
-            },
-          ]}
+          imageAlt="Portal de luz sobre un cielo estrellado"
+          title="Portales de Transformación"
           scrollHint="Explorar"
-          scrollTo="proximos"
+          scrollTo="experiencias"
+          height="full"
         />
 
-        <Reveal className="py-20 md:py-24">
-          <div
-            id="proximos"
-            className="mx-auto max-w-narrative px-margin-mobile md:px-margin-desktop scroll-mt-24"
-          >
-            <div className="mb-8 text-center">
-              <span className="text-label-sm uppercase text-on-surface-variant">
-                Calendario de viajes
-              </span>
-              <h2 className="mt-2 font-display text-headline-md sm:text-headline-lg text-on-surface">
-                {activeType ? activeType.upcoming : "Próximos Viajes"}
-              </h2>
-            </div>
-
-            <div className="mb-12 flex flex-wrap justify-center gap-2">
-              {filters.map((filter) => (
-                <Link
-                  key={filter.href}
-                  href={filter.href}
-                  scroll={false}
-                  aria-current={filter.active ? "page" : undefined}
-                  className={`rounded-full border px-5 py-2 text-label-sm uppercase transition-colors ${
-                    filter.active
-                      ? "border-primary-fixed-dim bg-primary-container text-on-primary"
-                      : "border-primary-fixed-dim/25 text-on-surface-variant hover:border-primary-fixed-dim/50 hover:text-on-surface"
-                  }`}
-                >
-                  {filter.label}
-                </Link>
-              ))}
-            </div>
-
-            {!trips || trips.length === 0 ? (
-              <p className="mx-auto max-w-md text-center text-body-md text-on-surface-variant">
-                {activeType
-                  ? `No hay ${activeType.label.toLowerCase()} publicadas por el momento. Probá con los otros viajes.`
-                  : "No hay viajes publicados por el momento. Volvé a visitarnos pronto."}
-              </p>
-            ) : (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {trips.map((trip) => (
-                  <TripCard key={trip.id} trip={trip} />
-                ))}
-              </div>
-            )}
+        {/* Julia pidió video de fondo; va la imagen hasta que llegue. */}
+        <MediaStatement
+          id="experiencias"
+          image={content("viajes.about.image")}
+          imageAlt="Círculo de ceremonia iluminado"
+          width="prose"
+          veil={0.68}
+        >
+          <div className="space-y-6 text-body-md leading-relaxed text-primary text-justify md:text-body-lg [&_strong]:font-display [&_strong]:font-bold [&_strong]:text-primary-container">
+            <p>
+              Nuestras experiencias cósmicas son{" "}
+              <strong>viajes de exploración interior</strong> diseñados para
+              revelar las estructuras profundas de tu ser y tu conexión con la{" "}
+              <strong>realidad multidimensional</strong>.
+            </p>
+            <p>
+              A través de la guía cuidadosa, la música canalizada y el trabajo
+              con seres de luz, creamos espacios seguros donde puedes acceder a
+              la memoria de tu alma personal, ancestral y cósmica, para{" "}
+              <strong>transformar tu comprensión</strong> de quién eres y qué es
+              posible.
+            </p>
+            <p>
+              <strong>Cada experiencia es un acto de valentía</strong>: un
+              compromiso contigo mismo de ir más allá de lo conocido, de disolver
+              los límites que creíste fijos y de reconectar con el poder y la
+              sabiduría que habita en ti. Ya sea en una sesión de un día o en un
+              viaje de una semana, trabajamos con tu ritmo, tu proceso único y el
+              colectivo que acompaña tu camino.
+            </p>
           </div>
-        </Reveal>
+        </MediaStatement>
 
-        {/* El CTA ancla al listado de arriba: aplicar es siempre a *un* viaje
-            concreto (/viajes/[id]/solicitar), no hay un formulario general. */}
-        <CallBand
-          image={IMAGES.almas}
-          title="¿Sentís el llamado?"
-          action={{ label: "Aplicar para un viaje", href: "#proximos" }}
+        <CreamSection id="sesiones" full={false} className="pb-0">
+          <Reveal className="mx-auto max-w-3xl">
+            <p className="mb-4 text-label-sm font-bold uppercase text-[#b3964b]">
+              Portales de transformación
+            </p>
+            <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+              Sesiones Cósmicas
+            </h2>
+            <div
+              aria-hidden="true"
+              className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]"
+            />
+            <div className="mb-6 space-y-5 text-body-md leading-relaxed text-[#333] text-justify">
+              <p>
+                Nuestras sesiones de un día están diseñadas para sostener un
+                trabajo interior profundo, la exploración multidimensional y la
+                conexión con la dimensión del alma.
+              </p>
+              <p>
+                Cada experiencia se sostiene cuidadosamente con amor, presencia,
+                atención personal y un profundo respeto por la privacidad de cada
+                persona.
+              </p>
+            </div>
+
+            <Collapsible label="Explorar próximas sesiones">
+              <TripCarousel
+                caption="Calendario de sesiones"
+                title="Próximas Sesiones"
+                trips={ceremonias}
+                emptyLabel="No hay sesiones publicadas por el momento. Volvé a visitarnos pronto."
+              />
+            </Collapsible>
+          </Reveal>
+
+          <TestimonialsBand
+            title="Nuestros Sanadores"
+            label="Lo que dicen quienes vivieron las sesiones"
+          />
+        </CreamSection>
+
+        <MediaStatement
+          image={content("viajes.banner.image")}
+          imageAlt="Siluetas de almas en partículas de luz"
+          text="El viaje cósmico es, en última instancia, un viaje hacia adentro: un recuerdo de nuestra naturaleza más profunda, una activación de nuestra luz original y un movimiento hacia una experiencia humana más consciente, conectada y luminosa."
+          veil={0.4}
         />
+
+        <CreamSection id="viajes" full={false} className="pb-0">
+          <Reveal className="mx-auto max-w-3xl">
+            <p className="mb-4 text-label-sm font-bold uppercase text-[#b3964b]">
+              Portales de transformación
+            </p>
+            <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+              Viajes Cósmicos
+            </h2>
+            <div
+              aria-hidden="true"
+              className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]"
+            />
+            <p className="mb-6 text-body-md leading-relaxed text-[#333] text-justify">
+              Experiencias de una semana diseñadas para quienes se sienten listos
+              para entrar en un proceso más profundo de exploración del alma,
+              transformación y evolución. Realizadas en portales sagrados
+              alrededor del mundo, cada locación es elegida intencionalmente por
+              su energía única, su historia y su conexión con el propósito
+              profundo del viaje.
+            </p>
+
+            <Collapsible label="Explorar próximos viajes">
+              <TripCarousel
+                caption="Calendario de viajes"
+                title="Próximos Viajes"
+                trips={retiros}
+                emptyLabel="No hay viajes publicados por el momento. Volvé a visitarnos pronto."
+              />
+            </Collapsible>
+          </Reveal>
+
+          <TestimonialsBand
+            title="Nuestros Viajeros"
+            label="Voces de quienes ya hicieron el camino"
+          />
+        </CreamSection>
+
+        <CreamSection id="salud" full={false}>
+          <Reveal className="mx-auto max-w-3xl">
+            <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+              Salud y Seguridad
+            </h2>
+            <div
+              aria-hidden="true"
+              className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]"
+            />
+            <div className="space-y-5 text-body-md leading-relaxed text-[#333] text-justify">
+              <p>
+                Si actualmente tomas medicamentos o estás bajo tratamiento
+                médico, psiquiátrico o psicológico, por favor revisa nuestra
+                información de salud antes de postular.
+              </p>
+              <p>
+                Esta experiencia no es adecuada para personas con ciertas
+                condiciones psiquiátricas, adicciones activas a sustancias,
+                trastornos de personalidad, condiciones cardiovasculares graves o
+                epilepsia.
+              </p>
+              <p>
+                Para información sobre preparación, qué llevar, integración,
+                dosis, miedo y ansiedad, y otros aspectos prácticos, por favor
+                visita nuestras FAQs.
+              </p>
+            </div>
+          </Reveal>
+        </CreamSection>
       </main>
       <Footer />
       <BackToTop />

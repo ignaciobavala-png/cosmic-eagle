@@ -31,11 +31,29 @@ const STATUS_LABEL: Record<string, string> = {
  * La portada la resuelve `TripCover`, que es quien decide el recorte (ver
  * docs/PORTADAS.md).
  */
-export function TripCard({ trip }: { trip: TripCardData }) {
+export function TripCard({
+  trip,
+  tone = "dark",
+}: {
+  trip: TripCardData;
+  /**
+   * `dark` es la tarjeta de vidrio de siempre, sobre el fondo azul del sitio.
+   * `light` es la del rediseño: fondo blanco, para la cartelera dorada de
+   * /viajes, donde el vidrio oscuro directamente se pierde. Cambia solo la
+   * piel; la estructura, el recorte de la portada y el link son los mismos.
+   */
+  tone?: "dark" | "light";
+}) {
+  const light = tone === "light";
+
   return (
     <Link
       href={`/viajes/${trip.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl glass-card transition-colors duration-300 hover:border-primary-fixed-dim/35"
+      className={
+        light
+          ? "group flex h-full flex-col overflow-hidden rounded-xl bg-white transition-shadow duration-300 hover:shadow-[0_10px_30px_rgba(5,18,90,0.25)]"
+          : "group flex flex-col overflow-hidden rounded-2xl glass-card transition-colors duration-300 hover:border-primary-fixed-dim/35"
+      }
     >
       <TripCover tripId={trip.id} imageUrl={trip.image_url} variant="card">
         <div className="absolute inset-0 bg-[#05102a]/20" />
@@ -59,27 +77,41 @@ export function TripCard({ trip }: { trip: TripCardData }) {
       </TripCover>
 
       <div className="flex flex-1 flex-col p-5 sm:p-6">
-        <h3 className="font-display text-headline-md text-on-surface">
+        <h3
+          className={`font-display text-headline-md ${light ? "text-[#05125a]" : "text-on-surface"}`}
+        >
           {trip.title}
         </h3>
         {trip.description && (
-          <p className="mt-3 text-body-md text-on-surface-variant line-clamp-4">
+          <p
+            className={`mt-3 text-body-md line-clamp-4 ${light ? "text-[#666]" : "text-on-surface-variant"}`}
+          >
             {trip.description}
           </p>
         )}
 
-        <div className="mt-6 flex items-end justify-between gap-4 border-t border-primary-fixed-dim/12 pt-4">
+        <div
+          className={`mt-6 flex items-end justify-between gap-4 border-t pt-4 ${light ? "border-[#05125a]/10" : "border-primary-fixed-dim/12"}`}
+        >
           <div>
-            <span className="block text-label-sm uppercase text-on-surface-variant/60">
+            <span
+              className={`block text-label-sm uppercase ${light ? "text-[#b3964b]" : "text-on-surface-variant/60"}`}
+            >
               Fecha
             </span>
-            <span className="mt-1 block text-body-md text-on-surface">
+            <span
+              className={`mt-1 block text-body-md ${light ? "text-[#05125a]" : "text-on-surface"}`}
+            >
               {formatDateRangeCompact(trip.start_date, trip.end_date)}
             </span>
           </div>
           <span
             aria-hidden="true"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary-fixed-dim/35 text-primary-fixed-dim transition-colors group-hover:bg-primary-container group-hover:text-on-primary"
+            className={
+              light
+                ? "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#05125a]/25 text-[#05125a] transition-colors group-hover:bg-[#05125a] group-hover:text-white"
+                : "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary-fixed-dim/35 text-primary-fixed-dim transition-colors group-hover:bg-primary-container group-hover:text-on-primary"
+            }
           >
             <ArrowUpRight size={18} />
           </span>
