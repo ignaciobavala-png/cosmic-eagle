@@ -790,6 +790,78 @@ Y **cuatro componentes quedaron sin uso** (`PortalsSection`, `AboutSection`, `Eb
 resueltos en CSS. No se borraron a propósito: la decisión de §9 del doc puede mudarlos a
 `/preparacion` o a otra página.
 
+### Sesión del 2026-08-27 — Julia entrega el diseño en HTML (rama `refactoring`)
+
+**Julia ahora trabaja con Claude y entrega código, no imágenes.** Llegaron
+`HOMEPAGE.html`, `EXPERIENCIAS.html` y `NOSOTROS.html` (en `~/Descargas`, **fuera
+del repo**), autocontenidos y con sus propios comentarios explicando los bugs que
+ya resolvió. Análisis del encaje, mapa de secciones y estado en
+**`docs/REDISENO_JULIA_HTML.md`**.
+
+Las tres páginas están volcadas. La paleta coincide casi exacta con los tokens
+(`#F9D78F`, `#B3964B` y `#FFF6EB` son `primary-container`, la base del
+`glass-card` y `primary`), así que el trabajo fue de composición, no de sistema.
+
+- **`/nosotros`**: hero a pantalla completa → cuatro palabras sobre **crema** →
+  Nuestro enfoque → Nuestro propósito → frase sobre imagen → relato sticky →
+  cierre. Primera franja de fondo claro del sitio (`CreamSection`).
+- **`/viajes`**: dejó de ser grilla con filtros. Dos bloques narrativos, uno por
+  tipo, con calendario desplegable en panel dorado y banda de testimonios, más
+  "Salud y Seguridad". El desplegable del navbar apunta a `#sesiones` y
+  `#viajes`: **eso reemplaza al `?tipo=`**.
+- **Home**: hero → frase manifiesto → relato que se destila con el scroll →
+  calendario → frase sobre imagen → propósito → panel doble → Voces de Luz →
+  Tecnología del Alma → cierre. Salen `QuoteBand`, `HumanitySection`,
+  `ImageStatements` y `GoldDivider`.
+
+**Tres reglas que valen para lo que venga:**
+
+1. **Las keys de los slots no se renombran aunque cambie la sección.** Se reusan
+   con otra etiqueta (`nosotros.proposito.image`, `home.frase.*`,
+   `home.promesas.image`…), o lo que la clienta ya subió queda huérfano y la
+   página vuelve a los assets del repo.
+2. **`createClient` de `supabase/server.ts` lee `cookies()` y vuelve dinámica la
+   página.** Los viajes volvieron a la home y **la home sigue siendo estática**
+   porque se leen con `src/lib/supabase/public.ts` (sin cookies) + `revalidate =
+   3600`. Corolario: los server actions del panel tienen que `revalidatePath()`
+   las rutas públicas, o con el ISR de una hora lo editado tarda en verse.
+3. **Todo lo que anima respeta `prefers-reduced-motion`**, que Julia no
+   contempló: los bloques de scroll largo se aplanan a texto normal.
+
+**Testimonios: tres juegos distintos** (confirmado por Julia). Salieron del
+código a la tabla `testimonials` (migración `20260827200000_testimonials.sql`) con
+panel en `/admin/testimonios`. `placement` = `home` / `sesiones` / `viajes`; lo
+despublicado no sale de la base; **si una sección no tiene ninguno, su bloque no
+se dibuja**. Los tres reales quedaron sembrados en `home`; los otros dos juegos
+los carga la clienta.
+
+**El panel de multimedia acepta videos** (`docs/MULTIMEDIA.md`). Un slot sigue
+guardando **una sola URL** y `BackgroundMedia` decide imagen o video por la
+extensión. Se comprimen en el browser con canvas + `MediaRecorder` (WebM 720p,
+sin audio) — **no** con `ffmpeg.wasm`, que son 25 MB de descarga. **Corre en
+tiempo real**: 8 segundos de clip tardan 8 segundos, de ahí el tope de 40s.
+**Ojo con el free tier**: no aprieta el 1 GB de storage sino los **5 GB de egress
+mensuales**, porque el video se descarga en cada visita (~3.300 visitas con un
+clip de 1,5 MB).
+
+**Lo que falta:**
+
+- Los **videos y el patrón de símbolos** los tiene que mandar Julia.
+- **`/contenidos`, `/cuenta` y el detalle de viaje no fueron rediseñados** y
+  siguen con el sistema visual anterior. Conviven, pero el corte se nota.
+- **6 preguntas sin responder** en `~/Escritorio/consultas-julia-rediseno.html`:
+  tipografía (cargó Domine+Montserrat pero el mockup renderiza Georgia), navbar
+  que volvió a ser translúcido, copy huérfano, nomenclatura Sesiones/Viajes en
+  todo el sitio, y el botón de la cuenta.
+- **Copy de la clienta sin lugar** en `docs/COPY_HUERFANO.md`: metodología (los
+  hongos y la psilocibina), "Nuestra Visión" y "La humanidad". No se borró.
+- **Sin verificación visual**: la extensión de Chrome no está conectada. Se
+  verificó con `tsc`, lint y build de producción.
+- Quedaron **sin uso** `QuoteBand`, `ImageStatements`, `HumanitySection`,
+  `GoldDivider`, `FeatureBlock`, `DocumentCard`, `CallBand`, `ClosingSection` y
+  `ClosingBanner`, más los cuatro de agosto. No se borraron: varios cargan el
+  copy huérfano.
+
 ## No hacer
 
 - No inventar cuentas de Supabase ni connection strings falsos
