@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { ChevronDown } from "lucide-react";
+import { BackgroundMedia } from "./BackgroundMedia";
 import { CtaLink } from "./CtaLink";
 
 type Action = { label: string; href: string; variant?: "solid" | "ghost" };
@@ -58,14 +58,7 @@ export function PageHero({
             : "absolute inset-0 [mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)]"
         }
       >
-        <Image
-          src={image}
-          alt={imageAlt}
-          fill
-          priority={priority}
-          sizes="100vw"
-          className="object-cover"
-        />
+        <BackgroundMedia src={image} alt={imageAlt} priority={priority} />
         {/* Tinte azul + oscurecido al pie, para asentar el titulo.
             El oscurecido de arriba se saco cuando el navbar paso a ser una
             banda opaca (asset del 20/08): ya no se apoya sobre la imagen, asi

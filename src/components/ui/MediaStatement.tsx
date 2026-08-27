@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { BackgroundMedia } from "./BackgroundMedia";
 import { Reveal } from "./Reveal";
 
 /**
@@ -6,9 +6,9 @@ import { Reveal } from "./Reveal";
  *
  * En los HTML de Julia este bloque aparece tres veces (`.atmos` de la home,
  * `.exp-banner` de experiencias, `.nos-video` de nosotros) y en dos de ellas
- * pide un video de fondo. **Mientras no lleguen los videos va la imagen**, que
- * es el mismo componente con otra fuente; cuando lleguen, se cambia el `<Image>`
- * por un `<video>` con `poster={image}` y el resto queda igual.
+ * pide un video de fondo. El slot acepta las dos cosas: `BackgroundMedia`
+ * resuelve si lo cargado es foto o clip, asi que la clienta pasa de una a otro
+ * desde el panel sin que haya que tocar nada aca.
  *
  * El velo NO es decorativo: la frase es texto claro sobre foto, y sin el velo
  * el contraste depende de que zona de la imagen toque. Va como capa aparte y no
@@ -38,13 +38,7 @@ export function MediaStatement({
       id={id}
       className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden"
     >
-      <Image
-        src={image}
-        alt={imageAlt}
-        fill
-        sizes="100vw"
-        className="object-cover"
-      />
+      <BackgroundMedia src={image} alt={imageAlt} />
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-[#05125a]"

@@ -33,6 +33,14 @@ export type Slot = {
   ratio?: string;
   /** Solo imagenes: lado mayor al que se redimensiona antes de subir. */
   maxPx?: number;
+  /**
+   * Solo `image`: el slot acepta tambien un video corto de fondo. El valor sigue
+   * siendo una sola URL y el renderer decide por la extension (`isVideoUrl`), asi
+   * que la clienta puede pasar de foto a video y volver sin que cambie nada mas.
+   * Se marca solo en los slots que en el mockup son pantalla completa: un video
+   * en una foto chica no aporta y gasta egress.
+   */
+  video?: true;
 };
 
 export type SlotGroup = {
@@ -59,6 +67,7 @@ export const SITE_GROUPS = [
         fallback: IMAGES.homeHero,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
       {
         key: "home.frase.left",
@@ -86,6 +95,7 @@ export const SITE_GROUPS = [
         fallback: IMAGES.homePromesas,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
       {
         key: "home.atmos.text",
@@ -112,6 +122,7 @@ export const SITE_GROUPS = [
         fallback: IMAGES.homeCierre,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
     ],
   },
@@ -128,6 +139,7 @@ export const SITE_GROUPS = [
         fallback: IMAGES.almas,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
       {
         key: "nosotros.hero.title",
@@ -164,6 +176,7 @@ export const SITE_GROUPS = [
         fallback: IMAGES.nosotrosProposito,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
       {
         key: "nosotros.metodologia.image",
@@ -173,6 +186,7 @@ export const SITE_GROUPS = [
         fallback: IMAGES.nosotrosMetodologia,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
     ],
   },
@@ -189,6 +203,7 @@ export const SITE_GROUPS = [
         fallback: IMAGES.heroViajes,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
       {
         key: "viajes.about.image",
@@ -198,6 +213,7 @@ export const SITE_GROUPS = [
         fallback: IMAGES.portal1,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
       {
         key: "viajes.banner.image",
@@ -207,6 +223,7 @@ export const SITE_GROUPS = [
         fallback: IMAGES.almas,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
     ],
   },

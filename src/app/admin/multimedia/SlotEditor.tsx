@@ -3,6 +3,8 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { Check, ImageUp, RotateCcw } from "lucide-react";
 import { compressImage } from "@/lib/compress-image";
+import { compressVideo, MAX_DURATION_SECONDS } from "@/lib/compress-video";
+import { isVideoUrl } from "@/lib/media";
 import type { Slot } from "@/lib/site-content";
 import { resetSlot, saveSlot, type SlotState } from "./actions";
 
@@ -135,34 +137,72 @@ function ImageField({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [previewIsVideo, setPreviewIsVideo] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
+  const [problem, setProblem] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
+
+  const acceptsVideo = slot.video === true;
 
   // Al guardar, el valor nuevo llega por props y la preview local sobra.
   useEffect(() => {
     setPreview(null);
     setInfo(null);
+    setProblem(null);
   }, [value]);
+
+  function attach(file: File) {
+    // El input tiene que llevar el archivo comprimido, no el original: es lo
+    // que se sube cuando el form hace submit.
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    if (inputRef.current) inputRef.current.files = transfer.files;
+  }
 
   async function handleFile(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    setProblem(null);
     setWorking(true);
+
+    if (file.type.startsWith("video/")) {
+      // La recodificacion corre en tiempo real: mientras dura, el boton dice
+      // "Comprimiendo" y no hay nada que apurar.
+      const result = await compressVideo(file);
+      setWorking(false);
+
+      if (!result.ok) {
+        setProblem(result.error);
+        setPreview(null);
+        setInfo(null);
+        // Se limpia el input para que no quede el archivo rechazado listo para
+        // subir si la clienta le da Guardar igual.
+        if (inputRef.current) inputRef.current.value = "";
+        return;
+      }
+
+      attach(result.file);
+      setPreview(URL.createObjectURL(result.file));
+      setPreviewIsVideo(true);
+      setInfo(
+        `${formatSize(file.size)} → ${formatSize(result.file.size)} · listo para subir`
+      );
+      return;
+    }
+
     const compressed = await compressImage(file, slot.maxPx);
     setWorking(false);
 
-    // El input tiene que llevar el archivo comprimido, no el original: es lo
-    // que se sube cuando el form hace submit.
-    const transfer = new DataTransfer();
-    transfer.items.add(compressed);
-    if (inputRef.current) inputRef.current.files = transfer.files;
-
+    attach(compressed);
     setPreview(URL.createObjectURL(compressed));
+    setPreviewIsVideo(false);
     setInfo(
       `${formatSize(file.size)} → ${formatSize(compressed.size)} · lista para subir`
     );
   }
+
+  const showVideo = preview ? previewIsVideo : isVideoUrl(value);
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
@@ -170,31 +210,55 @@ function ImageField({
         className="w-full shrink-0 overflow-hidden rounded-lg bg-surface-container-lowest sm:w-44"
         style={{ aspectRatio: slot.ratio ?? "16/9" }}
       >
-        {/* <img> y no next/image: la preview local es un blob: y el optimizador
-            no lo puede resolver. En el admin no hay costo de LCP que cuidar. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={preview ?? value}
-          alt=""
-          className="h-full w-full object-cover"
-        />
+        {showVideo ? (
+          <video
+            src={preview ?? value}
+            muted
+            loop
+            autoPlay
+            playsInline
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          /* <img> y no next/image: la preview local es un blob: y el optimizador
+             no lo puede resolver. En el admin no hay costo de LCP que cuidar. */
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={preview ?? value}
+            alt=""
+            className="h-full w-full object-cover"
+          />
+        )}
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-outline-variant/60 px-3 py-2 text-sm text-on-surface-variant transition-colors hover:border-primary-fixed-dim hover:text-on-surface">
           <ImageUp size={15} />
-          {working ? "Preparando…" : "Elegir imagen"}
+          {working
+            ? "Preparando…"
+            : acceptsVideo
+              ? "Elegir imagen o video"
+              : "Elegir imagen"}
           <input
             ref={inputRef}
             type="file"
             name="file"
-            accept="image/*"
+            accept={acceptsVideo ? "image/*,video/*" : "image/*"}
             onChange={handleFile}
             className="sr-only"
           />
         </label>
 
+        {acceptsVideo && !info && !problem && (
+          <p className="text-xs text-on-surface-variant">
+            También podés subir un video corto (hasta {MAX_DURATION_SECONDS}{" "}
+            segundos). Se reproduce solo, en silencio y en bucle. Comprimirlo
+            tarda lo que dura el video.
+          </p>
+        )}
+
         {info && <p className="text-xs text-on-surface-variant">{info}</p>}
+        {problem && <p className="text-xs text-error">{problem}</p>}
 
         <div>
           <SaveButton saving={saving || working} disabled={!preview} />

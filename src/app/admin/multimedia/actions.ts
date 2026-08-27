@@ -83,11 +83,20 @@ export async function saveSlot(
     const file = formData.get("file");
 
     if (!(file instanceof File) || file.size === 0) {
-      return { error: "Elegí una imagen para subir." };
+      return { error: "Elegí un archivo para subir." };
     }
 
-    if (!file.type.startsWith("image/")) {
-      return { error: "El archivo tiene que ser una imagen." };
+    const isVideo = file.type.startsWith("video/");
+
+    if (!file.type.startsWith("image/") && !isVideo) {
+      return { error: "El archivo tiene que ser una imagen o un video." };
+    }
+
+    // Un slot solo acepta video si el registro lo habilita: son los que en el
+    // diseño ocupan la pantalla entera. Un video en una foto chica no aporta y
+    // gasta egress, que es la cuota que aprieta en el free tier.
+    if (isVideo && !slot.video) {
+      return { error: "Este espacio solo acepta imágenes." };
     }
 
     // El bucket es publico y un SVG servido inline puede llevar script adentro.
@@ -97,17 +106,24 @@ export async function saveSlot(
       return { error: "Los SVG no están permitidos. Subí JPG, PNG o WebP." };
     }
 
-    // Llega ya comprimida del browser; el tope es una red de contencion por si
-    // la compresion no corrio (SVG, o el fallback al original).
-    if (file.size > 5 * 1024 * 1024) {
-      return { error: "La imagen no puede superar los 5MB." };
+    // Llega ya comprimido del browser; el tope es una red de contencion por si
+    // la compresion no corrio (formato raro, o el fallback al original). El del
+    // video es mas alto porque un clip comprimido pesa mas que una foto, y el
+    // bucket corta en 8MB de todos modos.
+    const limitMb = isVideo ? 8 : 5;
+    if (file.size > limitMb * 1024 * 1024) {
+      return {
+        error: isVideo
+          ? "El video no puede superar los 8MB. Probá con un clip más corto."
+          : "La imagen no puede superar los 5MB.",
+      };
     }
 
-    // Normalmente llega WebP del compresor, pero si la compresion fallo sube el
-    // original: la extension sale del tipo real, no se asume.
+    // Normalmente llega WebP (o WebM) del compresor, pero si la compresion
+    // fallo sube el original: la extension sale del tipo real, no se asume.
     const ext = file.type.split("/")[1]?.replace("jpeg", "jpg") ?? "webp";
     // Nombre nuevo en cada subida a proposito: con un path fijo por slot la URL
-    // no cambia y el CDN sigue sirviendo la imagen vieja despues de reemplazarla.
+    // no cambia y el CDN sigue sirviendo el asset viejo despues de reemplazarlo.
     const path = `${key}/${crypto.randomUUID()}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
@@ -115,7 +131,7 @@ export async function saveSlot(
       .upload(path, file, { contentType: file.type });
 
     if (uploadError) {
-      return { error: "No se pudo subir la imagen. Probá de nuevo." };
+      return { error: "No se pudo subir el archivo. Probá de nuevo." };
     }
 
     const {

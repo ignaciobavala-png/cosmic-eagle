@@ -1,5 +1,6 @@
-import Image from "next/image";
 import { ChevronDown } from "lucide-react";
+import { BackgroundMedia } from "./BackgroundMedia";
+import { isVideoUrl } from "@/lib/media";
 
 /**
  * Hero de imagen pura, con zoom lento de entrada.
@@ -57,14 +58,15 @@ export function ImmersiveHero({
       >
         {/* El zoom va en un envoltorio y no en el <Image>: next/image posiciona
             con `position:absolute` sus propios estilos inline, y una animacion
-            de transform sobre el mismo nodo pelea con eso. */}
-        <div className="absolute inset-0 animate-hero-zoom">
-          <Image
+            de transform sobre el mismo nodo pelea con eso.
+
+            Si lo cargado es un VIDEO no se aplica el zoom: el clip ya tiene su
+            propio movimiento, y encimarle una escala lenta marea. */}
+        <div className={isVideoUrl(image) ? "absolute inset-0" : "absolute inset-0 animate-hero-zoom"}>
+          <BackgroundMedia
             src={image}
             alt={imageAlt}
-            fill
             priority={priority}
-            sizes="100vw"
             /* `object-top` y no el centro por defecto: la figura tiene la
                cabeza pegada al borde superior de la foto, y en un viewport
                ancho y bajo (1920x870, por ejemplo) la caja del hero queda mas

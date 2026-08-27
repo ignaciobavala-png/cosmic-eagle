@@ -106,3 +106,50 @@ pero son ~50 con relaciones internas (`on-primary` existe para contrastar contra
 `primary`) y el fondo no es un token sino un degradé más cinco capas de
 estrellas. Si hace falta, el camino es **presets de paleta completos definidos en
 código**, no cincuenta color pickers.
+
+## Videos (27/08/2026)
+
+El panel acepta **video además de imagen** en los espacios que en el diseño
+ocupan la pantalla entera (los heros y las pantallas de frase). El slot no
+cambia: sigue guardando **una sola URL**, y el renderer decide si dibuja un
+`<Image>` o un `<video>` mirando la extensión (`src/lib/media.ts`). Para la
+clienta eso significa que puede pasar de foto a video y volver, en el mismo
+lugar, sin que haya que tocar código.
+
+Qué slots lo aceptan: los marcados con `video: true` en el registro. Un video en
+una foto chica no aporta nada y gasta egress, así que no se habilita en todos.
+
+### Se comprime en el browser, y por qué así
+
+`src/lib/compress-video.ts` re-codifica el clip dibujándolo en un `<canvas>` y
+grabando ese canvas con `MediaRecorder`. Sale WebM a 720p, ~1,2 Mbps y **sin
+audio** (son fondos que se reproducen en silencio; la pista sería peso puro).
+
+- **No se usa `ffmpeg.wasm`**: son ~25 MB de descarga para que la clienta suba un
+  clip de cinco segundos.
+- **La contra es que corre en tiempo real**: un clip de 8 segundos tarda 8
+  segundos en comprimirse. Por eso hay un tope de **40 segundos**, con un mensaje
+  que lo explica, en vez de dejarla esperando sin saber por qué.
+- Si el navegador no soporta `MediaRecorder`, si el codec falla o si el original
+  ya venía más liviano, **sube el original**. Mismo criterio que `compressImage`:
+  peor que comprimido, mejor que un error que ella no puede resolver.
+
+### El límite real del free tier no es el storage
+
+Un clip comprimido pesa ~1,5 MB y el free tier da 1 GB: por ahí no aprieta. Lo
+que aprieta son los **5 GB de egress al mes**, porque un video de fondo se
+descarga en **cada visita**. A 1,5 MB son ~3.300 visitas mensuales; el mismo
+tráfico con la imagen de 190 KB serían 26.000. Si el sitio empieza a recibir
+visitas de verdad, el hero en video es lo primero que hay que mirar.
+
+El bucket `site-assets` quedó en 8 MB por archivo y con `video/webm` y
+`video/mp4` habilitados (migración `20260827210000_site_assets_video.sql`). El
+tope de 8 MB es la red de contención para cuando la compresión no corre.
+
+### En el sitio
+
+`BackgroundMedia` es el único lugar que decide imagen vs. video. El video va
+`muted` + `playsInline` (sin las dos cosas el autoplay no arranca en mobile),
+`loop`, `preload="metadata"` y `aria-hidden` — es decoración, no contenido. En el
+hero, además, **el zoom lento no se aplica cuando lo cargado es un video**: el
+clip ya tiene su propio movimiento.
