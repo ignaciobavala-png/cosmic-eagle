@@ -37,7 +37,15 @@ export function ClosingHero({
         className="object-cover opacity-40"
       />
 
-      <Reveal className="relative z-10 px-margin-mobile md:px-margin-desktop">
+      {/* Bloque entero, sin cascada interna: titulo y botones entran juntos
+          (umbral 0.3, 20px, 1.2s). Reversible, como todo /nosotros. */}
+      <Reveal
+        amount={0.3}
+        once={false}
+        y={20}
+        duration={1.2}
+        className="relative z-10 px-margin-mobile md:px-margin-desktop"
+      >
         <h2 className="font-display text-display-mobile md:text-display-lg font-bold uppercase text-primary text-balance">
           {title}
         </h2>

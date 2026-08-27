@@ -8,7 +8,7 @@ import { CreamSection } from "@/components/ui/CreamSection";
 import { Collapsible } from "@/components/ui/Collapsible";
 import { TripCarousel } from "@/components/ui/TripCarousel";
 import { TestimonialsBand } from "@/components/ui/TestimonialsBand";
-import { Reveal } from "@/components/ui/Reveal";
+import { RevealItem } from "@/components/ui/Reveal";
 import { createClient } from "@/lib/supabase/server";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { getSiteContent } from "@/lib/site-content";
@@ -79,6 +79,10 @@ export default async function ViajesPage() {
           imageAlt="Círculo de ceremonia iluminado"
           width="prose"
           veil={0.68}
+          amount={0.22}
+          once={false}
+          y={24}
+          duration={0.9}
         >
           <div className="space-y-6 text-body-md leading-relaxed text-primary text-justify md:text-body-lg [&_strong]:font-display [&_strong]:font-bold [&_strong]:text-primary-container">
             <p>
@@ -105,40 +109,59 @@ export default async function ViajesPage() {
           </div>
         </MediaStatement>
 
-        <CreamSection id="sesiones" full={false} className="pb-0">
-          <Reveal className="mx-auto max-w-3xl">
-            <p className="mb-4 text-label-sm font-bold uppercase text-[#b3964b]">
-              Portales de transformación
-            </p>
-            <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-              Sesiones Cósmicas
-            </h2>
-            <div
-              aria-hidden="true"
-              className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]"
-            />
+        <CreamSection
+          id="sesiones"
+          full={false}
+          className="pb-0"
+          reveal={{ amount: 0.22, once: false, stagger: 0 }}
+        >
+          {/* Estandar de Experiencias: umbral 0.22 sobre la SECCION (lo pone
+              `reveal` arriba), reversible, cascada de 150ms y 0.9s por
+              elemento. La linea dorada aca NO crece, a diferencia de la home y
+              /nosotros: es una barra estatica, asi esta en el codigo aprobado. */}
+          <div className="mx-auto max-w-3xl">
+            <RevealItem>
+              <p className="mb-4 text-label-sm font-bold uppercase text-[#b3964b]">
+                Portales de transformación
+              </p>
+            </RevealItem>
+            <RevealItem delay={0.15}>
+              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                Sesiones Cósmicas
+              </h2>
+              <div
+                aria-hidden="true"
+                className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]"
+              />
+            </RevealItem>
             <div className="mb-6 space-y-5 text-body-md leading-relaxed text-[#333] text-justify">
+              <RevealItem delay={0.3}>
               <p>
                 Nuestras sesiones de un día están diseñadas para sostener un
                 trabajo interior profundo, la exploración multidimensional y la
                 conexión con la dimensión del alma.
               </p>
+              </RevealItem>
+              <RevealItem delay={0.45}>
               <p>
                 Cada experiencia se sostiene cuidadosamente con amor, presencia,
                 atención personal y un profundo respeto por la privacidad de cada
                 persona.
               </p>
+              </RevealItem>
             </div>
 
-            <Collapsible label="Explorar próximas sesiones">
-              <TripCarousel
-                caption="Calendario de sesiones"
-                title="Próximas Sesiones"
-                trips={ceremonias}
-                emptyLabel="No hay sesiones publicadas por el momento. Volvé a visitarnos pronto."
-              />
-            </Collapsible>
-          </Reveal>
+            <RevealItem delay={0.6}>
+              <Collapsible label="Explorar próximas sesiones">
+                <TripCarousel
+                  caption="Calendario de sesiones"
+                  title="Próximas Sesiones"
+                  trips={ceremonias}
+                  emptyLabel="No hay sesiones publicadas por el momento. Volvé a visitarnos pronto."
+                />
+              </Collapsible>
+            </RevealItem>
+          </div>
 
           <TestimonialsBand
             title="Nuestros Sanadores"
@@ -152,20 +175,38 @@ export default async function ViajesPage() {
           imageAlt="Siluetas de almas en partículas de luz"
           text="El viaje cósmico es, en última instancia, un viaje hacia adentro: un recuerdo de nuestra naturaleza más profunda, una activación de nuestra luz original y un movimiento hacia una experiencia humana más consciente, conectada y luminosa."
           veil={0.4}
+          amount={0.22}
+          once={false}
+          y={24}
+          duration={0.9}
         />
 
-        <CreamSection id="viajes" full={false} className="pb-0">
-          <Reveal className="mx-auto max-w-3xl">
-            <p className="mb-4 text-label-sm font-bold uppercase text-[#b3964b]">
-              Portales de transformación
-            </p>
-            <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-              Viajes Cósmicos
-            </h2>
-            <div
-              aria-hidden="true"
-              className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]"
-            />
+        <CreamSection
+          id="viajes"
+          full={false}
+          className="pb-0"
+          reveal={{ amount: 0.22, once: false, stagger: 0 }}
+        >
+          {/* Estandar de Experiencias: umbral 0.22 sobre la SECCION (lo pone
+              `reveal` arriba), reversible, cascada de 150ms y 0.9s por
+              elemento. La linea dorada aca NO crece, a diferencia de la home y
+              /nosotros: es una barra estatica, asi esta en el codigo aprobado. */}
+          <div className="mx-auto max-w-3xl">
+            <RevealItem>
+              <p className="mb-4 text-label-sm font-bold uppercase text-[#b3964b]">
+                Portales de transformación
+              </p>
+            </RevealItem>
+            <RevealItem delay={0.15}>
+              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                Viajes Cósmicos
+              </h2>
+              <div
+                aria-hidden="true"
+                className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]"
+              />
+            </RevealItem>
+            <RevealItem delay={0.3}>
             <p className="mb-6 text-body-md leading-relaxed text-[#333] text-justify">
               Experiencias de una semana diseñadas para quienes se sienten listos
               para entrar en un proceso más profundo de exploración del alma,
@@ -174,16 +215,19 @@ export default async function ViajesPage() {
               su energía única, su historia y su conexión con el propósito
               profundo del viaje.
             </p>
+            </RevealItem>
 
-            <Collapsible label="Explorar próximos viajes">
-              <TripCarousel
-                caption="Calendario de viajes"
-                title="Próximos Viajes"
-                trips={retiros}
-                emptyLabel="No hay viajes publicados por el momento. Volvé a visitarnos pronto."
-              />
-            </Collapsible>
-          </Reveal>
+            <RevealItem delay={0.45}>
+              <Collapsible label="Explorar próximos viajes">
+                <TripCarousel
+                  caption="Calendario de viajes"
+                  title="Próximos Viajes"
+                  trips={retiros}
+                  emptyLabel="No hay viajes publicados por el momento. Volvé a visitarnos pronto."
+                />
+              </Collapsible>
+            </RevealItem>
+          </div>
 
           <TestimonialsBand
             title="Nuestros Viajeros"
@@ -192,34 +236,50 @@ export default async function ViajesPage() {
           />
         </CreamSection>
 
-        <CreamSection id="salud" full={false}>
-          <Reveal className="mx-auto max-w-3xl">
-            <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-              Salud y Seguridad
-            </h2>
-            <div
-              aria-hidden="true"
-              className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]"
-            />
+        <CreamSection
+          id="salud"
+          full={false}
+          reveal={{ amount: 0.22, once: false, stagger: 0 }}
+        >
+          {/* Estandar de Experiencias: umbral 0.22 sobre la SECCION (lo pone
+              `reveal` arriba), reversible, cascada de 150ms y 0.9s por
+              elemento. La linea dorada aca NO crece, a diferencia de la home y
+              /nosotros: es una barra estatica, asi esta en el codigo aprobado. */}
+          <div className="mx-auto max-w-3xl">
+            <RevealItem>
+              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                Salud y Seguridad
+              </h2>
+              <div
+                aria-hidden="true"
+                className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]"
+              />
+            </RevealItem>
             <div className="space-y-5 text-body-md leading-relaxed text-[#333] text-justify">
+              <RevealItem delay={0.15}>
               <p>
                 Si actualmente tomas medicamentos o estás bajo tratamiento
                 médico, psiquiátrico o psicológico, por favor revisa nuestra
                 información de salud antes de postular.
               </p>
+              </RevealItem>
+              <RevealItem delay={0.3}>
               <p>
                 Esta experiencia no es adecuada para personas con ciertas
                 condiciones psiquiátricas, adicciones activas a sustancias,
                 trastornos de personalidad, condiciones cardiovasculares graves o
                 epilepsia.
               </p>
+              </RevealItem>
+              <RevealItem delay={0.45}>
               <p>
                 Para información sobre preparación, qué llevar, integración,
                 dosis, miedo y ansiedad, y otros aspectos prácticos, por favor
                 visita nuestras FAQs.
               </p>
+              </RevealItem>
             </div>
-          </Reveal>
+          </div>
         </CreamSection>
       </main>
       <Footer />

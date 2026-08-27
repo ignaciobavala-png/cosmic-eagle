@@ -8,7 +8,7 @@ import { WordSequence } from "@/components/ui/WordSequence";
 import { MediaStatement } from "@/components/ui/MediaStatement";
 import { StickyStory } from "@/components/ui/StickyStory";
 import { ClosingHero } from "@/components/ui/ClosingHero";
-import { Reveal } from "@/components/ui/Reveal";
+import { RevealItem, RevealLine } from "@/components/ui/Reveal";
 import { getSiteContent } from "@/lib/site-content";
 
 export const metadata: Metadata = {
@@ -62,21 +62,28 @@ export default async function NosotrosPage() {
           />
         </CreamSection>
 
-        <CreamSection>
-          <Reveal className="mx-auto max-w-3xl">
-            <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-              Nuestro enfoque
-            </h2>
-            <div
-              aria-hidden="true"
-              className="mt-3 mb-6 h-0.5 w-16 bg-[#f9d78f]"
-            />
+        <CreamSection reveal={{ amount: 0.25, once: false, stagger: 0 }}>
+          {/* Umbral 0.25 y REVERSIBLE: en /nosotros y /viajes las animaciones
+              se deshacen al volver hacia arriba (`nosObserveToggle`). El titulo
+              entra en 1s, la linea crece de 0 a 64px en 1.2s y los parrafos van
+              de a 14px con 0.15s de escalon. La frase itálica del cierre lleva
+              0.65s, que es el unico retardo que Julia escribe a mano. */}
+          <div className="mx-auto max-w-3xl">
+            <RevealItem y={0} duration={1}>
+              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                Nuestro enfoque
+              </h2>
+            </RevealItem>
+            <RevealLine className="mt-3 mb-6 h-0.5 w-16 bg-[#f9d78f]" />
             <div className="space-y-6 text-body-md leading-relaxed text-[#333] text-justify">
+              <RevealItem y={14} duration={0.8} delay={0.15}>
               <p>
                 Nuestro enfoque reúne conocimiento ancestral y galáctico,
                 tecnologías cósmicas y prácticas de conciencia para sostener
                 procesos de transformación, liberación y reconexión con el alma.
               </p>
+              </RevealItem>
+              <RevealItem y={14} duration={0.8} delay={0.3}>
               <p>
                 El camino comienza liberando los patrones y estructuras que nos
                 limitan, permitiendo que emerjan una memoria más profunda y un
@@ -85,6 +92,8 @@ export default async function NosotrosPage() {
                 cuerpo, a nuestras relaciones, a nuestro propósito y a la forma
                 en que vivimos.
               </p>
+              </RevealItem>
+              <RevealItem y={14} duration={0.8} delay={0.45}>
               <p>
                 Para los sanadores, esto puede abrir el acceso a nuevas formas de
                 conocimiento y sanación. Para los líderes, puede expandir la
@@ -94,25 +103,31 @@ export default async function NosotrosPage() {
                 en un trabajo evolutivo, puede abrir capas más profundas de
                 conocimiento sobre la conciencia y la evolución humana.
               </p>
+              </RevealItem>
             </div>
-            <p className="mt-8 border-t border-[#05125a]/15 pt-6 font-display text-xl italic leading-relaxed text-[#05125a]">
-              Nuestro rol no es definir lo que alguien debe experimentar o en qué
-              debe convertirse, sino crear las condiciones para que su propio
-              proceso se despliegue.
-            </p>
-          </Reveal>
+            <RevealItem y={14} duration={0.8} delay={0.65}>
+              <p className="mt-8 border-t border-[#05125a]/15 pt-6 font-display text-xl italic leading-relaxed text-[#05125a]">
+                Nuestro rol no es definir lo que alguien debe experimentar o en
+                qué debe convertirse, sino crear las condiciones para que su
+                propio proceso se despliegue.
+              </p>
+            </RevealItem>
+          </div>
         </CreamSection>
 
-        <CreamSection id="proposito">
-          <Reveal className="mx-auto max-w-3xl">
-            <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-              Nuestro propósito
-            </h2>
-            <div
-              aria-hidden="true"
-              className="mt-3 mb-6 h-0.5 w-16 bg-[#f9d78f]"
-            />
+        <CreamSection
+          id="proposito"
+          reveal={{ amount: 0.25, once: false, stagger: 0 }}
+        >
+          <div className="mx-auto max-w-3xl">
+            <RevealItem y={0} duration={1}>
+              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                Nuestro propósito
+              </h2>
+            </RevealItem>
+            <RevealLine className="mt-3 mb-6 h-0.5 w-16 bg-[#f9d78f]" />
             <div className="space-y-6 text-body-md leading-relaxed text-[#333] text-justify [&_strong]:font-display [&_strong]:font-bold [&_strong]:text-[#05125a]">
+              <RevealItem y={14} duration={0.8} delay={0.15}>
               <p>
                 Creamos espacios donde las personas puedan{" "}
                 <strong>trascender</strong> patrones limitantes,{" "}
@@ -120,6 +135,8 @@ export default async function NosotrosPage() {
                 acceder a la luz, la sabiduría y el poder interior que ya habitan
                 en ellas.
               </p>
+              </RevealItem>
+              <RevealItem y={14} duration={0.8} delay={0.3}>
               <p>
                 <strong>
                   Nuestro trabajo acompaña a personas en distintas etapas de este
@@ -129,17 +146,24 @@ export default async function NosotrosPage() {
                 hasta sanadores, guías y practicantes experimentados que entran
                 en nuevas etapas de evolución, desarrollo y servicio.
               </p>
+              </RevealItem>
             </div>
-          </Reveal>
+          </div>
         </CreamSection>
 
         {/* Julia pidió video acá; va la imagen hasta que llegue. La key del slot
             es la del bloque "Evolución Consciente" que el rediseño elimina, para
             no perder la foto que la clienta ya subió. */}
+        {/* Fade simple: umbral 0.4, 1.2s y SIN transform ni retardo — es el
+            unico bloque del sitio que solo cambia de opacidad. */}
         <MediaStatement
           image={content("nosotros.proposito.image")}
           imageAlt="Círculo de ceremonia iluminado"
           text={content("nosotros.frase")}
+          amount={0.4}
+          once={false}
+          y={0}
+          duration={1.2}
         />
 
         <StickyStory

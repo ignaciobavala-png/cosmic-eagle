@@ -27,7 +27,9 @@ export function TestimonialsBand({
 
   return (
     <div className="relative left-1/2 mt-16 w-screen -translate-x-1/2 bg-[linear-gradient(180deg,#0079b3_0%,#05125a_90%)] px-margin-mobile py-16 text-center md:px-margin-desktop md:py-20">
-      <Reveal className="mx-auto max-w-5xl">
+      {/* Estandar de Experiencias: umbral 0.22 y reversible, como el resto de
+          /viajes, que es la unica pagina donde vive esta banda. */}
+      <Reveal amount={0.22} once={false} className="mx-auto max-w-5xl">
         <h3 className="font-display text-headline-md text-primary">{title}</h3>
         <p className="mb-9 mt-2 text-label-sm uppercase text-primary-container">
           {label}

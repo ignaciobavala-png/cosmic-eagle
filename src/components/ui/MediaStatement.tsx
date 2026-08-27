@@ -22,6 +22,10 @@ export function MediaStatement({
   id,
   veil = 0.45,
   width = "narrow",
+  amount = 0.4,
+  once = true,
+  y = 30,
+  duration = 1,
 }: {
   image: string;
   imageAlt?: string;
@@ -32,6 +36,15 @@ export function MediaStatement({
   id?: string;
   veil?: number;
   width?: "narrow" | "prose";
+  /**
+   * Los valores por defecto son los de la frase atmosferica de la home (umbral
+   * 0.4, 30px, 1s). En /viajes el mismo bloque usa el estandar de Experiencias
+   * (0.22, 24px, 0.9s) y ademas es reversible.
+   */
+  amount?: number;
+  once?: boolean;
+  y?: number;
+  duration?: number;
 }) {
   return (
     <section
@@ -45,6 +58,10 @@ export function MediaStatement({
         style={{ opacity: veil }}
       />
       <Reveal
+        amount={amount}
+        once={once}
+        y={y}
+        duration={duration}
         className={`relative z-10 px-margin-mobile md:px-margin-desktop ${
           width === "prose" ? "max-w-3xl" : "max-w-2xl text-center"
         }`}

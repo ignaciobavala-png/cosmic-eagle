@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { HOME_COPY, IMAGES } from "@/lib/constants";
 import type { Testimonial } from "@/lib/testimonials";
-import { Reveal } from "./ui/Reveal";
 import { SectionHeading } from "./ui/SectionHeading";
 
 /**
@@ -22,8 +21,9 @@ import { SectionHeading } from "./ui/SectionHeading";
  * `home`), que carga la clienta desde /admin/testimonios. Si no hay ninguno, la
  * seccion no se dibuja: mejor eso que un encabezado sobre un vacio.
  *
- * Dejo de ser client component: el scroll reveal lo aporta `Reveal`, que aisla el
- * `"use client"` en el wrapper.
+ * **No tiene animacion de entrada, a proposito**: en el codigo aprobado de Julia
+ * este bloque es el unico sin IntersectionObserver — el carrusel esta siempre
+ * visible. Antes lo enviamos envuelto en `Reveal` y entraba con fundido.
  */
 export function TestimonialsSection({
   id,
@@ -79,7 +79,7 @@ export function TestimonialsSection({
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-narrative px-margin-mobile pt-24 pb-20 md:px-margin-desktop md:pt-[9rem] md:pb-section">
-        <Reveal>
+        <div>
           <SectionHeading
             title={HOME_COPY.voces.title}
             label={HOME_COPY.voces.label}
@@ -115,7 +115,7 @@ export function TestimonialsSection({
               </figure>
             ))}
           </div>
-        </Reveal>
+        </div>
       </div>
     </section>
   );
