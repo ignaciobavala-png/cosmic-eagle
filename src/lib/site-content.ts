@@ -1,6 +1,5 @@
-import { createServerClient } from "@supabase/ssr";
 import { unstable_cache } from "next/cache";
-import type { Database } from "./supabase/types";
+import { createPublicClient } from "./supabase/public";
 import { IMAGES } from "./constants";
 
 /**
@@ -34,6 +33,14 @@ export type Slot = {
   ratio?: string;
   /** Solo imagenes: lado mayor al que se redimensiona antes de subir. */
   maxPx?: number;
+  /**
+   * Solo `image`: el slot acepta tambien un video corto de fondo. El valor sigue
+   * siendo una sola URL y el renderer decide por la extension (`isVideoUrl`), asi
+   * que la clienta puede pasar de foto a video y volver sin que cambie nada mas.
+   * Se marca solo en los slots que en el mockup son pantalla completa: un video
+   * en una foto chica no aporta y gasta egress.
+   */
+  video?: true;
 };
 
 export type SlotGroup = {
@@ -60,66 +67,62 @@ export const SITE_GROUPS = [
         fallback: IMAGES.homeHero,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
       {
         key: "home.frase.left",
         label: "Frase · primera mitad",
-        help: "La frase suelta debajo de la portada se parte en dos: esta mitad entra desde abajo. Va con la coma al final.",
+        help: "La frase grande que ocupa toda la pantalla debajo de la portada: esta es la primera línea.",
         type: "text",
-        fallback: "Cuando el alma está lista,",
+        fallback: "Somos mucho más",
       },
       {
         key: "home.frase.right",
         label: "Frase · segunda mitad",
-        help: "La otra mitad de la misma frase; entra desde arriba. Las dos terminan juntas en el centro.",
+        help: "La segunda línea de la misma frase. Se muestra en blanco, debajo de la primera.",
         type: "text",
-        fallback: "el camino aparece.",
+        fallback: "que nuestra historia",
       },
+      // La key es la de "las cuatro promesas", que el rediseño elimina: se reusa
+      // para que la imagen que la clienta ya subio siga apareciendo en la
+      // pagina nueva, en vez de quedar huerfana. Los cuatro textos de esas
+      // promesas SI quedaron sin lugar (ver docs/COPY_HUERFANO.md).
       {
         key: "home.promesas.image",
-        label: "Imagen de las cuatro frases",
-        help: "El fondo de la figura en meditación. Las cuatro frases se acomodan alrededor, así que conviene que la figura quede centrada y con aire a los costados.",
+        label: "Imagen de la frase del medio",
+        help: "La foto a pantalla completa con una frase centrada encima, después del calendario.",
         type: "image",
         fallback: IMAGES.homePromesas,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
       {
-        key: "home.promesas.1",
-        label: "Frase 1 (arriba a la izquierda)",
-        help: "Primera de las cuatro frases sobre la imagen.",
+        key: "home.atmos.text",
+        label: "Frase sobre la imagen del medio",
+        help: "La frase corta que va centrada sobre esa foto.",
         type: "text",
-        fallback: "Despierta nuevas capacidades internas",
+        fallback:
+          "Un campo de conciencia mucho más amplio que la historia que contamos sobre nosotros.",
       },
       {
-        key: "home.promesas.2",
-        label: "Frase 2 (arriba a la derecha)",
-        help: "Segunda de las cuatro frases sobre la imagen.",
-        type: "text",
-        fallback: "Expande tu camino personal",
-      },
-      {
-        key: "home.promesas.3",
-        label: "Frase 3 (abajo a la izquierda)",
-        help: "Tercera de las cuatro frases sobre la imagen.",
-        type: "text",
-        fallback: "Desbloquea tu conexión con lo divino",
-      },
-      {
-        key: "home.promesas.4",
-        label: "Frase 4 (abajo a la derecha)",
-        help: "Cuarta de las cuatro frases sobre la imagen.",
-        type: "text",
-        fallback: "Contribuye a la evolución colectiva",
+        key: "home.tecnologia.image",
+        label: "Imagen de “Tecnología del Alma”",
+        help: "La foto vertical que acompaña al texto de Tecnología del Alma, sobre el fondo claro.",
+        type: "image",
+        fallback: IMAGES.portal2,
+        ratio: "4/5",
+        maxPx: 1400,
       },
       {
         key: "home.cierre.image",
         label: "Imagen de cierre",
-        help: "La foto ancha del final, justo antes de la franja dorada y el pie de página. Se recorta muy apaisada.",
+        help: "La foto del final, a pantalla completa, con la frase “Un viaje hacia el Humano Luminoso” encima.",
         type: "image",
         fallback: IMAGES.homeCierre,
-        ratio: "21/9",
+        ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
     ],
   },
@@ -136,6 +139,7 @@ export const SITE_GROUPS = [
         fallback: IMAGES.almas,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
       },
       {
         key: "nosotros.hero.title",
@@ -152,22 +156,37 @@ export const SITE_GROUPS = [
         fallback: "+10 años acompañando transformaciones",
       },
       {
+        key: "nosotros.frase",
+        label: "Frase sobre la imagen",
+        help: "La frase corta que aparece sola, centrada sobre la foto a pantalla completa.",
+        type: "text",
+        fallback:
+          "El viaje comienza cuando dejamos de buscar afuera lo que siempre estuvo adentro.",
+      },
+      // Las dos keys de abajo son las de los bloques "Evolución Consciente" y
+      // "Metodología", que el rediseño de Julia elimina. Se REUSAN a proposito,
+      // con la misma key y otra etiqueta: asi la foto que la clienta ya subio
+      // desde el panel sigue apareciendo en la pagina nueva. Renombrarlas
+      // dejaria las filas huerfanas y la pagina con los assets del repo.
+      {
         key: "nosotros.proposito.image",
-        label: "Imagen de “Evolución Consciente”",
-        help: "La foto ovalada que acompaña al primer bloque de texto.",
+        label: "Imagen de la frase central",
+        help: "La foto a pantalla completa que va detrás de la frase. Se ve oscurecida, así que conviene una imagen atmosférica y no un retrato.",
         type: "image",
         fallback: IMAGES.nosotrosProposito,
-        ratio: "3/4",
-        maxPx: 1400,
+        ratio: "16/9",
+        maxPx: 1920,
+        video: true,
       },
       {
         key: "nosotros.metodologia.image",
-        label: "Imagen de la metodología",
-        help: "La foto del segundo bloque, el que habla de cómo se trabaja.",
+        label: "Imagen de cierre",
+        help: "El fondo de la última pantalla, la del título “Un viaje hacia el Humano Luminoso”. Se ve tenue detrás del texto.",
         type: "image",
         fallback: IMAGES.nosotrosMetodologia,
-        ratio: "4/3",
-        maxPx: 1400,
+        ratio: "16/9",
+        maxPx: 1920,
+        video: true,
       },
     ],
   },
@@ -179,11 +198,32 @@ export const SITE_GROUPS = [
       {
         key: "viajes.hero.image",
         label: "Imagen de portada",
-        help: "Banner de arriba del listado de retiros y ceremonias.",
+        help: "El banner grande de arriba de todo, con el título “Portales de Transformación”. Ocupa la pantalla entera.",
         type: "image",
         fallback: IMAGES.heroViajes,
         ratio: "16/9",
         maxPx: 1920,
+        video: true,
+      },
+      {
+        key: "viajes.about.image",
+        label: "Imagen del texto de presentación",
+        help: "La foto que va detrás de los tres párrafos que explican qué son las experiencias. Se ve bastante oscurecida para que el texto se lea.",
+        type: "image",
+        fallback: IMAGES.portal1,
+        ratio: "16/9",
+        maxPx: 1920,
+        video: true,
+      },
+      {
+        key: "viajes.banner.image",
+        label: "Imagen de la frase del medio",
+        help: "La foto a pantalla completa que separa las Sesiones de los Viajes, con la frase centrada encima.",
+        type: "image",
+        fallback: IMAGES.almas,
+        ratio: "16/9",
+        maxPx: 1920,
+        video: true,
       },
     ],
   },
@@ -235,25 +275,12 @@ export function isSlotKey(value: unknown): value is SlotKey {
 }
 
 /**
- * Cliente sin cookies a proposito: `unstable_cache` no admite leer `cookies()`
- * dentro del scope cacheado, y este contenido es publico (lo lee `anon` por
- * RLS), asi que no necesita la sesion del visitante.
- */
-function publicClient() {
-  return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => [], setAll: () => {} } }
-  );
-}
-
-/**
  * Una sola lectura de todos los overrides por request, cacheada hasta que el
  * panel guarda (revalidateTag). Sin esto cada seccion consultaria la base.
  */
 const readOverrides = unstable_cache(
   async (): Promise<Record<string, string>> => {
-    const { data, error } = await publicClient()
+    const { data, error } = await createPublicClient()
       .from("site_content")
       .select("key, value");
 

@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { HOME_COPY, IMAGES, TESTIMONIALS } from "@/lib/constants";
+import { HOME_COPY, IMAGES } from "@/lib/constants";
+import type { Testimonial } from "@/lib/testimonials";
 import { Reveal } from "./ui/Reveal";
 import { SectionHeading } from "./ui/SectionHeading";
 
@@ -17,10 +18,22 @@ import { SectionHeading } from "./ui/SectionHeading";
  * dia que haya fotos reales de los viajeros pasa a ser un `<Image>` adentro del
  * mismo box, sin tocar el layout. Mismo patron que el avatar del navbar.
  *
+ * Los testimonios llegan por props desde la tabla `testimonials` (seccion
+ * `home`), que carga la clienta desde /admin/testimonios. Si no hay ninguno, la
+ * seccion no se dibuja: mejor eso que un encabezado sobre un vacio.
+ *
  * Dejo de ser client component: el scroll reveal lo aporta `Reveal`, que aisla el
  * `"use client"` en el wrapper.
  */
-export function TestimonialsSection({ id }: { id?: string }) {
+export function TestimonialsSection({
+  id,
+  testimonials,
+}: {
+  id?: string;
+  testimonials: Testimonial[];
+}) {
+  if (testimonials.length === 0) return null;
+
   return (
     <section
       id={id}
@@ -73,9 +86,9 @@ export function TestimonialsSection({ id }: { id?: string }) {
           />
 
           <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {TESTIMONIALS.map((t) => (
+            {testimonials.map((t) => (
               <figure
-                key={t.name}
+                key={t.id}
                 className="glass-card flex flex-col rounded-2xl p-7 text-left"
               >
                 <blockquote className="font-display text-body-md leading-relaxed text-on-surface">
@@ -86,15 +99,17 @@ export function TestimonialsSection({ id }: { id?: string }) {
                     tengan largos distintos. */}
                 <figcaption className="mt-auto flex items-center gap-3 pt-8">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-variant/70 font-display text-primary-fixed-dim">
-                    {t.initial}
+                    {t.author_name.charAt(0).toUpperCase()}
                   </span>
                   <span>
                     <span className="block font-display text-body-md text-on-surface">
-                      {t.name}
+                      {t.author_name}
                     </span>
-                    <span className="block text-label-sm uppercase text-on-surface-variant/70">
-                      {t.location}
-                    </span>
+                    {t.author_location && (
+                      <span className="block text-label-sm uppercase text-on-surface-variant/70">
+                        {t.author_location}
+                      </span>
+                    )}
                   </span>
                 </figcaption>
               </figure>
