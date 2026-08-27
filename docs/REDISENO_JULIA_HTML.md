@@ -357,6 +357,40 @@ ya estaban sin uso desde el 20/08 (`PortalsSection`, `AboutSection`,
 **No se borraron**: varios cargan copy de la clienta que el rediseño no reubica
 (`docs/COPY_HUERFANO.md`). Se limpian cuando esté decidido a dónde va ese texto.
 
+### Testimonios: tres juegos, y salieron del código (27/08)
+
+Julia confirmó la pregunta 6: **las tres secciones llevan textos distintos** —
+"Voces de Luz" en la home, "Nuestros Sanadores" en Sesiones y "Nuestros
+Viajeros" en Viajes.
+
+Tres listas hardcodeadas en `constants.ts` habrían obligado a un deploy por cada
+testimonio nuevo, que es exactamente lo que se resolvió con `articles`. Así que
+pasaron a una tabla, `testimonials` (migración `20260827200000_testimonials.sql`,
+**aplicada a producción**), con panel propio en **`/admin/testimonios`**.
+
+- `placement` (`home` / `sesiones` / `viajes`) decide dónde aparece. Un
+  testimonio vive en una sola sección: si el mismo texto sirve para dos, se carga
+  dos veces. No es una relación muchos a muchos, son tres piezas de copy.
+- **Lo despublicado no sale de la base**: la policy pública es
+  `using (is_published)`, mismo criterio que `articles` y a propósito distinto de
+  `trips`.
+- Sin flujo de borrador: un testimonio es un párrafo, no se escribe en varias
+  sesiones. La casilla "visible en el sitio" lo esconde sin borrarlo.
+- Orden manual (`sort_order`), porque el orden de los testimonios es una decisión
+  editorial y no la fecha de carga.
+- **Si una sección no tiene ninguno cargado, su bloque no se dibuja.** Mejor eso
+  que un encabezado sobre un vacío o repetir los de otra sección.
+- Los tres testimonios reales que estaban en `constants.ts` quedaron sembrados en
+  `home` por la propia migración, así "Voces de Luz" no quedó vacía. **Los de
+  Sesiones y Viajes los tiene que cargar la clienta**: hasta que lo haga, esos
+  dos bloques no aparecen en /viajes.
+- La lectura usa el cliente sin cookies, así la home sigue siendo estática. Los
+  server actions revalidan `/` y `/viajes` a mano: sin eso, con el ISR de una
+  hora, un testimonio nuevo podía tardar hasta 60 minutos en verse.
+
+Verificado con `set role anon`: no puede insertar y sólo ve los publicados
+(2 de 3 con uno despublicado). Advisors sin novedades.
+
 ### Lo que falta
 
 - **Los tres videos y el patrón de símbolos de Nosotros.** Julia los dejó como
@@ -364,7 +398,8 @@ ya estaban sin uso desde el 20/08 (`PortalsSection`, `AboutSection`,
 - **`/contenidos`, `/cuenta` y el detalle de un viaje** no fueron rediseñados y
   siguen con el sistema visual anterior. Conviven bien (comparten navbar, footer
   y paleta), pero el corte se nota al pasar de una a otra.
-- **Las 7 preguntas** del HTML que se le mandó a Julia (`~/Escritorio/
+- **Las preguntas 1 a 5 y 7** del HTML que se le mandó a Julia (la 6, la de los
+  testimonios, ya está contestada e implementada) (`~/Escritorio/
   consultas-julia-rediseno.html`): tipografía, navbar translúcido, copy huérfano,
   nomenclatura, testimonios por tipo y el botón de la cuenta.
 - **Verificación visual**: no hay capturas. La extensión de Chrome no está

@@ -12,6 +12,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { createClient } from "@/lib/supabase/server";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { getSiteContent } from "@/lib/site-content";
+import { getTestimonials } from "@/lib/testimonials";
 
 export const metadata: Metadata = {
   title: "Experiencias | Cosmic Eagle",
@@ -51,6 +52,12 @@ export default async function ViajesPage() {
   const trips = (data ?? []) as TripCardData[];
   const ceremonias = trips.filter((t) => t.type === "ceremonia");
   const retiros = trips.filter((t) => t.type === "retiro");
+
+  // Cada bloque tiene su propio juego de testimonios (Julia, 27/08).
+  const [testimoniosSesiones, testimoniosViajes] = await Promise.all([
+    getTestimonials("sesiones"),
+    getTestimonials("viajes"),
+  ]);
 
   return (
     <>
@@ -136,6 +143,7 @@ export default async function ViajesPage() {
           <TestimonialsBand
             title="Nuestros Sanadores"
             label="Lo que dicen quienes vivieron las sesiones"
+            testimonials={testimoniosSesiones}
           />
         </CreamSection>
 
@@ -180,6 +188,7 @@ export default async function ViajesPage() {
           <TestimonialsBand
             title="Nuestros Viajeros"
             label="Voces de quienes ya hicieron el camino"
+            testimonials={testimoniosViajes}
           />
         </CreamSection>
 

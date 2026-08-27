@@ -21,6 +21,7 @@ const LINKS = [
   { href: "/admin/solicitudes", label: "Solicitudes" },
   { href: "/admin/multimedia", label: "Multimedia" },
   { href: "/admin/contenidos", label: "Contenidos" },
+  { href: "/admin/testimonios", label: "Testimonios" },
   { href: "/admin/crm", label: "CRM" },
   { href: "/admin/suscriptores", label: "Suscriptores" },
 ];

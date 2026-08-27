@@ -15,6 +15,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { createPublicClient } from "@/lib/supabase/public";
 import { getSiteContent } from "@/lib/site-content";
+import { getTestimonials } from "@/lib/testimonials";
 
 /**
  * La home vuelve a consultar `trips` (la cartelera del rediseño), asi que ya no
@@ -61,6 +62,7 @@ export default async function Home() {
     .limit(8);
 
   const trips = (data ?? []) as TripCardData[];
+  const testimonials = await getTestimonials("home");
 
   return (
     <>
@@ -207,7 +209,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <TestimonialsSection id="voces" />
+        <TestimonialsSection id="voces" testimonials={testimonials} />
 
         {/* Tecnología del Alma: la puerta a /contenidos. */}
         <CreamSection id="tecnologia" full={false}>

@@ -432,6 +432,45 @@ export type Database = {
         }
         Relationships: []
       }
+      testimonials: {
+        Row: {
+          author_location: string | null
+          author_name: string
+          created_at: string
+          id: string
+          is_published: boolean
+          placement: Database["public"]["Enums"]["testimonial_placement"]
+          quote: string
+          sort_order: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          author_location?: string | null
+          author_name: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          placement: Database["public"]["Enums"]["testimonial_placement"]
+          quote: string
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          author_location?: string | null
+          author_name?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          placement?: Database["public"]["Enums"]["testimonial_placement"]
+          quote?: string
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       trips: {
         Row: {
           capacity: number
@@ -542,6 +581,7 @@ export type Database = {
       article_category: "biblioteca" | "ciencia" | "testimonios"
       article_status: "draft" | "published"
       payment_status: "pending" | "paid" | "waived"
+      testimonial_placement: "home" | "sesiones" | "viajes"
       trip_status: "draft" | "open" | "closed" | "completed"
       trip_type: "retiro" | "ceremonia"
     }

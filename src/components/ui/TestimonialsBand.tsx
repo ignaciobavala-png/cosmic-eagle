@@ -1,4 +1,4 @@
-import { TESTIMONIALS } from "@/lib/constants";
+import type { Testimonial } from "@/lib/testimonials";
 import { Reveal } from "./Reveal";
 
 /**
@@ -9,18 +9,22 @@ import { Reveal } from "./Reveal";
  * lo mismo que hace el `.exp-testi` del mockup: vive dentro de la columna
  * angosta del bloque, pero se pinta de borde a borde.
  *
- * **Los testimonios son los reales, los tres que ya están en `constants.ts`.**
- * Julia maquetó cuatro por bloque con texto de relleno; cuando la clienta mande
- * los suyos por tipo de experiencia, esto pasa a recibirlos por props (o a una
- * tabla, como los artículos). Anotado en docs/REDISENO_JULIA_HTML.md.
+ * Los testimonios salen de la tabla `testimonials` (Julia confirmó el 27/08 que
+ * las tres secciones llevan textos distintos). **Si la sección no tiene ninguno
+ * cargado, la banda no se dibuja**: es preferible a un bloque vacío o a repetir
+ * los de otra sección.
  */
 export function TestimonialsBand({
   title,
   label,
+  testimonials,
 }: {
   title: string;
   label: string;
+  testimonials: Testimonial[];
 }) {
+  if (testimonials.length === 0) return null;
+
   return (
     <div className="relative left-1/2 mt-16 w-screen -translate-x-1/2 bg-[linear-gradient(180deg,#0079b3_0%,#05125a_90%)] px-margin-mobile py-16 text-center md:px-margin-desktop md:py-20">
       <Reveal className="mx-auto max-w-5xl">
@@ -30,16 +34,17 @@ export function TestimonialsBand({
         </p>
 
         <div className="flex snap-x gap-5 overflow-x-auto pb-3 text-left [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {TESTIMONIALS.map((t) => (
+          {testimonials.map((t) => (
             <figure
-              key={t.name}
+              key={t.id}
               className="flex w-[18rem] shrink-0 snap-start flex-col justify-center rounded-xl border border-white/20 bg-white/[0.08] p-8"
             >
               <blockquote className="text-body-md italic text-primary">
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
               <figcaption className="mt-4 text-label-sm font-bold text-primary-container">
-                {t.name} — {t.location}
+                {t.author_name}
+                {t.author_location ? ` — ${t.author_location}` : ""}
               </figcaption>
             </figure>
           ))}

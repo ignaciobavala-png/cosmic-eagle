@@ -157,29 +157,10 @@ export const PORTAL_ALTS = [
  * El texto es literal del mockup, con una sola correccion: decia "evolcando",
  * que no es una palabra. Queda como "evocando".
  */
-export const TESTIMONIALS = [
-  {
-    quote:
-      "Todavía me sorprende la experiencia. Fue el viaje más increíble de mi vida. Sigo descubriendo nuevas comprensiones y habilidades que se activaron ese día, además de recibir información valiosa a través de mis sueños y prácticas. Me siento inmensamente agradecida.",
-    name: "Valeria",
-    location: "Uruguay",
-    initial: "V",
-  },
-  {
-    quote:
-      "Fue un regalo que cambió mi vida para siempre, evocando una sensación de amor que me acompaña en cada desafío diario. Accedí a un mundo que intuía, abriéndome a una maravillosa realidad oculta.",
-    name: "Claudia",
-    location: "Chile",
-    initial: "C",
-  },
-  {
-    quote:
-      "Un viaje interior memorable, donde experimenté directamente un amor profundo e incondicional. Me abrió las puertas a una nueva perspectiva del mundo, a comprender quién soy realmente y el rumbo que quiero darle a mi vida.",
-    name: "Andrew",
-    location: "Inglaterra",
-    initial: "A",
-  },
-];
+// Los testimonios dejaron de vivir en el codigo: son tres juegos distintos
+// (home, sesiones y viajes) que carga la clienta desde /admin/testimonios.
+// Ver src/lib/testimonials.ts y la migracion 20260827200000_testimonials.sql.
+
 
 /**
  * Copy de la home rediseñada. Es texto de la clienta, transcrito literal del
