@@ -19,6 +19,10 @@ export const IMAGES = {
   homePromesas: "/img/home/cuatro-promesas.webp",
   homeVoces: "/img/home/voces-de-luz.webp",
   homeCierre: "/img/home/cierre.webp",
+  // Panel lateral de la pantalla de acceso (login/registro). Sale embebida en
+  // base64 dentro de `login.html` / `register.html`, la entrega de Julia del
+  // 27/08: los dos archivos son la MISMA pagina con el prefijo renombrado.
+  cuentaAcceso: "/img/cuenta-acceso.webp",
   portal1: "/img/portal-1.webp",
   portal2: "/img/portal-2.webp",
   portal3: "/img/portal-3.webp",

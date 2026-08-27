@@ -3,6 +3,16 @@
 import { useActionState, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { signup, type SignupState } from "./actions";
+import {
+  fieldHint,
+  fieldInput,
+  fieldInputPassword,
+  fieldLabel,
+  fieldToggle,
+  fieldWrap,
+  formError,
+  submitButton,
+} from "./fields";
 
 const initialState: SignupState = { error: null };
 
@@ -11,10 +21,11 @@ export function SignupForm({ next }: { next?: string }) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <form action={formAction} className="glass-card rounded-2xl p-8 w-full max-w-sm flex flex-col gap-5">
+    <form action={formAction}>
       {next && <input type="hidden" name="next" value={next} />}
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="full_name" className="text-sm text-on-surface-variant tracking-[0.02em]">
+
+      <div className={fieldWrap}>
+        <label htmlFor="full_name" className={fieldLabel}>
           Nombre completo
         </label>
         <input
@@ -23,12 +34,13 @@ export function SignupForm({ next }: { next?: string }) {
           type="text"
           required
           autoComplete="name"
-          className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors"
+          placeholder="Tu nombre y apellido"
+          className={fieldInput}
         />
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="signup-email" className="text-sm text-on-surface-variant tracking-[0.02em]">
+      <div className={fieldWrap}>
+        <label htmlFor="signup-email" className={fieldLabel}>
           Email
         </label>
         <input
@@ -37,12 +49,13 @@ export function SignupForm({ next }: { next?: string }) {
           type="email"
           required
           autoComplete="email"
-          className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors"
+          placeholder="tu@email.com"
+          className={fieldInput}
         />
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="signup-password" className="text-sm text-on-surface-variant tracking-[0.02em]">
+      <div className="mb-9">
+        <label htmlFor="signup-password" className={fieldLabel}>
           Contraseña
         </label>
         <div className="relative">
@@ -53,31 +66,28 @@ export function SignupForm({ next }: { next?: string }) {
             required
             minLength={8}
             autoComplete="new-password"
-            className="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 pr-11 w-full text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors"
+            placeholder="••••••••"
+            className={fieldInputPassword}
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-            className="absolute inset-y-0 right-0 flex items-center px-3 text-on-surface-variant hover:text-primary-fixed-dim transition-colors"
+            className={fieldToggle}
           >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
           </button>
         </div>
-        <p className="text-xs text-on-surface-variant/70">Mínimo 8 caracteres.</p>
+        <p className={fieldHint}>Mínimo 8 caracteres.</p>
       </div>
 
       {state.error && (
-        <p className="text-error text-sm" role="alert">
+        <p className={formError} role="alert">
           {state.error}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="mt-2 bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-fixed transition-colors disabled:opacity-60"
-      >
+      <button type="submit" disabled={pending} className={submitButton}>
         {pending ? "Creando cuenta..." : "Crear cuenta"}
       </button>
     </form>

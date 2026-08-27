@@ -258,6 +258,25 @@ export const SITE_GROUPS = [
       },
     ],
   },
+  {
+    id: "cuenta",
+    title: "Acceso",
+    href: "/cuenta",
+    slots: [
+      {
+        key: "cuenta.acceso.image",
+        label: "Imagen de la pantalla de acceso",
+        help: "La foto vertical que acompaña al formulario de ingreso y de registro. Es la misma en las dos pantallas. En el celular no se muestra: ahí queda solo el formulario.",
+        type: "image",
+        fallback: IMAGES.cuentaAcceso,
+        // Vertical: en el diseño es una tarjeta alta al costado del formulario,
+        // no un banner. El recorte del panel tiene que mostrarla así o la
+        // clienta sube una apaisada y se recorta a la mitad.
+        ratio: "9/16",
+        maxPx: 1600,
+      },
+    ],
+  },
 ] as const satisfies readonly SlotGroup[];
 
 export type SlotKey = (typeof SITE_GROUPS)[number]["slots"][number]["key"];

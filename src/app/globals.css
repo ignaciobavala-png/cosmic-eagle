@@ -199,12 +199,74 @@
   will-change: transform;
 }
 
+/* Ken Burns en loop de la pantalla de acceso (login/registro).
+
+   Van DOS copias de la misma imagen con la animacion desfasada media vuelta
+   (`animation-delay: -1s` en la segunda): la que termina su acercamiento se
+   funde con la otra, que recien arranca desde su escala inicial. Con una sola
+   copia el ciclo saltaria a la vista cada 6s. Sale tal cual de `login.html`. */
+@keyframes kb-zoom {
+  0% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  16.6% {
+    transform: scale(1.035);
+    opacity: 1;
+  }
+  83.3% {
+    transform: scale(1.13);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.16);
+    opacity: 0;
+  }
+}
+
+@utility animate-kb-zoom {
+  animation: kb-zoom 6s linear infinite;
+  will-change: transform, opacity;
+}
+
+/* Entrada de la tarjeta del formulario: sube 20px con fundido, 1s, tras 150ms.
+   Va como animacion CSS y no como Framer Motion para que la pantalla de acceso
+   siga siendo Server Component — el unico `"use client"` ahi es el formulario. */
+@keyframes auth-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-auth-card {
+  animation: auth-card-in 1s ease-out 150ms both;
+}
+
 /* Las reglas sin `@layer` le ganan a las utilidades de Tailwind, que si estan
    en capa. Por eso este bloque apaga las animaciones aunque se escriba antes. */
 @media (prefers-reduced-motion: reduce) {
   .animate-hero-zoom,
-  .animate-float {
+  .animate-float,
+  .animate-auth-card {
     animation: none;
+  }
+
+  /* El Ken Burns no se apaga con `animation:none` a secas: la segunda copia
+     quedaria con la opacidad 0 del estado inicial y taparia a la primera. Se
+     fija la imagen quieta y se esconde la copia. */
+  .animate-kb-zoom {
+    animation: none;
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .animate-kb-zoom + .animate-kb-zoom {
+    display: none;
   }
 }
 

@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
+import { AuthScreen } from "@/components/ui/AuthScreen";
+import { getSiteContent } from "@/lib/site-content";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
@@ -24,10 +26,10 @@ function Notice({ text, tone }: { text: string; tone: "error" | "ok" }) {
   return (
     <p
       role="alert"
-      className={`rounded-lg border px-4 py-3 text-sm max-w-sm ${
+      className={`max-w-sm rounded-lg border px-4 py-3 text-sm ${
         tone === "error"
-          ? "border-error/40 bg-error/10 text-error"
-          : "border-primary-fixed-dim/40 bg-primary-container/10 text-primary-fixed-dim"
+          ? "border-[#ffb4a8]/40 bg-[#ffb4a8]/10 text-[#ffb4a8]"
+          : "border-primary-container/40 bg-primary-container/10 text-primary-container"
       }`}
     >
       {text}
@@ -47,6 +49,7 @@ export default async function CuentaPage({
   }>;
 }) {
   const { next, modo, vista, error, aviso } = await searchParams;
+  const content = await getSiteContent();
   const isSignup = modo === "registro";
   const supabase = await createClient();
   const {
@@ -129,9 +132,9 @@ export default async function CuentaPage({
   return (
     <>
       <Header />
-      <main className="pt-16 lg:pt-21 min-h-screen flex items-center justify-center">
+      <main className="pt-16 lg:pt-21">
         {user ? (
-          <div className="px-5 w-full max-w-3xl flex flex-col items-center gap-4 py-12">
+          <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-5 py-12">
             <AvatarUpload
               avatarUrl={profile?.avatar_url ?? null}
               fallbackLabel={(profile?.full_name?.trim()?.[0] ?? user.email?.[0] ?? "?").toUpperCase()}
@@ -159,30 +162,38 @@ export default async function CuentaPage({
             </form>
           </div>
         ) : (
-          <div className="text-center px-5 flex flex-col items-center gap-6">
-            <div>
-              <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary-fixed-dim mb-2">
-                Mi Cuenta
-              </h1>
-              <p className="text-on-surface-variant max-w-md">
-                {isSignup
-                  ? "Creá tu cuenta para postularte a un viaje."
-                  : "Iniciá sesión para acceder a tu cuenta."}
-              </p>
-            </div>
-            {error && ERROR_MESSAGES[error] && (
-              <Notice text={ERROR_MESSAGES[error]} tone="error" />
-            )}
+          <AuthScreen
+            image={content("cuenta.acceso.image")}
+            eyebrow={isSignup ? "Crear cuenta" : "Iniciar sesión"}
+            title={isSignup ? "Bienvenido" : "Hola de nuevo"}
+            subtitle={
+              isSignup
+                ? "Creá tu cuenta para postularte a un viaje."
+                : "Ingresá tu email y contraseña para continuar tu camino."
+            }
+            notice={
+              error && ERROR_MESSAGES[error] ? (
+                <Notice text={ERROR_MESSAGES[error]} tone="error" />
+              ) : null
+            }
+            footer={
+              <>
+                {isSignup ? "¿Ya tenés cuenta? " : "¿No tenés cuenta? "}
+                <a
+                  href={`/cuenta${isSignup ? "" : "?modo=registro"}${
+                    next
+                      ? `${isSignup ? "?" : "&"}next=${encodeURIComponent(next)}`
+                      : ""
+                  }`}
+                  className="text-primary-container underline"
+                >
+                  {isSignup ? "Iniciá sesión" : "Registrate"}
+                </a>
+              </>
+            }
+          >
             {isSignup ? <SignupForm next={next} /> : <LoginForm next={next} />}
-            <a
-              href={`/cuenta${isSignup ? "" : "?modo=registro"}${
-                next ? `${isSignup ? "?" : "&"}next=${encodeURIComponent(next)}` : ""
-              }`}
-              className="text-sm text-on-surface-variant hover:text-primary-fixed-dim transition-colors underline"
-            >
-              {isSignup ? "¿Ya tenés cuenta? Iniciá sesión" : "¿No tenés cuenta? Registrate"}
-            </a>
-          </div>
+          </AuthScreen>
         )}
       </main>
       <Footer />
