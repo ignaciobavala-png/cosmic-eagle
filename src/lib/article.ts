@@ -107,7 +107,7 @@ export function parseArticleBody(body: string): ArticleBlock[] {
 export function formatArticleDate(value: string | null): string | null {
   if (!value) return null;
 
-  return new Date(value).toLocaleDateString("es-AR", {
+  return new Date(value).toLocaleDateString("es-CL", {
     day: "numeric",
     month: "long",
     year: "numeric",

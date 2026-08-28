@@ -50,7 +50,7 @@ export async function compressVideo(
   try {
     video = await loadVideo(file);
   } catch {
-    return { ok: false, error: "No se pudo leer el video. Probá con un MP4." };
+    return { ok: false, error: "No se pudo leer el video. Prueba con un MP4." };
   }
 
   if (video.duration > MAX_DURATION_SECONDS) {

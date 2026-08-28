@@ -27,7 +27,7 @@ export async function reviewApplication(
     .single();
 
   if (application?.user_id === user?.id) {
-    throw new Error("No podés revisar tu propia solicitud.");
+    throw new Error("No puedes revisar tu propia solicitud.");
   }
 
   const { error } = await supabase
@@ -127,7 +127,7 @@ async function notifyApproved({
     title: `No se pudo avisarle a ${nombre} que fue aprobada`,
     body:
       result.reason === "not_configured"
-        ? `Resend todavía no está configurado (falta RESEND_API_KEY). Escribile a ${email} a mano.`
+        ? `Resend todavía no está configurado (falta RESEND_API_KEY). Escríbele a ${email} a mano.`
         : `Resend rechazó el envío a ${email}: ${result.error ?? "sin detalle"}.`,
     href: `/admin/solicitudes/${id}`,
   });

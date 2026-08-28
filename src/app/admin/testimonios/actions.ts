@@ -33,7 +33,7 @@ function parseForm(formData: FormData) {
     !authorName.trim()
   ) {
     return {
-      error: "Completá la sección, el testimonio y el nombre.",
+      error: "Completa la sección, el testimonio y el nombre.",
       data: null,
     } as const;
   }

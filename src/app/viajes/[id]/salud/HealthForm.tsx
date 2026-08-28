@@ -94,7 +94,7 @@ export function HealthForm({
 
       <BoolQuestion
         name="health_condition"
-        label="¿Tenés alguna condición de salud física o mental?"
+        label="¿Tienes alguna condición de salud física o mental?"
       />
       <BoolQuestion
         name="trauma"
@@ -110,11 +110,11 @@ export function HealthForm({
       />
       <BoolQuestion
         name="allergies"
-        label="¿Tenés alergias alimentarias o a medicamentos?"
+        label="¿Tienes alergias alimentarias o a medicamentos?"
       />
       <BoolQuestion
         name="spiritual_practice"
-        label="¿Tenés una práctica espiritual o de meditación activa?"
+        label="¿Tienes una práctica espiritual o de meditación activa?"
       />
       <BoolQuestion
         name="first_time_plants"
@@ -126,7 +126,7 @@ export function HealthForm({
       />
       <BoolQuestion
         name="fears"
-        label="¿Tenés miedos particulares respecto a la experiencia?"
+        label="¿Tienes miedos particulares respecto a la experiencia?"
       />
 
       <div className="flex flex-col gap-1.5 py-4">

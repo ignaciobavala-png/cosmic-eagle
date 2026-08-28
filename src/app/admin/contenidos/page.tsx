@@ -41,11 +41,11 @@ export default async function AdminContenidosPage() {
       </div>
 
       <p className="mb-8 max-w-2xl text-sm text-on-surface-variant">
-        Lo que cargues acá aparece en{" "}
+        Lo que cargues aquí aparece en{" "}
         <Link href="/contenidos" className="text-secondary hover:underline">
           /contenidos
         </Link>
-        . Mientras esté en borrador no lo ve nadie más que vos.
+        . Mientras esté en borrador no lo ve nadie más que tú.
       </p>
 
       {!articles || articles.length === 0 ? (

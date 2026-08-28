@@ -94,7 +94,7 @@ export default async function AdminMultimediaPage() {
           Multimedia
         </h1>
         <p className="mt-1 max-w-2xl text-sm text-on-surface-variant">
-          Las imágenes y los textos de las páginas públicas. Lo que cambies acá
+          Las imágenes y los textos de las páginas públicas. Lo que cambies aquí
           se ve en el sitio enseguida.{" "}
           {editedCount > 0
             ? `${editedCount} ${editedCount === 1 ? "elemento está editado" : "elementos están editados"}.`
@@ -160,7 +160,7 @@ export default async function AdminMultimediaPage() {
             ))
           ) : (
             <p className="px-5 py-5 text-sm text-on-surface-variant md:px-6">
-              Cargá un viaje desde Retiros o Ceremonias y su portada aparece acá.
+              Carga un viaje desde Retiros o Ceremonias y su portada aparece aquí.
             </p>
           )}
         </Accordion>
@@ -168,7 +168,7 @@ export default async function AdminMultimediaPage() {
 
       <p className="mt-8 text-xs text-on-surface-variant">
         Las imágenes se achican y se convierten solas antes de subirse, así que
-        podés cargar la foto tal cual sale de la cámara.
+        puedes cargar la foto tal cual sale de la cámara.
       </p>
     </div>
   );

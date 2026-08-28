@@ -157,7 +157,7 @@ export default async function ViajesPage() {
                   caption="Calendario de sesiones"
                   title="Próximas Sesiones"
                   trips={ceremonias}
-                  emptyLabel="No hay sesiones publicadas por el momento. Volvé a visitarnos pronto."
+                  emptyLabel="No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto."
                 />
               </Collapsible>
             </RevealItem>
@@ -223,7 +223,7 @@ export default async function ViajesPage() {
                   caption="Calendario de viajes"
                   title="Próximos Viajes"
                   trips={retiros}
-                  emptyLabel="No hay viajes publicados por el momento. Volvé a visitarnos pronto."
+                  emptyLabel="No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
                 />
               </Collapsible>
             </RevealItem>

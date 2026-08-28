@@ -45,7 +45,7 @@ function pendingStep(a: Application): { label: string; href?: string } {
 }
 
 function formatDate(iso: string) {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("es-AR", {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("es-CL", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -54,7 +54,7 @@ function formatDate(iso: string) {
 }
 
 function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleDateString("es-AR", {
+  return new Date(iso).toLocaleDateString("es-CL", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -67,7 +67,7 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
   if (applications.length === 0) {
     return (
       <p className="text-on-surface-variant text-center max-w-md">
-        Todavía no tenés solicitudes. Elegí un viaje en{" "}
+        Todavía no tienes solicitudes. Elige un viaje en{" "}
         <Link href="/viajes" className="text-primary-fixed-dim underline">
           Viajes
         </Link>{" "}

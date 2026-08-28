@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CopyEmails } from "./CopyEmails";
 
 function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString("es-AR", {
+  return new Date(iso).toLocaleString("es-CL", {
     day: "numeric",
     month: "short",
     year: "numeric",

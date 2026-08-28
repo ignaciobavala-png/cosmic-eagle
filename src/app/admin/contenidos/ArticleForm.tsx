@@ -167,7 +167,7 @@ export function ArticleForm({
           {!cropping && "Se recorta sola a 16:9 desde el centro. "}
           {!cropping &&
             article?.cover_url &&
-            "Si no elegís una, se mantiene la actual. "}
+            "Si no eliges una, se mantiene la actual. "}
           {!cropping && !article?.cover_url && "Sin portada la tarjeta va sin imagen."}
         </p>
       </div>
@@ -223,7 +223,7 @@ export function ArticleForm({
           className={`${inputClass} font-body leading-relaxed`}
         />
         <p className="text-xs text-on-surface-variant">
-          Dejá una línea en blanco entre párrafos. Una línea que empiece con{" "}
+          Deja una línea en blanco entre párrafos. Una línea que empiece con{" "}
           <code className="text-primary-fixed-dim">## </code> se ve como
           subtítulo.
         </p>

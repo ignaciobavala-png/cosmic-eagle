@@ -26,7 +26,7 @@ export function RecoverForm() {
           contraseña nueva.
         </p>
         <p className="mt-3 text-sm text-white/60">
-          Revisá también la carpeta de spam. El enlace vence en una hora y sirve
+          Revisa también la carpeta de spam. El enlace vence en una hora y sirve
           una sola vez.
         </p>
       </div>

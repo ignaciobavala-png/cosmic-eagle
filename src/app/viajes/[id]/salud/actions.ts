@@ -42,7 +42,7 @@ export async function submitHealthForm(
   const occupation = str(formData, "occupation");
 
   if (!age || !height || !weight || !country || !occupation) {
-    return { error: "Completá todos los campos requeridos." };
+    return { error: "Completa todos los campos requeridos." };
   }
 
   const { error } = await supabase.from("health_form_first_time").insert({

@@ -104,7 +104,7 @@ export function CoverEditor({
           </label>
 
           <p className="text-xs text-on-surface-variant">
-            Se recorta sola a 16:9 desde el centro. Dejá lo importante dentro del
+            Se recorta sola a 16:9 desde el centro. Deja lo importante dentro del
             recuadro punteado: es lo que se ve en todos los tamaños.
           </p>
 

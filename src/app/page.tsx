@@ -124,7 +124,7 @@ export default async function Home() {
                 caption="Calendario de experiencias"
                 title="Próximos Viajes"
                 trips={trips}
-                emptyLabel="No hay experiencias publicadas por el momento. Volvé a visitarnos pronto."
+                emptyLabel="No hay experiencias publicadas por el momento. Vuelve a visitarnos pronto."
               />
             </Collapsible>
           </div>

@@ -133,8 +133,8 @@ export function TripForm({
         <p className="text-xs text-on-surface-variant/70">
           {cropping
             ? "Recortando…"
-            : "Se recorta sola a 16:9 desde el centro y se convierte a WebP. Dejá lo importante dentro del recuadro punteado: es lo que se ve en todos los tamaños. "}
-          {!cropping && trip?.image_url && "Si no elegís una, se mantiene la actual. "}
+            : "Se recorta sola a 16:9 desde el centro y se convierte a WebP. Deja lo importante dentro del recuadro punteado: es lo que se ve en todos los tamaños. "}
+          {!cropping && trip?.image_url && "Si no eliges una, se mantiene la actual. "}
           {!cropping && "Sin portada se usa una imagen genérica."}
         </p>
       </div>

@@ -110,8 +110,8 @@ export default async function SolicitudDetallePage({
         <h2 className="font-display text-xl text-primary-fixed-dim mb-2">Revisión</h2>
         {isOwnApplication ? (
           <p className="text-on-surface-variant text-sm">
-            Esta es tu propia solicitud — no podés aprobarla ni rechazarla. Pedile
-            a otro admin que la revise.
+            Esta es tu propia solicitud — no puedes aprobarla ni rechazarla.
+            Pídele a otro admin que la revise.
           </p>
         ) : (
           <ReviewButtons id={id} currentStatus={application.status} />
@@ -134,12 +134,12 @@ export default async function SolicitudDetallePage({
         <AnswerList answers={answersFor(SCREENING_FIELDS, application, null)}>
           <Field
             label="Enviada"
-            value={new Date(application.created_at).toLocaleString("es-AR")}
+            value={new Date(application.created_at).toLocaleString("es-CL")}
           />
           {application.reviewed_at && (
             <Field
               label="Revisada"
-              value={new Date(application.reviewed_at).toLocaleString("es-AR")}
+              value={new Date(application.reviewed_at).toLocaleString("es-CL")}
             />
           )}
         </AnswerList>
@@ -168,7 +168,7 @@ export default async function SolicitudDetallePage({
             <AnswerList answers={answersFor(HEALTH_FIELDS, health, null)}>
               <Field
                 label="Enviado"
-                value={new Date(health.created_at).toLocaleString("es-AR")}
+                value={new Date(health.created_at).toLocaleString("es-CL")}
               />
             </AnswerList>
           </>

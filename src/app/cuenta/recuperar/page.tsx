@@ -22,7 +22,7 @@ export default async function RecuperarPage() {
           image={content("cuenta.acceso.image")}
           eyebrow="Recuperar acceso"
           title="Volver a entrar"
-          subtitle="Escribí tu email y te mandamos un enlace para crear una contraseña nueva."
+          subtitle="Escribe tu email y te mandamos un enlace para crear una contraseña nueva."
           footer={
             <Link href="/cuenta" className="text-primary-container underline">
               Volver al inicio de sesión

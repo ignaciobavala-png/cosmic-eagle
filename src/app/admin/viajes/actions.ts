@@ -60,7 +60,7 @@ function parseTripForm(formData: FormData) {
     typeof status !== "string" ||
     !isTripType(type)
   ) {
-    return { error: "Completá los campos requeridos.", data: null } as const;
+    return { error: "Completa los campos requeridos.", data: null } as const;
   }
 
   if (end_date < start_date) {

@@ -29,7 +29,7 @@ export function SolicitudAprobada({
       <Paragraph>Hola {nombre},</Paragraph>
 
       <Paragraph>
-        Revisamos tu solicitud para <strong>{viaje}</strong> ({fechas}) y tenés tu
+        Revisamos tu solicitud para <strong>{viaje}</strong> ({fechas}) y tienes tu
         lugar confirmado. Nos alegra mucho que nos acompañes.
       </Paragraph>
 

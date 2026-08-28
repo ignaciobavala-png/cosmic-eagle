@@ -28,7 +28,7 @@ const STATUS_CLASS: Record<string, string> = {
 // Postgres `date` llega como "YYYY-MM-DD": parsear y formatear en UTC evita que
 // el timezone local corra la fecha un dia hacia atras.
 function formatDate(iso: string) {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("es-AR", {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("es-CL", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -173,7 +173,7 @@ export default async function ViajePage({ params }: Props) {
               ) : (
                 <p className="text-on-surface-variant">
                   Pronto vamos a compartir más detalles sobre esta experiencia.
-                  Escribinos si querés saber más.
+                  Escríbenos si quieres saber más.
                 </p>
               )}
 
@@ -240,7 +240,7 @@ export default async function ViajePage({ params }: Props) {
                       : "Inscripciones cerradas"}
                   </h2>
                   <p className="text-on-surface-variant text-sm mb-5">
-                    Mirá el resto del calendario para encontrar la próxima
+                    Mira el resto del calendario para encontrar la próxima
                     fecha disponible.
                   </p>
                   <Link

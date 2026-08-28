@@ -32,7 +32,7 @@ const STATE_CLASS: Record<string, string> = {
 };
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("es-AR", {
+  return new Date(iso).toLocaleDateString("es-CL", {
     day: "numeric",
     month: "short",
     year: "numeric",

@@ -39,7 +39,7 @@ export async function uploadTripCover(
 
   // El bucket es publico y un SVG servido inline puede llevar script adentro.
   if (file.type === "image/svg+xml") {
-    return { error: "Los SVG no están permitidos. Subí JPG, PNG o WebP." };
+    return { error: "Los SVG no están permitidos. Sube JPG, PNG o WebP." };
   }
 
   // Llega ya recortada y comprimida del browser; el tope es la red de
@@ -59,7 +59,7 @@ export async function uploadTripCover(
     .upload(path, file, { contentType: file.type });
 
   if (error) {
-    return { error: "No se pudo subir la portada. Probá de nuevo." };
+    return { error: "No se pudo subir la portada. Prueba de nuevo." };
   }
 
   if (currentUrl?.includes(PUBLIC_PREFIX)) {

@@ -25,7 +25,7 @@ function nextStep(
   if (app.status === "rejected") {
     return {
       title: "Tu solicitud no fue aprobada para este viaje",
-      body: "Podés postularte a otro viaje más adelante.",
+      body: "Puedes postularte a otro viaje más adelante.",
     };
   }
 

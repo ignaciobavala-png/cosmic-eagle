@@ -18,7 +18,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 function formatDate(iso: string) {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("es-AR", {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("es-CL", {
     day: "numeric",
     month: "short",
     year: "numeric",

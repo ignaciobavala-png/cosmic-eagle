@@ -45,7 +45,7 @@ function parseArticleForm(formData: FormData) {
     !isArticleCategory(category) ||
     !isStatus(status)
   ) {
-    return { error: "Completá el título y el texto.", data: null } as const;
+    return { error: "Completa el título y el texto.", data: null } as const;
   }
 
   // El slug llega sugerido del form, pero se normaliza igual: es la URL publica
@@ -91,7 +91,7 @@ async function uploadCover(
 
   // El bucket es publico y un SVG servido inline puede llevar script adentro.
   if (file.type === "image/svg+xml") {
-    return { error: "Los SVG no están permitidos. Subí JPG, PNG o WebP." };
+    return { error: "Los SVG no están permitidos. Sube JPG, PNG o WebP." };
   }
 
   // Llega ya recortada y comprimida del browser; el tope es la red de
@@ -109,7 +109,7 @@ async function uploadCover(
     .from(BUCKET)
     .upload(path, file, { contentType: file.type });
 
-  if (error) return { error: "No se pudo subir la portada. Probá de nuevo." };
+  if (error) return { error: "No se pudo subir la portada. Prueba de nuevo." };
 
   if (currentUrl?.includes(PUBLIC_PREFIX)) {
     const oldPath = currentUrl.split(PUBLIC_PREFIX)[1]?.split("?")[0];
@@ -128,7 +128,7 @@ async function uploadCover(
 /** El slug es unico: el mensaje crudo de Postgres no le dice nada a la clienta. */
 function friendlyError(message: string, action: "crear" | "guardar") {
   if (message.includes("articles_slug_key")) {
-    return "Ya hay un contenido con esa dirección. Cambiá el título o la dirección.";
+    return "Ya hay un contenido con esa dirección. Cambia el título o la dirección.";
   }
   return `No se pudo ${action} el contenido: ${message}`;
 }

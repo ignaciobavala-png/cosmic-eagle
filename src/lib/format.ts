@@ -13,9 +13,9 @@ export function formatDateRangeCompact(startDate: string, endDate: string) {
   const end = parseDate(endDate);
 
   const day = (d: Date) =>
-    d.toLocaleDateString("es-AR", { day: "numeric", timeZone: "UTC" });
+    d.toLocaleDateString("es-CL", { day: "numeric", timeZone: "UTC" });
   const monthYear = (d: Date) =>
-    d.toLocaleDateString("es-AR", {
+    d.toLocaleDateString("es-CL", {
       month: "short",
       year: "numeric",
       timeZone: "UTC",
@@ -37,7 +37,7 @@ export function formatScheduleDay(startDate: string, day: number) {
   const date = parseDate(startDate);
   date.setUTCDate(date.getUTCDate() + day - 1);
 
-  return date.toLocaleDateString("es-AR", {
+  return date.toLocaleDateString("es-CL", {
     weekday: "long",
     day: "numeric",
     timeZone: "UTC",

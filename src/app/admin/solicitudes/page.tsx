@@ -31,7 +31,7 @@ const FILTERS: { value: string; label: string }[] = [
 ];
 
 function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleDateString("es-AR", {
+  return new Date(iso).toLocaleDateString("es-CL", {
     day: "numeric",
     month: "short",
     year: "numeric",

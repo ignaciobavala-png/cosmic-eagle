@@ -138,7 +138,7 @@ export function ScreeningForm({
             className={inputClass}
           />
           <span className="text-xs text-on-surface-variant">
-            Si es tu primera vez, dejá el 0.
+            Si es tu primera vez, deja el 0.
           </span>
         </div>
       </div>
@@ -156,7 +156,7 @@ export function ScreeningForm({
       <Question
         name="mental_health_treatment"
         label="¿Estás o has estado en tratamiento psiquiátrico o psicológico?"
-        hint="Si es así, contanos por qué motivo y hace cuánto."
+        hint="Si es así, cuéntanos por qué motivo y hace cuánto."
         placeholder="Motivo y hace cuánto tiempo."
       />
       <Question
@@ -175,7 +175,7 @@ export function ScreeningForm({
 
       <div className="flex flex-col gap-1.5 py-4">
         <label className={labelClass}>
-          Tema o intención que querés trabajar (opcional)
+          Tema o intención que quieres trabajar (opcional)
         </label>
         <textarea name="theme" rows={2} className={inputClass} />
       </div>

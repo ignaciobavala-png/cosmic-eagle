@@ -25,7 +25,7 @@ export async function subscribeNewsletter(
     .toLowerCase();
 
   if (!EMAIL_RE.test(email) || email.length > 320) {
-    return { ok: false, message: "Revisá el correo, no parece válido." };
+    return { ok: false, message: "Revisa el correo, no parece válido." };
   }
 
   const supabase = await createClient();
@@ -35,7 +35,7 @@ export async function subscribeNewsletter(
 
   // 23505 = unique_violation: ya estaba suscripto.
   if (error && error.code !== "23505") {
-    return { ok: false, message: "No pudimos registrarte. Probá de nuevo." };
+    return { ok: false, message: "No pudimos registrarte. Prueba de nuevo." };
   }
 
   return { ok: true, message: "Listo, te vamos a escribir." };

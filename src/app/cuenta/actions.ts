@@ -20,7 +20,7 @@ export async function login(
   const next = formData.get("next");
 
   if (typeof email !== "string" || typeof password !== "string") {
-    return { error: "Completá email y contraseña." };
+    return { error: "Completa email y contraseña." };
   }
 
   const supabase = await createClient();
@@ -31,7 +31,7 @@ export async function login(
 
   if (error) {
     if (error.code === "email_not_confirmed") {
-      return { error: "Confirmá tu email antes de iniciar sesión. Revisá tu bandeja de entrada." };
+      return { error: "Confirma tu email antes de iniciar sesión. Revisa tu bandeja de entrada." };
     }
     return { error: "Email o contraseña incorrectos." };
   }
@@ -66,7 +66,7 @@ export async function signup(
     typeof fullName !== "string" ||
     fullName.trim().length === 0
   ) {
-    return { error: "Completá nombre, email y contraseña." };
+    return { error: "Completa nombre, email y contraseña." };
   }
 
   if (password.length < 8) {
@@ -88,9 +88,9 @@ export async function signup(
 
   if (error) {
     if (error.code === "user_already_exists") {
-      return { error: "Ya existe una cuenta con ese email. Iniciá sesión." };
+      return { error: "Ya existe una cuenta con ese email. Inicia sesión." };
     }
-    return { error: "No se pudo crear la cuenta. Probá de nuevo." };
+    return { error: "No se pudo crear la cuenta. Prueba de nuevo." };
   }
 
   revalidatePath("/", "layout");
@@ -112,7 +112,7 @@ export async function requestPasswordReset(
   const email = formData.get("email");
 
   if (typeof email !== "string" || !email.includes("@")) {
-    return { error: "Ingresá un email válido.", sent: false };
+    return { error: "Ingresa un email válido.", sent: false };
   }
 
   const supabase = await createClient();
@@ -138,7 +138,7 @@ export async function updatePassword(
   const confirm = formData.get("password_confirm");
 
   if (typeof password !== "string" || typeof confirm !== "string") {
-    return { error: "Completá los dos campos." };
+    return { error: "Completa los dos campos." };
   }
 
   if (password.length < 8) {
@@ -155,7 +155,7 @@ export async function updatePassword(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "El enlace venció. Pedí uno nuevo desde “¿Olvidaste tu contraseña?”." };
+    return { error: "El enlace venció. Pide uno nuevo desde “¿Olvidaste tu contraseña?”." };
   }
 
   const { error } = await supabase.auth.updateUser({ password });
@@ -164,7 +164,7 @@ export async function updatePassword(
     if (error.code === "same_password") {
       return { error: "La contraseña nueva tiene que ser distinta de la anterior." };
     }
-    return { error: "No se pudo cambiar la contraseña. Probá de nuevo." };
+    return { error: "No se pudo cambiar la contraseña. Prueba de nuevo." };
   }
 
   revalidatePath("/", "layout");
@@ -178,7 +178,7 @@ export async function updateAvatar(
   const file = formData.get("avatar");
 
   if (!(file instanceof File) || file.size === 0) {
-    return { error: "Elegí una imagen." };
+    return { error: "Elige una imagen." };
   }
 
   if (!file.type.startsWith("image/")) {
@@ -195,7 +195,7 @@ export async function updateAvatar(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "Sesión expirada. Volvé a iniciar sesión." };
+    return { error: "Sesión expirada. Vuelve a iniciar sesión." };
   }
 
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
@@ -206,7 +206,7 @@ export async function updateAvatar(
     .upload(path, file, { upsert: true, contentType: file.type });
 
   if (uploadError) {
-    return { error: "No se pudo subir la imagen. Probá de nuevo." };
+    return { error: "No se pudo subir la imagen. Prueba de nuevo." };
   }
 
   const {

@@ -83,7 +83,7 @@ export async function saveSlot(
     const file = formData.get("file");
 
     if (!(file instanceof File) || file.size === 0) {
-      return { error: "Elegí un archivo para subir." };
+      return { error: "Elige un archivo para subir." };
     }
 
     const isVideo = file.type.startsWith("video/");
@@ -103,7 +103,7 @@ export async function saveSlot(
     // El bucket tambien lo rechaza por `allowed_mime_types`; esto es para que el
     // mensaje diga algo util en vez del error crudo de Storage.
     if (file.type === "image/svg+xml") {
-      return { error: "Los SVG no están permitidos. Subí JPG, PNG o WebP." };
+      return { error: "Los SVG no están permitidos. Sube JPG, PNG o WebP." };
     }
 
     // Llega ya comprimido del browser; el tope es una red de contencion por si
@@ -114,7 +114,7 @@ export async function saveSlot(
     if (file.size > limitMb * 1024 * 1024) {
       return {
         error: isVideo
-          ? "El video no puede superar los 8MB. Probá con un clip más corto."
+          ? "El video no puede superar los 8MB. Prueba con un clip más corto."
           : "La imagen no puede superar los 5MB.",
       };
     }
@@ -131,7 +131,7 @@ export async function saveSlot(
       .upload(path, file, { contentType: file.type });
 
     if (uploadError) {
-      return { error: "No se pudo subir el archivo. Probá de nuevo." };
+      return { error: "No se pudo subir el archivo. Prueba de nuevo." };
     }
 
     const {
@@ -203,7 +203,7 @@ export async function saveTripCover(
 
   const file = formData.get("file");
   if (!(file instanceof File) || file.size === 0) {
-    return { error: "Elegí una imagen para subir." };
+    return { error: "Elige una imagen para subir." };
   }
 
   const supabase = await createClient();

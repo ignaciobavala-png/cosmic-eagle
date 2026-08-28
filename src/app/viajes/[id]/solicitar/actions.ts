@@ -35,7 +35,7 @@ export async function submitApplication(
   const previous_ceremonies = str(formData, "previous_ceremonies");
 
   if (!full_name || !email || !previous_ceremonies) {
-    return { error: "Completá todos los campos requeridos." };
+    return { error: "Completa todos los campos requeridos." };
   }
 
   const { error } = await supabase.from("applications").insert({
@@ -63,7 +63,7 @@ export async function submitApplication(
     // El índice parcial `applications_one_active_per_trip_idx` deja una sola
     // solicitud viva por viaje: rechazada o vencida sí se puede volver a mandar.
     if (error.code === "23505") {
-      return { error: "Ya tenés una solicitud en curso para este viaje." };
+      return { error: "Ya tienes una solicitud en curso para este viaje." };
     }
     return { error: `No se pudo enviar la solicitud: ${error.message}` };
   }

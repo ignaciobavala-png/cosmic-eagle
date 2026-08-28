@@ -36,7 +36,7 @@ export function AuthScreen({
   subtitle: string;
   /** El formulario. */
   children: React.ReactNode;
-  /** Link del pie de la tarjeta ("¿No tenes cuenta? Registrate"). */
+  /** Link del pie de la tarjeta ("¿No tienes cuenta? Regístrate"). */
   footer?: React.ReactNode;
   /** Aviso de error o de exito, arriba del formulario. */
   notice?: React.ReactNode;

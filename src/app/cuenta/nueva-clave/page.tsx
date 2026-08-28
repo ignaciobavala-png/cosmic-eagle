@@ -31,7 +31,7 @@ export default async function NuevaClavePage() {
         <AuthScreen
           image={content("cuenta.acceso.image")}
           eyebrow="Nueva contraseña"
-          title="Elegí tu clave"
+          title="Elige tu clave"
           subtitle={`Estás cambiando la contraseña de ${user.email}.`}
         >
           <NewPasswordForm />

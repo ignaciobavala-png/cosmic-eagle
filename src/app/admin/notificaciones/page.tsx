@@ -37,7 +37,7 @@ const FILTERS = [
 ];
 
 function formatWhen(iso: string) {
-  return new Date(iso).toLocaleString("es-AR", {
+  return new Date(iso).toLocaleString("es-CL", {
     day: "numeric",
     month: "short",
     hour: "2-digit",

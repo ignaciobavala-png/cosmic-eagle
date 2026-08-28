@@ -251,7 +251,7 @@ function ImageField({
 
         {acceptsVideo && !info && !problem && (
           <p className="text-xs text-on-surface-variant">
-            También podés subir un video corto (hasta {MAX_DURATION_SECONDS}{" "}
+            También puedes subir un video corto (hasta {MAX_DURATION_SECONDS}{" "}
             segundos). Se reproduce solo, en silencio y en bucle. Comprimirlo
             tarda lo que dura el video.
           </p>

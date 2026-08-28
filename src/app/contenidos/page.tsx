@@ -108,7 +108,7 @@ export default async function ContenidosPage({
               <p className="mx-auto max-w-md text-center text-body-md text-on-surface-variant">
                 {active
                   ? "Todavía no hay contenidos publicados en esta categoría."
-                  : "Estamos preparando el material. Volvé a visitarnos pronto."}
+                  : "Estamos preparando el material. Vuelve a visitarnos pronto."}
               </p>
             ) : (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -14,8 +14,8 @@ import { AvatarUpload } from "./AvatarUpload";
 // Avisos que llegan por querystring desde /auth/confirm y desde updatePassword.
 const ERROR_MESSAGES: Record<string, string> = {
   "enlace-vencido":
-    "El enlace venció o ya se usó. Pedí uno nuevo desde “¿Olvidaste tu contraseña?”.",
-  "enlace-invalido": "El enlace no es válido. Probá pidiendo uno nuevo.",
+    "El enlace venció o ya se usó. Pide uno nuevo desde “¿Olvidaste tu contraseña?”.",
+  "enlace-invalido": "El enlace no es válido. Prueba pidiendo uno nuevo.",
 };
 
 const AVISO_MESSAGES: Record<string, string> = {
@@ -168,8 +168,8 @@ export default async function CuentaPage({
             title={isSignup ? "Bienvenido" : "Hola de nuevo"}
             subtitle={
               isSignup
-                ? "Creá tu cuenta para postularte a un viaje."
-                : "Ingresá tu email y contraseña para continuar tu camino."
+                ? "Crea tu cuenta para postularte a un viaje."
+                : "Ingresa tu email y contraseña para continuar tu camino."
             }
             notice={
               error && ERROR_MESSAGES[error] ? (
@@ -178,7 +178,7 @@ export default async function CuentaPage({
             }
             footer={
               <>
-                {isSignup ? "¿Ya tenés cuenta? " : "¿No tenés cuenta? "}
+                {isSignup ? "¿Ya tienes cuenta? " : "¿No tienes cuenta? "}
                 <a
                   href={`/cuenta${isSignup ? "" : "?modo=registro"}${
                     next
@@ -187,7 +187,7 @@ export default async function CuentaPage({
                   }`}
                   className="text-primary-container underline"
                 >
-                  {isSignup ? "Iniciá sesión" : "Registrate"}
+                  {isSignup ? "Inicia sesión" : "Regístrate"}
                 </a>
               </>
             }

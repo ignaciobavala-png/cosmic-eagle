@@ -29,7 +29,7 @@ const STAGE_LABEL = {
 } as const;
 
 function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString("es-AR", {
+  return new Date(iso).toLocaleString("es-CL", {
     day: "numeric",
     month: "long",
     year: "numeric",
