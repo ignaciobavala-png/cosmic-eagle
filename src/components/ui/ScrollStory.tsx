@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef } from "react";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useTransform, useReducedMotion, type MotionValue } from "framer-motion";
+import { useSectionProgress } from "@/lib/use-section-progress";
 
 type Cta = { label: string; href: string };
 
@@ -24,6 +24,9 @@ type Cta = { label: string; href: string };
  * Las palabras clave se resaltan dentro de los párrafos partiendo el texto por
  * la palabra: así el copy se escribe una sola vez y no hay que marcarlo a mano
  * con etiquetas.
+ *
+ * El progreso lo mide `useSectionProgress`, que documenta por qué no se usa
+ * `useScroll` acá.
  */
 export function ScrollStory({
   paragraphs,
@@ -36,13 +39,8 @@ export function ScrollStory({
   cta: Cta;
   id?: string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end end"],
-  });
+  const { ref, progress: scrollYProgress } = useSectionProgress(!reduced);
 
   // Los párrafos ocupan el primer 55% del recorrido; entre 55% y 70% se apagan
   // y emergen las palabras; el resto es la pausa con el botón.
@@ -137,7 +135,7 @@ function StoryParagraph({
   total,
 }: {
   children: React.ReactNode;
-  progress: ReturnType<typeof useScroll>["scrollYProgress"];
+  progress: MotionValue<number>;
   index: number;
   total: number;
 }) {

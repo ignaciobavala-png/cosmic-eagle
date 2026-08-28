@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useTransform, useReducedMotion, type MotionValue } from "framer-motion";
+import { useSectionProgress } from "@/lib/use-section-progress";
 
 /**
  * Bloque de texto que queda fijo en pantalla mientras el scroll revela un
@@ -18,6 +18,9 @@ import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion
  *
  * Con `prefers-reduced-motion` los párrafos quedan visibles y el bloque deja de
  * ocupar tres pantallas de scroll: se muestra como texto normal.
+ *
+ * El progreso lo mide `useSectionProgress`, que documenta por qué no se usa
+ * `useScroll` acá.
  */
 export function StickyStory({
   paragraphs,
@@ -26,13 +29,8 @@ export function StickyStory({
   paragraphs: readonly React.ReactNode[];
   id?: string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end end"],
-  });
+  const { ref, progress: scrollYProgress } = useSectionProgress(!reduced);
 
   if (reduced) {
     return (
@@ -81,7 +79,7 @@ function StoryParagraph({
   total,
 }: {
   children: React.ReactNode;
-  progress: ReturnType<typeof useScroll>["scrollYProgress"];
+  progress: MotionValue<number>;
   index: number;
   total: number;
 }) {
