@@ -95,7 +95,7 @@ export function TripCard({
         >
           <div>
             <span
-              className={`block text-label-sm uppercase ${light ? "text-[#b3964b]" : "text-on-surface-variant/60"}`}
+              className={`block text-label-sm uppercase ${light ? "text-on-primary-container" : "text-on-surface-variant/60"}`}
             >
               Fecha
             </span>

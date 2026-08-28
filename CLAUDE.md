@@ -968,6 +968,76 @@ y un barrido de las tres páginas completas que confirma **cero elementos que
 queden invisibles**. Más `tsc`, lint (los 2 errores de `multimedia/SlotEditor.tsx`
 son previos) y build de producción.
 
+### Sesión del 2026-08-28 — auditoría del frontend: el botón invisible y el bug de `useScroll`
+
+Reporte de Ignacio: animaciones incompletas, cosas que no andan en iPhone y
+botones ilegibles ("«Ver próximas fechas» es azul como el fondo"). Auditado en
+Chrome real (CDP, 390x844 y 1440x900), no a ojo.
+
+**1. El botón «Ver próximas fechas» era azul sobre azul.** `Collapsible` nació en
+`/viajes`, dentro de una `CreamSection`, y por eso su texto es `#05125a`. En la
+home el mismo botón cae sobre el `#020c41` de la sección del calendario. Ahora
+tiene prop **`tone`**: `light` (crema, el default de /viajes) y `dark` (borde y
+texto `primary-container`, que es lo que usa la home). **Cualquier uso nuevo del
+Collapsible sobre fondo oscuro tiene que pasar `tone="dark"`.**
+
+**2. `useScroll` estaba roto en los dos bloques de scroll largo** — este es el
+hallazgo importante y explica lo de "la animación de conciencia / potencial /
+dimensión / evolución se rompe". Afectaba a `ScrollStory` (home) y a
+`StickyStory` (/nosotros, "Somos investigadores…").
+
+Framer Motion 12 **delega las animaciones ligadas al scroll al motor nativo del
+browser** (`ViewTimeline` + WAAPI) cuando el valor viene de `useScroll` y la
+propiedad es acelerable, como `opacity`. Para traducir
+`offset: ["start start", "end end"]` usa el rango **`contain`**, que es el tramo
+en que el elemento entra ENTERO en la pantalla. Estos bloques miden 360vh y
+260vh: **nunca entran enteros**, así que ese rango es degenerado y lo que pinta
+el compositor no tiene nada que ver con el progreso real.
+
+Medido: `scrollYProgress` daba 0 → 1 perfecto y el `progress` del efecto WAAPI
+también, pero la opacidad que terminaba en el DOM subía hasta ~0.75 del recorrido
+y después **volvía sola a su valor inicial**. O sea que las palabras clave se
+desvanecían justo cuando tenían que quedar solas en pantalla, y los párrafos de
+/nosotros se apagaban en orden. Pasaba **igual en escritorio**: no era un bug de
+mobile, se notaba más ahí.
+
+Arreglado con **`src/lib/use-section-progress.ts`**: un `MotionValue` propio
+actualizado desde un listener de scroll (coalescido a un `rAF`). Al no tener
+timeline asociada, Framer no puede delegarlo y escribe los estilos desde JS. Se
+siguen animando sólo `opacity` y `transform`. **Si algún día se vuelve a
+`useScroll` en un bloque más alto que la pantalla, hay que volver a verificarlo
+en el browser** — compila igual y se ve mal.
+
+**Ojo con el umbral de `Reveal` en secciones altas**: el ratio de intersección
+máximo alcanzable es `alto de pantalla / alto de la sección`. Una sección de 4
+pantallas nunca pasa de 0.25, así que un `amount` mayor **no dispara nunca**. Se
+revisaron las tres páginas a 390x844 y ninguna está en ese caso (el más ajustado
+es `#somos`, con 0.38), pero es la trampa a chequear al agregar una sección alta.
+
+Verificado en el browser, punto por punto: los 11 puntos del recorrido de
+`ScrollStory` y los 9 de `StickyStory` ahora coinciden **exactos** con el valor
+esperado de cada transform; cero animaciones WAAPI colgadas; barrido de las tres
+páginas sin elementos que queden invisibles; `prefers-reduced-motion` sigue
+aplanando los dos bloques a texto normal. Más `tsc`, lint y build de producción.
+
+**3. Dos contrastes abajo del mínimo, corregidos con tokens que ya existían** —
+no se inventó ningún hex nuevo, para no salirse de la paleta de Julia:
+
+- El oro de acento `#b3964b` en las etiquetas chicas sobre fondo claro
+  ("Portales de transformación" de `/viajes`, el "FECHA" de `TripCard`, las
+  flechas de `WordSequence`) daba **2,66:1** sobre la crema. Pasaron a
+  **`text-on-primary-container`** (`#755c21`), que es justamente el rol del
+  sistema para texto oscuro sobre superficie dorada: **5,93:1** medido sobre la
+  crema y 6,35:1 sobre blanco.
+- El `CtaLink variant="ghost"` usaba `primary-fixed-dim` (`#e3c37d`), que sobre
+  el azul del panel Sesiones de la home daba ~4:1. Pasó a **`primary-container`**
+  (`#f9d78f`): 4,9:1. El borde subió de `/45` a `/55` para acompañar.
+
+**La regla que sale de esto**: `primary-fixed-dim` es el oro de *acento* (bordes,
+íconos, headings sobre fondo oscuro). Para **texto chico sobre fondo claro** va
+`on-primary-container`, y para **texto sobre azul** va `primary-container`. El
+`#b3964b` sirve como relleno y borde, no como color de texto.
+
 ## No hacer
 
 - No inventar cuentas de Supabase ni connection strings falsos

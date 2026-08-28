@@ -6,9 +6,12 @@ const VARIANTS: Record<Variant, string> = {
   // CTA solido: oro champagne con texto oscuro (primary-container / on-primary)
   solid:
     "bg-primary-container text-on-primary hover:bg-primary-fixed shadow-[0_0_24px_rgba(249,215,143,0.25)]",
-  // "Ghost": borde dorado 1px sobre blur, sin relleno
+  // "Ghost": borde dorado 1px sobre blur, sin relleno.
+  // El texto va en `primary-container` (#f9d78f) y no en el oro de acento
+  // `primary-fixed-dim` (#e3c37d): sobre el azul del panel de la home ese
+  // oro quedaba en ~4:1, abajo del minimo de 4,5:1. Con este llega a 4,9:1.
   ghost:
-    "border border-primary-fixed-dim/45 text-primary-fixed-dim backdrop-blur-md hover:border-primary-fixed-dim hover:text-primary-fixed bg-white/[0.03]",
+    "border border-primary-container/55 text-primary-container backdrop-blur-md hover:border-primary-container hover:text-primary-fixed bg-white/[0.03]",
 };
 
 /**

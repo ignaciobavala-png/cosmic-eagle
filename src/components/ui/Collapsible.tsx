@@ -16,19 +16,33 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
  * Los hijos llegan como `children` desde un Server Component, así que las
  * tarjetas siguen armándose en el servidor con los datos de Supabase: el
  * `"use client"` queda acotado a este envoltorio (mismo patrón que `Reveal`).
+ *
+ * **`tone` no es decoración**: el botón nació en `/viajes`, dentro de una
+ * `CreamSection`, y por eso su texto es el azul `#05125a`. En la home el mismo
+ * botón cae sobre el azul `#020c41` de la sección del calendario, donde ese
+ * texto es invisible — azul sobre azul. Cualquier uso nuevo sobre fondo oscuro
+ * tiene que pasar `tone="dark"`.
  */
 export function Collapsible({
   label,
   children,
   defaultOpen = false,
+  tone = "light",
 }: {
   label: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  /** `light` = sobre crema (/viajes). `dark` = sobre el azul de la home. */
+  tone?: "light" | "dark";
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const panelId = useId();
   const reduced = useReducedMotion();
+
+  const toneClasses =
+    tone === "dark"
+      ? "border-primary-container text-primary-container hover:bg-primary-container hover:text-[#05125a]"
+      : "border-[#b3964b] text-[#05125a] hover:bg-[#05125a] hover:text-white";
 
   return (
     <div className="w-full">
@@ -37,7 +51,7 @@ export function Collapsible({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls={panelId}
-        className="inline-flex items-center gap-2.5 rounded-full border-[1.5px] border-[#b3964b] px-8 py-3.5 font-display text-body-md font-bold text-[#05125a] transition-colors duration-300 hover:bg-[#05125a] hover:text-white"
+        className={`inline-flex items-center gap-2.5 rounded-full border-[1.5px] px-8 py-3.5 font-display text-body-md font-bold transition-colors duration-300 ${toneClasses}`}
       >
         {label}
         <span

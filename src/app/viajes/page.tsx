@@ -121,7 +121,7 @@ export default async function ViajesPage() {
               /nosotros: es una barra estatica, asi esta en el codigo aprobado. */}
           <div className="mx-auto max-w-3xl">
             <RevealItem>
-              <p className="mb-4 text-label-sm font-bold uppercase text-[#b3964b]">
+              <p className="mb-4 text-label-sm font-bold uppercase text-on-primary-container">
                 Portales de transformación
               </p>
             </RevealItem>
@@ -193,7 +193,7 @@ export default async function ViajesPage() {
               /nosotros: es una barra estatica, asi esta en el codigo aprobado. */}
           <div className="mx-auto max-w-3xl">
             <RevealItem>
-              <p className="mb-4 text-label-sm font-bold uppercase text-[#b3964b]">
+              <p className="mb-4 text-label-sm font-bold uppercase text-on-primary-container">
                 Portales de transformación
               </p>
             </RevealItem>

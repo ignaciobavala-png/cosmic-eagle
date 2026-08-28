@@ -36,7 +36,7 @@ export function WordSequence({ words }: { words: readonly string[] }) {
                 key={`arrow-${word}`}
                 as="span"
                 y={0}
-                className="rotate-90 text-2xl text-[#b3964b] sm:rotate-0"
+                className="rotate-90 text-2xl text-on-primary-container sm:rotate-0"
               >
                 <span aria-hidden="true">→</span>
               </RevealItem>,

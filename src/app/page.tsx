@@ -119,7 +119,7 @@ export default async function Home() {
             el relato, para que no haya corte de color entre las dos. */}
         <section className="w-full bg-[#020c41] px-margin-mobile py-20 md:px-margin-desktop">
           <div className="mx-auto max-w-narrative text-center">
-            <Collapsible label="Ver próximas fechas" defaultOpen>
+            <Collapsible label="Ver próximas fechas" defaultOpen tone="dark">
               <TripCarousel
                 caption="Calendario de experiencias"
                 title="Próximos Viajes"
