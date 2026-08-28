@@ -77,7 +77,7 @@ export default async function ContenidosPage({
           >
             <div className="mb-8 text-center">
               <span className="text-label-sm uppercase text-on-surface-variant">
-                Explorá
+                Explora
               </span>
               <h2 className="mt-2 font-display text-headline-md sm:text-headline-lg text-on-surface">
                 {active
