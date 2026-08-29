@@ -2,6 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { sendEmail } from "@/lib/email/resend";
+import { SolicitudRecibida } from "@/emails/SolicitudRecibida";
+import { formatDateRangeCompact } from "@/lib/format";
 
 export type ApplicationFormState = { error: string | null };
 
@@ -68,5 +71,50 @@ export async function submitApplication(
     return { error: `No se pudo enviar la solicitud: ${error.message}` };
   }
 
+  // El acuse va después del insert y antes del redirect (que lanza). Si el mail
+  // no sale, la solicitud ya está guardada igual — `sendEmail` no lanza nunca.
+  await notifyReceived({ tripId, nombre: full_name, email });
+
   redirect(`/viajes/${tripId}/solicitar`);
+}
+
+/**
+ * Acuse de recibo al postulante.
+ *
+ * **A diferencia de los mails que salen del panel, un fallo acá NO se anota en
+ * la casilla de avisos**: quien corre esta acción es el postulante, y no tiene
+ * permiso de escribir en `admin_notifications` (esa policy es sólo admin). Si el
+ * acuse no sale queda en los logs y nada más — es aceptable, porque el aviso que
+ * Estela sí necesita (solicitud nueva) lo escribe el trigger de Postgres.
+ */
+async function notifyReceived({
+  tripId,
+  nombre,
+  email,
+}: {
+  tripId: string;
+  nombre: string;
+  email: string;
+}) {
+  const supabase = await createClient();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://cosmic-eagle.vercel.app";
+
+  const { data: trip } = await supabase
+    .from("trips")
+    .select("title, start_date, end_date")
+    .eq("id", tripId)
+    .single();
+
+  await sendEmail({
+    to: email,
+    subject: `Recibimos tu solicitud para ${trip?.title ?? "el viaje"}`,
+    react: SolicitudRecibida({
+      // Solo el primer nombre: el formulario pide nombre completo y "Hola María
+      // Fernanda Gómez" suena a carta del banco.
+      nombre: nombre.split(" ")[0],
+      viaje: trip?.title ?? "tu viaje",
+      fechas: trip ? formatDateRangeCompact(trip.start_date, trip.end_date) : "",
+      url: `${siteUrl}/viajes/${tripId}/solicitar`,
+    }),
+  });
 }

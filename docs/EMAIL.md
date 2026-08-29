@@ -1,6 +1,6 @@
 # Mails de la app (Resend)
 
-Fecha: 2026-08-15. Cubre los mails que dispara la aplicación. Los mails de
+Fecha: 2026-08-15, actualizado 2026-08-29. Cubre los mails que dispara la aplicación. Los mails de
 **autenticación** (recuperar contraseña, confirmar cuenta) los manda Supabase por
 su cuenta y se configuran aparte: ver `docs/AUTH_EMAIL.md`.
 
@@ -30,10 +30,12 @@ Para que salga un mail hacen falta tres cosas, en orden:
    dominio verificado. Un subdominio y no la raíz, para no tocar el MX de
    Workspace ni el A record del sitio viejo. Ojo de fusionar el SPF si ya existe.
 2. Cargar las variables de entorno (abajo) en `.env.local` y en Vercel.
-3. ~~Cablear el envío al flujo que corresponda~~ **HECHO el 2026-08-18**: aprobar
-   una solicitud manda `SolicitudAprobada`. Ver `docs/NOTIFICACIONES.md`. Falta
-   igual el punto 1, así que todavía no sale nada — pero ahora el "no salió"
-   queda anotado en la casilla interna del panel en vez de perderse en los logs.
+3. ~~Cablear el envío al flujo que corresponda~~ **HECHO**: aprobar una solicitud
+   manda `SolicitudAprobada` (18/08), y desde el 29/08 están también el acuse de
+   recibo, el rechazo y el aviso de cupo reservado (tabla más abajo). Ver
+   `docs/NOTIFICACIONES.md`. Falta igual el punto 1, así que todavía no sale
+   nada — pero ahora el "no salió" queda anotado en la casilla interna del panel
+   en vez de perderse en los logs.
 
 ## Variables de entorno
 
@@ -50,7 +52,39 @@ Para que salga un mail hacen falta tres cosas, en orden:
 |---|---|
 | `src/lib/email/resend.ts` | Cliente y `sendEmail`. No lanza nunca |
 | `src/emails/BaseLayout.tsx` | Marco común: paleta del sitio, `Title`, `Paragraph`, `CtaButton` |
-| `src/emails/SolicitudAprobada.tsx` | Primer template. Cableado a `reviewApplication` |
+| `src/emails/SolicitudRecibida.tsx` | Acuse del filtro corto. Cableado a `submitApplication` |
+| `src/emails/SolicitudAprobada.tsx` | Aprobación. Cableado a `reviewApplication` |
+| `src/emails/SolicitudRechazada.tsx` | Rechazo. Cableado a `reviewApplication` |
+| `src/emails/PagoRegistrado.tsx` | Cupo reservado. Cableado a `markPayment` |
+
+## Los cuatro mails, y cuándo sale cada uno
+
+Todos salen **solo en la transición**: se relee el estado anterior antes del
+update, así que volver a apretar el mismo botón no le vuelve a escribir a nadie.
+
+| Mail | Disparador | Transición exacta |
+|---|---|---|
+| Recibimos tu solicitud | `submitApplication` | insert del filtro corto |
+| Tu solicitud fue aprobada | `reviewApplication` | `* → approved` |
+| Sobre tu solicitud | `reviewApplication` | `* → rejected` |
+| Tu cupo está reservado | `markPayment` | pago `pending → paid`/`waived`, **y** solicitud ya `approved` |
+
+Tres decisiones de este set:
+
+- **`expired` no manda mail.** Es una invalidación administrativa, no una
+  respuesta a la persona.
+- **El rechazo no dice por qué.** El motivo puede ser un dato de salud del
+  filtro, y eso no viaja por mail. Si hay que explicarlo, lo hace Estela.
+- **`PagoRegistrado` es el que destraba la etapa 2**: su CTA lleva al formulario
+  de salud si la persona es primeriza y todavía no lo mandó, y al detalle del
+  viaje si no. Mientras el pago se marque a mano, este mail es el único acuse
+  que la persona recibe de ese pago.
+
+**Ojo con el acuse de recibo**: un fallo ahí **no** se anota en la casilla de
+avisos, a diferencia de los otros tres. Quien corre esa acción es el postulante,
+que no tiene permiso de escribir en `admin_notifications`. Queda en los logs y
+nada más — aceptable, porque el aviso que Estela sí necesita (solicitud nueva) lo
+escribe el trigger de Postgres.
 
 Previsualizar sin mandar nada: `pnpm email` (abre en `localhost:3001`, con hot
 reload de los templates).
