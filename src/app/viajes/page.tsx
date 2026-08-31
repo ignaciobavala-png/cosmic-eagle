@@ -11,7 +11,7 @@ import { TestimonialsBand } from "@/components/ui/TestimonialsBand";
 import { RevealItem } from "@/components/ui/Reveal";
 import { createClient } from "@/lib/supabase/server";
 import type { TripCardData } from "@/components/ui/TripCard";
-import { getSiteContent } from "@/lib/site-content";
+import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { getTestimonials } from "@/lib/testimonials";
 
 export const metadata: Metadata = {
@@ -70,6 +70,7 @@ export default async function ViajesPage() {
           scrollHint="Explorar"
           scrollTo="experiencias"
           height="full"
+          overlay={isEnabled(content("viajes.hero.overlay"))}
         />
 
         {/* Julia pidió video de fondo; va la imagen hasta que llegue. */}
@@ -83,6 +84,7 @@ export default async function ViajesPage() {
           once={false}
           y={24}
           duration={0.9}
+          overlay={isEnabled(content("viajes.about.overlay"))}
         >
           <div className="space-y-6 text-body-md leading-relaxed text-primary text-justify md:text-body-lg [&_strong]:font-display [&_strong]:font-bold [&_strong]:text-primary-container">
             <p>
@@ -179,6 +181,7 @@ export default async function ViajesPage() {
           once={false}
           y={24}
           duration={0.9}
+          overlay={isEnabled(content("viajes.banner.overlay"))}
         />
 
         <CreamSection

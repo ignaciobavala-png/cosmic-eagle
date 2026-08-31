@@ -5,7 +5,7 @@ import { Check, ImageUp, RotateCcw } from "lucide-react";
 import { compressImage } from "@/lib/compress-image";
 import { compressVideo, MAX_DURATION_SECONDS } from "@/lib/compress-video";
 import { isVideoUrl } from "@/lib/media";
-import type { Slot } from "@/lib/site-content";
+import { isEnabled, type Slot } from "@/lib/site-content";
 import { resetSlot, saveSlot, type SlotState } from "./actions";
 
 const INITIAL: SlotState = { error: null };
@@ -25,6 +25,7 @@ export function SlotEditor({
   const [resetState, reset, resetting] = useActionState(resetSlot, INITIAL);
 
   const isImage = slot.type === "image";
+  const isBoolean = slot.type === "boolean";
   const error = state.error ?? resetState.error;
 
   return (
@@ -56,6 +57,8 @@ export function SlotEditor({
 
         {isImage ? (
           <ImageField slot={slot} value={value} saving={saving} />
+        ) : isBoolean ? (
+          <BooleanField value={value} saving={saving} />
         ) : (
           <TextField slot={slot} value={value} saving={saving} />
         )}
@@ -121,6 +124,47 @@ function TextField({
           className="w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest px-3 py-2 text-sm text-on-surface outline-none focus:border-primary-fixed-dim"
         />
       )}
+      <SaveButton saving={saving} disabled={!dirty} />
+    </div>
+  );
+}
+
+function BooleanField({
+  value,
+  saving,
+}: {
+  value: string;
+  saving: boolean;
+}) {
+  const enabled = isEnabled(value);
+  const [checked, setChecked] = useState(enabled);
+  const [lastValue, setLastValue] = useState(value);
+
+  // Tras guardar, el server manda el valor nuevo por props: si el estado no se
+  // resincroniza, el tilde sigue mostrando lo viejo al restaurar. Se ajusta
+  // durante el render (estado derivado) para no encadenar renders.
+  if (lastValue !== value) {
+    setLastValue(value);
+    setChecked(enabled);
+  }
+
+  const dirty = checked !== enabled;
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <label className="flex w-fit cursor-pointer select-none items-center gap-3">
+        <input
+          type="checkbox"
+          name="value"
+          value="true"
+          checked={checked}
+          onChange={(e) => setChecked(e.target.checked)}
+          className="h-4 w-4 shrink-0 accent-primary-fixed-dim"
+        />
+        <span className="text-sm text-on-surface">
+          {checked ? "Sí, se muestra el texto" : "No, solo la imagen"}
+        </span>
+      </label>
       <SaveButton saving={saving} disabled={!dirty} />
     </div>
   );

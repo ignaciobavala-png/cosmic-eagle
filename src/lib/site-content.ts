@@ -21,7 +21,7 @@ import { IMAGES } from "./constants";
  * cae la cosa, no como se llama la variable.
  */
 
-export type SlotType = "text" | "multiline" | "image";
+export type SlotType = "text" | "multiline" | "image" | "boolean";
 
 export type Slot = {
   key: string;
@@ -42,6 +42,16 @@ export type Slot = {
    */
   video?: true;
 };
+
+/**
+ * Lectura de un slot `boolean`. El valor guardado es "true" / "false" y el
+ * default es SIEMPRE mostrar: un slot sin fila, o con un valor raro escrito a
+ * mano en la base, tiene que renderizar la pagina como estaba antes de que el
+ * tilde existiera.
+ */
+export function isEnabled(value: string): boolean {
+  return value !== "false";
+}
 
 export type SlotGroup = {
   id: string;
@@ -106,6 +116,13 @@ export const SITE_GROUPS = [
           "Un campo de conciencia mucho más amplio que la historia que contamos sobre nosotros.",
       },
       {
+        key: "home.promesas.overlay",
+        label: "Mostrar la frase sobre la imagen del medio",
+        help: "Si lo destildas, ese banner queda solo con la imagen, sin texto encima.",
+        type: "boolean",
+        fallback: "true",
+      },
+      {
         key: "home.tecnologia.image",
         label: "Imagen de “Tecnología del Alma”",
         help: "La foto vertical que acompaña al texto de Tecnología del Alma, sobre el fondo claro.",
@@ -123,6 +140,13 @@ export const SITE_GROUPS = [
         ratio: "16/9",
         maxPx: 1920,
         video: true,
+      },
+      {
+        key: "home.cierre.overlay",
+        label: "Mostrar la frase sobre la imagen de cierre",
+        help: "Si lo destildas, la pantalla final queda solo con la imagen, sin la frase encima.",
+        type: "boolean",
+        fallback: "true",
       },
     ],
   },
@@ -156,6 +180,13 @@ export const SITE_GROUPS = [
         fallback: "+10 años acompañando transformaciones",
       },
       {
+        key: "nosotros.hero.overlay",
+        label: "Mostrar el título sobre la portada",
+        help: "Si lo destildas, el banner de Nosotros queda solo con la imagen: no se ven ni el título ni la bajada.",
+        type: "boolean",
+        fallback: "true",
+      },
+      {
         key: "nosotros.frase",
         label: "Frase sobre la imagen",
         help: "La frase corta que aparece sola, centrada sobre la foto a pantalla completa.",
@@ -179,6 +210,13 @@ export const SITE_GROUPS = [
         video: true,
       },
       {
+        key: "nosotros.proposito.overlay",
+        label: "Mostrar la frase sobre esa imagen",
+        help: "Si lo destildas, ese banner queda solo con la imagen, sin la frase encima.",
+        type: "boolean",
+        fallback: "true",
+      },
+      {
         key: "nosotros.metodologia.image",
         label: "Imagen de cierre",
         help: "El fondo de la última pantalla, la del título “Un viaje hacia el Humano Luminoso”. Se ve tenue detrás del texto.",
@@ -187,6 +225,13 @@ export const SITE_GROUPS = [
         ratio: "16/9",
         maxPx: 1920,
         video: true,
+      },
+      {
+        key: "nosotros.metodologia.overlay",
+        label: "Mostrar el título y los botones del cierre",
+        help: "Si lo destildas, la última pantalla queda solo con la imagen, sin el título ni los botones.",
+        type: "boolean",
+        fallback: "true",
       },
     ],
   },
@@ -206,6 +251,13 @@ export const SITE_GROUPS = [
         video: true,
       },
       {
+        key: "viajes.hero.overlay",
+        label: "Mostrar el título sobre la portada",
+        help: "Si lo destildas, el banner de arriba queda solo con la imagen, sin el título encima.",
+        type: "boolean",
+        fallback: "true",
+      },
+      {
         key: "viajes.about.image",
         label: "Imagen del texto de presentación",
         help: "La foto que va detrás de los tres párrafos que explican qué son las experiencias. Se ve bastante oscurecida para que el texto se lea.",
@@ -216,6 +268,13 @@ export const SITE_GROUPS = [
         video: true,
       },
       {
+        key: "viajes.about.overlay",
+        label: "Mostrar el texto de presentación",
+        help: "Si lo destildas, ese banner queda solo con la imagen y los tres párrafos no se muestran.",
+        type: "boolean",
+        fallback: "true",
+      },
+      {
         key: "viajes.banner.image",
         label: "Imagen de la frase del medio",
         help: "La foto a pantalla completa que separa las Sesiones de los Viajes, con la frase centrada encima.",
@@ -224,6 +283,13 @@ export const SITE_GROUPS = [
         ratio: "16/9",
         maxPx: 1920,
         video: true,
+      },
+      {
+        key: "viajes.banner.overlay",
+        label: "Mostrar la frase sobre la imagen del medio",
+        help: "Si lo destildas, ese banner queda solo con la imagen, sin la frase encima.",
+        type: "boolean",
+        fallback: "true",
       },
     ],
   },
@@ -255,6 +321,13 @@ export const SITE_GROUPS = [
         type: "text",
         fallback:
           "Lecturas, ciencia almática y testimonios para acompañar el camino.",
+      },
+      {
+        key: "contenidos.hero.overlay",
+        label: "Mostrar el título sobre la portada",
+        help: "Si lo destildas, el banner de Contenidos queda solo con la imagen: no se ven ni el título ni la bajada.",
+        type: "boolean",
+        fallback: "true",
       },
     ],
   },

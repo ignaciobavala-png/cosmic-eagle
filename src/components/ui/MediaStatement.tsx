@@ -21,6 +21,7 @@ export function MediaStatement({
   children,
   id,
   veil = 0.45,
+  overlay = true,
   width = "narrow",
   amount = 0.4,
   once = true,
@@ -35,6 +36,11 @@ export function MediaStatement({
   children?: React.ReactNode;
   id?: string;
   veil?: number;
+  /**
+   * false deja el banner solo con la imagen: sin velo ni texto. Es el tilde
+   * "Mostrar el texto" del panel de multimedia (`*.overlay`).
+   */
+  overlay?: boolean;
   width?: "narrow" | "prose";
   /**
    * Los valores por defecto son los de la frase atmosferica de la home (umbral
@@ -52,27 +58,31 @@ export function MediaStatement({
       className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden"
     >
       <BackgroundMedia src={image} alt={imageAlt} />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-[#05125a]"
-        style={{ opacity: veil }}
-      />
-      <Reveal
-        amount={amount}
-        once={once}
-        y={y}
-        duration={duration}
-        className={`relative z-10 px-margin-mobile md:px-margin-desktop ${
-          width === "prose" ? "max-w-3xl" : "max-w-2xl text-center"
-        }`}
-      >
-        {text && (
-          <p className="font-display text-headline-md text-primary md:text-headline-lg text-balance">
-            {text}
-          </p>
-        )}
-        {children}
-      </Reveal>
+      {overlay && (
+        <>
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-[#05125a]"
+            style={{ opacity: veil }}
+          />
+          <Reveal
+            amount={amount}
+            once={once}
+            y={y}
+            duration={duration}
+            className={`relative z-10 px-margin-mobile md:px-margin-desktop ${
+              width === "prose" ? "max-w-3xl" : "max-w-2xl text-center"
+            }`}
+          >
+            {text && (
+              <p className="font-display text-headline-md text-primary md:text-headline-lg text-balance">
+                {text}
+              </p>
+            )}
+            {children}
+          </Reveal>
+        </>
+      )}
     </section>
   );
 }

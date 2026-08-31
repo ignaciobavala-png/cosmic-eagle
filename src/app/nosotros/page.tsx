@@ -9,7 +9,7 @@ import { MediaStatement } from "@/components/ui/MediaStatement";
 import { StickyStory } from "@/components/ui/StickyStory";
 import { ClosingHero } from "@/components/ui/ClosingHero";
 import { RevealItem, RevealLine } from "@/components/ui/Reveal";
-import { getSiteContent } from "@/lib/site-content";
+import { getSiteContent, isEnabled } from "@/lib/site-content";
 
 export const metadata: Metadata = {
   title: "Nosotros | Cosmic Eagle",
@@ -54,6 +54,7 @@ export default async function NosotrosPage() {
           scrollHint="Conocenos"
           scrollTo="enfoque"
           height="full"
+          overlay={isEnabled(content("nosotros.hero.overlay"))}
         />
 
         <CreamSection id="enfoque">
@@ -164,6 +165,7 @@ export default async function NosotrosPage() {
           once={false}
           y={0}
           duration={1.2}
+          overlay={isEnabled(content("nosotros.proposito.overlay"))}
         />
 
         <StickyStory
@@ -199,6 +201,7 @@ export default async function NosotrosPage() {
               variant: "ghost",
             },
           ]}
+          overlay={isEnabled(content("nosotros.metodologia.overlay"))}
         />
       </main>
       <Footer />

@@ -139,6 +139,9 @@ export async function saveSlot(
     } = supabase.storage.from(BUCKET).getPublicUrl(path);
 
     value = publicUrl;
+  } else if (slot.type === "boolean") {
+    // El checkbox envia "true" cuando esta tildado y nada cuando no lo esta.
+    value = formData.get("value") === "true" ? "true" : "false";
   } else {
     const raw = formData.get("value");
 

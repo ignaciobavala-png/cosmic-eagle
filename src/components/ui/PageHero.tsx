@@ -19,6 +19,7 @@ export function PageHero({
   scrollTo,
   priority = true,
   height = "banner",
+  overlay = true,
 }: {
   image: string;
   imageAlt?: string;
@@ -28,6 +29,13 @@ export function PageHero({
   scrollHint?: string;
   scrollTo?: string;
   priority?: boolean;
+  /**
+   * false deja el banner solo con la imagen: no se ven ni el titulo ni la
+   * bajada. Es el tilde "Mostrar el título sobre la portada" del panel de
+   * multimedia (`*.hero.overlay`). El hint de scroll se mantiene: es un
+   * indicador de navegacion, no texto sobre la imagen.
+   */
+  overlay?: boolean;
   /**
    * `banner` es el hero historico (82% del alto, con el pie desvanecido sobre
    * el fondo de la pagina). `full` es el del rediseño de Julia: ocupa la
@@ -69,26 +77,30 @@ export function PageHero({
       </div>
 
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-margin-mobile md:px-margin-desktop text-center">
-        <h1 className="font-display text-display-mobile md:text-display-lg text-primary text-shadow-glow max-w-3xl text-balance">
-          {title}
-        </h1>
-        {subtitle && (
-          <p className="mt-5 max-w-xl text-body-md md:text-body-lg text-primary-fixed-dim">
-            {subtitle}
-          </p>
-        )}
-        {actions.length > 0 && (
-          <div className="mt-8 flex w-full max-w-sm flex-col items-stretch gap-3 sm:mt-9 sm:w-auto sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
-            {actions.map((action) => (
-              <CtaLink
-                key={action.href + action.label}
-                href={action.href}
-                variant={action.variant ?? "solid"}
-              >
-                {action.label}
-              </CtaLink>
-            ))}
-          </div>
+        {overlay && (
+          <>
+            <h1 className="font-display text-display-mobile md:text-display-lg text-primary text-shadow-glow max-w-3xl text-balance">
+              {title}
+            </h1>
+            {subtitle && (
+              <p className="mt-5 max-w-xl text-body-md md:text-body-lg text-primary-fixed-dim">
+                {subtitle}
+              </p>
+            )}
+            {actions.length > 0 && (
+              <div className="mt-8 flex w-full max-w-sm flex-col items-stretch gap-3 sm:mt-9 sm:w-auto sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
+                {actions.map((action) => (
+                  <CtaLink
+                    key={action.href + action.label}
+                    href={action.href}
+                    variant={action.variant ?? "solid"}
+                  >
+                    {action.label}
+                  </CtaLink>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 

@@ -14,7 +14,7 @@ import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { createPublicClient } from "@/lib/supabase/public";
-import { getSiteContent } from "@/lib/site-content";
+import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { getTestimonials } from "@/lib/testimonials";
 
 /**
@@ -137,6 +137,7 @@ export default async function Home() {
           imageAlt="Figura en meditación con un núcleo de luz dorada"
           text={content("home.atmos.text")}
           veil={0.35}
+          overlay={isEnabled(content("home.promesas.overlay"))}
         />
 
         <Reveal
@@ -327,6 +328,7 @@ export default async function Home() {
           imageAlt="Amanecer sobre el horizonte"
           text="Un viaje hacia el Humano Luminoso"
           veil={0.3}
+          overlay={isEnabled(content("home.cierre.overlay"))}
         />
       </main>
       <Footer />

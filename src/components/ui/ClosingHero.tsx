@@ -17,12 +17,15 @@ export function ClosingHero({
   title,
   actions = [],
   id,
+  overlay = true,
 }: {
   image: string;
   imageAlt?: string;
   title: React.ReactNode;
   actions?: { label: string; href: string; variant?: "solid" | "ghost" }[];
   id?: string;
+  /** false deja la pantalla solo con la imagen de fondo: sin titulo ni botones. */
+  overlay?: boolean;
 }) {
   return (
     <section
@@ -39,36 +42,38 @@ export function ClosingHero({
 
       {/* Bloque entero, sin cascada interna: titulo y botones entran juntos
           (umbral 0.3, 20px, 1.2s). Reversible, como todo /nosotros. */}
-      <Reveal
-        amount={0.3}
-        once={false}
-        y={20}
-        duration={1.2}
-        className="relative z-10 px-margin-mobile md:px-margin-desktop"
-      >
-        <h2 className="font-display text-display-mobile md:text-display-lg font-bold uppercase text-primary text-balance">
-          {title}
-        </h2>
+      {overlay && (
+        <Reveal
+          amount={0.3}
+          once={false}
+          y={20}
+          duration={1.2}
+          className="relative z-10 px-margin-mobile md:px-margin-desktop"
+        >
+          <h2 className="font-display text-display-mobile md:text-display-lg font-bold uppercase text-primary text-balance">
+            {title}
+          </h2>
 
-        {actions.length > 0 && (
-          <div className="mt-10 flex w-full max-w-xs flex-col items-stretch gap-4 sm:max-w-none sm:flex-row sm:justify-center sm:gap-8">
-            {actions.map((action) => (
-              <CtaLink
-                key={action.href + action.label}
-                href={action.href}
-                variant={action.variant ?? "solid"}
-                className={
-                  action.variant === "ghost"
-                    ? "rounded-full"
-                    : "rounded-full shadow-[0_0_22px_rgba(249,215,143,0.6),0_0_43px_rgba(249,215,143,0.32)]"
-                }
-              >
-                {action.label}
-              </CtaLink>
-            ))}
-          </div>
-        )}
-      </Reveal>
+          {actions.length > 0 && (
+            <div className="mt-10 flex w-full max-w-xs flex-col items-stretch gap-4 sm:max-w-none sm:flex-row sm:justify-center sm:gap-8">
+              {actions.map((action) => (
+                <CtaLink
+                  key={action.href + action.label}
+                  href={action.href}
+                  variant={action.variant ?? "solid"}
+                  className={
+                    action.variant === "ghost"
+                      ? "rounded-full"
+                      : "rounded-full shadow-[0_0_22px_rgba(249,215,143,0.6),0_0_43px_rgba(249,215,143,0.32)]"
+                  }
+                >
+                  {action.label}
+                </CtaLink>
+              ))}
+            </div>
+          )}
+        </Reveal>
+      )}
     </section>
   );
 }

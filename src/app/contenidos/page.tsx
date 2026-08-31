@@ -8,7 +8,7 @@ import { ArticleCard } from "@/components/ui/ArticleCard";
 import { Reveal } from "@/components/ui/Reveal";
 import { YouTubeFacade } from "@/components/ui/YouTubeFacade";
 import { createClient } from "@/lib/supabase/server";
-import { getSiteContent } from "@/lib/site-content";
+import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { ARTICLE_CATEGORY_LIST, isArticleCategory } from "@/lib/article";
 
 export const metadata: Metadata = {
@@ -69,6 +69,7 @@ export default async function ContenidosPage({
           subtitle={content("contenidos.hero.subtitle")}
           scrollHint="Explorar"
           scrollTo="biblioteca"
+          overlay={isEnabled(content("contenidos.hero.overlay"))}
         />
 
         <Reveal className="py-20 md:py-24">
