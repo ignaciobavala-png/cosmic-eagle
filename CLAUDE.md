@@ -1038,6 +1038,75 @@ no se inventó ningún hex nuevo, para no salirse de la paleta de Julia:
 `on-primary-container`, y para **texto sobre azul** va `primary-container`. El
 `#b3964b` sirve como relleno y borde, no como color de texto.
 
+### Sesión del 2026-09-01 — el pago sube a la plataforma (rama `cobros`)
+
+Charla de Ignacio con Sofía. Tres definiciones, y una de ellas **corrige algo que
+le habíamos dicho mal**:
+
+1. **Encuadrado acepta tarjeta de crédito y pagos desde el exterior**, aunque
+   cobren comisión. Nosotros le habíamos dicho que era sólo para Chile: era
+   falso, y estaba escrito así en `docs/ENCUADRADO.md` §6. Corregido en §7 de ese
+   doc. Consecuencia: el `payment_url` de Encuadrado pasa de "sirve a medias
+   para los chilenos" a **el único checkout real disponible**.
+2. **Para euros, la cuenta de Santander.**
+3. **Estela confirma el pago desde el panel mirando el comprobante**, como en la
+   tiquetera de Manso Club. Eso desactiva la objeción principal contra Encuadrado
+   (no tiene webhooks): la confirmación manual no es un provisorio, es el
+   mecanismo.
+
+Implementado, ver **`docs/PAGOS.md` §6**. Migraciones
+`20260901220000_notification_kind_payment_proof.sql` y
+`20260901220100_payment_rails_and_proofs.sql`.
+
+- **`/admin/pagos`** (sección nueva del panel): Estela carga los medios de cobro
+  — nombre, a quién le corresponde, instrucciones multilínea, moneda, link
+  opcional, visible sí/no. **Los datos bancarios no van en el repo**: la
+  migración siembra los dos rieles vacíos e inactivos.
+- **`payment_methods` es tabla propia y NO slots de `site_content`**: ahí el
+  registro de slots ya existía y tenía panel, pero `site_content` se lee con el
+  cliente público, o sea que `anon` la puede listar. Un IBAN, un titular y un RUT
+  son datos de personas — el SELECT arranca en `authenticated`.
+- **`payment_proofs` es tabla hija y no columnas en `applications`**, por lo
+  mismo de la migración de dos etapas (cada aporte del postulante es un INSERT,
+  nunca un UPDATE sobre la fila con sus respuestas) **y porque son varios**: el
+  flyer promete seña del 50% y saldo.
+- **Bucket `comprobantes` PRIVADO**, el único del proyecto. Un comprobante lleva
+  nombre, cuenta y a veces el saldo de quien transfiere; público significa
+  "cualquiera con la URL lo abre". El panel lo abre con `createSignedUrl` a 10
+  minutos. **Acepta PDF** — en un bucket privado no aplica el riesgo que dejó
+  afuera al SVG en los públicos.
+- **Ojo con el enum**: `alter type ... add value` no se puede USAR en la misma
+  transacción en la que se agrega, y cada migración corre en una. Por eso el
+  `payment_proof` de `admin_notification_kind` va en su propia migración, aparte
+  del trigger que lo escribe.
+- **El postulante no tiene DELETE sobre el bucket** a propósito, así que el
+  action **no borra** el archivo si el insert de la fila falla: dárselo le
+  permitiría hacer desaparecer un comprobante ya revisado. Un archivo sin fila
+  queda huérfano y no lo ve nadie.
+- La pantalla de estado (`/viajes/[id]/solicitar`) muestra los rieles y el
+  formulario de subida; el mail `SolicitudAprobada` lleva los datos de pago y su
+  CTA pasó a apuntar ahí, no a la página del viaje.
+- **Subir un comprobante NO marca el pago.** `payment_status` lo sigue moviendo
+  Estela.
+
+Verificado: `tsc`, lint (los 2 errores de `multimedia/SlotEditor.tsx` son
+previos), build de producción, y la RLS probada con `set role` sobre la base real
+— el dueño de una solicitud aprobada inserta y no relee, otro usuario rechazado,
+la misma solicitud sin aprobar rechazada, UPDATE revocado para todos, `anon` sin
+grant sobre `payment_methods`, un no-admin ve sólo los activos y no los escribe,
+y el trigger escribe el aviso. Filas de prueba borradas. Advisors sin novedades.
+
+**Sin verificar end-to-end** (requiere sesión, la hace Ignacio): cargar un riel
+desde `/admin/pagos`, verlo en la pantalla de un aprobado, subir un comprobante y
+abrirlo desde el panel.
+
+**Lo que sigue**: la moneda (`trips.price` es un número sin moneda) y la
+integración con Encuadrado. El plan de las dos y las 8 preguntas para Sofía están
+en `~/Escritorio/cosmic-eagle-cobros-requerimientos.txt`. **Lo bloqueante es una
+sola**: si los servicios de Encuadrado emiten boleta electrónica, el
+`POST /bookings` exige RUT y comuna chilena, y ahí se cae justo el caso
+internacional que motivó todo esto.
+
 ## No hacer
 
 - No inventar cuentas de Supabase ni connection strings falsos

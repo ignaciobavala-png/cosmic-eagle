@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, Inbox, MailWarning, UserPlus } from "lucide-react";
+import { AlertTriangle, Inbox, MailWarning, Receipt, UserPlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/lib/supabase/types";
 import { MarkAllReadButton, MarkReadButton } from "./MarkReadButtons";
@@ -23,6 +23,12 @@ const KIND: Record<
     label: "Revisión manual",
     icon: AlertTriangle,
     className: "text-error border-error/40 bg-error/10",
+  },
+  payment_proof: {
+    label: "Comprobante",
+    icon: Receipt,
+    className:
+      "text-primary-fixed-dim border-primary-fixed-dim/30 bg-primary-container/10",
   },
   email_failed: {
     label: "Mail no enviado",
