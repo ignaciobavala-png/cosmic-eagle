@@ -202,14 +202,63 @@ function useThreshold(progress: MotionValue<number>, at: number, enabled: boolea
   return past;
 }
 
+/**
+ * Un `href` que arranca con `#` sale como `<a>` y no como `Link`, y encima se
+ * maneja a mano. Dos motivos, los dos medidos en Chrome:
+ *
+ * - El `Link` de Next resuelve el salto con `pushState`, que **no dispara
+ *   `hashchange`**, así que el `openOnHash` del `Collapsible` de destino no se
+ *   entera y el panel queda cerrado.
+ * - El ancla nativa sí cambia el hash, pero **no scrollea**: el botón vive
+ *   dentro del sticky del relato y desde ahí el salto al fragmento no se
+ *   aplica. Medido: el hash cambiaba y `scrollY` se quedaba igual.
+ *
+ * Por eso se hace explícito: se fija el hash (que dispara el evento y abre el
+ * panel) y se scrollea con `scrollIntoView`, que respeta el `scroll-padding-top`
+ * con el que el sitio compensa el navbar.
+ *
+ * Dos detalles medidos que no hay que "limpiar":
+ *
+ * - **El scroll va un frame después.** En el mismo tick, la navegación al
+ *   fragmento que provoca fijar el hash le pisa el scroll y queda a mitad de
+ *   camino (3538 en vez de 5316).
+ * - **`behavior: "instant"`, no `smooth`.** El scroll suave disparado desde un
+ *   click de mouse se cancela solo y la página no se mueve — con el teclado, o
+ *   llamándolo 300ms después, el mismo código sí llega. Un salto seco además es
+ *   lo que hace un ancla nativa, que es lo que este botón imita.
+ *
+ * Si el destino no existe no se toca nada y decide el browser. Para cualquier
+ * otra ruta sigue siendo `Link`.
+ */
 function StoryCta({ label, href }: Cta) {
-  return (
-    <Link
-      href={href}
-      className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-10 py-4 font-display text-label-sm font-bold uppercase text-[#05125a] transition-[filter] duration-300 hover:brightness-110"
-    >
+  const className =
+    "inline-flex items-center gap-2 rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-10 py-4 font-display text-label-sm font-bold uppercase text-[#05125a] transition-[filter] duration-300 hover:brightness-110";
+  const content = (
+    <>
       {label}
       <span aria-hidden="true">↗</span>
+    </>
+  );
+
+  return href.startsWith("#") ? (
+    <a
+      href={href}
+      className={className}
+      onClick={(event) => {
+        const target = document.getElementById(href.slice(1));
+        if (!target) return;
+        event.preventDefault();
+        window.location.hash = href;
+        requestAnimationFrame(() =>
+          target.scrollIntoView({ behavior: "instant", block: "start" })
+        );
+      }}
+    >
+      {content}
+    </a>
+  ) : (
+    <Link href={href} className={className}>
+      {content}
     </Link>
   );
 }

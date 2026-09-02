@@ -112,14 +112,23 @@ export default async function Home() {
             "Desde esta perspectiva, la evolución humana pasa a ser parte de un campo de conciencia mucho más amplio, abriendo un camino hacia un conocimiento más profundo, la sabiduría cósmica y una comprensión expandida de quiénes y qué somos.",
           ]}
           keywords={["conciencia", "potencial", "dimensión", "evolución"]}
-          cta={{ label: "Explorar experiencias", href: "/viajes" }}
+          cta={{ label: "Explorar experiencias", href: "#calendario" }}
         />
 
         {/* El calendario en la home. Va sobre el mismo azul con el que termina
-            el relato, para que no haya corte de color entre las dos. */}
-        <section className="w-full bg-[#020c41] px-margin-mobile py-20 md:px-margin-desktop">
+            el relato, para que no haya corte de color entre las dos.
+
+            Arranca CERRADO y lo abre el botón del relato, como en el mockup: el
+            ancla la trae hasta acá y `openOnHash` despliega el panel. Que el
+            disparador sea un link y no estado compartido es a propósito — el
+            salto lo hace el browser y las tarjetas siguen armándose en el
+            servidor. */}
+        <section
+          id="calendario"
+          className="w-full bg-[#020c41] px-margin-mobile py-20 md:px-margin-desktop"
+        >
           <div className="mx-auto max-w-narrative text-center">
-            <Collapsible label="Ver próximas fechas" defaultOpen tone="dark">
+            <Collapsible label="Ver próximas fechas" openOnHash="calendario" tone="dark">
               <TripCarousel
                 caption="Calendario de experiencias"
                 title="Próximos Viajes"

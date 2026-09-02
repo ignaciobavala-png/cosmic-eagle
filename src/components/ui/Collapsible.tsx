@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 /**
@@ -17,6 +17,11 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
  * tarjetas siguen armándose en el servidor con los datos de Supabase: el
  * `"use client"` queda acotado a este envoltorio (mismo patrón que `Reveal`).
  *
+ * `openOnHash` lo deja abrirse desde otra parte de la página sin compartir
+ * estado: el disparador es un `<a href="#lo-que-sea">` común, así que el salto
+ * lo hace el browser (y sigue funcionando sin JS) y acá sólo se despliega el
+ * panel. Es lo que usa el botón "Explorar experiencias" del relato de la home.
+ *
  * **`tone` no es decoración**: el botón nació en `/viajes`, dentro de una
  * `CreamSection`, y por eso su texto es el azul `#05125a`. En la home el mismo
  * botón cae sobre el azul `#020c41` de la sección del calendario, donde ese
@@ -27,17 +32,30 @@ export function Collapsible({
   label,
   children,
   defaultOpen = false,
+  openOnHash,
   tone = "light",
 }: {
   label: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  /** Se abre solo cuando la URL apunta a este id (sin `#`). */
+  openOnHash?: string;
   /** `light` = sobre crema (/viajes). `dark` = sobre el azul de la home. */
   tone?: "light" | "dark";
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const panelId = useId();
   const reduced = useReducedMotion();
+
+  useEffect(() => {
+    if (!openOnHash) return;
+    const sync = () => {
+      if (window.location.hash === `#${openOnHash}`) setOpen(true);
+    };
+    sync();
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, [openOnHash]);
 
   const toneClasses =
     tone === "dark"
