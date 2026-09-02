@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosmic Eagle — Tarjeta "¿Quieres seguir explorando?"</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{margin:0;padding:0;width:100%;min-height:100vh;}
+body{
+  font-family:Georgia,serif;color:#05125A;line-height:1.6;
+  background:#dcdcdc;
+  min-height:100vh;
+}
+.sans{font-family:'Montserrat','Helvetica Neue',Arial,sans-serif;}
+
+:root{
+  --azul-oscuro:#05125A;
+  --azul-claro:#0079B3;
+  --dorado-claro:#F9D78F;
+  --dorado-oscuro:#B3964B;
+  --crema-beige:#D0C5B4;
+  --crema-claro:#FFF6EB;
+}
+
+/* NOTA PARA DESARROLLADOR: este archivo es SOLO el componente (velo + tarjeta + animaciones),
+   listo para portar. El fondo gris y el rótulo de abajo son puramente para poder previsualizarlo
+   en un navegador — representan "la página del sitio" que quedaría detrás en producción (la
+   página real desde la que se dispare esta tarjeta, ej. el detalle de una experiencia). No son
+   parte del componente en sí. El disparador real (qué evento abre la tarjeta) todavía no existe
+   porque esa página de detalle no está diseñada — cuando exista, basta con agregarle el mismo
+   toggle de clase "open" sobre #gateOverlay que ya usa el botón de cierre acá abajo. */
+.pagina-de-fondo{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  color:rgba(5,18,90,0.35);font-family:'Montserrat',sans-serif;font-size:13px;text-align:center;
+  padding:24px;
+}
+
+/* ===== VELO OSCURO ===== */
+/* Orden de capas: página → velo (negro 40% opacity) → tarjeta. El velo cubre toda la pantalla
+   y se muestra/oculta en conjunto con la tarjeta (mismo toggle de la clase "open"). */
+.gate-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,0.4);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.35s ease;
+}
+.gate-overlay.open{opacity:1;pointer-events:auto;}
+
+/* ===== TARJETA ===== */
+.gate-card{
+  position:relative;
+  width:100%;max-width:440px;
+  background:linear-gradient(150deg,var(--azul-claro) 0%,#0a1a6e 45%,var(--azul-oscuro) 100%);
+  border-radius:32px;
+  padding:56px 40px 40px;
+  text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,0.45);
+  transform:scale(0.92) translateY(16px);
+  opacity:0;
+  transition:transform 0.4s cubic-bezier(0.2,0.8,0.2,1),opacity 0.35s ease;
+}
+.gate-overlay.open .gate-card{transform:scale(1) translateY(0);opacity:1;}
+
+.gate-close{
+  position:absolute;top:24px;right:24px;
+  width:36px;height:36px;
+  background:none;border:none;cursor:pointer;
+  color:var(--azul-claro);font-size:26px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  text-shadow:0 0 0 rgba(0,121,179,0);
+  transition:text-shadow 0.3s ease,transform 0.3s ease,color 0.3s ease;
+}
+.gate-close:hover,.gate-close:active{
+  color:#4db8e8;
+  text-shadow:0 0 14px rgba(0,121,179,0.95),0 0 28px rgba(0,121,179,0.65);
+  transform:scale(1.12);
+}
+
+.gate-title{
+  font-family:'Domine',Georgia,serif;font-weight:bold;
+  font-size:clamp(26px,5vw,34px);line-height:1.25;
+  color:var(--dorado-claro);
+  margin-bottom:22px;
+}
+
+.gate-text{
+  font-size:16px;line-height:1.65;
+  color:rgba(249,215,143,0.85);
+  max-width:340px;margin:0 auto 36px;
+}
+
+.gate-buttons{display:flex;flex-direction:column;gap:16px;margin-bottom:28px;}
+.gate-btn{
+  display:block;width:100%;
+  padding:16px 20px;border:none;border-radius:50px;cursor:pointer;
+  background:linear-gradient(135deg,var(--dorado-claro),var(--dorado-oscuro));
+  color:var(--azul-oscuro);
+  font-family:'Domine',Georgia,serif;font-size:16px;font-weight:bold;
+  text-decoration:none;
+  box-shadow:0 0 0 rgba(249,215,143,0);
+  transition:box-shadow 0.3s ease,transform 0.3s ease,filter 0.3s ease;
+}
+.gate-btn:hover,.gate-btn:active{
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+  box-shadow:0 0 22px rgba(249,215,143,0.75),0 0 44px rgba(249,215,143,0.4);
+}
+
+.gate-support{
+  font-size:13px;color:rgba(255,246,235,0.75);
+}
+.gate-support a{
+  color:rgba(255,246,235,0.95);
+  text-decoration:underline;
+  text-underline-offset:3px;
+  text-shadow:0 0 0 rgba(180,180,180,0);
+  transition:text-shadow 0.3s ease,color 0.3s ease;
+}
+.gate-support a:hover,.gate-support a:active{
+  color:#fff;
+  text-shadow:0 0 10px rgba(200,200,200,0.9),0 0 20px rgba(200,200,200,0.55);
+}
+
+@media (max-width:480px){
+  .gate-card{padding:48px 28px 32px;border-radius:26px;}
+  .gate-title{margin-bottom:18px;}
+  .gate-text{margin-bottom:30px;}
+}
+</style>
+</head>
+<body>
+
+<div class="pagina-de-fondo">[PÁGINA DEL SITIO — ej. detalle de una experiencia]</div>
+
+<div class="gate-overlay open" id="gateOverlay">
+  <div class="gate-card">
+    <button class="gate-close" id="gateClose" aria-label="Cerrar">✕</button>
+    <h2 class="gate-title">¿Quieres seguir explorando?</h2>
+    <p class="gate-text sans">Para explorar los detalles de esta experiencia cósmica, necesitamos conocerte primero.</p>
+    <div class="gate-buttons">
+      <a href="login.html" class="gate-btn">Inicia sesión</a>
+      <a href="register.html" class="gate-btn">Crear cuenta</a>
+    </div>
+    <p class="gate-support sans">¿Necesitas ayuda? <a href="#">Contacta soporte</a></p>
+  </div>
+</div>
+
+<script>
+const overlay = document.getElementById('gateOverlay');
+const closeBtn = document.getElementById('gateClose');
+function closeGate(){ overlay.classList.remove('open'); }
+function openGate(){ overlay.classList.add('open'); }
+closeBtn.addEventListener('click', closeGate);
+overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeGate(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && overlay.classList.contains('open')) closeGate(); });
+// Solo para poder reabrirla al previsualizar este archivo suelto (no hay una página real
+// todavía con un botón que la dispare) — clic en el fondo la vuelve a abrir.
+document.querySelector('.pagina-de-fondo').addEventListener('click', openGate);
+</script>
+
+</body>
+</html>

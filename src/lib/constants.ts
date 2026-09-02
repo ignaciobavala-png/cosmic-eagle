@@ -50,28 +50,33 @@ export function tripPlaceholderImage(id: string) {
   return TRIP_PLACEHOLDERS[sum % TRIP_PLACEHOLDERS.length];
 }
 
-// Retiros y ceremonias son ambos `trips`, separados por `trips.type`
-// (decision de docs/CONTENT_MAP.md). No son dos rutas: son un filtro de /viajes,
-// y el `slug` es el valor que viaja en ?tipo= — en castellano y en plural, que
-// es como se ve en el navbar.
+// Sesiones y viajes son ambos `trips`, separados por `trips.type`
+// (decision de docs/CONTENT_MAP.md). No son dos rutas: son dos bloques de
+// /viajes con ancla propia.
+//
+// Los rotulos son los de la entrega de Julia del 02/09: "Ceremonias" paso a
+// llamarse "Sesiones" y "Retiros" a "Viajes", en todo el sitio. Los `value`
+// siguen siendo los del enum de la base (`retiro` / `ceremonia`) y el `slug`
+// tambien: era el valor del viejo `?tipo=`, que ya nadie escribe, y cambiarlo
+// solo romperia links viejos.
 export const TRIP_TYPES = [
-  {
-    value: "retiro",
-    slug: "retiros",
-    label: "Retiros",
-    singular: "Retiro",
-    // El titulo va armado y no concatenado con "Proximos": "Proximos Retiros"
-    // pero "Proximas Ceremonias", el genero cambia.
-    upcoming: "Próximos Retiros",
-    description: "Viajes de varios dias en grupo",
-  },
   {
     value: "ceremonia",
     slug: "ceremonias",
-    label: "Ceremonias",
-    singular: "Ceremonia",
-    upcoming: "Próximas Ceremonias",
-    description: "Encuentros ceremoniales puntuales",
+    label: "Sesiones",
+    singular: "Sesión",
+    upcoming: "Próximas Sesiones",
+    description: "Encuentros ceremoniales de un dia",
+  },
+  {
+    value: "retiro",
+    slug: "retiros",
+    label: "Viajes",
+    singular: "Viaje",
+    // El titulo va armado y no concatenado con "Proximos": "Proximos Viajes"
+    // pero "Proximas Sesiones", el genero cambia.
+    upcoming: "Próximos Viajes",
+    description: "Viajes de varios dias en grupo",
   },
 ] as const;
 
@@ -105,8 +110,8 @@ export const NAV_LINKS: NavLink[] = [
     // completo, los hijos son atajos al mismo listado ya filtrado.
     // Desde el rediseno de Julia (27/08) /viajes son dos bloques con ancla
     // propia y ya no una grilla filtrada por `?tipo=`, asi que los hijos del
-    // desplegable apuntan al ancla de su bloque. Los rotulos siguen siendo
-    // Retiros/Ceremonias hasta que se confirme el cambio de nomenclatura.
+    // desplegable apuntan al ancla de su bloque. Los rotulos son Sesiones y
+    // Viajes desde la entrega del 02/09, que cerro esa pregunta.
     children: TRIP_TYPES.map((t) => ({
       label: t.label,
       href: `/viajes#${t.value === "ceremonia" ? "sesiones" : "viajes"}`,

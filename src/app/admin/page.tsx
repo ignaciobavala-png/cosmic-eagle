@@ -87,14 +87,14 @@ export default async function AdminDashboardPage() {
   const stats = [
     {
       href: TRIP_TYPES.retiro.adminPath,
-      label: "Retiros activos",
+      label: "Viajes activos",
       value: openRetiros ?? 0,
       hint: `${totalRetiros ?? 0} en total`,
       icon: Compass,
     },
     {
       href: TRIP_TYPES.ceremonia.adminPath,
-      label: "Ceremonias activas",
+      label: "Sesiones activas",
       value: openCeremonias ?? 0,
       hint: `${totalCeremonias ?? 0} en total`,
       icon: Flame,
@@ -219,20 +219,20 @@ export default async function AdminDashboardPage() {
         <div className="glass-card rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-xl text-primary-fixed-dim">
-              Próximos viajes
+              Próximas experiencias
             </h2>
             <div className="flex items-center gap-3">
               <Link
                 href={TRIP_TYPES.retiro.adminPath}
                 className="text-xs text-secondary hover:underline"
               >
-                Retiros
+                Viajes
               </Link>
               <Link
                 href={TRIP_TYPES.ceremonia.adminPath}
                 className="text-xs text-secondary hover:underline"
               >
-                Ceremonias
+                Sesiones
               </Link>
             </div>
           </div>
@@ -246,7 +246,7 @@ export default async function AdminDashboardPage() {
               {upcomingTrips.map((trip) => (
                 <li key={trip.id} className="py-3">
                   <Link
-                    href={`/admin/viajes/${trip.id}/editar`}
+                    href={`/admin/experiencias/${trip.id}/editar`}
                     className="flex items-center justify-between gap-4 group"
                   >
                     <div className="min-w-0">

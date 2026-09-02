@@ -83,9 +83,11 @@ export function Header() {
 
   return (
     <>
-      {/* El fondo sale del asset `navbar.png` de Julia (1440x84): no es arte
-          sino un degrade horizontal, plano en #05125a hasta el 31% del ancho y
-          despues rampa hasta #026fab. Se hace en CSS por lo mismo que la banda
+      {/* El fondo sale del mockup aprobado de Julia (`homepage_correccion.html`,
+          entrega del 02/09): degrade horizontal recto de #05125a a #0079b3, sin
+          mesetas. Antes se muestreaba del PNG `navbar.png` y quedaba plano hasta
+          el 31% y rematando en #026fab; el codigo de ella es la referencia y su
+          `--azul-claro` es #0079b3. Se hace en CSS por lo mismo que la banda
           dorada y "La humanidad" (docs/HOME_REDISENO.md §6.1): pesa cero, no se
           pixela y acompana cualquier ancho de viewport. Es la misma familia de
           degrade que ya usa el footer, pero al reves de arriba a abajo.
@@ -93,7 +95,7 @@ export function Header() {
           Ojo: el navbar paso a ser OPACO. Antes era vidrio y el hero le pasaba
           por debajo; en el mockup es una banda solida y el contenido arranca
           abajo. Por eso cada `main` compensa con `pt-16 lg:pt-21`. */}
-      <header className="fixed top-0 w-full z-50 bg-[linear-gradient(to_right,#05125a_0%,#05125a_31%,#026fab_100%)]">
+      <header className="fixed top-0 w-full z-50 bg-[linear-gradient(to_right,#05125a_0%,#0079b3_100%)]">
         {/* La barra horizontal arranca en lg, no en md: entre 768 y 1024 el
             logo + los 3 links + "Unirme al circulo" no entran y el CTA termina
             pisando el logo. Hasta 1024 manda el drawer, que entra siempre. */}

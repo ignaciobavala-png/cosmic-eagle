@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Domine, Literata } from "next/font/google";
+import { Domine, Montserrat } from "next/font/google";
 import "./globals.css";
 
 const domine = Domine({
@@ -7,7 +7,7 @@ const domine = Domine({
   variable: "--font-display",
 });
 
-const literata = Literata({
+const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-body",
 });
@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${domine.variable} ${literata.variable} h-full antialiased`}
+      className={`${domine.variable} ${montserrat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

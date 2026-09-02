@@ -1,0 +1,16 @@
+Entrega de Julia del 02/09/2026. Copiada tal cual, sin editar.
+
+HOMEPAGE/  homepage_correccion.html (mockup aprobado, tres rondas de correccion
+           del 1/9) + design-system-homepage.md + notas de implementacion + el
+           logo real en PNG.
+tarjetas/  el modal "¿Quieres seguir explorando?" (gate de sesion), componente
+           aislado + su design system + sus notas.
+
+Falta acá un video de 30s, un recorrido en mobile de /contenidos rediseñada con
+el gate por codigo de acceso. No entro al repo por peso (3 MB) y porque la regla
+de binarios es "solo assets fijos de layout". Esta en:
+
+    ~/Escritorio/entregas-julia/2026-09-02-contenidos-mobile.mp4
+
+Lo que sale de esta entrega y su estado esta en CLAUDE.md, seccion
+"Sesion del 2026-09-02 (quater)".

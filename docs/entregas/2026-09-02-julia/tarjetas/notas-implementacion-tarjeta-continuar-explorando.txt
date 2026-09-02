@@ -1,0 +1,103 @@
+NOTAS DE IMPLEMENTACIÓN — tarjeta-continuar-explorando-final.html (Cosmic Eagle)
+Para el agente de desarrollo (Claude) que porta este componente a la app real Next.js/React/Tailwind/Supabase.
+Escrito por el Claude que diseñó/mockupeó el sitio junto con Julia (la clienta/diseñadora). Este
+archivo es contexto de PROCESO y DECISIONES — el detalle técnico de valores exactos (colores,
+tamaños, animaciones) está en el archivo adjunto "design-system-tarjeta-continuar-explorando.md",
+léanlo junto a este.
+
+QUÉ ES ESTE ARCHIVO
+tarjeta-continuar-explorando-final.html es un COMPONENTE AISLADO, no una página del sitio. Es el
+modal "¿Quieres seguir explorando?" que se dispara sobre cualquier página cuando un usuario
+anónimo intenta acceder a contenido que requiere sesión (el caso de uso previsto: ver el detalle
+de una experiencia estando deslogueado). Julia lo diseñó primero en Figma y pidió replicarlo en
+HTML para pasárselo a Nacho.
+
+IMPORTANTE — este archivo NO es la versión con la que se revisó/aprobó el diseño con Julia. Hubo
+una primera versión (`tarjeta-continuar-explorando.html`, ya aprobada por Julia sin cambios: "esta
+perfecto") que incluía además una página de demo alrededor (un título, un texto explicativo y un
+botón "VER EXPERIENCIA" para poder disparar el modal y probarlo aislado). Julia pidió después
+explícitamente una segunda versión con SOLO el componente en sí (velo + tarjeta + animaciones),
+para entregar a desarrollo — esta es esa versión. El componente (CSS y HTML de `.gate-overlay`,
+`.gate-card` y todo lo de adentro) es IDÉNTICO entre ambos archivos, carácter por carácter — no
+hay ningún cambio de diseño entre la versión aprobada y esta, solo se quitó el andamiaje de demo
+que no era parte del componente.
+
+QUÉ HAY EN ESTE ARCHIVO QUE NO ES PARTE DEL COMPONENTE (no portar)
+- El `<div class="pagina-de-fondo">` con el texto entre corchetes "[PÁGINA DEL SITIO — ej. detalle
+  de una experiencia]" y su fondo gris (#dcdcdc). Es un placeholder puramente para poder
+  visualizar el archivo suelto en un navegador — representa "lo que sea que esté detrás" del
+  modal en producción, que sería la página real del sitio (no algo que este componente deba
+  incluir o renderizar).
+- El listener de JS que abre el modal al hacer click en ese fondo gris
+  (`document.querySelector('.pagina-de-fondo').addEventListener('click', openGate)`). Existe
+  únicamente para poder reabrir el modal y probarlo en este archivo aislado (si no, una vez
+  cerrado no habría forma de volver a verlo sin recargar la página). No es un patrón a replicar.
+- Todo esto está además comentado dentro del propio `<style>` del archivo, por si se pierde este
+  .txt en el camino.
+
+QUÉ SÍ ES EL COMPONENTE REAL (portar esto)
+- El overlay `#gateOverlay` (velo oscuro) y todo lo que contiene: la tarjeta `.gate-card` con su
+  botón de cerrar, título, texto, dos botones de acción (Inicia sesión / Crear cuenta) y el link
+  de soporte.
+- La función `openGate()` (agrega la clase `.open`) y `closeGate()` (la quita) — esta lógica de
+  apertura/cierre por clase SÍ es la que hay que portar, independientemente de cuál sea el
+  disparador real.
+- Los tres cierres ya implementados y funcionando: click en ✕, click en el velo (fuera de la
+  tarjeta), tecla Escape.
+
+EL DISPARADOR REAL TODAVÍA NO EXISTE
+A diferencia de otras piezas ya entregadas, este componente no tiene todavía una página "anfitriona"
+real que lo dispare — la página de detalle de una experiencia (desde donde se abriría este modal en
+producción) todavía no está diseñada. Esto significa:
+- No hay que inventar ni asumir cómo se ve esa página — no es parte de este encargo.
+- Cuando esa página exista, conectar el disparador real es trivial: cualquier evento (ej. un botón
+  "Ver detalle" para un usuario sin sesión) solo necesita togglear la misma clase `.open` sobre el
+  contenedor del overlay, exactamente como ya lo hace el botón de cerrar en sentido inverso.
+- Mientras tanto, este archivo se puede integrar al proyecto como un componente reutilizable
+  (ej. <GateModal isOpen={...} onClose={...}/> en React) y quedar listo para conectarse en cuanto
+  la página de detalle esté definida — no hace falta esperar a esa página para portar el componente
+  en sí.
+
+DECISIONES YA CONFIRMADAS CON JULIA (para que no vuelvan a quedar como preguntas abiertas)
+- Los tres efectos de glow (dorado en los botones de acción, azul en el botón de cerrar, gris en
+  "Contacta soporte") están confirmados y son intencionalmente distintos entre sí — no es
+  inconsistencia, cada uno marca una jerarquía distinta de acción (acción principal / cerrar /
+  ayuda secundaria).
+- El glow se dispara en hover de mouse (desktop) Y en tap (mobile) mediante el selector CSS
+  combinado `:hover,:active` — no hace falta JS para esto, es el mismo patrón que ya usan en otros
+  componentes del sitio (ej. el botón de scroll-to-top). Si lo portan con Tailwind, esto se traduce
+  directo a variantes `hover:` y `active:` sobre las mismas clases.
+- El orden de capas (página → velo 40% opacity → tarjeta) es explícito y confirmado por Julia — el velo
+  siempre va tanto en el DOM como en el z-index por debajo de la tarjeta pero por encima de todo
+  lo demás (z-index:1000 en el mockup).
+- El link "Contacta soporte" hoy apunta a `#` — es un placeholder, falta que Julia confirme el
+  destino real (¿un mailto?, ¿una página de contacto?, ¿un chat?). No asumir ninguno de estos por
+  cuenta propia.
+
+DETALLES DE IMPLEMENTACIÓN QUE CONVIENE SABER ANTES DE PORTAR
+- El cierre por click en el velo compara `event.target` contra el nodo del overlay mismo (no
+  contra la tarjeta) — si el click cae dentro de la tarjeta, `event.target` nunca es el overlay, así
+  que no se cierra. Es importante preservar esta comparación (o su equivalente, ej. un
+  `stopPropagation` en la tarjeta) al portar, para que un click dentro del modal no lo cierre por
+  error.
+- El listener de Escape está en `document`, no en el overlay, y chequea `classList.contains('open')`
+  antes de actuar — para no interferir con otros usos de Escape en el resto del sitio cuando este
+  modal está cerrado.
+- Todas las transiciones son CSS puro (`transition` en las propiedades relevantes) — no hay
+  ninguna librería de animación involucrada en este componente, a diferencia de otras piezas del
+  sitio (ej. el scroll-scrubbing de la Home). Si lo portan con Framer Motion, alcanza con animar
+  `opacity` en el overlay y `opacity`+`transform` (scale + translateY) en la tarjeta con los
+  mismos tiempos/easing detallados en el .md adjunto — no hay lógica de scroll ni de timeline
+  involucrada.
+- Reutiliza tokens de color y tipografía ya existentes del sitio (--azul-oscuro, --azul-claro,
+  --dorado-claro, --dorado-oscuro, Domine + Montserrat) — el único valor nuevo, específico de este
+  componente, es el color intermedio del degradé de fondo de la tarjeta (#0a1a6e), que no es un
+  token global, solo aplica acá.
+
+CÓMO INTERPRETAR ESTE PAQUETE SI SON UN AGENTE DE IA
+Cualquier valor de este archivo y del .md adjunto ya está aprobado por la clienta — no es punto de
+partida para reinterpretar con libertad creativa, salvo lo marcado explícitamente arriba como
+pendiente (el destino real del link de soporte, y el disparador real que todavía no existe). Si
+algo no queda claro leyendo ambos documentos, es más seguro preguntar antes de adivinar — ya hubo
+casos anteriores en este proyecto (símbolos decorativos de Nosotros, animaciones de Framer Motion en
+Home) donde una interpretación distinta al mockup generó una ronda extra de correcciones evitable.

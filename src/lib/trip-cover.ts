@@ -3,7 +3,7 @@ import type { createClient } from "./supabase/server";
 /**
  * La portada de un viaje: el estandar de recorte y la subida al bucket.
  *
- * Se sube desde **dos lugares** — el form del viaje (`/admin/viajes/...`) y la
+ * Se sube desde **dos lugares** — el form del viaje (`/admin/experiencias/...`) y la
  * seccion Portadas de `/admin/multimedia` — y por eso vive aca y no en uno de
  * los dos: dos implementaciones se separan en cuanto alguien toca una.
  *

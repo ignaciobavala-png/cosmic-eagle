@@ -5,9 +5,10 @@ import { NewsletterForm } from "./NewsletterForm";
 
 export function Footer() {
   return (
-    <footer // El degrade del mockup (#05125a -> #0079b2, muestreado del slide) va en CSS:
-    // el PNG que entrego la disenadora era un degrade plano de 1,7 KB.
-    className="bg-[linear-gradient(to_right,#05125a_0%,#062a72_55%,#0079b2_100%)] pt-16 pb-8 px-margin-mobile md:px-margin-desktop">
+    <footer // El degrade va en CSS: el PNG que entrego la disenadora era un
+    // degrade plano de 1,7 KB. Los extremos salen del mockup aprobado
+    // (`.footer` de homepage_correccion.html): #05125a -> #0079b3, recto.
+    className="bg-[linear-gradient(to_right,#05125a_0%,#0079b3_100%)] pt-16 pb-8 px-margin-mobile md:px-margin-desktop">
       <div className="mx-auto grid max-w-narrative grid-cols-1 gap-12 md:grid-cols-4">
         <Link href="/" className="md:self-start">
           <Image

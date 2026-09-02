@@ -11,7 +11,7 @@ import { uploadTripCover } from "@/lib/trip-cover";
 export type TripFormState = { error: string | null };
 
 /**
- * Retiros y ceremonias tienen listado propio en el admin y comparten el listado
+ * Sesiones y viajes tienen listado propio en el admin y comparten el listado
  * publico, asi que cualquier escritura invalida las tres rutas.
  */
 function revalidateTripPaths() {

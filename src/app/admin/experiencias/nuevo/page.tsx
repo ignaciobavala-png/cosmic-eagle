@@ -5,8 +5,8 @@ import { TripForm } from "../TripForm";
 import { createTrip } from "../actions";
 
 /**
- * El tipo llega en la URL desde la seccion que abrio el form (Retiros o
- * Ceremonias). Sin `?tipo=` valido se asume retiro, que es el default historico.
+ * El tipo llega en la URL desde la seccion que abrio el form (Sesiones o
+ * Viajes). Sin `?tipo=` valido se asume retiro, que es el default historico.
  */
 export default async function NuevoViajePage({
   searchParams,

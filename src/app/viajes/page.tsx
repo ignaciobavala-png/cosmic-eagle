@@ -31,9 +31,10 @@ export const metadata: Metadata = {
  * que reemplaza al viejo `?tipo=`.
  *
  * Los títulos usan el vocabulario de Sofía ("Sesión Cósmica" = ceremonia,
- * "Viaje Cósmico" = retiro) porque es el copy del mockup. **Los rótulos del
- * navbar y del panel siguen diciendo Ceremonias/Retiros** hasta que Julia
- * confirme si el cambio de nombre va en todo el sitio (pregunta 5 del 27/08).
+ * "Viaje Cósmico" = retiro) porque es el copy del mockup. Desde la entrega de
+ * Julia del 02/09 ese vocabulario vale **en todo el sitio**, navbar y panel
+ * incluidos: "Ceremonias" es "Sesiones" y "Retiros" es "Viajes". Lo único que
+ * sigue diciendo `retiro`/`ceremonia` es el enum de la base.
  *
  * Sigue filtrando `draft` en la consulta: la policy `trips_select_public` deja
  * leer todos los trips a `anon`, incluidos los borradores.

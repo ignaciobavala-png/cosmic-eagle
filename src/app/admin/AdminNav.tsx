@@ -16,8 +16,8 @@ import { logout } from "@/app/cuenta/actions";
 
 const LINKS = [
   { href: "/admin", label: "Dashboard" },
-  { href: "/admin/retiros", label: "Retiros" },
-  { href: "/admin/ceremonias", label: "Ceremonias" },
+  { href: "/admin/sesiones", label: "Sesiones" },
+  { href: "/admin/viajes", label: "Viajes" },
   { href: "/admin/solicitudes", label: "Solicitudes" },
   { href: "/admin/pagos", label: "Pagos" },
   { href: "/admin/multimedia", label: "Multimedia" },

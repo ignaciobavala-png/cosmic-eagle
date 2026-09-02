@@ -28,8 +28,8 @@ function formatDate(iso: string) {
 }
 
 /**
- * Listado del admin acotado a un tipo. Lo comparten /admin/retiros y
- * /admin/ceremonias: son la misma tabla, pero cada una es una seccion propia.
+ * Listado del admin acotado a un tipo. Lo comparten /admin/sesiones y
+ * /admin/viajes: son la misma tabla, pero cada una es una seccion propia.
  */
 export async function TripsList({ type }: { type: TripType }) {
   const meta = TRIP_TYPES[type];
@@ -47,7 +47,7 @@ export async function TripsList({ type }: { type: TripType }) {
           {meta.plural}
         </h1>
         <Link
-          href={`/admin/viajes/nuevo?tipo=${type}`}
+          href={`/admin/experiencias/nuevo?tipo=${type}`}
           className="bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg px-4 py-2.5 text-sm whitespace-nowrap hover:bg-primary-fixed transition-colors"
         >
           {meta.newLabel}
@@ -97,7 +97,7 @@ export async function TripsList({ type }: { type: TripType }) {
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-4">
                       <Link
-                        href={`/admin/viajes/${trip.id}/editar`}
+                        href={`/admin/experiencias/${trip.id}/editar`}
                         className="text-secondary hover:underline"
                       >
                         Editar

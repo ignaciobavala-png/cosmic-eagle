@@ -6,7 +6,7 @@
    `primary` (#fff6eb) queda para el realce mas brillante. */
 @theme {
   --font-display: var(--font-display, "Domine", serif);
-  --font-body: var(--font-body, "Literata", serif);
+  --font-body: var(--font-body, "Montserrat", "Helvetica Neue", Arial, sans-serif);
 
   --color-background: #131410;
   --color-on-background: #e5e2db;
@@ -39,7 +39,7 @@
 
   --color-secondary: #8fcdff;
   --color-on-secondary: #003450;
-  --color-secondary-container: #0079b2;
+  --color-secondary-container: #0079b3;
   --color-on-secondary-container: #f5f9ff;
   --color-secondary-fixed: #cbe6ff;
   --color-secondary-fixed-dim: #8fcdff;
@@ -310,7 +310,7 @@ html {
 body {
   position: relative;
   color: #e5e2db;
-  font-family: var(--font-body, "Literata", serif);
+  font-family: var(--font-body, "Montserrat", "Helvetica Neue", Arial, sans-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #05060a;

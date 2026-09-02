@@ -160,7 +160,7 @@ export default async function AdminMultimediaPage() {
             ))
           ) : (
             <p className="px-5 py-5 text-sm text-on-surface-variant md:px-6">
-              Carga un viaje desde Retiros o Ceremonias y su portada aparece aquí.
+              Carga una experiencia desde Sesiones o Viajes y su portada aparece aquí.
             </p>
           )}
         </Accordion>

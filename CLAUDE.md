@@ -1276,3 +1276,85 @@ el recordatorio [3B], que además necesita el envío programado que no existe.
 
 **Sin verificar end-to-end** (requiere sesión de admin): cargar una seña en un
 viaje, aprobar a alguien, registrar la seña y ver el saldo en su pantalla.
+
+### Sesión del 2026-09-02 (quater) — la entrega de Julia y las tres alineaciones
+
+Julia mandó el **primer paquete formal de entrega** para la home, más el modal de
+gate y un video. Todo copiado a **`docs/entregas/2026-09-02-julia/`** el mismo
+día — es la regla que ya nos costó tres documentos (`~/Descargas` se vacía sola).
+
+- **`HOMEPAGE/`**: `homepage_correccion.html` (mockup aprobado, con las tres
+  rondas de corrección del 1/9), `design-system-homepage.md` (tokens, tamaños por
+  sección, breakpoint único de 768px y **la tabla completa de animaciones** con
+  trigger/duración/delay/reversibilidad), notas de proceso y el logo en PNG.
+- **`tarjetas/`**: el modal **"¿Quieres seguir explorando?"** — gate de sesión
+  sobre el detalle de una experiencia. Componente aislado, CSS puro, aprobado.
+- **Un video**, cuyo nombre engaña: **no es la home**. Es un recorrido en mobile
+  de **`/contenidos`** rediseñada, y trae la novedad más pesada del paquete (ver
+  abajo). Es lo único de la entrega que **no** está en el repo — son 3 MB y la
+  regla de binarios es "solo assets fijos de layout". Vive en
+  `~/Escritorio/entregas-julia/2026-09-02-contenidos-mobile.mp4`, fuera de
+  `~/Descargas` para que no se lo lleve la limpieza.
+
+**El código de acceso volvió, y con diseño.** El video muestra `/contenidos`
+como hero → "Tecnología Humana y Ciencia del Alma" (el mismo componente de la
+home) → **"APRENDIZAJE"**, acordeón de tres niveles (Fundamentos / Evolución /
+Avanzados, 3 módulos cada uno) → **"VER MÁS"** (Testimonios Extendidos /
+Artículos & Vlog / Ebook). Todo con candado, y un modal dorado **"SOLO PARA
+MIEMBROS — Introduce tu código de acceso"**. Confirma la lectura del anexo de
+Privacidad (gate de contenido por nivel, no un login alternativo) y
+**contradice el `/contenidos` que está en producción**, que es un hub público de
+artículos por categoría. No implementar hasta definir quién emite los códigos,
+cómo se asigna el nivel y qué pasa con los artículos ya cargados.
+
+**Hecho en esta sesión — las tres alineaciones baratas:**
+
+1. **Montserrat reemplaza a Literata** como fuente de cuerpo (`layout.tsx`,
+   `globals.css`). Julia lo cerró explícito: Literata nunca fue intencional y un
+   render en Georgia es falla de carga. Cierra una de las 6 preguntas del 27/08.
+   Verificado en el browser: `font-family` computado es Montserrat, self-hosteada
+   por `next/font`.
+2. **El celeste es `#0079b3`, y los degradés van rectos.** El navbar remataba en
+   `#026fab` con meseta hasta el 31% y el footer tenía un `#062a72` al 55%: los
+   dos salían de muestrear los PNG. El mockup aprobado dice
+   `linear-gradient(90deg,#05125A,#0079B3)` en los dos, sin escalas. También se
+   alineó `--color-secondary-container` (`#0079b2` → `#0079b3`).
+3. **Nomenclatura Sesiones/Viajes en todo el sitio, panel incluido.** Cierra la
+   pregunta 5 del 27/08. **El enum de la base NO cambió**: en `trips.type` siguen
+   siendo `retiro` y `ceremonia`, y renombrarlos costaría una migración y tocar
+   cada query — lo que cambia es la etiqueta, que vive en `src/lib/trip-type.ts`
+   y en `TRIP_TYPES` de `constants.ts`. **Ojo con la palabra "ceremonia"**: en el
+   formulario de salud, en `ScreeningForm` y en el CRM significa *el ritual*, no
+   el tipo de viaje, y ahí no se toca.
+
+**Las rutas del admin se movieron** (es lo único de esta sesión que rompe links):
+
+| Antes | Ahora |
+|---|---|
+| `/admin/viajes` (redirect) + CRUD | `/admin/experiencias` — el CRUD (form, actions, nuevo, editar) |
+| `/admin/retiros` | `/admin/viajes` — listado `type=retiro` |
+| `/admin/ceremonias` | `/admin/sesiones` — listado `type=ceremonia` |
+
+No quedaron stubs de redirección: son rutas detrás del login del panel, a las que
+sólo se llega por el nav.
+
+**Pendiente de Julia**: el video del hero (5s), y las imágenes de Atmosférica,
+Tecnología del Alma y Cierre. El destino real del link "Contacta soporte" del
+modal (hoy `#`).
+
+**Requerimiento nuevo del panel**, de sus aclaraciones: cada banner de
+imagen/video tiene que aceptar **cajas de texto opcionales encima, con elección
+de tamaño de fuente**. Hoy un slot de `site_content` guarda una sola URL y nada
+más — es un cambio de forma del registro de slots, no una entrada más.
+
+**Lo que confirma y no hay que tocar**: el navbar opaco está bien; `.scroll-story`
+(400vh sticky) es exactamente el caso del bug de Framer/`ViewTimeline` que
+arreglamos el 28/08 con `use-section-progress.ts`; `.symbol-note` es código
+muerto; y **la home es one-shot mientras Nosotros/Experiencias/Contenidos son
+reversibles** — eso cierra la duda del 27/08: conviven a propósito, y ya está así.
+
+**Lo que falta de la entrega**: auditar la home sección por sección contra
+`homepage_correccion.html` (ahí aparecen, entre otras, la altura del navbar —
+96/72px en el mockup contra 84/64px nuestros — y la del logo), portar el modal
+como `GateModal` y engancharlo al carrusel de experiencias para el usuario sin
+sesión.
