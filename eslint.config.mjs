@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Salida de Playwright: el reporte HTML trae bundles minificados que el
+    // lint tarda en recorrer y sobre los que no hay nada que corregir.
+    "e2e/.report/**",
+    "test-results/**",
   ]),
 ]);
 

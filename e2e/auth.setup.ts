@@ -1,8 +1,9 @@
 import { test as setup, expect } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
+import { ADMIN_STATE } from "./limpieza";
 
-export const ADMIN_STATE = path.join(__dirname, ".auth", "admin.json");
+export { ADMIN_STATE };
 
 /**
  * Inicia sesion UNA vez y guarda las cookies. Todos los tests del panel parten
