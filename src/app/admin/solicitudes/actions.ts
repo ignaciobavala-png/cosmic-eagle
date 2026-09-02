@@ -7,6 +7,7 @@ import { createAdminNotification } from "@/lib/notifications";
 import { getActivePaymentMethods } from "@/lib/payments";
 import { SolicitudAprobada } from "@/emails/SolicitudAprobada";
 import { SolicitudRechazada } from "@/emails/SolicitudRechazada";
+import { SolicitudConversemos } from "@/emails/SolicitudConversemos";
 import { PagoRegistrado } from "@/emails/PagoRegistrado";
 import { formatDateRangeCompact } from "@/lib/format";
 import type { Enums } from "@/lib/supabase/types";
@@ -64,6 +65,23 @@ export async function reviewApplication(
   // invalidación administrativa, no una respuesta a la persona.
   if (status === "rejected" && application && application.status !== "rejected") {
     await notifyRejected({
+      id,
+      nombre: application.full_name,
+      email: application.email,
+      trip: application.trips,
+    });
+  }
+
+  // "Conversemos": ni aprobada ni rechazada. Es el correo [2A] del documento de
+  // Sofia y el unico camino que vuelve al principio — despues de hablar, Estela
+  // mueve la solicitud a `approved` o a `rejected` desde el mismo panel, y ese
+  // segundo movimiento dispara el mail que corresponda.
+  if (
+    status === "needs_conversation" &&
+    application &&
+    application.status !== "needs_conversation"
+  ) {
+    await notifyConversation({
       id,
       nombre: application.full_name,
       email: application.email,
@@ -224,6 +242,42 @@ async function notifyRejected({
     body:
       result.reason === "not_configured"
         ? `Resend todavía no está configurado (falta RESEND_API_KEY). Escríbele a ${email} a mano.`
+        : `Resend rechazó el envío a ${email}: ${result.error ?? "sin detalle"}.`,
+    href: `/admin/solicitudes/${id}`,
+  });
+}
+
+async function notifyConversation({
+  id,
+  nombre,
+  email,
+  trip,
+}: {
+  id: string;
+  nombre: string;
+  email: string;
+  trip: { title: string; start_date: string; end_date: string } | null;
+}) {
+  const result = await sendEmail({
+    to: email,
+    subject: "Sobre tu postulación — nos gustaría conversar",
+    react: SolicitudConversemos({
+      nombre: nombre.split(" ")[0],
+      viaje: trip?.title ?? "el viaje",
+    }),
+  });
+
+  if (result.ok) return;
+
+  // Este fallo es el mas caro de los tres: la persona quedo en un estado que le
+  // dice "te vamos a escribir" y el mail que se lo explica no salio. Sin este
+  // aviso, nadie se entera.
+  await createAdminNotification({
+    kind: "email_failed",
+    title: `No se pudo invitar a ${nombre} a conversar sobre su solicitud`,
+    body:
+      result.reason === "not_configured"
+        ? `Resend todavía no está configurado (falta RESEND_API_KEY). Escríbele a ${email} a mano: su solicitud quedó esperando esa conversación.`
         : `Resend rechazó el envío a ${email}: ${result.error ?? "sin detalle"}.`,
     href: `/admin/solicitudes/${id}`,
   });

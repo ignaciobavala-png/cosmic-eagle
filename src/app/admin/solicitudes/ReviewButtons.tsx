@@ -11,6 +11,15 @@ const OPTIONS: { status: Enums<"application_status">; label: string; className: 
     className: "bg-secondary/20 text-secondary border-secondary/40 hover:bg-secondary/30",
   },
   {
+    // Ni aprobar ni rechazar: el correo [2A] de Sofia. Va segundo a proposito
+    // — es la salida natural de una solicitud con banderas de salud, y el
+    // encuadre del filtro corto dice que eso no cierra la puerta.
+    status: "needs_conversation",
+    label: "Conversemos",
+    className:
+      "bg-tertiary-container/20 text-tertiary-container border-tertiary-container/40 hover:bg-tertiary-container/30",
+  },
+  {
     status: "rejected",
     label: "Rechazar",
     className: "bg-error/20 text-error border-error/40 hover:bg-error/30",

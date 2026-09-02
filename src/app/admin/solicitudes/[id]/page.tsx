@@ -13,6 +13,7 @@ import {
 
 const STATUS_LABEL: Record<string, string> = {
   pending_review: "Pendiente",
+  needs_conversation: "Conversemos",
   approved: "Aprobada",
   rejected: "Rechazada",
   expired: "Expirada",
@@ -103,6 +104,13 @@ export default async function SolicitudDetallePage({
             {health
               ? "Requiere revisión manual obligatoria: el formulario de salud declara condición de salud, uso de sustancias o trauma."
               : "Requiere revisión manual obligatoria: el filtro declara una enfermedad grave, un tratamiento psiquiátrico o psicológico, o medicación en curso."}
+          </p>
+          {/* La salida prevista para este caso no es rechazar: es el correo [2A]
+              de Sofía (docs/COMUNICACIONES.md). Hasta que existió "Conversemos"
+              este aviso no ofrecía ningún camino intermedio. */}
+          <p className="mt-2 text-sm text-on-surface-variant">
+            Si hace falta hablarlo antes de decidir, «Conversemos» le avisa a la
+            persona y deja la solicitud abierta.
           </p>
         </div>
       )}

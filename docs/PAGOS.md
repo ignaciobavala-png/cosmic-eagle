@@ -195,3 +195,20 @@ Lo que **sigue abierto** de este hilo:
   un campo más y que Estela lo marque.
 - En qué moneda cobra la tarjeta de Encuadrado (pregunta 4 de las ocho). No
   cambia lo de arriba: sea cual sea, es otro riel con su conversión del día.
+
+---
+
+## 8. El documento de comunicaciones asume seña + saldo (02/09)
+
+`docs/COMUNICACIONES.md` (el orden cronológico de mails que mandó Sofía el
+26/08) da por hecho un modelo de pago que **contradice la decisión de §7**: sus
+correos [2], [3A], [3B] y [3C] ofrecen reservar el cupo con una seña, pagar el
+saldo *"de una vez o en cuotas"* desde el espacio personal, y ponen una fecha de
+corte a 15 días de la experiencia.
+
+Hoy `payment_status` es `pending | paid | waived` — un booleano con excepción,
+sin lugar para un pago parcial ni para un saldo.
+
+**No se implementa nada hasta que respondan**: las siete preguntas están en
+`docs/consulta-sofia-pagos.txt`. Es lo único de ese documento que cambia el
+schema.

@@ -12,6 +12,7 @@ import { TRIP_TYPES, tripAdminPath, tripTypeLabel } from "@/lib/trip-type";
 
 const STATUS_LABEL: Record<string, string> = {
   pending_review: "Pendiente",
+  needs_conversation: "Conversemos",
   approved: "Aprobada",
   rejected: "Rechazada",
   expired: "Expirada",

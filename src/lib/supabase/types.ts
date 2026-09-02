@@ -698,7 +698,12 @@ export type Database = {
         | "application_health_flag"
         | "email_failed"
         | "payment_proof"
-      application_status: "pending_review" | "approved" | "rejected" | "expired"
+      application_status:
+        | "pending_review"
+        | "needs_conversation"
+        | "approved"
+        | "rejected"
+        | "expired"
       article_category: "biblioteca" | "ciencia" | "testimonios"
       article_status: "draft" | "published"
       faq_placement: "general" | "sesiones" | "viajes"
@@ -839,7 +844,13 @@ export const Constants = {
         "email_failed",
         "payment_proof",
       ],
-      application_status: ["pending_review", "approved", "rejected", "expired"],
+      application_status: [
+        "pending_review",
+        "needs_conversation",
+        "approved",
+        "rejected",
+        "expired",
+      ],
       article_category: ["biblioteca", "ciencia", "testimonios"],
       article_status: ["draft", "published"],
       faq_placement: ["general", "sesiones", "viajes"],

@@ -4,6 +4,7 @@ import type { Enums } from "@/lib/supabase/types";
 
 const STATUS_LABEL: Record<string, string> = {
   pending_review: "Pendiente",
+  needs_conversation: "Conversemos",
   approved: "Aprobada",
   rejected: "Rechazada",
   expired: "Expirada",
@@ -11,6 +12,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_CLASS: Record<string, string> = {
   pending_review: "bg-secondary/20 text-secondary border-secondary/40",
+  needs_conversation: "bg-tertiary-container/20 text-tertiary-container border-tertiary-container/40",
   approved: "bg-primary-container/20 text-primary-fixed-dim border-primary-fixed-dim/40",
   rejected: "bg-error/20 text-error border-error/40",
   expired: "bg-outline-variant/30 text-on-surface-variant border-outline/40",
@@ -24,6 +26,7 @@ const PAYMENT_LABEL: Record<string, string> = {
 
 const FILTERS: { value: string; label: string }[] = [
   { value: "pending_review", label: "Pendientes" },
+  { value: "needs_conversation", label: "A conversar" },
   { value: "approved", label: "Aprobadas" },
   { value: "rejected", label: "Rechazadas" },
   { value: "expired", label: "Expiradas" },

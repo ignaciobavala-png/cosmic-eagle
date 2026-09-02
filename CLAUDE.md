@@ -1183,3 +1183,58 @@ Filas de prueba borradas, la tabla volvió a cero.
 **Sin verificar end-to-end** (requiere sesión de admin, la hace Ignacio): cargar
 una pregunta desde `/admin/faqs` y verla en `/faqs`, y el grupo nuevo de
 Multimedia.
+
+### Sesión del 2026-09-02 (bis) — el documento de comunicaciones y el estado "conversemos"
+
+Sofía mandó `Comunicaciones-Orden-Cronologico_1.pdf` (26/08): las **14
+comunicaciones automáticas** al viajero, ordenadas por momento del flujo, con
+asunto y copy completo. **El PDF no está en el repo** — el copy está transcripto
+entero en **`docs/COMUNICACIONES.md`**, que además trae el cruce contra lo
+implementado y los 6 pendientes de definir de ella. Es la aplicación de la regla
+que ya nos costó tres documentos: lo que mandan las clientas se transcribe el
+mismo día.
+
+Ojo con el nombre: dice "orden cronológico de la página" pero **no es la
+estructura del sitio**, es el árbol de los mails.
+
+Tenemos **5 de 14**. Lo que falta no son diez templates: son cinco piezas de
+sistema (seña y saldo, consentimiento + aprobación del formulario de salud,
+envíos programados por fecha del viaje, formulario de contacto, formulario de
+feedback). **"Tu espacio personal" aparece en seis de los catorce correos**, así
+que `/cuenta` es la ruta con más deuda de este documento — y es la que Julia no
+rediseñó.
+
+**Dos correcciones al documento**, anotadas en `docs/COMUNICACIONES.md` §5: su
+pendiente 6 dice "la web está en inglés" y es falso (está toda en español, el
+i18n no existe), y su modelo de pago con seña + saldo en cuotas **contradice lo
+que decidimos el 01/09**. Las siete preguntas de eso están en
+`docs/consulta-sofia-pagos.txt` y hay una nota cruzada en `docs/PAGOS.md` §8.
+**No se implementa nada de pagos hasta que responda**: es lo único del documento
+que cambia el schema.
+
+#### Implementado: [2A] "Conversemos" — ver `docs/COMUNICACIONES.md` §6
+
+Tercer resultado de revisión, entre aprobar y rechazar. Migraciones
+`20260902160000` (el valor del enum) y `20260902160100` (el índice), aplicadas y
+verificadas contra producción.
+
+Se eligió por barato: **no inventa flujo, le pone nombre a algo que el sistema ya
+sabía**. El trigger `notify_new_application` ya levantaba un aviso interno cuando
+el filtro traía banderas de salud, pero ese aviso moría en el panel y la persona
+quedaba en "en revisión" sin enterarse.
+
+Tres cosas que no hay que "limpiar":
+
+- **Dos migraciones y no una**: `alter type ... add value` no se puede *usar* en
+  la misma transacción en la que se agrega. Mismo caso que `payment_proof`.
+- **El índice `applications_one_active_per_trip_idx` tuvo que ampliarse** para
+  incluir el estado nuevo. Sin eso, una conversación abierta dejaba a la persona
+  mandar una segunda solicitud al mismo viaje — se duplicaría justo el caso
+  delicado. Rechazo y vencimiento siguen fuera a propósito.
+- **El correo no lleva botón y no dice qué hay que conversar.** El paso siguiente
+  es humano, y el motivo suele ser un dato de salud: mismo criterio que
+  `SolicitudRechazada`.
+
+**Sin verificar end-to-end** (requiere sesión de admin): apretar «Conversemos» y
+ver la pantalla del postulante. **El correo sigue sin salir** hasta verificar el
+dominio en Resend.

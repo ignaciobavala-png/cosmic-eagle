@@ -2,6 +2,7 @@ import Link from "next/link";
 
 const STATUS_LABEL: Record<string, string> = {
   pending_review: "En revisión",
+  needs_conversation: "Conversemos",
   approved: "Aprobada",
   rejected: "Rechazada",
   expired: "Expirada",
@@ -9,6 +10,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_CLASS: Record<string, string> = {
   pending_review: "bg-secondary/20 text-secondary border-secondary/40",
+  needs_conversation: "bg-tertiary-container/20 text-tertiary-container border-tertiary-container/40",
   approved: "bg-primary-container/20 text-primary-fixed-dim border-primary-fixed-dim/40",
   rejected: "bg-error/20 text-error border-error/40",
   expired: "bg-outline-variant/30 text-on-surface-variant border-outline/40",
@@ -33,6 +35,9 @@ type Application = {
  */
 function pendingStep(a: Application): { label: string; href?: string } {
   if (a.status === "pending_review") return { label: "Esperando revisión" };
+  // El paso siguiente de este estado no esta en la web: contesta Estela por
+  // privado (ver el correo [2A] en docs/COMUNICACIONES.md).
+  if (a.status === "needs_conversation") return { label: "Te vamos a escribir" };
   if (a.status !== "approved") return { label: "—" };
   if (a.payment_status === "pending") return { label: "Falta la seña" };
   if (a.is_first_time && !a.health_form_submitted) {

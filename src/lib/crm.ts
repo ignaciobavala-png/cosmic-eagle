@@ -128,7 +128,12 @@ export function buildContacts({
 
     const state: RelationshipState = approved
       ? "viajero"
-      : all.some((a) => a.status === "pending_review")
+      : // Una conversacion abierta es una solicitud viva: sigue siendo
+        // solicitante, no "potencial" (ver docs/COMUNICACIONES.md, correo [2A]).
+        all.some(
+            (a) =>
+              a.status === "pending_review" || a.status === "needs_conversation"
+          )
         ? "solicitante"
         : "potencial";
 

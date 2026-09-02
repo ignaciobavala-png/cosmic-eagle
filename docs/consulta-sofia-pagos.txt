@@ -1,0 +1,97 @@
+CONSULTA PARA SOFIA — EL MODELO DE PAGO (RESERVA Y SALDO)
+Fecha: 02/09/2026
+Contexto: documento "Comunicaciones al Viajero - Orden Cronologico" (26/08),
+          correos [2], [3], [3A], [3B] y [3C]
+
+*** SIN RESPONDER ***
+
+
+POR QUE PREGUNTAMOS
+-------------------
+
+El documento de comunicaciones da por hecho un modelo de pago que la web
+hoy no tiene, y que ademas contradice lo que habiamos definido la semana
+pasada. Es lo unico del documento que cambia la base de datos, asi que
+antes de escribir nada necesitamos que lo confirmen.
+
+Lo que dice el documento:
+
+  * El correo [2] "Puedes avanzar" ofrece DOS opciones:
+    reservar el cupo con {monto reserva}, o pagar el total.
+  * El correo [3A] dice que el saldo se puede pagar "de una vez o en
+    cuotas", desde el espacio personal.
+  * El saldo tiene fecha de corte: "a mas tardar 15 dias antes de la
+    experiencia".
+  * El correo [3B] recuerda el saldo antes de esa fecha.
+
+Lo que la web hace hoy:
+
+  * El viaje tiene UN precio, en dolares. La persona ve el total.
+  * Estela marca "pagado" o "sin pagar" mirando el comprobante. No hay
+    forma de registrar un pago parcial.
+  * Con tarjeta (Encuadrado) se cobra el total, no la reserva. Esa
+    decision la tomamos nosotros y la dejamos marcada como reversible,
+    justamente esperando esta definicion.
+
+O sea: el sistema hoy no distingue "reservo el cupo" de "pago todo", y
+tampoco sabe cuanto falta.
+
+
+LAS PREGUNTAS
+-------------
+
+1. LA RESERVA. Cuando una persona es aprobada, se le ofrecen de verdad
+   las dos opciones (reservar o pagar el total), o preferiran arrancar
+   cobrando el total y dejar la reserva para mas adelante?
+
+2. CUANTO ES LA RESERVA. El flyer dice 50%. Es siempre 50%, o el monto
+   de la reserva lo definen ustedes experiencia por experiencia? Nos
+   sirve saberlo porque cambia si es una cuenta automatica o un campo
+   mas que Estela carga en cada viaje.
+
+3. "DE UNA VEZ O EN CUOTAS". Cuantas cuotas? Puede mandar el monto que
+   quiera, cuando quiera, hasta completar? O son cuotas definidas por
+   ustedes?
+
+   (Si es monto libre es mas simple de construir: cada transferencia es
+   un comprobante mas y el sistema va restando. Solo necesitamos que
+   Estela anote cuanto entro en cada una.)
+
+4. LOS 15 DIAS. Vale para todo, o solo para los Viajes? En una Sesion de
+   un dia, si alguien reserva a 10 dias de la fecha, que pasa: no puede
+   reservar y tiene que pagar todo, o el corte se acomoda?
+
+5. QUE PASA SI NO PAGA EL SALDO. Llega la fecha limite con saldo
+   pendiente y la persona no responde. Se libera el cupo? Se le
+   devuelve lo que pago? Lo decide Estela caso por caso? El correo [3B]
+   dice "siempre hay manera de acomodarlo", asi que suponemos que no hay
+   nada automatico, pero necesitamos saber si el sistema tiene que
+   avisarle a Estela cuando eso ocurre.
+
+6. LA TARJETA. Encuadrado cobra el monto que uno le ponga al servicio.
+   Quieren que se pueda pagar la reserva con tarjeta tambien, o la
+   tarjeta es siempre por el total y la reserva es siempre
+   transferencia?
+
+7. EL SALDO, POR DONDE. El correo [3A] dice "puedes hacerlo desde tu
+   espacio personal". Entendemos que el saldo se paga igual que la
+   reserva: transferencia + comprobante que Estela confirma. Confirman?
+
+
+LO QUE NO PREGUNTAMOS PORQUE YA ESTA DECIDIDO
+---------------------------------------------
+
+  * El precio de cada experiencia esta fijado en dolares. Los medios de
+    cobro en otras monedas aclaran "el equivalente del dia".
+  * Estela confirma cada pago a mano, mirando el comprobante. Eso no
+    cambia con nada de lo de arriba.
+
+
+DE PASO, UNA CORRECCION AL DOCUMENTO
+------------------------------------
+
+El pendiente 6 del documento dice: "la web esta en ingles y estos textos
+en espanol". No es asi: la web esta enteramente en espanol. La version
+en ingles esta planificada pero todavia no existe. Cuando exista, el
+idioma del correo va a salir del idioma de la cuenta de cada persona, no
+del texto.

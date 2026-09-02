@@ -39,6 +39,17 @@ function nextStep(
     };
   }
 
+  // Ni aprobada ni rechazada: hay algo que Estela quiere mirar con la persona
+  // antes de decidir (correo [2A], docs/COMUNICACIONES.md). Es el único estado
+  // cuyo paso siguiente no ocurre en la web, así que no lleva CTA — y no dice
+  // qué hay que conversar: puede ser un dato de salud del filtro.
+  if (app.status === "needs_conversation") {
+    return {
+      title: "Nos gustaría conversar contigo",
+      body: "Hay algunos aspectos de lo que nos contaste que preferimos mirar juntos, con calma. Esto no significa que no puedas participar: te vamos a escribir para coordinar, y también podés responder el correo que te mandamos.",
+    };
+  }
+
   if (app.status !== "approved") {
     return {
       title: "Tu solicitud está en revisión",
