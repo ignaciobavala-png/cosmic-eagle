@@ -277,6 +277,18 @@
 
 html {
   scroll-behavior: smooth;
+  /* El navbar es una banda OPACA y fija (desde el 20/08), asi que un anclaje
+     —`#sesiones` y `#viajes` del desplegable, el "Leer" de cada hero— dejaba el
+     arranque de la seccion 84px debajo de el. `scroll-padding-top` corre el
+     destino de cualquier scroll hacia un ancla; va con la misma altura que el
+     `pt-16 lg:pt-21` que llevan todos los `main`. */
+  scroll-padding-top: 4rem;
+}
+
+@media (min-width: 1024px) {
+  html {
+    scroll-padding-top: 5.25rem;
+  }
 }
 
 /* El `background` en `html` corta la propagacion del fondo de `body` al canvas.

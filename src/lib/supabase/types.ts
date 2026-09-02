@@ -261,6 +261,42 @@ export type Database = {
           },
         ]
       }
+      faqs: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          is_published: boolean
+          placement: Database["public"]["Enums"]["faq_placement"]
+          question: string
+          sort_order: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          placement: Database["public"]["Enums"]["faq_placement"]
+          question: string
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          placement?: Database["public"]["Enums"]["faq_placement"]
+          question?: string
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       health_form_first_time: {
         Row: {
           age: number
@@ -665,6 +701,7 @@ export type Database = {
       application_status: "pending_review" | "approved" | "rejected" | "expired"
       article_category: "biblioteca" | "ciencia" | "testimonios"
       article_status: "draft" | "published"
+      faq_placement: "general" | "sesiones" | "viajes"
       payment_status: "pending" | "paid" | "waived"
       testimonial_placement: "home" | "sesiones" | "viajes"
       trip_status: "draft" | "open" | "closed" | "completed"
@@ -805,6 +842,7 @@ export const Constants = {
       application_status: ["pending_review", "approved", "rejected", "expired"],
       article_category: ["biblioteca", "ciencia", "testimonios"],
       article_status: ["draft", "published"],
+      faq_placement: ["general", "sesiones", "viajes"],
       trip_status: ["draft", "open", "closed", "completed"],
       trip_type: ["retiro", "ceremonia"],
     },

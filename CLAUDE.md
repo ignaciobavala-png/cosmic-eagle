@@ -66,6 +66,7 @@ src/
 │   ├── contenidos/
 │   │   ├── page.tsx                  # hub: hero + filtro por categoria + grilla de articles
 │   │   └── [slug]/page.tsx           # detalle publico del articulo
+│   ├── faqs/page.tsx                 # preguntas frecuentes (tabla `faqs`, vacia hasta que carguen el texto)
 │   ├── api/keep-alive/route.ts       # ping a `trips`, cron diario via vercel.json
 │   ├── viajes/
 │   │   ├── page.tsx                  # P1 + grilla P4 + P6, conectado a `trips` real
@@ -93,6 +94,7 @@ src/
 │       ├── ceremonias/               # listado de trips type=ceremonia (idem)
 │       ├── viajes/                   # CRUD de trips (form + actions). page.tsx redirige a /admin/retiros
 │       ├── contenidos/               # CRUD de articles (form + actions), portada a site-assets
+│       ├── faqs/                     # CRUD de faqs (tres bloques: general / sesiones / viajes)
 │       ├── suscriptores/             # lista del newsletter (solo lectura + copiar)
 │       └── solicitudes/              # revision + registro del pago a mano
 │           ├── page.tsx              # listado unico (ya no hay dos tablas)
@@ -141,6 +143,7 @@ public/
 └── img/                        # assets de Julia convertidos a WebP (11.4 MB -> 267 KB)
 docs/
 ├── CONTENIDOS.md               # Articulos editables: /admin/contenidos -> /contenidos
+├── FAQS.md                     # /faqs editable + el texto de Sofia que se perdio
 ├── EMAIL.md                    # Resend: mails que dispara la app (NO los de auth)
 ├── AUTH_EMAIL.md               # Mails de Supabase Auth (reset de clave)
 ├── consulta-sofia-acceso.txt   # Consulta pendiente sobre el "codigo de acceso"
@@ -361,8 +364,9 @@ más importante que entró hasta ahora. Traducción de nombres:
 | Viajes Cósmicos (1 semana) | `type = retiro` |
 
 Trae en anexos los **textos completos de FAQs** (dos juegos, uno por tipo) y de
-**Privacidad y Confidencialidad**. Eso ya **no hay que pedirlo** — sacarlo de la
-lista de "contenido que falta" de `docs/CONTENT_MAP.md`.
+**Privacidad y Confidencialidad**. ~~Eso ya no hay que pedirlo~~ — **CORREGIDO el
+02/09: el archivo se perdió** (vivía en `~/Descargas`, que quedó vacía, y nunca
+se copió al repo). Hay que pedirlo de nuevo. Ver `docs/FAQS.md` §2.
 
 **Ojo con el nombre "Viajes"**: hoy `/viajes` es el paraguas de los dos tipos. En
 el vocabulario de Sofía, "Viaje Cósmico" nombra **solo al retiro**. Si se adopta su
@@ -1113,3 +1117,69 @@ internacional que motivó todo esto.
 - No crear rutas de API que asuman backend
 - No modificar los textos legales del consentimiento (son de la clienta)
 - No cambiar el flujo de aprobacion sin consultar (ver docs/CONTEXT.md:6)
+
+
+### Sesión del 2026-09-02 — el precio en dólares y las FAQs editables
+
+Dos cosas, las dos en la rama `cobros` (que sigue **sin pushear**: `main` está en
+`066bfdd`, igual que producción).
+
+#### 1. El precio de cada viaje está fijado en USD
+
+Punto 6 de las ocho preguntas de cobros, respondido por Ignacio: es una decisión
+de producto, no un dato de Sofía. Detalle en `docs/PAGOS.md` §7.
+
+- **Sin migración.** La moneda que varía es la del **riel**, y esa ya vive en
+  `payment_methods.currency`. Una columna `currency` en `trips` sería una
+  constante guardada siete veces.
+- `formatAmount` se mudó de `payments.ts` a **`src/lib/format.ts`** y ahora
+  imprime `USD 900`. Es la **única** función que escribe un precio: antes el
+  `USD` estaba a mano en `TripsList` y en las dos vistas del detalle, y la
+  pantalla del postulante lo omitía a propósito (hedge de la indefinición).
+- Un riel con moneda distinta de USD aclara **"· el equivalente del día"**.
+- El documento para Sofía pasó de 8 preguntas a **4** (`~/Escritorio/cosmic-eagle-cobros-requerimientos.txt`).
+  De las que salieron, la de la seña la decidí sola y está marcada como
+  reversible: **por Encuadrado se cobra el total**, la seña sigue siendo
+  transferencia con comprobante.
+
+#### 2. `/faqs`, editable desde el panel — ver `docs/FAQS.md`
+
+Migración `20260902140000_faqs.sql`: tabla `faqs` + enum `faq_placement`
+(general / sesiones / viajes), panel en `/admin/faqs`, página pública `/faqs`
+con acordeón `<details>` nativo, y hero editable desde Multimedia (grupo nuevo
+"Preguntas frecuentes"). Mismo patrón que `articles` y `testimonials`.
+
+**Ojo, dos cosas que no hay que "arreglar":**
+
+- **La tabla sale VACÍA a propósito.** El texto es de la clienta: Sofía escribió
+  los dos juegos en los anexos de `web-cosmic-journey-ES.md`, pero **ese archivo
+  se perdió** — vivía en `~/Descargas` (hoy vacía) y nunca se copió al repo. Con
+  él se fue también el anexo de **Privacidad**, que era lo que iba a llenar
+  `/privacidad`. Es la segunda vez que pasa: los tres HTML de Julia
+  desaparecieron igual. **Lo que mandan las clientas se copia al repo.**
+- **El `Reveal` de esta página NO observa la sección**, a diferencia del resto
+  del sitio. El ratio de intersección máximo alcanzable es *alto de pantalla /
+  alto del observado*, y acá **el alto lo decide la clienta**: con suficientes
+  preguntas la sección nunca llega al umbral y, con `once`, no aparece nunca. Se
+  observa sólo el encabezado (alto fijo) y la lista queda visible desde el
+  arranque. Medido: encabezado 18,35 de ratio máximo contra 1,03 de la sección.
+
+**De paso, un bug de todo el sitio**: desde que el navbar es opaco (20/08),
+cualquier anclaje dejaba la sección 84px debajo de él — incluidos `#sesiones` y
+`#viajes` del desplegable, que son la navegación principal a Experiencias.
+Arreglado con `scroll-padding-top` en `html`. Verificado en el browser: el top de
+`#sesiones` pasó de 0 a 84.
+
+Verificado: `tsc`, lint (los 2 errores de `multimedia/SlotEditor.tsx` son
+previos), build de producción (`/faqs` queda `○` con ISR de 1h), la RLS probada
+con `set role` sobre la base real —`anon` y un no admin ven sólo lo publicado y
+no escriben; el admin ve lo oculto, escribe, y el trigger sella el autor; el
+grant por columna bloquea tocar `updated_by`—, advisors sin novedades, y la
+página medida en Chrome real a 1440×900 y 390×844: los encabezados van de
+opacidad 0 a 1 al llegar, el acordeón abre (64 → 260px) con los dos párrafos, la
+pregunta despublicada no está en el DOM, y el estado vacío rinde el aviso.
+Filas de prueba borradas, la tabla volvió a cero.
+
+**Sin verificar end-to-end** (requiere sesión de admin, la hace Ignacio): cargar
+una pregunta desde `/admin/faqs` y verla en `/faqs`, y el grupo nuevo de
+Multimedia.

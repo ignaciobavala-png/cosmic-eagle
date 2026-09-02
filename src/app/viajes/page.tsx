@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -278,7 +279,14 @@ export default async function ViajesPage() {
               <p>
                 Para información sobre preparación, qué llevar, integración,
                 dosis, miedo y ansiedad, y otros aspectos prácticos, por favor
-                visita nuestras FAQs.
+                visita nuestras{" "}
+                <Link
+                  href="/faqs"
+                  className="font-medium text-on-primary-container underline underline-offset-4"
+                >
+                  preguntas frecuentes
+                </Link>
+                .
               </p>
               </RevealItem>
             </div>
