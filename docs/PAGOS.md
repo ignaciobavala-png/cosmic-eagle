@@ -232,3 +232,53 @@ Detalle completo del modelo en `docs/COMUNICACIONES.md` §7. Lo esencial:
 `deposit_paid` en el medio. El saldo es una resta, no una columna.
 
 **Sigue sin existir el plazo de los 15 días** y ninguna pantalla lo nombra.
+
+## 10. El link de pago por viaje (02/09/2026)
+
+Migración `20260902200000_trip_payment_url.sql`. Es el camino 2 de
+`docs/ENCUADRADO.md` §9: la API de Encuadrado no crea servicios, así que la URL
+se pega a mano, una vez por viaje.
+
+- **`trips.payment_url` y no `payment_methods.link_url`.** El riel es UNO para
+  todo el sitio y este link lleva el precio de UN viaje adentro: cargado allá,
+  todos los viajes cobrarían el importe del primero. Por eso además se borró el
+  riel sembrado "Pago con tarjeta", que ya no tiene sentido como riel global.
+- **CHECK de `https://` en la base y la misma validación en el server action.**
+  El valor termina en el `href` de un botón: un `javascript:` ahí sería un XSS.
+  La validación del action existe para que el error se lea en el formulario y no
+  como un fallo de Postgres.
+- **Sin grants nuevos.** `trips` tiene los permisos a nivel tabla, así que la
+  columna los hereda. Queda legible por `anon` y está bien: el link de Encuadrado
+  es una URL pública y compartible por diseño —ella misma la manda por WhatsApp—.
+  Lo que evita que alguien pague sin estar aprobado no es el secreto de la URL
+  sino **dónde se la muestra**: el botón vive sólo en la pantalla del aprobado,
+  nunca en la página pública del viaje.
+- **El botón va primero y aparte de la lista de rieles**: es el único que cobra
+  solo; los otros dos son transferencia con comprobante. Sin link, el bloque no
+  se dibuja y quedan las transferencias de siempre.
+- **Subir el comprobante se pide igual**, incluso pagando con tarjeta:
+  Encuadrado no tiene webhooks, no nos avisa nada, y quien confirma sigue siendo
+  Estela.
+- **El mail de aprobación no cambió.** Su CTA ya apunta a
+  `/viajes/{id}/solicitar`, que es donde vive el botón: una sola pantalla decide
+  cómo se paga.
+
+### Rieles cargados el 02/09
+
+| Orden | Riel | Moneda | Activo |
+|---|---|---|---|
+| 1 | Transferencia bancaria en euros (Santander España) | EUR | sí |
+| 2 | Transferencia a Mercado Pago (Chile) | CLP | sí |
+
+Los números están en `~/Escritorio/account/cosmic-eagle-cobros.txt`, **fuera del
+repo**. Ignacio los repitió el 02/09 y coinciden exactos con los que Sofía había
+mandado el 28/08. Antes de esto el bloque de pago decía "te vamos a escribir con
+los datos": ahora un aprobado ve los dos rieles de verdad.
+
+El link real de la Ceremonia en Buenos Aires (5-6/09, USD 350) quedó cargado en
+su viaje, que es el mismo que cobra el link de Sofía.
+
+**Ojo con el nombre**: en Encuadrado ese servicio se llama "Viaje Cósmico /
+Buenos Aires", pero dura dos días y en nuestra base es una `ceremonia`. Con la
+nomenclatura de Julia (Sesión = un día, Viaje = una semana) tampoco cierra. No
+bloquea nada, pero conviene alinearlo antes de cargar los seis links que faltan.

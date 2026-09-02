@@ -117,7 +117,7 @@ export default async function SolicitarPage({
   const { data: trip } = await supabase
     .from("trips")
     .select(
-      "id, title, location, start_date, end_date, status, price, deposit_amount"
+      "id, title, location, start_date, end_date, status, price, deposit_amount, payment_url"
     )
     .eq("id", id)
     .single();
@@ -239,11 +239,50 @@ export default async function SolicitarPage({
                 </div>
               )}
 
+              {/* El pago con tarjeta va PRIMERO y aparte de la lista: es el
+                  unico riel que cobra solo, los demas son transferencia con
+                  comprobante. El link es de Encuadrado y lo carga el admin en
+                  el viaje; sin link, este bloque no existe y quedan las
+                  transferencias de siempre.
+
+                  `noopener noreferrer` no es ceremonia: la pestana nueva podria
+                  tocar `window.opener` sin eso. */}
+              {trip.payment_url && (
+                <div className="mb-6 rounded-xl border border-primary-fixed-dim/40 bg-primary-container/10 p-5">
+                  <p className="font-medium text-primary-fixed-dim">
+                    Pagar con tarjeta
+                  </p>
+                  <p className="mt-0.5 text-sm text-on-surface-variant">
+                    Desde cualquier país, en dólares o pesos chilenos. Lo cobra
+                    Encuadrado y puede tener un recargo por comisión.
+                  </p>
+                  <a
+                    href={trip.payment_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-block rounded-lg bg-primary-container px-5 py-2.5 text-sm font-medium tracking-[0.05em] text-on-primary transition-colors hover:bg-primary-fixed"
+                  >
+                    Ir a pagar
+                  </a>
+                  {/* Encuadrado no nos avisa que el pago entro: no tiene
+                      webhooks. Asi que el comprobante se pide igual, y quien
+                      confirma sigue siendo Estela. */}
+                  <p className="mt-3 text-sm text-on-surface-variant">
+                    Cuando termines, subinos el comprobante acá abajo así lo
+                    confirmamos.
+                  </p>
+                </div>
+              )}
+
+              {/* Sin rieles Y sin link no hay nada que mostrar, asi que se
+                  avisa. Con link alcanza: el boton de arriba ya es el camino. */}
               {paymentMethods.length === 0 ? (
-                <p className="text-on-surface-variant">
-                  Te vamos a escribir con los datos para hacer el pago. Cuando lo
-                  hagas, podés enviarnos el comprobante desde acá.
-                </p>
+                trip.payment_url ? null : (
+                  <p className="text-on-surface-variant">
+                    Te vamos a escribir con los datos para hacer el pago. Cuando
+                    lo hagas, podés enviarnos el comprobante desde acá.
+                  </p>
+                )
               ) : (
                 <ul className="space-y-5">
                   {paymentMethods.map((method) => (

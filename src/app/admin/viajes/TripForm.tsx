@@ -233,6 +233,30 @@ export function TripForm({
         </div>
       </div>
 
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="payment_url" className={labelClass}>
+          Link de pago con tarjeta
+        </label>
+        <input
+          id="payment_url"
+          name="payment_url"
+          type="url"
+          inputMode="url"
+          defaultValue={trip?.payment_url ?? ""}
+          placeholder="https://encuadrado.com/s/..."
+          className={inputClass}
+        />
+        {/* La URL se pega a mano porque la API de Encuadrado no crea servicios:
+            tiene dos endpoints y los dos piden un `service_uuid` que ya exista
+            (ver docs/ENCUADRADO.md §8). Es UN link por viaje —lleva el precio
+            adentro— y por eso vive acá y no en el riel global de /admin/pagos. */}
+        <p className="text-xs text-on-surface-variant">
+          Pegá acá el link del viaje en Encuadrado. Sólo lo ve quien ya fue
+          aprobado, junto a los datos de transferencia. Dejalo vacío si este
+          viaje se cobra sólo por transferencia.
+        </p>
+      </div>
+
       <ScheduleEditor
         defaultValue={parseSchedule(trip?.schedule)}
         type={type}

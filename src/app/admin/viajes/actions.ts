@@ -47,6 +47,7 @@ function parseTripForm(formData: FormData) {
   const status = formData.get("status");
   const type = formData.get("type");
   const terms = formData.get("terms");
+  const paymentUrl = formData.get("payment_url");
   const schedule = parseScheduleField(formData.get("schedule"));
 
   if (
@@ -87,6 +88,22 @@ function parseTripForm(formData: FormData) {
     } as const;
   }
 
+  // El link de pago se pega desde Encuadrado, asi que llega tipeado a mano.
+  // Se exige `https://` y no solo "que parezca una URL": este valor termina en
+  // el `href` de un boton, y un `javascript:` ahi seria un XSS. La base tiene el
+  // mismo CHECK; esto existe para que el error se lea en el formulario.
+  const paymentUrlValue =
+    typeof paymentUrl === "string" && paymentUrl.trim()
+      ? paymentUrl.trim()
+      : null;
+
+  if (paymentUrlValue !== null && !/^https:\/\/[^\s]+$/.test(paymentUrlValue)) {
+    return {
+      error: "El link de pago tiene que empezar con https://",
+      data: null,
+    } as const;
+  }
+
   return {
     error: null,
     data: {
@@ -107,6 +124,7 @@ function parseTripForm(formData: FormData) {
       status: status as Enums<"trip_status">,
       type,
       terms: typeof terms === "string" && terms.trim() ? terms.trim() : null,
+      payment_url: paymentUrlValue,
       schedule,
     },
   } as const;

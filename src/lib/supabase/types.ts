@@ -598,6 +598,7 @@ export type Database = {
           id: string
           image_url: string | null
           location: string | null
+          payment_url: string | null
           price: number
           schedule: Json
           start_date: string
@@ -615,6 +616,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           location?: string | null
+          payment_url?: string | null
           price?: number
           schedule?: Json
           start_date: string
@@ -632,6 +634,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           location?: string | null
+          payment_url?: string | null
           price?: number
           schedule?: Json
           start_date?: string

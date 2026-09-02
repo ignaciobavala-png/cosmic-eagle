@@ -184,3 +184,106 @@ Dos cosas que **no** se caen con esta corrección:
 
 El plan de la integración y la lista completa de lo que hace falta para
 arrancarla están en `~/Escritorio/cosmic-eagle-cobros-requerimientos.txt`.
+
+## 8. Corrección del 02/09: no es una reserva, es un LINK DE PAGO
+
+Sofía mandó el link que usa hoy y Ignacio sacó las tres capturas del recorrido
+(`docs/entregas/pagos-2026-09-02/`):
+
+    https://encuadrado.com/s/estela-gala/viaje-cosmico-buenos-aires-septiembre-2026?from=app
+
+**Todo este documento estaba analizando el producto equivocado.** Los §1 a §4
+describen la API de *agenda* (`available-time-slots` + `bookings`), y de ahí
+salían los cuatro choques del §3: el orden incompatible, los slots que no
+aplican, el cupo duplicado y el modelo chileno. Lo que Estela usa no es eso: es
+un **link de pago suelto**, uno por viaje, sin agenda ni horarios. La página
+tiene un botón "Pagar" y nada más.
+
+El recorrido real, en dos pasos:
+
+1. **Datos**: nombre y apellidos, correo, celular con código de país, y el tilde
+   de términos de Encuadrado. **No pide RUT. No pide comuna ni región.**
+2. **Pago**, con selector de moneda arriba:
+   - **USD** → Stripe, tarjeta de crédito o débito (Visa, Mastercard, Amex,
+     Discover). Es el checkout internacional.
+   - **CLP** → Apple Pay, transferencia bancaria o tarjeta.
+
+El precio se muestra en las dos monedas a la vez (`$ 350.000 CLP ($ 350.00 USD)`).
+
+### Qué se cae y qué queda en pie
+
+- **Se cae la pregunta 5 de §5, que era la bloqueante.** Era "¿emite boleta
+  electrónica?, porque entonces `POST /bookings` exige RUT y comuna y se rompe
+  justo el caso internacional". El formulario real no los pide: **el viajero de
+  Tulum puede pagar.**
+- **Se cae la necesidad de la API entera.** No hace falta `service_uuid`, ni la
+  `ENCUADRADO_API_KEY`, ni registrar el dominio para el `redirect_url`, ni el
+  `POST /bookings` del §4. El link ya existe y lo genera Estela desde su panel.
+  La integración pasa de "un par de horas de código server-side con una key
+  secreta" a **pegar una URL**.
+- **Sigue en pie que no hay webhook**, y sigue sin importar: Estela confirma
+  mirando el comprobante (§7).
+- **Sigue en pie el cupo duplicado**, y ahora es lo único delicado: el link es
+  público y no sabe de aprobaciones. Alguien con la URL puede pagar sin haber
+  sido aprobado. No es plata perdida —se le devuelve o se le corre a otra
+  fecha— pero conviene que Estela lo sepa, y es un argumento para no publicar
+  el link en la página del viaje sino sólo en la pantalla del aprobado, que es
+  donde ya vive el bloque de pago.
+
+### Lo que falta para cablearlo
+
+**El link es por viaje**, y `payment_methods.link_url` es global: si se carga
+ahí, todos los viajes cobrarían el precio del viaje de Buenos Aires. Hace falta
+una columna **`trips.payment_url`**, cargada desde el form del admin, y que el
+bloque "Cómo pagar" de `/viajes/[id]/solicitar` dibuje ese botón arriba de los
+rieles de transferencia. Es una migración chica y un campo de texto.
+
+### Estado de los rieles (cargados el 02/09)
+
+| Orden | Riel | Moneda | Activo |
+|---|---|---|---|
+| 1 | Transferencia bancaria en euros (Santander España) | EUR | sí |
+| 2 | Transferencia a Mercado Pago (Chile) | CLP | sí |
+| 3 | Pago con tarjeta (Encuadrado) | USD | **no**, espera `trips.payment_url` |
+
+Los números salen de `~/Escritorio/account/cosmic-eagle-cobros.txt`, **fuera del
+repo**. Ignacio los repitió el 02/09 y coinciden exactos con los que Sofía había
+mandado el 28/08.
+
+## 9. ¿Se puede crear el viaje en Encuadrado desde nuestro panel? NO
+
+Sofía preguntó el 02/09 si, en vez de crear el servicio en Encuadrado y pegar el
+link acá, se puede crear todo desde nuestro panel por API. Verificado contra el
+spec en vivo el mismo día (sigue idéntico al del 29/08):
+
+```
+GET  /services/{service_uuid}/available-time-slots
+POST /services/{service_uuid}/bookings
+```
+
+**No hay endpoint para crear un servicio, ni para listarlos, ni para editarlos.**
+Los dos endpoints reciben un `service_uuid` que ya tiene que existir, y
+`BookingData` —sus 25 campos— **no tiene ninguno de monto**: el precio vive en el
+servicio y el servicio sólo se crea a mano en su panel. No es difícil: no existe
+la puerta.
+
+Tres caminos, en el orden en que se decidieron:
+
+1. **Pedírselo a Encuadrado.** El propio spec invita
+   (`soporte@encuadrado.com`) y la API se llama "para partners". Cuesta un mail y
+   no se puede planificar contra la respuesta. **Sin hacer.**
+2. **Bajar la fricción**: un campo "link de pago" en el viaje, que ella pega una
+   vez por viaje (son ~7 al año). **HECHO el 02/09**, ver `docs/PAGOS.md` §10.
+3. **Ir directo a Stripe.** Sale de la captura `2-pago-usd.png`: cuando se paga
+   en dólares, Encuadrado **dice literalmente "Stripe"**. No es una pasarela
+   propia, es un revendedor con comisión encima. Yendo directo, Sofía obtiene lo
+   que pidió —el checkout se genera solo desde nuestro panel, con el precio que
+   cargó, sin tocar otra plataforma— más **webhooks**, o sea que el pago se
+   confirmaría solo y Estela dejaría de revisar comprobantes a mano.
+   **Descartado por ahora** (Ignacio, 02/09: "hagamos la 2 ahora nada más").
+   Si se retoma, lo que hay que averiguar primero es si Estela puede darse de
+   alta en Stripe Chile con su entidad, y qué pierde de Encuadrado —agenda y
+   boleta— que hoy usa para su otro trabajo.
+
+El campo `trips.payment_url` no se tira si algún día se va a Stripe: guarda una
+URL de checkout, sea de quien sea.
