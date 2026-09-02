@@ -131,6 +131,34 @@ test("los anclajes no caen debajo del navbar", async ({ page }) => {
   }
 });
 
+/**
+ * El indicador de scroll de cada hero tiene que entrar en la pantalla sin
+ * scrollear. Es el primer reclamo de la entrega de Julia del 1/9: el hero medía
+ * `100svh` DENTRO de un `main` que ya esquiva el navbar con `pt-16 lg:pt-21`,
+ * asi que terminaba una banda entera debajo del pliegue y se llevaba puesto el
+ * "Descubrir" (medido en produccion: 44px afuera en 1440x900, 24px en 390x844).
+ *
+ * Se mide el indicador y no el alto del hero a proposito: lo que importa es que
+ * se vea, no cuanto mide la seccion.
+ */
+for (const ruta of ["/", "/nosotros", "/viajes", "/contenidos", "/faqs"]) {
+  test(`${ruta}: el indicador de scroll del hero entra en pantalla`, async ({ page }) => {
+    await page.goto(ruta);
+    await page.waitForLoadState("load");
+
+    const hint = page.locator("main > section a[href^='#']").first();
+    await expect(hint).toBeVisible();
+
+    const { bottom, alto } = await page.evaluate(() => {
+      const el = document.querySelector("main > section a[href^='#']")!;
+      return { bottom: el.getBoundingClientRect().bottom, alto: window.innerHeight };
+    });
+
+    expect(Math.round(bottom), `el indicador de ${ruta} cae debajo del pliegue`)
+      .toBeLessThanOrEqual(alto);
+  });
+}
+
 test("/faqs: el acordeón abre y cierra", async ({ page }) => {
   await page.goto("/faqs");
 

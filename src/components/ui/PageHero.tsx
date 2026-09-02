@@ -39,8 +39,10 @@ export function PageHero({
   /**
    * `banner` es el hero historico (82% del alto, con el pie desvanecido sobre
    * el fondo de la pagina). `full` es el del rediseño de Julia: ocupa la
-   * pantalla entera y corta seco, porque debajo arranca una seccion opaca con
-   * su propio fondo y no hay degrade del `body` que dejar ver.
+   * pantalla VISIBLE (una pantalla menos el navbar) y corta seco, porque debajo
+   * arranca una seccion opaca con su propio fondo y no hay degrade del `body`
+   * que dejar ver. Sin `min-h`: un piso en `rem` volveria a empujar el
+   * indicador debajo del pliegue en una pantalla baja.
    */
   height?: "banner" | "full";
 }) {
@@ -48,11 +50,23 @@ export function PageHero({
   return (
     // `svh` en mobile a proposito: con `vh` la barra del browser queda fuera de
     // la cuenta y el hint de scroll cae debajo del pliegue visible.
+    //
+    // Y se le RESTA el alto del navbar. La banda es opaca y fija, y todos los
+    // `main` la esquivan con `pt-16 lg:pt-21`, asi que una seccion de `100svh`
+    // adentro de ese `main` mide una pantalla ENTERA empezando debajo del
+    // navbar: termina 84px mas abajo del pliegue y se lleva puesto el indicador
+    // de scroll, que va anclado al pie. Es el primer reclamo de la entrega de
+    // Julia del 1/9 ("el banner hero era mas grande que la screen y el
+    // indicador con el texto 'descubrir' quedaba no visible").
+    //
+    // El `banner` no se pasa de alto, pero en una pantalla ancha y baja su tope
+    // en `rem` si podia comerse el indicador: por eso el `max-h` tambien se
+    // mide contra el pliegue.
     <section
       className={
         full
-          ? "relative h-[100svh] min-h-[34rem] w-full overflow-hidden"
-          : "relative min-h-[30rem] h-[82svh] max-h-[52rem] w-full overflow-hidden md:min-h-[36rem] md:h-[82vh]"
+          ? "relative h-[calc(100svh-var(--navbar-h))] w-full overflow-hidden"
+          : "relative min-h-[30rem] h-[82svh] max-h-[min(52rem,calc(100svh-var(--navbar-h)))] w-full overflow-hidden md:min-h-[36rem] md:h-[82vh]"
       }
     >
       {/* La foto y sus tintes van juntos dentro de un grupo enmascarado: el borde

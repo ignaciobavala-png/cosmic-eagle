@@ -1,0 +1,28 @@
+﻿prestar atencion al tamaño de las screens.
+en la versión anterior subida el banner hero era más grande que la screen y el indicador de scroll con el texto “descubrir” quedaba no visible . prestarle atención a esto en todas las screens ya que la mayoría tienen indicador de scroll
+
+
+todos los banners (de imagen o video) son placeholders que se rellenan desde el panel de control.
+todos los banners (de imagen o video) pueden tener textos agregados desde el panel de control. Estos cuadros de texto deben tener la opcion de quedar vacíos (no deben ser obligatorios).
+Agregar elección de tamaño de fuente de texto en el panel de control para cada caja de texto.
+
+
+el boton “explorar experiencias” que aparece animado por scroll en la seccion about al ser presionado abre el carrusel con tarjetas de experiencias. este carrusel dorado ocupa todo el ancho de la página (responsive). este carrusel es autoplay infinito hacia la izquierda y muestra en tarjetas todas las experiencias (sesiones y viajes) que fueron cargadas desde el panel de control. por hover de mouse o tap de celular se detiene la animacion y la tarjeta seleccionada se anima). al hacer click, el usuario logueado es dirigido a la página de esa experiencia. si el usuario no está logueado le aparece un cartel para que inicie sesion (este cartel está en proceso de diseño).
+
+el boton “ir mas profundo” de la seccion “nuestro proposito” en la homepage dirige al usuario a la página “nosotros”
+
+
+el boton “explorar sesiones” lleva al usuario a la seccion “sesiones cósmicas” de la página “experiencias”
+
+
+el boton “ir más alla” lleva al usuario a la seccion “viajes cósmicos” de la página “experiencias”
+
+
+seccion testimonios:
+las 9 tarjetas de testimonios están posicionadas en un carrusel de deslizamiento manual por usuario. los textos de los 9 testimonios son personalizables desde el panel de control.
+
+
+seccion tecnología del alma
+
+
+el boton “ir mas profundo” que se encuentra en esta sección dirige al usuario a la página contenidos.

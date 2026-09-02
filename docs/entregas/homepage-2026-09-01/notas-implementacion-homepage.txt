@@ -1,0 +1,127 @@
+NOTAS DE IMPLEMENTACIÓN — homepage.html (Cosmic Eagle)
+Para el agente de desarrollo (Claude) que porta este mockup a la app real Next.js/React/Tailwind/Supabase.
+Escrito por el Claude que diseñó/mockupeó el sitio junto con Julia (la clienta/diseñadora). Este
+archivo es contexto de PROCESO y DECISIONES — el detalle técnico de valores exactos (colores,
+tamaños, animaciones) está en el archivo adjunto "design-system-homepage.md", léanlo junto a este.
+
+QUÉ ES ESTE ARCHIVO
+homepage.html es un mockup estático (HTML+CSS+JS vanilla, un solo archivo autocontenido, sin
+build ni dependencias) que representa el diseño ya APROBADO por Julia para la home del sitio. No
+es código para copiar y pegar tal cual en el repo real — es la referencia visual/funcional exacta
+contra la cual comparar la implementación en React, para que no haya discrepancias entre "lo que
+Julia aprobó" y "lo que carga en producción". Cada valor de color, tipografía, tamaño, spacing,
+timing de animación y comportamiento interactivo que aparece en el HTML es intencional, ya
+revisado con la clienta — no hay nada "de relleno" salvo lo marcado explícitamente como
+placeholder (ver más abajo).
+
+CONTEXTO DEL PROYECTO Y DE ESTA ENTREGA
+Este es el resultado de varias rondas de correcciones de Julia sobre la home, la última tanda
+aplicada el 1/9/2026 (tres rondas de correcciones puntuales post-reunión de cliente). Las páginas
+Nosotros, Experiencias, Login y Registro ya fueron aprobadas y entregadas en rondas anteriores;
+Contenidos está en desarrollo (primera entrega solo mobile). Esta es la PRIMERA vez que se arma un
+paquete de entrega formal para el desarrollador sobre homepage.html — hasta ahora solo se venía
+mandando el HTML solo, sin specs adicionales, porque el diseño todavía podía cambiar. Julia pidió
+ahora explícitamente este paquete para evitar que se repitan discrepancias que ya aparecieron
+antes con Nosotros/Experiencias (ver "PROBLEMAS YA CONOCIDOS" más abajo).
+
+QUÉ HAY EN ESTE PAQUETE
+1. homepage.html — el mockup aprobado, tal cual, autocontenido (fuentes de Google Fonts vía CDN,
+   logo embebido en base64 para que el archivo sea visualizable standalone en un navegador).
+2. design-system-homepage.md — spec técnica completa: tokens de color, tipografía, breakpoint
+   único (768px), estructura de secciones en orden, spec detallada por componente, y una tabla
+   completa de animaciones (trigger, duración, easing, delay, si es reversible o no).
+3. cosmic-eagle-logo.png — el logo real (914x267px, PNG con transparencia) extraído del base64
+   embebido en el HTML, para que lo tengan como asset real en vez de tener que extraerlo ustedes
+   del código (ya vimos que tienen su propia convención de extraer imágenes de prueba embebidas a
+   archivos reales — por ejemplo lo hicieron con la imagen de login/register — así que les
+   ahorramos ese paso acá).
+4. Este archivo.
+
+QUÉ NO ESTÁ EN ESTE PAQUETE (dependencias externas, no resueltas por nosotros)
+- El video del Hero (5 seg, MP4) — Julia lo va a proveer directamente, no hay que generarlo.
+- Las imágenes de fondo de Atmosférica, Tecnología del Alma y Cierre — mismo caso, placeholder de
+  texto en el HTML hasta que Julia las mande.
+Ninguno de estos 4 assets bloquea la implementación del resto del sitio — se pueden dejar como
+gradiente/color sólido temporal (que es exactamente lo que hace el mockup hoy) hasta que lleguen.
+
+DECISIONES DE PRODUCTO YA CONFIRMADAS CON JULIA (para que no vuelvan a quedar como preguntas
+abiertas en su documentación interna)
+- Navbar: debe ser OPACA al 100% (gradiente sólido), nunca semitransparente. Ya lo tienen así en
+  el sitio en vivo hoy — confirmado que es la dirección correcta, no revertir.
+- Tipografía: Domine (headings/botones) + Montserrat (cuerpo). Si en algún render ven "Georgia"
+  en vez de Domine, es solo una falla de carga de fuente del entorno de mockup, nunca fue Literata
+  ni ninguna otra fuente a propósito — esto lo sabemos que todavía estaba anotado como pregunta
+  abierta de su lado, ya está cerrado.
+- Nomenclatura: "Ceremonias" → "Sesiones", "Retiros" → "Viajes", en todo el sitio (menú, calendario,
+  panel de admin).
+- Testimonios: los 3 grupos (Home "Voces de Luz", Sesiones "Nuestros Sanadores" de Experiencias,
+  Viajes "Nuestros Viajeros" de Experiencias) llevan TEXTOS DISTINTOS cada uno — no reciclar el
+  mismo set de testimonios en los 3 lugares. Julia todavía tiene que mandar los textos reales
+  (hoy son de relleno en el mockup).
+- Botón de cuenta: un solo botón en el navbar que cambia de texto ("Unirme al círculo" ↔ "Mi
+  cuenta") según haya sesión o no — no dos botones separados. En login.html/register.html
+  directamente no aparece.
+
+PROBLEMAS YA CONOCIDOS ENTRE MOCKUP Y SITIO EN VIVO (auditoría del 27-28/8, previa a esta entrega)
+Cuando subieron Nosotros/Experiencias/Home a producción con una versión anterior de estos mismos
+mockups, la implementación no quedó igual: sobre todo problemas de animación (algunas se
+revertían a mitad de scroll), también de tamaños/espaciados puntuales, y los símbolos decorativos
+de Nosotros no llegaron a cargar. Se armó en su momento un documento de auditoría línea por línea
+(`spec_verificacion_sitio.html`) comparando selector por selector — si todavía lo tienen a mano,
+puede servir de referencia cruzada, aunque quedó desactualizado respecto a esta versión final de
+homepage.html (las tres rondas de correcciones del 1/9 son posteriores a esa auditoría).
+La causa raíz que ya identificaron ustedes mismos (28/8) para buena parte de esos problemas de
+animación fue un bug real de Framer Motion 12 con `ViewTimeline` nativo en secciones sticky muy
+altas — ya lo diagnosticaron y arreglaron de su lado (`use-section-progress.ts`). Este mismo tipo
+de sección (sticky, muy alta) aparece en esta entrega en `.scroll-story` (400vh) — ver el detalle
+del motor de scroll en design-system-homepage.md, sección 6, con una nota específica sobre este
+punto. Vale la pena tenerlo presente especialmente ahí.
+Otra causa raíz que identificamos juntos: en la entrega anterior solo se pasó el HTML sin ningún
+archivo adicional (imágenes reales, specs) — lo cual dificultó una implementación 1:1. Este
+paquete existe justamente para no repetir eso.
+
+DETALLES DE IMPLEMENTACIÓN QUE CONVIENE SABER ANTES DE PORTAR (no son bugs, es cómo está hecho el
+mockup a propósito, para que no se pierdan en la traducción a React)
+- El motor de "scroll-scrubbing" de la sección `.scroll-story` (el texto que se destila y las
+  keywords que viajan al centro) NO usa ninguna librería de animación en el mockup — es un
+  listener de scroll nativo que calcula un progreso 0→1 y aplica estilos inline por JS en cada
+  frame. Si lo reimplementan con Framer Motion (`useScroll`/`useTransform`), el comportamiento
+  visual esperado es el mismo: reversible en ambas direcciones de scroll, continuo (no es un
+  toggle on/off), dividido en las 4 fases que se detallan en design-system-homepage.md.
+- La mayoría de las animaciones de reveal en Home son "one-shot": se disparan una vez al entrar en
+  viewport y NO se revierten si el usuario vuelve a scrollear hacia arriba. Esto es intencional en
+  Home específicamente. OJO: si reusan algún componente compartido con Nosotros/Experiencias/
+  Contenidos (por ejemplo el bloque "Tecnología del Alma", que es exactamente el mismo componente
+  en Home y en Contenidos), esas otras páginas SÍ usan un patrón reversible (la animación se
+  revierte al scrollear hacia arriba) en varias de sus secciones — no es inconsistencia nuestra,
+  es una decisión de diseño distinta por página. No asuman que el comportamiento de reveal de una
+  página aplica igual en otra solo porque el componente visual es el mismo.
+- El texto del cuerpo de "Nuestro Propósito" se anima palabra por palabra, agrupado por línea REAL
+  del navegador (medida en tiempo real con getBoundingClientRect, no una línea fija hardcodeada) —
+  esto es importante si el copy final cambia de longitud o si cambia el ancho de columna en algún
+  breakpoint intermedio que agreguen a futuro: el agrupamiento por línea se recalcula solo, no hay
+  que tocar nada a mano.
+- El botón "IR MÁS PROFUNDO" de Propósito no se dispara por scroll — aparece automáticamente
+  cuando termina la animación del cuerpo (con un timeout calculado en base a cuántas líneas tiene
+  el texto). Si el copy cambia y el texto ocupa más o menos líneas, el timing del botón se ajusta
+  solo.
+- Hay una clase CSS `.symbol-note` en la hoja de estilos de Home que NO tiene ningún elemento HTML
+  que la use — es código muerto. Fue un intento de agregar símbolos decorativos de fondo en la
+  sección Sesiones/Viajes que se probó visualmente y Julia decidió no usar. Es seguro ignorarla o
+  eliminarla al portar, no hace falta reproducir ningún símbolo ahí.
+- El carrusel de la cartelera de experiencias tiene autoplay continuo en desktop (se pausa en
+  hover) y se desactiva completamente en mobile (ahí el usuario scrollea manualmente con el dedo,
+  `overflow-x:auto`) — no es un bug que en mobile "no se mueva solo", es a propósito.
+- Las cards de esa cartelera replican el estado de :hover en mobile mediante una clase
+  `.tap-active` togglada por JS en `touchstart`, porque `:hover` no dispara de forma confiable en
+  touch — si lo portan con Tailwind, van a necesitar el mismo manejo manual de estado táctil en
+  vez de depender solo de las pseudo-clases de hover.
+
+CÓMO INTERPRETAR ESTE PAQUETE SI SON UN AGENTE DE IA
+Este archivo y design-system-homepage.md están escritos para que otro agente (ustedes) pueda
+portar el diseño sin tener que inferir intención a partir del CSS. Cualquier valor que aparezca en
+homepage.html y no esté marcado acá como "pendiente" o "placeholder" debe tratarse como definitivo,
+ya aprobado por la clienta — no es un punto de partida a reinterpretar con libertad creativa. Si
+algo genuinamente no queda claro leyendo ambos documentos, lo más seguro es preguntar antes de
+adivinar, ya que hubo casos anteriores (símbolos de Nosotros, animaciones de Framer Motion) donde
+una interpretación distinta al mockup causó una ronda extra de correcciones.

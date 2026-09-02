@@ -277,17 +277,24 @@
 
 html {
   scroll-behavior: smooth;
+
+  /* Alto de la banda del navbar, en un solo lugar. Es el mismo numero que el
+     `h-16 lg:h-21` del `Header` y que el `pt-16 lg:pt-21` que llevan todos los
+     `main`, y ahora ademas lo que le restan los heros de pantalla completa para
+     no pasarse del pliegue. Si el navbar cambia de alto, se cambia aca y en el
+     `Header`, y no en cinco paginas. */
+  --navbar-h: 4rem;
+
   /* El navbar es una banda OPACA y fija (desde el 20/08), asi que un anclaje
      —`#sesiones` y `#viajes` del desplegable, el "Leer" de cada hero— dejaba el
      arranque de la seccion 84px debajo de el. `scroll-padding-top` corre el
-     destino de cualquier scroll hacia un ancla; va con la misma altura que el
-     `pt-16 lg:pt-21` que llevan todos los `main`. */
-  scroll-padding-top: 4rem;
+     destino de cualquier scroll hacia un ancla. */
+  scroll-padding-top: var(--navbar-h);
 }
 
 @media (min-width: 1024px) {
   html {
-    scroll-padding-top: 5.25rem;
+    --navbar-h: 5.25rem;
   }
 }
 
