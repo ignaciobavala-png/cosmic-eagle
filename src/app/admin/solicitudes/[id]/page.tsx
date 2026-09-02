@@ -21,6 +21,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 const PAYMENT_LABEL: Record<string, string> = {
   pending: "Sin pagar",
+  deposit_paid: "Seña pagada",
   paid: "Pagado",
   waived: "Sin cargo",
 };
@@ -48,7 +49,9 @@ export default async function SolicitudDetallePage({
 
   const { data: application } = await supabase
     .from("applications")
-    .select("*, trips(title, start_date, end_date), health_form_first_time(*)")
+    .select(
+      "*, trips(title, start_date, end_date, price, deposit_amount), health_form_first_time(*)"
+    )
     .eq("id", id)
     .single();
 
@@ -136,6 +139,9 @@ export default async function SolicitudDetallePage({
           id={id}
           currentStatus={application.payment_status}
           currentReference={application.payment_reference}
+          amountPaid={application.amount_paid}
+          price={application.trips?.price ?? 0}
+          depositAmount={application.trips?.deposit_amount ?? null}
         />
       </div>
 

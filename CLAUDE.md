@@ -1238,3 +1238,41 @@ Tres cosas que no hay que "limpiar":
 **Sin verificar end-to-end** (requiere sesión de admin): apretar «Conversemos» y
 ver la pantalla del postulante. **El correo sigue sin salir** hasta verificar el
 dominio en Resend.
+
+### Sesión del 2026-09-02 (ter) — la seña, con las dos opciones
+
+Sofía respondió las preguntas 1 y 2 de `docs/consulta-sofia-pagos.txt`: **hay que
+ofrecer las dos opciones —seña o total— y el monto de la seña tiene que ser
+editable.** Implementado el mismo día; detalle en `docs/COMUNICACIONES.md` §7 y
+nota cruzada en `docs/PAGOS.md` §9.
+
+Migraciones `20260902180000` (enum), `20260902180100` (columnas) y
+`20260902180200` (la vista). Aplicadas y verificadas contra producción.
+
+- **`payment_status` sumó `deposit_paid`**, entre `pending` y `paid`. Otra vez el
+  enum en su propia migración: `alter type ... add value` no se puede usar en la
+  transacción que lo agrega. Van tres veces que aparece esta trampa.
+- **Dos columnas, no una**: `trips.deposit_amount` es *cuánto se pide* (lo
+  publica ella, nulo = ese viaje se paga completo) y `applications.amount_paid`
+  es *cuánto llegó* (lo registra Estela, **acumulado**). La segunda no se deriva
+  de la primera y por eso existe: los correos [3A] y [3B] prometen decir el monto
+  real. **El saldo es una resta, no una columna.**
+- **`amount_paid` necesitó su propio `grant update`**: `authenticated` no tiene
+  UPDATE a nivel tabla sobre `applications` desde la migración de dos etapas.
+  Verificado que el grant no alcanza para que el postulante se marque pagado —
+  lo frena la RLS.
+- **La vista `my_applications` expone `amount_paid` al final.** `create or
+  replace view` sólo acepta agregar columnas al final; reordenar obliga a
+  dropearla con sus grants.
+- **Se cerró un agujero que ya existía**: `markPayment` sólo avisaba en la
+  transición desde `pending`, así que completar el saldo no mandaba nada. Ahora
+  avisa en cualquier cambio real, que es el correo [3C].
+- **Ninguna pantalla ni correo nombra el plazo de 15 días**: la pregunta 4 sigue
+  abierta y prometer una fecha que después cambia es peor que no darla.
+
+Quedan abiertas las preguntas 3 a 7 (cuotas, plazo, qué pasa si no paga, la
+tarjeta, el riel del saldo). Ninguna bloquea lo construido; la 4 y la 5 bloquean
+el recordatorio [3B], que además necesita el envío programado que no existe.
+
+**Sin verificar end-to-end** (requiere sesión de admin): cargar una seña en un
+viaje, aprobar a alguien, registrar la seña y ver el saldo en su pantalla.

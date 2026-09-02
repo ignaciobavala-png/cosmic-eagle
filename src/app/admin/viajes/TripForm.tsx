@@ -211,6 +211,26 @@ export function TripForm({
             className={inputClass}
           />
         </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="deposit_amount" className={labelClass}>
+            Seña para reservar (USD)
+          </label>
+          <input
+            id="deposit_amount"
+            name="deposit_amount"
+            type="number"
+            min={0}
+            step="0.01"
+            defaultValue={trip?.deposit_amount ?? ""}
+            className={inputClass}
+          />
+          {/* Vacío es una opción real, no un olvido: hay experiencias que se
+              pagan enteras. Si se carga, la persona ve las dos opciones. */}
+          <p className="text-xs text-on-surface-variant">
+            Dejalo vacío si este viaje se paga completo. Si ponés un monto, la
+            persona elige entre reservar con esa seña o pagar el total.
+          </p>
+        </div>
       </div>
 
       <ScheduleEditor

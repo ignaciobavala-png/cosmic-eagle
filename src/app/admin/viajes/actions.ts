@@ -43,6 +43,7 @@ function parseTripForm(formData: FormData) {
   const end_date = formData.get("end_date");
   const capacity = formData.get("capacity");
   const price = formData.get("price");
+  const deposit = formData.get("deposit_amount");
   const status = formData.get("status");
   const type = formData.get("type");
   const terms = formData.get("terms");
@@ -70,6 +71,22 @@ function parseTripForm(formData: FormData) {
     } as const;
   }
 
+  // La seña es opcional (vacío = este viaje se paga completo), pero si está
+  // tiene que ser menor que el total: una "seña" igual o mayor al precio no
+  // reserva nada, cobra todo. La base tiene el mismo CHECK; esto existe para
+  // que el error se lea en el formulario y no como un fallo de Postgres.
+  const priceValue = typeof price === "string" && price ? Number(price) : 0;
+  const depositValue =
+    typeof deposit === "string" && deposit.trim() ? Number(deposit) : null;
+
+  if (depositValue !== null && !(depositValue > 0 && depositValue < priceValue)) {
+    return {
+      error:
+        "La seña tiene que ser mayor que cero y menor que el precio total. Dejala vacía si el viaje se paga completo.",
+      data: null,
+    } as const;
+  }
+
   return {
     error: null,
     data: {
@@ -85,7 +102,8 @@ function parseTripForm(formData: FormData) {
       start_date,
       end_date,
       capacity: Number(capacity),
-      price: typeof price === "string" && price ? Number(price) : 0,
+      price: priceValue,
+      deposit_amount: depositValue,
       status: status as Enums<"trip_status">,
       type,
       terms: typeof terms === "string" && terms.trim() ? terms.trim() : null,

@@ -212,3 +212,23 @@ sin lugar para un pago parcial ni para un saldo.
 **No se implementa nada hasta que respondan**: las siete preguntas están en
 `docs/consulta-sofia-pagos.txt`. Es lo único de ese documento que cambia el
 schema.
+
+---
+
+## 9. Seña y total, las dos opciones (02/09)
+
+Sofía respondió las preguntas 1 y 2 de `docs/consulta-sofia-pagos.txt`: **se
+ofrecen las dos opciones y el monto de la seña es editable por viaje.**
+
+Eso **revierte lo que había decidido sola en §7** ("por Encuadrado se cobra el
+total, la seña sigue siendo transferencia con comprobante"). Estaba marcado como
+reversible justamente esperando esta respuesta. Hoy la web ofrece las dos por
+cualquier riel; qué hace la tarjeta con la seña es la pregunta 6, todavía
+abierta.
+
+Detalle completo del modelo en `docs/COMUNICACIONES.md` §7. Lo esencial:
+`trips.deposit_amount` (cuánto se pide, nulo = se paga completo),
+`applications.amount_paid` (cuánto llegó, acumulado), y `payment_status` con
+`deposit_paid` en el medio. El saldo es una resta, no una columna.
+
+**Sigue sin existir el plazo de los 15 días** y ninguna pantalla lo nombra.

@@ -39,7 +39,12 @@ function pendingStep(a: Application): { label: string; href?: string } {
   // privado (ver el correo [2A] en docs/COMUNICACIONES.md).
   if (a.status === "needs_conversation") return { label: "Te vamos a escribir" };
   if (a.status !== "approved") return { label: "—" };
-  if (a.payment_status === "pending") return { label: "Falta la seña" };
+  // "Falta el pago" y no "la seña": la seña es opcional y por viaje
+  // (trips.deposit_amount), y esta tabla no lee el viaje. El detalle de las dos
+  // opciones lo da la pantalla de estado.
+  if (a.payment_status === "pending") return { label: "Falta el pago" };
+  if (a.payment_status === "deposit_paid" && !(a.is_first_time && !a.health_form_submitted))
+    return { label: "Falta el saldo", href: `/viajes/${a.trip_id}/solicitar` };
   if (a.is_first_time && !a.health_form_submitted) {
     return {
       label: "Completar formulario de salud",

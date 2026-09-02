@@ -339,13 +339,13 @@ interna, que es el otro canal y no se confunde con este).
 | # | Comunicación | Estado |
 |---|---|---|
 | [1] | Postulación recibida | ✅ `SolicitudRecibida`, disparado en `submitApplication` |
-| [2] | Puedes avanzar | ✅ `SolicitudAprobada`, en la transición a `approved` |
+| [2] | Puedes avanzar | ✅ `SolicitudAprobada`, con las dos opciones de pago (02/09) |
 | [2A] | Conversemos | ✅ `SolicitudConversemos`, estado `needs_conversation` (02/09) |
 | [2B] | No aprobada | ✅ `SolicitudRechazada` |
-| [3] | Pago confirmado | ✅ `PagoRegistrado`, cuando Estela marca el pago |
-| [3A] | Cupo reservado | ❌ no existe el modelo de seña |
-| [3B] | Recordatorio de saldo | ❌ ídem + no hay envíos programados |
-| [3C] | Saldo completado | ❌ ídem |
+| [3] | Pago confirmado | ✅ `PagoRegistrado` |
+| [3A] | Cupo reservado | ✅ `PagoRegistrado` con saldo, estado `deposit_paid` (02/09) |
+| [3B] | Recordatorio de saldo | ❌ falta el envío programado |
+| [3C] | Saldo completado | ✅ `PagoRegistrado`, al pasar de seña a pagado (02/09) |
 | [4] | Formularios recibidos | ❌ falta el consentimiento |
 | [4A] | Formularios pendientes | ❌ ídem + no hay envíos programados |
 | [5] | Bienvenido | ❌ no existe "formulario de salud aprobado" |
@@ -358,12 +358,8 @@ Lo que falta **no es escribir diez templates**. Son cinco piezas de sistema:
 
 1. ~~**Un tercer resultado de revisión: "conversemos".**~~ **HECHO el 02/09**,
    ver §6.
-2. **Seña + saldo.** `payment_status` es `pending | paid | waived`, un booleano
-   con excepción. El documento pide reserva, saldo, pago en cuotas y una fecha de
-   corte a 15 días. **Contradice lo que quedó decidido el 01/09** en
-   `docs/PAGOS.md` §7 ("por Encuadrado se cobra el total, la seña sigue siendo
-   transferencia con comprobante") — por eso está preguntado, ver
-   `docs/consulta-sofia-pagos.txt`. **Bloqueante de [3], [3A], [3B] y [3C].**
+2. ~~**Seña + saldo.**~~ **HECHO el 02/09**, ver §7. Queda pendiente sólo el
+   recordatorio [3B], que necesita el envío programado del punto 4.
 3. **Consentimiento informado + aprobación del formulario de salud.** La tabla
    `consents` existe desde el schema original y sigue sin UI, y los textos legales
    son de la clienta. Sin eso no hay [4] ni [5]. El estado "salud aprobada"
@@ -470,3 +466,53 @@ borradas (la base volvió a cero). Advisors sin novedades.
 «Conversemos» en el panel y ver la pantalla del postulante. **El correo no sale
 todavía**: sigue faltando verificar el dominio en Resend (`docs/EMAIL.md`). Hasta
 entonces el "no salió" queda registrado en la casilla de avisos, no en los logs.
+
+
+---
+
+## 7. Seña y saldo, implementado (02/09)
+
+Sofía respondió las dos primeras preguntas de `docs/consulta-sofia-pagos.txt`:
+**se ofrecen las dos opciones** —reservar con una seña o pagar el total— y **el
+monto de la seña lo definen ellas, viaje por viaje**. Con eso alcanzó para
+construir los correos [2], [3], [3A] y [3C].
+
+Migraciones `20260902180000` (el valor del enum), `20260902180100` (las dos
+columnas) y `20260902180200` (la vista).
+
+- **`payment_status` sumó `deposit_paid`**, entre `pending` y `paid`. Era un
+  booleano con excepción y no podía representar "reservado": ni el cupo estaba
+  sin pagar ni la inscripción estaba completa.
+- **Son dos columnas y no una**, y la distinción importa:
+  `trips.deposit_amount` es *cuánto hay que mandar* (lo publica ella),
+  `applications.amount_paid` es *cuánto mandó esta persona* (lo registra Estela).
+  La segunda no se deriva de la primera: la seña es lo que se pide, no
+  necesariamente lo que llega, y los correos prometen decir el monto real. El
+  saldo es una resta.
+- **`amount_paid` es acumulado, no "lo de este pago".** Es la respuesta a
+  "cuánto lleva pagado", que es la pregunta que se hace quien mira la pantalla —
+  y deja la puerta abierta al pago en cuotas sin otra migración, que es la
+  pregunta 3, todavía sin responder.
+- **`deposit_amount` nulo es una opción real**, no un olvido: ese viaje se paga
+  completo y la persona ve un solo monto. El CHECK exige que, si está, sea mayor
+  que cero y menor que el precio — una "seña" igual al total no reserva, cobra
+  todo. El form del admin valida antes para que el error se lea ahí.
+- **Ojo con el grant por columna**: `authenticated` no tiene UPDATE a nivel tabla
+  sobre `applications` desde la migración de dos etapas, así que `amount_paid`
+  necesitó su propio `grant update (amount_paid)`. Sin eso el admin no podría
+  registrar el monto. Verificado que el grant **no** alcanza para que el
+  postulante se marque pagado: lo frena la RLS, no el grant.
+- **La vista `my_applications` tuvo que exponer `amount_paid`**, y la columna va
+  al final: `create or replace view` sólo acepta agregar al final, y reordenar
+  obliga a dropearla (con sus grants).
+- **El correo [3C] cerró un agujero que ya existía**: `markPayment` sólo avisaba
+  en la transición desde `pending`, así que completar el saldo no mandaba nada.
+  Ahora avisa en cualquier cambio real de estado de pago.
+- **Ningún correo ni pantalla nombra el plazo de 15 días.** La pregunta 4 sigue
+  sin responder y prometer una fecha que después cambia es peor que no darla.
+
+**Lo que sigue sin resolverse de este hilo** (preguntas 3 a 7): si el saldo se
+puede pagar en cuotas y cuántas, el plazo de corte, qué pasa si no lo paga, si
+la tarjeta cobra la seña o el total, y si el saldo va por el mismo riel. Ninguna
+bloquea lo construido; la 4 y la 5 bloquean el recordatorio [3B], que además
+necesita el envío programado.

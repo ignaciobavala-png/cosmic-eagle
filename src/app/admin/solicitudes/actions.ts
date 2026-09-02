@@ -26,7 +26,9 @@ export async function reviewApplication(
   // y de paso trae los datos del mail en la misma consulta.
   const { data: application } = await supabase
     .from("applications")
-    .select("user_id, full_name, email, status, trip_id, trips(title, start_date, end_date)")
+    .select(
+      "user_id, full_name, email, status, trip_id, trips(title, start_date, end_date, price, deposit_amount)"
+    )
     .eq("id", id)
     .single();
 
@@ -101,7 +103,9 @@ export async function reviewApplication(
 export async function markPayment(
   id: string,
   paymentStatus: Enums<"payment_status">,
-  reference: string
+  reference: string,
+  /** Total recibido hasta ahora, no lo de este pago. Ver PaymentControls. */
+  amountPaid = 0
 ) {
   const supabase = await createClient();
 
@@ -111,7 +115,7 @@ export async function markPayment(
   const { data: application } = await supabase
     .from("applications")
     .select(
-      "full_name, email, status, payment_status, trip_id, previous_ceremonies, trips(title, start_date, end_date)"
+      "full_name, email, status, payment_status, trip_id, previous_ceremonies, trips(title, start_date, end_date, price, deposit_amount)"
     )
     .eq("id", id)
     .single();
@@ -122,6 +126,13 @@ export async function markPayment(
       payment_status: paymentStatus,
       paid_at: paymentStatus === "pending" ? null : new Date().toISOString(),
       payment_reference: reference.trim() || null,
+      // "Sin pagar" vuelve el contador a cero y "sin cargo" no tiene monto que
+      // registrar: en los dos casos guardar el número tecleado dejaría un saldo
+      // fantasma en la pantalla de la persona.
+      amount_paid:
+        paymentStatus === "pending" || paymentStatus === "waived"
+          ? 0
+          : Math.max(0, amountPaid),
     })
     .eq("id", id);
 
@@ -132,9 +143,15 @@ export async function markPayment(
   // Este es el mail que destraba la etapa 2. Sólo en la transición desde
   // `pending`, y sólo si la solicitud ya está aprobada: marcar el pago de una
   // solicitud que todavía no se aprobó no le confirma ningún cupo a nadie.
+  // Sale en cualquier cambio real de estado de pago, no sólo desde `pending`:
+  // el salto de seña a pagado es el correo [3C] ("tu pago está completo") y
+  // antes no avisaba nada. Sigue exigiendo la aprobación —marcar el pago de una
+  // solicitud sin aprobar no le confirma el cupo a nadie— y sigue siendo sólo en
+  // la transición, así que apretar dos veces el mismo botón no remanda.
   if (
     paymentStatus !== "pending" &&
-    application?.payment_status === "pending" &&
+    application &&
+    application.payment_status !== paymentStatus &&
     application.status === "approved"
   ) {
     await notifyPaid({
@@ -144,6 +161,14 @@ export async function markPayment(
       tripId: application.trip_id,
       trip: application.trips,
       sinCargo: paymentStatus === "waived",
+      // Correo [3] contra [3A] del documento de Sofía: "tu pago fue confirmado"
+      // y "tu cupo está reservado" son dos mensajes distintos, y el segundo
+      // tiene que decir cuánto falta.
+      esSena: paymentStatus === "deposit_paid",
+      saldoCompletado:
+        paymentStatus === "paid" && application.payment_status === "deposit_paid",
+      montoPagado: Math.max(0, amountPaid),
+      saldo: Math.max(0, (application.trips?.price ?? 0) - Math.max(0, amountPaid)),
       // Mismo criterio que la vista `my_applications`: primeriza es la que
       // declaró cero ceremonias, y es la única que tiene etapa 2 (no existe un
       // `health_form_returning`).
@@ -166,7 +191,13 @@ async function notifyApproved({
   nombre: string;
   email: string;
   tripId: string;
-  trip: { title: string; start_date: string; end_date: string } | null;
+  trip: {
+    title: string;
+    start_date: string;
+    end_date: string;
+    price: number;
+    deposit_amount: number | null;
+  } | null;
 }) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://cosmic-eagle.vercel.app";
 
@@ -190,6 +221,8 @@ async function notifyApproved({
       // instrucciones de pago y el formulario del comprobante.
       url: `${siteUrl}/viajes/${tripId}/solicitar`,
       medios,
+      total: trip?.price ?? 0,
+      sena: trip?.deposit_amount ?? null,
     }),
   });
 
@@ -290,6 +323,10 @@ async function notifyPaid({
   tripId,
   trip,
   sinCargo,
+  esSena,
+  saldoCompletado,
+  montoPagado,
+  saldo,
   esPrimeriza,
 }: {
   id: string;
@@ -298,6 +335,10 @@ async function notifyPaid({
   tripId: string;
   trip: { title: string; start_date: string; end_date: string } | null;
   sinCargo: boolean;
+  esSena: boolean;
+  saldoCompletado: boolean;
+  montoPagado: number;
+  saldo: number;
   esPrimeriza: boolean;
 }) {
   const supabase = await createClient();
@@ -316,12 +357,20 @@ async function notifyPaid({
 
   const result = await sendEmail({
     to: email,
-    subject: `Tu cupo en ${trip?.title ?? "el viaje"} está reservado`,
+    subject: esSena
+      ? `Tu cupo en ${trip?.title ?? "el viaje"} está reservado`
+      : saldoCompletado
+        ? `Tu pago para ${trip?.title ?? "el viaje"} está completo`
+        : `Tu pago para ${trip?.title ?? "el viaje"} fue confirmado`,
     react: PagoRegistrado({
       nombre: nombre.split(" ")[0],
       viaje: trip?.title ?? "tu viaje",
       fechas: trip ? formatDateRangeCompact(trip.start_date, trip.end_date) : "",
       sinCargo,
+      esSena,
+      saldoCompletado,
+      montoPagado,
+      saldo,
       necesitaSalud,
       url: necesitaSalud
         ? `${siteUrl}/viajes/${tripId}/salud`
@@ -333,7 +382,7 @@ async function notifyPaid({
 
   await createAdminNotification({
     kind: "email_failed",
-    title: `No se pudo avisarle a ${nombre} que su cupo quedó reservado`,
+    title: `No se pudo avisarle a ${nombre} que registramos su pago`,
     body:
       result.reason === "not_configured"
         ? `Resend todavía no está configurado (falta RESEND_API_KEY). Escríbele a ${email} a mano${necesitaSalud ? " para que complete el formulario de salud" : ""}.`

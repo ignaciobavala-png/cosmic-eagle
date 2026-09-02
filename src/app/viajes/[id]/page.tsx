@@ -55,7 +55,7 @@ async function getTrip(id: string) {
   const { data } = await supabase
     .from("trips")
     .select(
-      "id, title, description, location, start_date, end_date, capacity, price, status, image_url, type, schedule, terms"
+      "id, title, description, location, start_date, end_date, capacity, price, deposit_amount, status, image_url, type, schedule, terms"
     )
     .eq("id", id)
     .single();
@@ -289,9 +289,20 @@ export default async function ViajePage({ params }: Props) {
               {(trip.price > 0 || trip.terms) && (
                 <div className="mt-6 border-t border-primary-fixed-dim/20 pt-5">
                   {trip.price > 0 && (
-                    <p className="font-display text-2xl text-primary-fixed-dim">
-                      {formatAmount(trip.price)}
-                    </p>
+                    <>
+                      <p className="font-display text-2xl text-primary-fixed-dim">
+                        {formatAmount(trip.price)}
+                      </p>
+                      {/* La seña se anuncia acá, antes de postularse: es parte
+                          de decidir si uno puede. Que exista la opción sale de
+                          `deposit_amount`; si el viaje se paga completo, esta
+                          línea no aparece. */}
+                      {trip.deposit_amount && (
+                        <p className="mt-1 text-sm text-on-surface-variant">
+                          o reservá tu cupo con {formatAmount(trip.deposit_amount)}
+                        </p>
+                      )}
+                    </>
                   )}
                   {trip.terms && (
                     <p className="mt-2 text-xs leading-relaxed text-on-surface-variant">

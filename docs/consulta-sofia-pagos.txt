@@ -3,7 +3,9 @@ Fecha: 02/09/2026
 Contexto: documento "Comunicaciones al Viajero - Orden Cronologico" (26/08),
           correos [2], [3], [3A], [3B] y [3C]
 
-*** SIN RESPONDER ***
+*** PREGUNTAS 1 Y 2 RESPONDIDAS el 02/09/2026 — ver el pie. ***
+*** Ya implementadas: migraciones 20260902180000 / 180100 / 180200. ***
+*** Siguen abiertas la 3, 4, 5, 6 y 7. ***
 
 
 POR QUE PREGUNTAMOS
@@ -95,3 +97,25 @@ en espanol". No es asi: la web esta enteramente en espanol. La version
 en ingles esta planificada pero todavia no existe. Cuando exista, el
 idioma del correo va a salir del idioma de la cuenta de cada persona, no
 del texto.
+
+
+RESPUESTA DE SOFIA (02/09/2026)
+-------------------------------
+
+Sobre las dos primeras preguntas:
+
+  * Hay que ofrecer LAS DOS OPCIONES: pagar la sena o pagar el total.
+  * El monto de la reserva tiene que ser EDITABLE.
+
+Implementado el mismo dia:
+
+  * Cada viaje tiene ahora un campo "Sena para reservar (USD)" en el panel,
+    al lado del precio. Vacio = ese viaje se paga completo.
+  * La pagina del viaje anuncia las dos opciones antes de postularse.
+  * El correo de aprobacion las ofrece a las dos, con los dos montos.
+  * Estela registra cuanto entro, y el sistema calcula el saldo solo.
+  * Quien reserva con sena recibe el correo [3A] con su saldo, y al
+    completarlo recibe el [3C].
+
+NO se implemento el plazo de 15 dias ni el recordatorio [3B]: dependen de
+las preguntas 4 y 5, que siguen abiertas.

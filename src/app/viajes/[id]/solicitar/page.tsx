@@ -68,6 +68,24 @@ function nextStep(
     };
   }
 
+  // Reservó con seña: la etapa 2 se abre igual (así lo pide el correo [3A] de
+  // Sofía — los formularios se mandan con la reserva, no con el saldo), pero la
+  // pantalla tiene que seguir mostrando cuánto falta.
+  if (app.payment_status === "deposit_paid" && app.is_first_time && !app.health_form_submitted) {
+    return {
+      title: "Cupo reservado",
+      body: "Recibimos tu seña y tu lugar está guardado. Abajo está el saldo y cómo completarlo, cuando quieras. Mientras tanto podés seguir con el formulario de salud, que es lo que nos permite preparar la ceremonia.",
+      cta: { href: `/viajes/${tripId}/salud`, label: "Completar el formulario de salud" },
+    };
+  }
+
+  if (app.payment_status === "deposit_paid") {
+    return {
+      title: "Cupo reservado",
+      body: "Recibimos tu seña y tu lugar está guardado. Abajo está el saldo y los medios para completarlo cuando quieras.",
+    };
+  }
+
   if (app.is_first_time && !app.health_form_submitted) {
     return {
       title: "Cupo reservado",
@@ -98,7 +116,9 @@ export default async function SolicitarPage({
 
   const { data: trip } = await supabase
     .from("trips")
-    .select("id, title, location, start_date, end_date, status, price")
+    .select(
+      "id, title, location, start_date, end_date, status, price, deposit_amount"
+    )
     .eq("id", id)
     .single();
 
@@ -109,7 +129,7 @@ export default async function SolicitarPage({
   const { data: applications } = await supabase
     .from("my_applications")
     .select(
-      "id, status, payment_status, is_first_time, health_form_submitted, payment_proof_submitted, payment_proof_at"
+      "id, status, payment_status, amount_paid, is_first_time, health_form_submitted, payment_proof_submitted, payment_proof_at"
     )
     .eq("trip_id", id)
     .order("created_at", { ascending: false });
@@ -120,10 +140,13 @@ export default async function SolicitarPage({
   // Los rieles de cobro sólo se leen cuando hacen falta: son datos bancarios y
   // no tienen por qué viajar a la pantalla de alguien que todavía está en
   // revisión.
+  // También con la seña pagada: si el bloque desapareciera, la persona no
+  // tendría desde dónde completar el saldo ni a quién mandarle el comprobante.
   const enPago =
     !!existing?.id &&
     existing.status === "approved" &&
-    existing.payment_status === "pending";
+    (existing.payment_status === "pending" ||
+      existing.payment_status === "deposit_paid");
   const paymentMethods = enPago ? await getActivePaymentMethods() : [];
 
   return (
@@ -173,14 +196,47 @@ export default async function SolicitarPage({
               </h2>
 
               {trip.price > 0 && (
-                <p className="text-on-surface-variant mb-5">
-                  Aporte de la experiencia:{" "}
-                  <span className="text-on-surface font-medium">
-                    {formatAmount(trip.price)}
-                  </span>
-                  . Si acordaste una seña o un monto distinto con nosotros, vale
-                  lo que acordaron.
-                </p>
+                <div className="mb-5 text-on-surface-variant">
+                  {existing.payment_status === "deposit_paid" ? (
+                    // Ya reservó: lo único que importa es cuánto falta. El
+                    // plazo no se nombra — la pregunta 4 de
+                    // docs/consulta-sofia-pagos.txt sigue sin respuesta.
+                    <p>
+                      Recibimos{" "}
+                      <span className="text-on-surface font-medium">
+                        {formatAmount(existing.amount_paid ?? 0)}
+                      </span>{" "}
+                      de {formatAmount(trip.price)}. Queda un saldo de{" "}
+                      <span className="text-on-surface font-medium">
+                        {formatAmount(trip.price - (existing.amount_paid ?? 0))}
+                      </span>
+                      , que podés completar de una vez o en partes.
+                    </p>
+                  ) : trip.deposit_amount ? (
+                    // Las dos opciones, como las pide el correo [2] de Sofía.
+                    <p>
+                      Podés reservar tu cupo con una seña de{" "}
+                      <span className="text-on-surface font-medium">
+                        {formatAmount(trip.deposit_amount)}
+                      </span>{" "}
+                      o pagar el total de{" "}
+                      <span className="text-on-surface font-medium">
+                        {formatAmount(trip.price)}
+                      </span>
+                      . Si acordaste otro monto con nosotros, vale lo que
+                      acordaron.
+                    </p>
+                  ) : (
+                    <p>
+                      Aporte de la experiencia:{" "}
+                      <span className="text-on-surface font-medium">
+                        {formatAmount(trip.price)}
+                      </span>
+                      . Si acordaste una seña o un monto distinto con nosotros,
+                      vale lo que acordaron.
+                    </p>
+                  )}
+                </div>
               )}
 
               {paymentMethods.length === 0 ? (

@@ -1,5 +1,6 @@
 import { Text } from "react-email";
 import { BaseLayout, CtaButton, Paragraph, Title, c } from "./BaseLayout";
+import { formatAmount } from "@/lib/format";
 
 export type MedioDePago = {
   id: string;
@@ -32,12 +33,17 @@ export function SolicitudAprobada({
   fechas,
   url,
   medios = [],
+  total = 0,
+  sena = null,
 }: {
   nombre: string;
   viaje: string;
   fechas: string;
   url: string;
   medios?: MedioDePago[];
+  total?: number;
+  /** `null` cuando el viaje se paga completo: no hay dos opciones que ofrecer. */
+  sena?: number | null;
 }) {
   return (
     <BaseLayout preview={`Tu lugar en ${viaje} está confirmado`}>
@@ -49,6 +55,26 @@ export function SolicitudAprobada({
         Revisamos tu solicitud para <strong>{viaje}</strong> ({fechas}) y tienes tu
         lugar confirmado. Nos alegra mucho que nos acompañes.
       </Paragraph>
+
+      {/* Las dos opciones, tal como las pide el correo [2] de Sofía
+          (docs/COMUNICACIONES.md). Se dicen antes de los medios de pago: son
+          la decisión, y los medios son el cómo. */}
+      {total > 0 && (
+        <Paragraph>
+          {sena ? (
+            <>
+              Ya puedes reservar formalmente tu lugar. Puedes hacerlo con una
+              seña de <strong>{formatAmount(sena)}</strong>, o pagar el total de{" "}
+              <strong>{formatAmount(total)}</strong>.
+            </>
+          ) : (
+            <>
+              Ya puedes reservar formalmente tu lugar. El aporte de la
+              experiencia es de <strong>{formatAmount(total)}</strong>.
+            </>
+          )}
+        </Paragraph>
+      )}
 
       {medios.length === 0 ? (
         <Paragraph>

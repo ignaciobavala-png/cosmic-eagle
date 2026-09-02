@@ -77,6 +77,7 @@ export type Database = {
       }
       applications: {
         Row: {
+          amount_paid: number
           comment: string | null
           created_at: string
           current_medication: boolean
@@ -101,6 +102,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          amount_paid?: number
           comment?: string | null
           created_at?: string
           current_medication: boolean
@@ -125,6 +127,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          amount_paid?: number
           comment?: string | null
           created_at?: string
           current_medication?: boolean
@@ -589,6 +592,7 @@ export type Database = {
         Row: {
           capacity: number
           created_at: string
+          deposit_amount: number | null
           description: string | null
           end_date: string
           id: string
@@ -605,6 +609,7 @@ export type Database = {
         Insert: {
           capacity: number
           created_at?: string
+          deposit_amount?: number | null
           description?: string | null
           end_date: string
           id?: string
@@ -621,6 +626,7 @@ export type Database = {
         Update: {
           capacity?: number
           created_at?: string
+          deposit_amount?: number | null
           description?: string | null
           end_date?: string
           id?: string
@@ -640,6 +646,7 @@ export type Database = {
     Views: {
       my_applications: {
         Row: {
+          amount_paid: number | null
           consent_submitted: boolean | null
           created_at: string | null
           health_form_submitted: boolean | null
@@ -653,6 +660,7 @@ export type Database = {
           trip_id: string | null
         }
         Insert: {
+          amount_paid?: number | null
           consent_submitted?: never
           created_at?: string | null
           health_form_submitted?: never
@@ -666,6 +674,7 @@ export type Database = {
           trip_id?: string | null
         }
         Update: {
+          amount_paid?: number | null
           consent_submitted?: never
           created_at?: string | null
           health_form_submitted?: never
@@ -707,7 +716,7 @@ export type Database = {
       article_category: "biblioteca" | "ciencia" | "testimonios"
       article_status: "draft" | "published"
       faq_placement: "general" | "sesiones" | "viajes"
-      payment_status: "pending" | "paid" | "waived"
+      payment_status: "pending" | "deposit_paid" | "paid" | "waived"
       testimonial_placement: "home" | "sesiones" | "viajes"
       trip_status: "draft" | "open" | "closed" | "completed"
       trip_type: "retiro" | "ceremonia"
@@ -854,6 +863,8 @@ export const Constants = {
       article_category: ["biblioteca", "ciencia", "testimonios"],
       article_status: ["draft", "published"],
       faq_placement: ["general", "sesiones", "viajes"],
+      payment_status: ["pending", "deposit_paid", "paid", "waived"],
+      testimonial_placement: ["home", "sesiones", "viajes"],
       trip_status: ["draft", "open", "closed", "completed"],
       trip_type: ["retiro", "ceremonia"],
     },

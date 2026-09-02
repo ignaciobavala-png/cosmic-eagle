@@ -20,6 +20,7 @@ const STATUS_CLASS: Record<string, string> = {
 
 const PAYMENT_LABEL: Record<string, string> = {
   pending: "Sin pagar",
+  deposit_paid: "Seña pagada",
   paid: "Pagado",
   waived: "Sin cargo",
 };
