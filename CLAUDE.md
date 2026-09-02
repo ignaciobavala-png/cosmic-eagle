@@ -1353,6 +1353,35 @@ arreglamos el 28/08 con `use-section-progress.ts`; `.symbol-note` es código
 muerto; y **la home es one-shot mientras Nosotros/Experiencias/Contenidos son
 reversibles** — eso cierra la duda del 27/08: conviven a propósito, y ya está así.
 
+**Hecho después, con el mockup ya en mano — el scroll-story de la home.** Las
+fases 2 y 3 estaban pendientes desde el 27/08 y por eso el efecto no se leía: el
+texto se apagaba entero de golpe y la lista de palabras aparecía centrada, en vez
+de que las palabras se despeguen del párrafo y viajen al centro. Ahora
+`ScrollStory.tsx` sigue las cuatro fases del motor del mockup, con sus umbrales
+literales (0.28 / 0.55 / 0.78 / 0.80) y el tramo de 400vh (medía 360).
+
+- **Fase 2 es la que faltaba entera**: los siete tramos de texto blanco se apagan
+  en cascada, uno por uno, y las palabras clave quedan encendidas dentro del
+  párrafo. No se apagan a cero: queda un 8%.
+- **Fase 3 es el viaje**: cada palabra sale del offset en px donde estaba en el
+  texto (`KEYWORD_START_OFFSETS`, valores de Julia) y llega al centro creciendo
+  de `scale(0.6)` a 1, mientras el bloque de texto se apaga entero.
+- **Sólo la primera aparición de cada palabra se marca.** "conciencia" vuelve a
+  aparecer en el tercer párrafo: si se marcara también, habría cinco palabras
+  encendidas y sólo cuatro viajando al centro. Por eso el split fusiona los
+  tramos vecinos — sin eso salen ocho tramos y no los siete del mockup.
+- **Ojo al verificar en Chrome headless**: viene con `prefers-reduced-motion:
+  reduce` por defecto, así que sirve la versión aplanada y parece que nada anima.
+  Hay que pedir `reducedMotion: "no-preference"` en el contexto de Playwright.
+
+Verificado en el browser midiendo el DOM en ocho puntos del recorrido: el orden
+de la cascada, las opacidades de los siete tramos, el `translate`+`scale` de cada
+palabra en cada punto y el umbral del botón, todo contra el valor esperado del
+mockup. Más capturas a 1440×900 y 390×844 a mitad del viaje.
+
+**El CTA sigue siendo una divergencia**: en el mockup "Explorar experiencias"
+abre la cartelera que está abajo (`toggleCartelera()`), acá linkea a `/viajes`.
+
 **Lo que falta de la entrega**: auditar la home sección por sección contra
 `homepage_correccion.html` (ahí aparecen, entre otras, la altura del navbar —
 96/72px en el mockup contra 84/64px nuestros — y la del logo), portar el modal
