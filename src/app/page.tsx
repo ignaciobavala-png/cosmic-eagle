@@ -62,9 +62,10 @@ export default async function Home() {
     .limit(8);
 
   const trips = (data ?? []) as TripCardData[];
-  // La cartelera de la home muestra solo Sesiones (ceremonias). Los Viajes
-  // tienen su bloque en /viajes; la home no repite el calendario de retiros.
+  // La cartelera de la home muestra los DOS calendarios a todo el ancho: el de
+  // sesiones (ceremonias) y el de viajes (retiros), cada uno con su carrusel.
   const sesiones = trips.filter((t) => t.type === "ceremonia");
+  const viajes = trips.filter((t) => t.type === "retiro");
   const testimonials = await getTestimonials("home");
 
   return (
@@ -128,20 +129,28 @@ export default async function Home() {
             servidor.
 
             La cartelera dorada ocupa TODO el ancho de la pantalla (el "carrusel
-            dorado" del mockup), sin el contenedor angosto: se muestra solo el
-            calendario de sesiones. */}
+            dorado" del mockup), sin el contenedor angosto. Dentro del panel van
+            las dos bandas full-bleed: sesiones y luego viajes. */}
         <section
           id="calendario"
           className="w-full bg-[#020c41] py-20"
         >
           <div className="w-full text-center">
             <Collapsible label="Ver próximas fechas" openOnHash="calendario" tone="dark">
-              <TripCarousel
-                caption="Calendario de sesiones"
-                title="Próximas Sesiones"
-                trips={sesiones}
-                emptyLabel="No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto."
-              />
+              <div className="flex w-full flex-col gap-10">
+                <TripCarousel
+                  caption="Calendario de sesiones"
+                  title="Próximas Sesiones"
+                  trips={sesiones}
+                  emptyLabel="No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto."
+                />
+                <TripCarousel
+                  caption="Calendario de viajes"
+                  title="Próximos Viajes"
+                  trips={viajes}
+                  emptyLabel="No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
+                />
+              </div>
             </Collapsible>
           </div>
         </section>
