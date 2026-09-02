@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { TRIP_TYPES, type TripType } from "@/lib/trip-type";
 import { DeleteTripButton } from "./DeleteTripButton";
+import { formatAmount } from "@/lib/format";
 
 const STATUS_LABEL: Record<string, string> = {
   draft: "Borrador",
@@ -84,7 +85,7 @@ export async function TripsList({ type }: { type: TripType }) {
                   </td>
                   <td className="px-5 py-4 text-on-surface-variant">{trip.capacity}</td>
                   <td className="px-5 py-4 text-on-surface-variant">
-                    {trip.price > 0 ? `USD ${trip.price}` : "Gratuito"}
+                    {trip.price > 0 ? formatAmount(trip.price) : "Gratuito"}
                   </td>
                   <td className="px-5 py-4">
                     <span

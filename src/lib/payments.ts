@@ -26,14 +26,3 @@ export async function getActivePaymentMethods(): Promise<PaymentMethod[]> {
 
   return data ?? [];
 }
-
-/**
- * El aporte del viaje tal como se imprime al lado de las instrucciones.
- *
- * `trips.price` es un numero solo y no dice moneda (ver docs/PAGOS.md): el
- * simbolo que se muestra es el del riel, no el del viaje. Mientras eso siga
- * asi, el monto se escribe sin simbolo y la moneda la aclara cada riel.
- */
-export function formatAmount(price: number): string {
-  return new Intl.NumberFormat("es-CL", { maximumFractionDigits: 0 }).format(price);
-}

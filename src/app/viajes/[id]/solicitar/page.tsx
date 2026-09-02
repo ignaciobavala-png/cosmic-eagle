@@ -4,7 +4,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
-import { getActivePaymentMethods, formatAmount } from "@/lib/payments";
+import { getActivePaymentMethods } from "@/lib/payments";
+import { formatAmount } from "@/lib/format";
 import { ScreeningForm } from "./ScreeningForm";
 import { PaymentProofUpload } from "./PaymentProofUpload";
 
@@ -189,6 +190,13 @@ export default async function SolicitarPage({
                           <span className="text-on-surface-variant font-normal">
                             {" "}
                             · {method.currency}
+                            {/* El aporte del viaje esta fijado en dolares (ver
+                                formatAmount); cualquier otro riel cobra la
+                                conversion del dia y hay que decirlo aca, o el
+                                monto de arriba se lee como si fuera en esta
+                                moneda. */}
+                            {method.currency.toUpperCase() !== "USD" &&
+                              " · el equivalente del día"}
                           </span>
                         )}
                       </p>

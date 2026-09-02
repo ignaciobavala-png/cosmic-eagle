@@ -43,3 +43,19 @@ export function formatScheduleDay(startDate: string, day: number) {
     timeZone: "UTC",
   });
 }
+
+/**
+ * El aporte de un viaje: "USD 900".
+ *
+ * **Los precios de `trips.price` estan fijados en dolares** (definido el
+ * 02/09/2026, punto 6 de la consulta de cobros). Los demas rieles cobran el
+ * equivalente del dia: el IBAN de Santander en euros, Encuadrado en lo que
+ * cobre. Por eso no hay columna `currency` en `trips` — la moneda del viaje es
+ * siempre esta, y la del riel la aclara cada medio de cobro.
+ *
+ * Es la unica funcion que imprime un precio: antes "USD" estaba escrito a mano
+ * en tres pantallas y la cuarta lo omitia a proposito.
+ */
+export function formatAmount(price: number): string {
+  return `USD ${new Intl.NumberFormat("es-CL", { maximumFractionDigits: 0 }).format(price)}`;
+}

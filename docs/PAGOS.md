@@ -61,11 +61,7 @@ Nada de esto necesita migración de schema salvo el país, y ninguno toca RLS.
 
 ## 4. Lo que sigue sin resolverse
 
-- **La moneda.** Los precios del flyer están en USD. Una transferencia a un IBAN
-  español se liquida en EUR salvo que la cuenta admita multi-divisa, y Mercado
-  Pago Chile cobra en CLP. O sea que hay **tres monedas** y `trips.price` es un
-  número solo. Es el mismo agujero que ya apareció con el precio de Santiago
-  (`docs/EXPERIENCIAS_2026.md`), ahora agrandado.
+- ~~**La moneda.**~~ **RESUELTO el 02/09/2026**, ver §7.
 - **La seña del 50%.** El flyer la promete; con transferencia, es la persona la
   que decide cuánto manda. La web sólo puede decir el monto.
 - **Dónde queda Encuadrado.** Ver `docs/ENCUADRADO.md`. La respuesta de Sofía
@@ -163,3 +159,39 @@ Advisors sin novedades.
 **Sin verificar end-to-end** (requiere sesión, la hace Ignacio): cargar un riel
 desde `/admin/pagos`, verlo en la pantalla de estado de una solicitud aprobada,
 subir un comprobante y abrirlo desde el panel.
+
+
+## 7. La moneda: el precio se fija en dólares (02/09/2026)
+
+Definido por Ignacio, sin esperar a Sofía: es una decisión de producto, no un
+dato de ella. Era el punto 6 de las ocho preguntas de
+`~/Escritorio/cosmic-eagle-cobros-requerimientos.txt`.
+
+**`trips.price` está fijado en USD. Todos los demás rieles cobran el
+equivalente del día.** El IBAN de Santander liquida en euros, Encuadrado en lo
+que cobre; ninguno de los dos tiene un precio propio por viaje.
+
+- **No se agregó columna `currency` a `trips`.** Si la moneda del viaje es
+  siempre la misma, la columna sería una constante guardada 7 veces y un campo
+  más en el form del admin. La moneda que varía es la del **riel**, y esa ya
+  vive en `payment_methods.currency`.
+- **`formatAmount` se mudó de `src/lib/payments.ts` a `src/lib/format.ts`** y
+  ahora imprime `USD 900`. Es la **única** función que escribe un precio: antes
+  el `USD` estaba escrito a mano en `TripsList`, en las dos vistas del detalle
+  del viaje, y la pantalla de estado del postulante lo omitía a propósito
+  (hedge de la indefinición). Eran cuatro criterios para el mismo número.
+  `payments.ts` quedó sin ella y no la reexporta.
+- **Un riel con moneda distinta de USD aclara "· el equivalente del día"** al
+  lado de su etiqueta, en la pantalla de estado. Sin eso el monto de arriba se
+  lee como si estuviera en la moneda del riel, que es exactamente el caso de
+  "900 USD vs 900 EUR" que motivaba la pregunta.
+
+Lo que **sigue abierto** de este hilo:
+
+- El precio de la ceremonia de Santiago es una conversión aproximada de CLP a
+  USD y hay que confirmarlo (`docs/EXPERIENCIAS_2026.md`).
+- La seña del 50%: la web dice el monto total, y quien transfiere decide cuánto
+  manda. Para que el sistema distinga "pagó la seña" de "pagó todo" hace falta
+  un campo más y que Estela lo marque.
+- En qué moneda cobra la tarjeta de Encuadrado (pregunta 4 de las ocho). No
+  cambia lo de arriba: sea cual sea, es otro riel con su conversión del día.
