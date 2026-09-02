@@ -28,7 +28,11 @@ export function TripCarousel({
   emptyLabel: string;
 }) {
   return (
-    <div className="rounded-[20px] bg-[linear-gradient(135deg,#7a6329_0%,#f9d78f_30%,#fbe9c0_50%,#b3964b_75%,#6b551f_100%)] px-5 py-11">
+    // `left-1/2 -translate-x-1/2 w-screen`: el panel dorado SIEMPRE ocupa todo
+    // el ancho de la pantalla, sin importar en qué contenedor angosto viva
+    // (columna de texto de /viajes, banda de la home, etc.). Es la cartelera
+    // de Julia, full-bleed en cualquier página donde aparezca.
+    <div className="relative left-1/2 w-screen -translate-x-1/2 rounded-[20px] bg-[linear-gradient(135deg,#7a6329_0%,#f9d78f_30%,#fbe9c0_50%,#b3964b_75%,#6b551f_100%)] px-5 py-11">
       <p className="text-center text-label-sm uppercase text-[#05125a]/70">
         {caption}
       </p>
