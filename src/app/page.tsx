@@ -62,6 +62,9 @@ export default async function Home() {
     .limit(8);
 
   const trips = (data ?? []) as TripCardData[];
+  // La cartelera de la home muestra solo Sesiones (ceremonias). Los Viajes
+  // tienen su bloque en /viajes; la home no repite el calendario de retiros.
+  const sesiones = trips.filter((t) => t.type === "ceremonia");
   const testimonials = await getTestimonials("home");
 
   return (
@@ -122,18 +125,22 @@ export default async function Home() {
             ancla la trae hasta acá y `openOnHash` despliega el panel. Que el
             disparador sea un link y no estado compartido es a propósito — el
             salto lo hace el browser y las tarjetas siguen armándose en el
-            servidor. */}
+            servidor.
+
+            La cartelera dorada ocupa TODO el ancho de la pantalla (el "carrusel
+            dorado" del mockup), sin el contenedor angosto: se muestra solo el
+            calendario de sesiones. */}
         <section
           id="calendario"
-          className="w-full bg-[#020c41] px-margin-mobile py-20 md:px-margin-desktop"
+          className="w-full bg-[#020c41] py-20"
         >
-          <div className="mx-auto max-w-narrative text-center">
+          <div className="w-full text-center">
             <Collapsible label="Ver próximas fechas" openOnHash="calendario" tone="dark">
               <TripCarousel
-                caption="Calendario de experiencias"
-                title="Próximos Viajes"
-                trips={trips}
-                emptyLabel="No hay experiencias publicadas por el momento. Vuelve a visitarnos pronto."
+                caption="Calendario de sesiones"
+                title="Próximas Sesiones"
+                trips={sesiones}
+                emptyLabel="No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto."
               />
             </Collapsible>
           </div>
