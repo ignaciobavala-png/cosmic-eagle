@@ -8,7 +8,6 @@ import { ImmersiveHero } from "@/components/ui/ImmersiveHero";
 import { ScrollStory } from "@/components/ui/ScrollStory";
 import { MediaStatement } from "@/components/ui/MediaStatement";
 import { CreamSection } from "@/components/ui/CreamSection";
-import { Collapsible } from "@/components/ui/Collapsible";
 import { TripCarousel } from "@/components/ui/TripCarousel";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
@@ -119,39 +118,27 @@ export default async function Home() {
           cta={{ label: "Explorar experiencias", href: "#calendario" }}
         />
 
-        {/* El calendario en la home. Va sobre el mismo azul con el que termina
+        {/* Los calendarios en la home. Van sobre el mismo azul con el que termina
             el relato, para que no haya corte de color entre las dos.
 
-            Arranca CERRADO y lo abre el botón del relato, como en el mockup: el
-            ancla la trae hasta acá y `openOnHash` despliega el panel. Que el
-            disparador sea un link y no estado compartido es a propósito — el
-            salto lo hace el browser y las tarjetas siguen armándose en el
-            servidor.
-
-            La cartelera dorada ocupa TODO el ancho de la pantalla (el "carrusel
-            dorado" del mockup), sin el contenedor angosto. Dentro del panel van
-            las dos bandas full-bleed: sesiones y luego viajes. */}
-        <section
-          id="calendario"
-          className="w-full bg-[#020c41] py-20"
-        >
-          <div className="w-full text-center">
-            <Collapsible label="Ver próximas fechas" openOnHash="calendario" tone="dark">
-              <div className="flex w-full flex-col gap-10">
-                <TripCarousel
-                  caption="Calendario de sesiones"
-                  title="Próximas Sesiones"
-                  trips={sesiones}
-                  emptyLabel="No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto."
-                />
-                <TripCarousel
-                  caption="Calendario de viajes"
-                  title="Próximos Viajes"
-                  trips={viajes}
-                  emptyLabel="No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
-                />
-              </div>
-            </Collapsible>
+            Las dos carteleras doradas ocupan TODO el ancho de la pantalla y se
+            ven DIRECTAS, sin boton que las despliegue (el "carrusel dorado" de
+            Julia, scroll horizontal por banda): arriba las sesiones y debajo los
+            viajes. El "Explorar experiencias" del relato solo ancla hasta acá. */}
+        <section id="calendario" className="w-full bg-[#020c41] py-20">
+          <div className="flex w-full flex-col gap-10">
+            <TripCarousel
+              caption="Calendario de sesiones"
+              title="Próximas Sesiones"
+              trips={sesiones}
+              emptyLabel="No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto."
+            />
+            <TripCarousel
+              caption="Calendario de viajes"
+              title="Próximos Viajes"
+              trips={viajes}
+              emptyLabel="No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
+            />
           </div>
         </section>
 
