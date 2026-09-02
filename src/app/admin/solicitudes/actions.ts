@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/resend";
 import { createAdminNotification } from "@/lib/notifications";
+import { getActivePaymentMethods } from "@/lib/payments";
 import { SolicitudAprobada } from "@/emails/SolicitudAprobada";
 import { SolicitudRechazada } from "@/emails/SolicitudRechazada";
 import { PagoRegistrado } from "@/emails/PagoRegistrado";
@@ -151,6 +152,13 @@ async function notifyApproved({
 }) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://cosmic-eagle.vercel.app";
 
+  // Los medios de cobro se leen acá y viajan dentro del mail: aprobar es
+  // justamente el momento en que la persona necesita saber cómo pagar (ver
+  // docs/PAGOS.md). Si Estela todavía no cargó ninguno, el mail cae en "te
+  // escribimos con los datos" y nadie se entera del faltante salvo ella, que lo
+  // ve avisado en /admin/pagos.
+  const medios = await getActivePaymentMethods();
+
   const result = await sendEmail({
     to: email,
     subject: `Tu solicitud para ${trip?.title ?? "el viaje"} fue aprobada`,
@@ -160,7 +168,10 @@ async function notifyApproved({
       nombre: nombre.split(" ")[0],
       viaje: trip?.title ?? "tu viaje",
       fechas: trip ? formatDateRangeCompact(trip.start_date, trip.end_date) : "",
-      url: `${siteUrl}/viajes/${tripId}`,
+      // A la pantalla de estado y no a la página del viaje: es donde están las
+      // instrucciones de pago y el formulario del comprobante.
+      url: `${siteUrl}/viajes/${tripId}/solicitar`,
+      medios,
     }),
   });
 

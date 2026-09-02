@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ReviewButtons } from "../ReviewButtons";
 import { PaymentControls } from "../PaymentControls";
+import { PaymentProofList } from "../PaymentProofList";
 import { AnswerList } from "../../AnswerList";
 import {
   SCREENING_FIELDS,
@@ -120,6 +121,9 @@ export default async function SolicitudDetallePage({
 
       <div className="glass-card rounded-2xl p-6 md:p-8 mb-6">
         <h2 className="font-display text-xl text-primary-fixed-dim mb-4">Pago</h2>
+        {/* El comprobante primero: la decisión de marcar pagado se toma
+            mirándolo, no al revés. */}
+        <PaymentProofList applicationId={id} />
         <PaymentControls
           id={id}
           currentStatus={application.payment_status}

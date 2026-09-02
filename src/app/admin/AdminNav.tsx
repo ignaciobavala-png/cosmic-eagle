@@ -19,9 +19,11 @@ const LINKS = [
   { href: "/admin/retiros", label: "Retiros" },
   { href: "/admin/ceremonias", label: "Ceremonias" },
   { href: "/admin/solicitudes", label: "Solicitudes" },
+  { href: "/admin/pagos", label: "Pagos" },
   { href: "/admin/multimedia", label: "Multimedia" },
   { href: "/admin/contenidos", label: "Contenidos" },
   { href: "/admin/testimonios", label: "Testimonios" },
+  { href: "/admin/faqs", label: "Preguntas frecuentes" },
   { href: "/admin/crm", label: "CRM" },
   { href: "/admin/suscriptores", label: "Suscriptores" },
 ];

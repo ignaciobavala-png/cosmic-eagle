@@ -332,6 +332,44 @@ export const SITE_GROUPS = [
     ],
   },
   {
+    id: "faqs",
+    title: "Preguntas frecuentes",
+    href: "/faqs",
+    slots: [
+      {
+        key: "faqs.hero.image",
+        label: "Imagen de portada",
+        help: "Banner de arriba de la página de preguntas frecuentes.",
+        type: "image",
+        fallback: IMAGES.almas,
+        ratio: "16/9",
+        maxPx: 1920,
+      },
+      {
+        key: "faqs.hero.title",
+        label: "Título de portada",
+        help: "El texto grande sobre el banner de Preguntas frecuentes.",
+        type: "text",
+        fallback: "Preguntas frecuentes",
+      },
+      {
+        key: "faqs.hero.subtitle",
+        label: "Bajada de portada",
+        help: "La frase corta debajo del título de Preguntas frecuentes.",
+        type: "text",
+        fallback:
+          "Lo que suelen preguntarnos antes de emprender el viaje.",
+      },
+      {
+        key: "faqs.hero.overlay",
+        label: "Mostrar el título sobre la portada",
+        help: "Si lo destildas, el banner queda solo con la imagen: no se ven ni el título ni la bajada.",
+        type: "boolean",
+        fallback: "true",
+      },
+    ],
+  },
+  {
     id: "cuenta",
     title: "Acceso",
     href: "/cuenta",

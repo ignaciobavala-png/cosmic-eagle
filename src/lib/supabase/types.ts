@@ -261,6 +261,42 @@ export type Database = {
           },
         ]
       }
+      faqs: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          is_published: boolean
+          placement: Database["public"]["Enums"]["faq_placement"]
+          question: string
+          sort_order: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          placement: Database["public"]["Enums"]["faq_placement"]
+          question: string
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          placement?: Database["public"]["Enums"]["faq_placement"]
+          question?: string
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       health_form_first_time: {
         Row: {
           age: number
@@ -383,6 +419,84 @@ export type Database = {
           id?: string
         }
         Relationships: []
+      }
+      payment_methods: {
+        Row: {
+          audience: string | null
+          currency: string | null
+          id: string
+          instructions: string
+          is_active: boolean
+          label: string
+          link_url: string | null
+          sort_order: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          audience?: string | null
+          currency?: string | null
+          id?: string
+          instructions: string
+          is_active?: boolean
+          label: string
+          link_url?: string | null
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          audience?: string | null
+          currency?: string | null
+          id?: string
+          instructions?: string
+          is_active?: boolean
+          label?: string
+          link_url?: string | null
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      payment_proofs: {
+        Row: {
+          application_id: string
+          created_at: string
+          id: string
+          note: string | null
+          storage_path: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          storage_path: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_proofs_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_proofs_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "my_applications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -531,6 +645,8 @@ export type Database = {
           health_form_submitted: boolean | null
           id: string | null
           is_first_time: boolean | null
+          payment_proof_at: string | null
+          payment_proof_submitted: boolean | null
           payment_status: Database["public"]["Enums"]["payment_status"] | null
           reviewed_at: string | null
           status: Database["public"]["Enums"]["application_status"] | null
@@ -542,6 +658,8 @@ export type Database = {
           health_form_submitted?: never
           id?: string | null
           is_first_time?: never
+          payment_proof_at?: never
+          payment_proof_submitted?: never
           payment_status?: Database["public"]["Enums"]["payment_status"] | null
           reviewed_at?: string | null
           status?: Database["public"]["Enums"]["application_status"] | null
@@ -553,6 +671,8 @@ export type Database = {
           health_form_submitted?: never
           id?: string | null
           is_first_time?: never
+          payment_proof_at?: never
+          payment_proof_submitted?: never
           payment_status?: Database["public"]["Enums"]["payment_status"] | null
           reviewed_at?: string | null
           status?: Database["public"]["Enums"]["application_status"] | null
@@ -577,9 +697,11 @@ export type Database = {
         | "application_new"
         | "application_health_flag"
         | "email_failed"
+        | "payment_proof"
       application_status: "pending_review" | "approved" | "rejected" | "expired"
       article_category: "biblioteca" | "ciencia" | "testimonios"
       article_status: "draft" | "published"
+      faq_placement: "general" | "sesiones" | "viajes"
       payment_status: "pending" | "paid" | "waived"
       testimonial_placement: "home" | "sesiones" | "viajes"
       trip_status: "draft" | "open" | "closed" | "completed"
@@ -715,10 +837,12 @@ export const Constants = {
         "application_new",
         "application_health_flag",
         "email_failed",
+        "payment_proof",
       ],
       application_status: ["pending_review", "approved", "rejected", "expired"],
       article_category: ["biblioteca", "ciencia", "testimonios"],
       article_status: ["draft", "published"],
+      faq_placement: ["general", "sesiones", "viajes"],
       trip_status: ["draft", "open", "closed", "completed"],
       trip_type: ["retiro", "ceremonia"],
     },

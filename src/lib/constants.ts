@@ -127,13 +127,15 @@ export const FOOTER_COLUMNS = [
       { label: "Nosotros", href: "/nosotros" },
       { label: "Experiencias", href: "/viajes" },
       { label: "Contenidos", href: "/contenidos" },
+      { label: "Preguntas frecuentes", href: "/faqs" },
     ],
   },
   {
     title: "Legal",
     links: [
-      // Privacidad no tiene ruta todavia, pero el texto SI existe: viene en el
-      // anexo del boceto de Sofia. Es composicion pura, ver docs/HOME_REDISENO.md §7.
+      // Privacidad no tiene ruta NI texto a mano: el anexo de Sofia que lo traia
+      // (`web-cosmic-journey-ES.md`) se perdio y nunca se copio al repo. Hay que
+      // pedirlo de nuevo — ver docs/FAQS.md.
       { label: "Privacidad", href: null },
       { label: "Términos de Servicio", href: null },
       { label: "Contacto", href: "mailto:contacto@cosmiceaglejourney.com" },

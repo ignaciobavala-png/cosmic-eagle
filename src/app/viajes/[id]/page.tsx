@@ -7,7 +7,7 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { TripCover } from "@/components/ui/TripCover";
-import { formatScheduleDay } from "@/lib/format";
+import { formatScheduleDay, formatAmount } from "@/lib/format";
 import { groupScheduleByDay, parseSchedule } from "@/lib/trip-schedule";
 import { tripTypeLabel } from "@/lib/trip-type";
 
@@ -112,7 +112,7 @@ export default async function ViajePage({ params }: Props) {
     {
       icon: Wallet,
       label: "Aporte",
-      value: trip.price > 0 ? `USD ${trip.price}` : "A confirmar",
+      value: trip.price > 0 ? formatAmount(trip.price) : "A confirmar",
     },
   ];
 
@@ -290,7 +290,7 @@ export default async function ViajePage({ params }: Props) {
                 <div className="mt-6 border-t border-primary-fixed-dim/20 pt-5">
                   {trip.price > 0 && (
                     <p className="font-display text-2xl text-primary-fixed-dim">
-                      USD {trip.price}
+                      {formatAmount(trip.price)}
                     </p>
                   )}
                   {trip.terms && (
