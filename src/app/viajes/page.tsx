@@ -154,18 +154,26 @@ export default async function ViajesPage() {
               </p>
               </RevealItem>
             </div>
-
-            <RevealItem delay={0.6}>
-              <Collapsible label="Explorar próximas sesiones">
-                <TripCarousel
-                  caption="Calendario de sesiones"
-                  title="Próximas Sesiones"
-                  trips={ceremonias}
-                  emptyLabel="No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto."
-                />
-              </Collapsible>
-            </RevealItem>
           </div>
+
+          {/* La cartelera va FUERA de la columna de texto, como banda propia a
+              todo el ancho de la pantalla. Los margenes negativos cancelan el
+              padding de la CreamSection (`-mx-margin-*`) para que el panel
+              dorado quede full-bleed, y así el `overflow-hidden` del panel
+              desplegable del Collapsible no recorta el carrusel a la columna. */}
+          <RevealItem
+            delay={0.6}
+            className="-mx-margin-mobile text-center md:-mx-margin-desktop"
+          >
+            <Collapsible label="Explorar próximas sesiones">
+              <TripCarousel
+                caption="Calendario de sesiones"
+                title="Próximas Sesiones"
+                trips={ceremonias}
+                emptyLabel="No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto."
+              />
+            </Collapsible>
+          </RevealItem>
 
           <TestimonialsBand
             title="Nuestros Sanadores"
@@ -221,18 +229,24 @@ export default async function ViajesPage() {
               profundo del viaje.
             </p>
             </RevealItem>
-
-            <RevealItem delay={0.45}>
-              <Collapsible label="Explorar próximos viajes">
-                <TripCarousel
-                  caption="Calendario de viajes"
-                  title="Próximos Viajes"
-                  trips={retiros}
-                  emptyLabel="No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
-                />
-              </Collapsible>
-            </RevealItem>
           </div>
+
+          {/* Banda full-bleed, igual que en Sesiones: fuera de la columna de
+              texto, con margenes negativos que cancelan el padding de la
+              CreamSection. */}
+          <RevealItem
+            delay={0.45}
+            className="-mx-margin-mobile text-center md:-mx-margin-desktop"
+          >
+            <Collapsible label="Explorar próximos viajes">
+              <TripCarousel
+                caption="Calendario de viajes"
+                title="Próximos Viajes"
+                trips={retiros}
+                emptyLabel="No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
+              />
+            </Collapsible>
+          </RevealItem>
 
           <TestimonialsBand
             title="Nuestros Viajeros"
