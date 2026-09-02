@@ -198,21 +198,27 @@ export default async function Home() {
           </div>
         </Reveal>
 
-        {/* Panel doble: una mitad azul (Sesiones) y otra dorada (Viajes). En
-            mobile se apilan, que es lo que hace el mockup.
+        {/* Panel doble: arriba Sesiones (azul) y abajo Viajes (dorado), APILADOS
+            en vertical — Julia lo pidió así y lo revirtió cuando se probó lado a
+            lado (spec del 1/9, `.sesiones-viajes`). Cada mitad 50vh en desktop,
+            alto auto en mobile.
 
-            **Un solo observador para las dos mitades** (umbral 0.25), no uno
-            por mitad: en el mockup las dos cascadas arrancan juntas. Por eso el
+            **Un solo observador para los dos paneles** (umbral 0.25), no uno por
+            panel: en el mockup las dos cascadas arrancan juntas. Por eso el
             `Reveal` ES la seccion. La cascada no es pareja — titulo y linea
-            entran los dos en 0ms — asi que va `stagger={0}` y el escalon lo
-            pone cada item con su `delay`. */}
+            entran los dos en 0ms — asi que va `stagger={0}` y el escalon lo pone
+            cada item con su `delay`.
+
+            **Los dos botones son el mismo tipo** (`.sv-btn` del mockup): pildora
+            con borde 1.5px del color del texto, fondo translucido del color del
+            panel y glow propio en hover. Solo cambia el tono de cada panel. */}
         <Reveal
           id="experiencias"
           amount={0.25}
           stagger={0}
-          className="grid w-full md:grid-cols-2"
+          className="w-full"
         >
-          <div className="flex min-h-[28rem] items-center bg-[linear-gradient(135deg,#0079b3,#05125a)] px-margin-mobile py-16 text-primary-container md:px-14">
+          <div className="flex w-full items-center bg-[linear-gradient(135deg,#0079b3,#05125a)] px-margin-mobile py-16 text-primary-container md:min-h-[50svh] md:px-14 md:py-20">
             <div className="max-w-md">
               <RevealItem duration={0.8}>
                 <h2 className="font-display text-headline-md">
@@ -233,18 +239,18 @@ export default async function Home() {
                 </p>
               </RevealItem>
               <RevealItem duration={0.8} delay={0.45}>
-                <CtaLink
+                <Link
                   href="/viajes#sesiones"
-                  variant="ghost"
-                  className="rounded-full"
+                  className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,rgba(0,121,179,0.35),rgba(5,18,90,0.35))] px-7 py-3 font-display text-label-sm uppercase tracking-wide text-primary-container transition-[filter,box-shadow] duration-300 hover:brightness-110 hover:shadow-[0_0_20px_rgba(0,121,179,0.55)]"
                 >
                   Explorar próximas sesiones
-                </CtaLink>
+                  <span aria-hidden="true">→</span>
+                </Link>
               </RevealItem>
             </div>
           </div>
 
-          <div className="flex min-h-[28rem] items-center bg-[linear-gradient(to_bottom_right,#6b551f_0%,#b3964b_22%,#f9d78f_50%,#b3964b_78%,#6b551f_100%)] px-margin-mobile py-16 text-[#05125a] md:px-14">
+          <div className="flex w-full items-center bg-[linear-gradient(to_bottom_right,#6b551f_0%,#b3964b_22%,#f9d78f_50%,#b3964b_78%,#6b551f_100%)] px-margin-mobile py-16 text-[#05125a] md:min-h-[50svh] md:px-14 md:py-20">
             <div className="max-w-md">
               <RevealItem duration={0.8}>
                 <h2 className="font-display text-headline-md">
@@ -266,9 +272,10 @@ export default async function Home() {
               <RevealItem duration={0.8} delay={0.45}>
                 <Link
                   href="/viajes#viajes"
-                  className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#05125a]/60 bg-white/25 px-7 py-3 text-label-sm uppercase text-[#05125a] transition-[filter] duration-300 hover:brightness-110"
+                  className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#05125a] bg-[linear-gradient(135deg,rgba(249,215,143,0.4),rgba(179,150,75,0.2))] px-7 py-3 font-display text-label-sm uppercase tracking-wide text-[#05125a] transition-[filter,box-shadow] duration-300 hover:brightness-110 hover:shadow-[0_0_34px_rgba(249,215,143,0.9)]"
                 >
                   Ir más allá
+                  <span aria-hidden="true">→</span>
                 </Link>
               </RevealItem>
             </div>
