@@ -61,10 +61,6 @@ export default async function Home() {
     .limit(8);
 
   const trips = (data ?? []) as TripCardData[];
-  // La cartelera de la home muestra los DOS calendarios a todo el ancho: el de
-  // sesiones (ceremonias) y el de viajes (retiros), cada uno con su carrusel.
-  const sesiones = trips.filter((t) => t.type === "ceremonia");
-  const viajes = trips.filter((t) => t.type === "retiro");
   const testimonials = await getTestimonials("home");
 
   return (
@@ -118,26 +114,21 @@ export default async function Home() {
           cta={{ label: "Explorar experiencias", href: "#calendario" }}
         />
 
-        {/* Los calendarios en la home. Van sobre el mismo azul con el que termina
-            el relato, para que no haya corte de color entre las dos.
+        {/* La cartelera en la home. Va sobre el mismo azul con el que termina el
+            relato, para que no haya corte de color entre las dos.
 
-            Las dos carteleras doradas ocupan TODO el ancho de la pantalla y se
-            ven DIRECTAS, sin boton que las despliegue (el "carrusel dorado" de
-            Julia, scroll horizontal por banda): arriba las sesiones y debajo los
-            viajes. El "Explorar experiencias" del relato solo ancla hasta acá. */}
+            Es UNA sola vista general a todo el ancho, como pide Julia: un
+            carrusel que integra sesiones y viajes (cada tarjeta con su tag).
+            No son dos carruseles separados: a la sección específica de cada
+            tipo se accede desde el panel o desde /viajes. El "Explorar
+            experiencias" del relato ancla hasta acá. */}
         <section id="calendario" className="w-full bg-[#020c41] py-20">
-          <div className="flex w-full flex-col gap-10">
-            <TripCarousel
-              caption="Calendario de sesiones"
-              title="Próximas Sesiones"
-              trips={sesiones}
-              emptyLabel="No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto."
-            />
+          <div className="w-full">
             <TripCarousel
               caption="Calendario de viajes"
               title="Próximos Viajes"
-              trips={viajes}
-              emptyLabel="No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
+              trips={trips}
+              emptyLabel="No hay experiencias publicadas por el momento. Vuelve a visitarnos pronto."
             />
           </div>
         </section>
