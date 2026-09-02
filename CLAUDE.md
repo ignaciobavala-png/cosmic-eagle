@@ -1387,3 +1387,94 @@ abre la cartelera que está abajo (`toggleCartelera()`), acá linkea a `/viajes`
 96/72px en el mockup contra 84/64px nuestros — y la del logo), portar el modal
 como `GateModal` y engancharlo al carrusel de experiencias para el usuario sin
 sesión.
+
+### Sesión del 2026-09-02 (quinquies) — el recorrido en capturas y las 15 correcciones de Julia
+
+Todo lo de abajo está **mergeado a `main` y deployado a producción** (verificado
+contra el sitio en vivo con marcadores exclusivos del commit).
+
+#### 1. El embudo de inscripción, en capturas, para mostrárselo a Sofía
+
+`e2e/capturas.escritura.spec.ts` recorre el mismo embudo que ya verifica
+`inscripcion.escritura.spec.ts` y **captura cada pantalla**, incluidas las
+cuatro del panel donde interviene Estela. `e2e/armar-indice.mjs` arma un
+`index.html` con las capturas y un epígrafe por paso. Las imágenes van a
+`~/Escritorio/flujo de pagos y formulario/`, **fuera del repo**.
+
+Tres cosas que hay que dejar como están o las capturas salen mal:
+
+- **`prefers-reduced-motion: reduce` en el contexto** (como `contextOptions`, el
+  `reducedMotion` suelto de `test.use` no tipa). Sin eso, media página sale en
+  opacidad 0: el observador sólo reveló lo que estaba en el viewport.
+- **El navbar se desfija, con dos reglas distintas**: el público reserva su hueco
+  arriba y va `absolute`; el del panel es pegajoso y no reserva nada, así que ahí
+  `absolute` lo saca del flujo y tapa el título — va `static`.
+- Se esconde `nextjs-portal`, el badge del overlay de `next dev`.
+
+#### 2. Las 15 correcciones de Julia
+
+Entrega en `docs/entregas/2026-09-02-julia-correcciones/`, checklist cruzado
+contra el código en **`docs/CORRECCIONES_JULIA_0209.md`**. Lo que hay que
+recordar:
+
+- **La píldora dorada es UN solo botón** y ahora es variante del sistema
+  (`CtaLink variant="pill"`): en el mockup `.navbar-cta`, `.about-btn-ghost`,
+  `.proposito-btn` y `.tec-btn` son el mismo diseño y sólo cambia el padding.
+- **Los links del navbar y los indicadores de scroll van en Domine.** Heredaban
+  Montserrat del `body` porque no llevaban `font-display`.
+- **La frase manifiesto tenía los colores invertidos**: primera línea crema,
+  segunda dorada en itálica.
+- **La cartelera de la home vuelve a arrancar cerrada**, y la despliega
+  "Explorar experiencias" — revierte los tres commits del 02/09 que la habían
+  dejado a la vista (confirmado por Ignacio: gana Julia). El disparador está
+  400vh más arriba, dentro del sticky del relato, así que el panel **no lleva
+  botón propio**: `label` pasó a ser opcional en `Collapsible` y se abre por hash.
+- **El calendario se mueve solo en escritorio** y se frena al hover. **El
+  separador va como `mr` de cada tarjeta y NO como `gap` de la pista**: con
+  `gap`, el recorrido de `-50%` cae medio separador corrido del arranque del
+  segundo juego y el loop pega un saltito por vuelta.
+- **La tarjeta de la cartelera cambió** (`calendariodeviajes_design.png`):
+  portada apaisada (variante `strip` de `TripCover`, que es la proporción en que
+  se guarda), los dos tags **debajo** de la portada y no superpuestos, y el pie
+  con FECHA en Domine. El label de fecha va en `on-primary-container` y no en el
+  `#b3964b` del mockup, por lo del 28/08 (3,4:1 en un texto de 10px).
+- **"Voces de Luz" era lo único que no se había respetado**: pasó a fondo degradé
+  azul, carrusel arrastrable pensado para nueve tarjetas, y franja de imagen al
+  pie editable desde Multimedia (slot nuevo `home.voces.image`).
+- **El gate de sesión existe** (`GateModal` + `ExperienceGate`): tocar una
+  experiencia sin sesión abre la tarjeta aprobada. **No toca `TripCard`** —
+  escucha el click en el contenedor, así la tarjeta sigue siendo un `<a>` real
+  que se indexa, se abre en pestaña nueva y funciona sin JS. La página del viaje
+  es pública igual: el modal es una invitación, no un candado.
+
+**Dos hallazgos que no estaban en su lista y valen para todo el sitio:**
+
+1. **La cascada de `Reveal` nunca funcionó.** `RevealItem` emitía siempre un
+   `delay` en su transición, y cuando el padre orquesta con `staggerChildren`
+   Framer implementa el escalón **como** ese delay: un `delay: 0` escrito a mano
+   lo pisa. Los bloques que se veían escalonados lo lograban con retardos
+   escritos uno por uno, no por el stagger. Medido en Chrome: los siete
+   elementos de `WordSequence` cruzaban a opacidad plena **en el mismo
+   milisegundo** (777ms los siete); ahora escalonan de a 185ms en escritorio y
+   330ms en mobile, y la segunda línea del manifiesto entra 168ms después de la
+   primera, que es el `transition-delay: 0.15s` del mockup. Está en el skill
+   `scroll-driven-animations-no-confiar` de brain-data, con cómo medirlo.
+2. **Un gate no puede interceptar el click desde el burbujeo.** `next/link` lo
+   maneja primero: el evento llega al contenedor con `defaultPrevented` en true
+   —o sea que no se distingue de un click ya atendido— y la navegación del router
+   ya arrancó, así que prevenir el default no la frena. Va en **fase de captura**
+   con `stopPropagation`. Y la sesión se lee con **`getSession` y no `getUser`**:
+   el segundo pega contra el Auth de Supabase y hasta que contesta el click se va
+   de largo, que es justo la primera visita.
+
+**Queda abierto** (anotado en `docs/CORRECCIONES_JULIA_0209.md`): el destino real
+de "Contacta soporte" (hoy sin linkear, como los links apagados del footer), una
+foto pensada para la franja de Voces de Luz —el asset viejo es oscuro y casi no
+se lee— y el tag de tipo con texto blanco sobre dorado, que es lo que pide su
+mockup pero queda en contraste bajo.
+
+**Y algo para mirar en algún momento**: `Collapsible` dice en su comentario que
+renderiza el contenido siempre, aunque el panel esté cerrado, justamente para que
+las tarjetas estén en el HTML para Google y para un lector de pantalla — pero el
+código las monta recién al abrir (`{open && ...}`). Es previo (viene de
+`/viajes`) y ahora también aplica a la home.
