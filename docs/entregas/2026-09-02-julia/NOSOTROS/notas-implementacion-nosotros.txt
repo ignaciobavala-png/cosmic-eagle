@@ -1,0 +1,138 @@
+NOTAS DE IMPLEMENTACIÓN — nosotros.html (Cosmic Eagle)
+Para el agente de desarrollo (Claude) que porta este mockup a la app real Next.js/React/Tailwind/Supabase.
+Escrito por el Claude que diseñó/mockupeó el sitio junto con Julia (la clienta/diseñadora). Este
+archivo es contexto de PROCESO y DECISIONES — el detalle técnico de valores exactos (colores,
+tamaños, animaciones) está en el archivo adjunto "design-system-nosotros.md", léanlo junto a este.
+
+QUÉ ES ESTE ARCHIVO
+nosotros.html es un mockup estático (HTML+CSS+JS vanilla, un solo archivo autocontenido, sin build
+ni dependencias) que representa el diseño ya APROBADO por Julia para la página "Nosotros" del
+sitio. Al igual que con homepage.html, no es código para copiar y pegar tal cual — es la
+referencia exacta contra la cual comparar la implementación en React.
+
+CONTEXTO DEL PROYECTO Y DE ESTA ENTREGA
+Nosotros fue de las primeras páginas del sitio en aprobarse (antes que Home), y ya pasó por varias
+rondas de correcciones a lo largo de las últimas semanas: 4 rondas iniciales, más una ronda de
+ajustes menores el 1/9 (navbar opaca, fix de un bug real de reveal direccional, indicador de
+scroll faltante, nota de CMS en el título de cierre), dos rondas más ese mismo día resolviendo
+timing/posición de los símbolos decorativos, y una cuarta ronda el 2/9 reduciendo a la mitad las
+distancias verticales entre símbolos y texto en mobile (con un fix inmediato el mismo día por un
+efecto secundario no buscado). El archivo que acompaña este paquete es la versión final de todas
+esas rondas — ya aprobada, sin cambios pendientes conocidos.
+Julia ya recibió el mismo tipo de paquete (HTML + .md + .txt) para homepage.html el 2/9, y pidió
+ahora este mismo tratamiento para Nosotros para evitar las mismas discrepancias que ya aparecieron
+antes entre el mockup y el sitio en vivo (ver "PROBLEMAS YA CONOCIDOS" más abajo).
+
+QUÉ HAY EN ESTE PAQUETE
+1. nosotros.html — el mockup aprobado, tal cual (Julia ya lo tiene, este paquete lo acompaña).
+2. design-system-nosotros.md — spec técnica completa: qué CSS de este archivo es real y cuál es
+   heredado sin usar (MUY IMPORTANTE, ver más abajo), estructura de secciones en orden, spec
+   detallada por componente, el algoritmo de centrado dinámico de los símbolos, el patrón de
+   reveal direccional, y una tabla completa de animaciones.
+3. nos-symbol-1.png (320×268px) y nos-symbol-2.png (320×195px) — los dos símbolos decorativos
+   reales, extraídos del base64 embebido en el HTML, con transparencia. Son arte final aprobado
+   por Julia, no placeholders — mismos archivos que ya se le habían pasado a este mismo equipo de
+   desarrollo el 27/8 para resolver un bug de símbolos que no cargaban en el sitio en vivo (si ya
+   los tienen guardados de esa vez, son exactamente los mismos, no hace falta reemplazarlos).
+4. Este archivo.
+
+LO MÁS IMPORTANTE DE ESTE PAQUETE — CSS HEREDADO SIN USAR
+A diferencia de homepage.html (que tenía una sola clase huérfana, `.symbol-note`), nosotros.html
+arrastra un bloque MUCHO más grande de CSS que no se usa en ningún lado de esta página. La razón:
+este archivo se construyó copiando como base el stylesheet de Home (el mismo que hoy es
+homepage.html) y agregando encima las secciones nuevas y propias de Nosotros (todas con el prefijo
+de clase `nos-`) — pero el CSS viejo de Home nunca se limpió del archivo.
+Como resultado, hay bloques completos de estilos para secciones que EXISTEN en el CSS pero NO
+tienen ningún elemento HTML correspondiente en esta página: el Hero de Home (`.hero`, distinto de
+`.nos-hero` que sí se usa), el indicador de scroll de Home (`.scroll-ind`, distinto de
+`.hero-discover` que sí se usa acá), toda la sección About de Home (`.about-statement`,
+`.about-editorial`, `.scroll-story`, `.story-keywords`, `.story-cta`, `.cartelera-*`, `.card*`),
+Atmosférica (`.atmos*`), Propósito (`.proposito*`), Sesiones/Viajes (`.sesiones`, `.viajes`,
+`.sv-*`, `.symbol-note`), Testimonios (`.testimonios`, `.testi-*`) y Tecnología del Alma
+(`.tecnologia`, `.tec-*`), más un Cierre genérico sin prefijo (`.cierre`, distinto de
+`.nos-cierre` que sí se usa).
+**Ninguna de estas clases debe portarse** — no representan nada de esta página, son
+código muerto de la plantilla original. La lista completa de qué SÍ está realmente en el `<body>`
+de nosotros.html (y por lo tanto qué SÍ hay que portar) está detallada en design-system-nosotros.md,
+sección 0 y 1. Si tienen alguna herramienta de detección de CSS no usado en su pipeline, es
+esperable y normal que marque todo este bloque en este archivo puntual — no es una señal de que
+algo esté roto, es deuda conocida de cómo se armó este mockup.
+
+UNA POSIBLE INCONSISTENCIA A REVISAR, NO CORREGIDA EN ESTE ARCHIVO
+El botón flotante "volver arriba" (`.scrolltop`) de homepage.html recibió, en una corrección
+del 1/9, un efecto de glow en hover/tap y un `onclick` real (`scrollTo({top:0,behavior:'smooth'})`)
+que antes no tenía. Ese mismo fix NO llegó a aplicarse en nosotros.html — acá el `.scrolltop`
+sigue sin `onclick` (no hace nada al tocarlo) y sin el glow. No lo corregimos en este archivo
+porque Julia no lo pidió explícitamente para esta página y este paquete es solo de documentación,
+no una ronda de corrección — lo marcamos acá para que no se pierda como posible descuido a
+confirmar con ella antes de portar (¿debería llevar el mismo comportamiento que en Home, por
+consistencia entre páginas, o quedó así a propósito?).
+
+DECISIONES DE PRODUCTO YA CONFIRMADAS CON JULIA (para que no vuelvan a quedar como preguntas
+abiertas en su documentación interna — mismas que ya se cerraron para homepage.html, aplican
+igual acá)
+- Navbar: opaca al 100% (gradiente sólido), nunca semitransparente — ya corregido en esta página
+  el 1/9.
+- Tipografía: Domine (headings/botones) + Montserrat (cuerpo). Georgia en el `body` es solo la
+  falla de carga de fuente del entorno de mockup.
+- El título de cierre ("UN VIAJE HACIA EL HUMANO LUMINOSO") y el hero (titular+bajada) deben ser
+  campos de texto editables desde el panel de control (CMS) — ya documentado con comentarios HTML
+  dentro del propio archivo, en el lugar exacto de cada uno. El salto de línea del título de
+  cierre es parte del diseño visual (2 líneas), no debe depender de un `<br>` literal si el campo
+  del CMS termina siendo una sola línea larga de texto dinámico — replicar el quiebre por
+  CSS/JS según el ancho disponible.
+- Botón de cuenta: un solo botón que cambia de texto ("Unirme al círculo" ↔ "Mi cuenta") según
+  haya sesión o no — hoy simulado con `localStorage.getItem('userLoggedIn')`, sin backend real.
+
+PROBLEMAS YA CONOCIDOS ENTRE MOCKUP Y SITIO EN VIVO (auditoría del 27-28/8, previa a este paquete)
+Cuando esta página se subió a producción con una versión anterior de este mismo mockup, no quedó
+igual: los símbolos decorativos no llegaron a cargar en absoluto (ya se resolvió pasándoles los
+PNG reales, adjuntos también en este paquete), y hubo también problemas de animación (algunas se
+revertían a mitad de scroll en varias páginas del sitio, no solo en esta). La causa raíz de esos
+problemas de animación fue un bug real de Framer Motion 12 con `ViewTimeline` nativo en secciones
+sticky muy altas — ya lo diagnosticaron y arreglaron de su lado (`use-section-progress.ts`, 28/8).
+Esta página tiene justamente una sección de ese tipo: `.nos-about` (280vh, sticky) — vale la pena
+tenerla presente especialmente ahí, por la misma razón que `.scroll-story` de Home.
+
+DETALLES DE IMPLEMENTACIÓN QUE CONVIENE SABER ANTES DE PORTAR (no son bugs, es cómo está hecho el
+mockup a propósito, para que no se pierdan en la traducción a React)
+- El reveal de los párrafos de "Sobre nosotros" (`.nos-about`) NO es un IntersectionObserver ni
+  un toggle on/off — es una función continua atada al progreso real del scroll dentro del
+  contenedor sticky (0 a 1), recalculada en cada evento de scroll con `requestAnimationFrame`
+  para no saturar el hilo principal. Cada uno de los 3 párrafos anima su propio tramo de ese
+  progreso (dividido en partes iguales dentro del primer 75% del recorrido). Si lo reimplementan
+  con Framer Motion (`useScroll`/`useTransform`), el comportamiento esperado es el mismo: continuo
+  y reversible en ambas direcciones de scroll, no un disparo único.
+- El símbolo decorativo 2 (entre "Nuestro enfoque" y "Nuestro propósito") tiene un
+  IntersectionObserver PROPIO e independiente de las dos pantallas que lo rodean — a propósito,
+  porque vive visualmente al límite entre ambas y atarlo al `in-view` de cualquiera de las dos
+  sería frágil (una se activa una pantalla entera antes de que el símbolo sea visible, la otra
+  podría activarse después de que ya haga falta). Si en el proceso de portado se refactoriza esta
+  sección a componentes separados por pantalla, hay que preservar esta independencia — no asumir
+  que el símbolo pertenece al ciclo de vida de ninguna de las dos.
+- La posición de ambos símbolos (desktop: `top` absoluto; mobile: `margin-top`/`margin-bottom`) se
+  calcula en tiempo de ejecución midiendo el layout real, no con valores fijos — ver
+  `nosCenterSymbol()` en el .md adjunto. Esto es intencional y necesario: el espacio disponible
+  entre los textos varía según cuánto se envuelva el copy real en cada ancho de pantalla, y un
+  valor fijo se rompería en cuanto el copy cambie de longitud. Si lo portan con un enfoque
+  distinto (ej. Flexbox `gap` fijo), van a perder esta adaptabilidad — probarlo con textos de
+  distinta longitud (el copy real puede no ser exactamente el del mockup) antes de dar por
+  cerrado el layout.
+- Todas las reveals de scroll de esta página (excepto "Sobre nosotros", que es continua) usan el
+  mismo patrón direccional que Home: se revierten si el usuario vuelve hacia arriba, pero NO si
+  sigue scrolleando hacia abajo. Es el mismo `nosObserveToggle()` que corrigió un bug real
+  reportado por Julia el 1/9 (antes se apagaban las animaciones apenas el usuario seguía de largo
+  hacia abajo, sin importar la dirección). Reversible-al-volver-atrás es el comportamiento
+  correcto acá — no confundir con el patrón "one-shot" (nunca reversible) que sí usa Home en la
+  mayoría de sus secciones.
+- Los símbolos decorativos, además de su reveal (fade-in), tienen una rotación continua e
+  independiente (`nosSymbolSpin`, 30s por vuelta, sentido antihorario, infinita) que arranca apenas
+  el elemento existe en el DOM — no depende de scroll ni de ningún observer. No confundir esta
+  animación de fondo con la animación de aparición.
+
+CÓMO INTERPRETAR ESTE PAQUETE SI SON UN AGENTE DE IA
+Igual que con homepage.html: cualquier valor de nosotros.html que no esté marcado en el .md como
+"pendiente"/"placeholder" (o, en este caso, como CSS heredado sin usar — ver más arriba) debe
+tratarse como definitivo, ya aprobado por la clienta. La única duda real flagueada en este paquete
+es el comportamiento del botón `.scrolltop` (ver más arriba) — si genuinamente no queda claro algo
+más leyendo ambos documentos, es más seguro preguntar antes de adivinar.

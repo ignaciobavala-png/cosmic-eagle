@@ -247,12 +247,28 @@
   animation: auth-card-in 1s ease-out 150ms both;
 }
 
+/* Rotacion continua de los simbolos decorativos de /nosotros: 360° antihorario
+   en 30s, infinita. Arranca apenas el elemento existe, no depende de scroll. */
+@keyframes nos-symbol-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@utility animate-nos-spin {
+  animation: nos-symbol-spin 30s linear infinite;
+}
+
 /* Las reglas sin `@layer` le ganan a las utilidades de Tailwind, que si estan
    en capa. Por eso este bloque apaga las animaciones aunque se escriba antes. */
 @media (prefers-reduced-motion: reduce) {
   .animate-hero-zoom,
   .animate-float,
-  .animate-auth-card {
+  .animate-auth-card,
+  .animate-nos-spin {
     animation: none;
   }
 

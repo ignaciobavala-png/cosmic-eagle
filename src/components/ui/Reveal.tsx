@@ -177,6 +177,7 @@ export function RevealItem({
   delay = 0,
   scaleFrom,
   as = "div",
+  id,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -187,15 +188,17 @@ export function RevealItem({
   scaleFrom?: number;
   /** `span` para los items que viven dentro de un titulo o un parrafo. */
   as?: "div" | "span";
+  /** Ancla para scroll o para las mediciones de centrado de /nosotros. */
+  id?: string;
 }) {
   const reduced = useReducedMotion();
   const Tag = as === "span" ? motion.span : motion.div;
 
   if (reduced) {
     return as === "span" ? (
-      <span className={className}>{children}</span>
+      <span id={id} className={className}>{children}</span>
     ) : (
-      <div className={className}>{children}</div>
+      <div id={id} className={className}>{children}</div>
     );
   }
 
@@ -210,7 +213,7 @@ export function RevealItem({
   };
 
   return (
-    <Tag className={className} variants={variants}>
+    <Tag id={id} className={className} variants={variants}>
       {children}
     </Tag>
   );

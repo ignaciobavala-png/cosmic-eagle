@@ -1,5 +1,6 @@
 import { BackgroundMedia } from "./BackgroundMedia";
 import { Reveal } from "./Reveal";
+import { ScrollHintButton } from "./ScrollHintButton";
 
 /**
  * Pantalla completa de imagen con un velo azul encima y una frase centrada.
@@ -22,6 +23,7 @@ export function MediaStatement({
   id,
   veil = 0.45,
   overlay = true,
+  scrollHint,
   width = "narrow",
   amount = 0.4,
   once = true,
@@ -41,6 +43,11 @@ export function MediaStatement({
    * "Mostrar el texto" del panel de multimedia (`*.overlay`).
    */
   overlay?: boolean;
+  /**
+   * Indicador de scroll al pie ("SOBRE NOSOTROS" en /nosotros). Se mantiene
+   * aunque el overlay este apagado, como el hint del hero: es navegacion.
+   */
+  scrollHint?: { label: string; target: string };
   width?: "narrow" | "prose";
   /**
    * Los valores por defecto son los de la frase atmosferica de la home (umbral
@@ -82,6 +89,13 @@ export function MediaStatement({
             {children}
           </Reveal>
         </>
+      )}
+      {scrollHint && (
+        <ScrollHintButton
+          label={scrollHint.label}
+          target={scrollHint.target}
+          tone="light"
+        />
       )}
     </section>
   );

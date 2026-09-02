@@ -233,6 +233,13 @@ export const SITE_GROUPS = [
         type: "boolean",
         fallback: "true",
       },
+      {
+        key: "nosotros.cierre.title",
+        label: "Título del cierre",
+        help: "El titular de la última pantalla. Cada salto de línea que escribas parte el título en una línea nueva. Si lo dejas vacío se muestran solo los botones.",
+        type: "multiline",
+        fallback: "Un viaje hacia el\nHumano Luminoso",
+      },
     ],
   },
   {

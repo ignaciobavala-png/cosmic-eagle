@@ -41,7 +41,8 @@ export function ClosingHero({
       />
 
       {/* Bloque entero, sin cascada interna: titulo y botones entran juntos
-          (umbral 0.3, 20px, 1.2s). Reversible, como todo /nosotros. */}
+          (umbral 0.3, 20px, 1.2s). Reversible, como todo /nosotros. El titulo es
+          campo CMS y puede quedar vacio: entonces solo se muestran los botones. */}
       {overlay && (
         <Reveal
           amount={0.3}
@@ -50,9 +51,11 @@ export function ClosingHero({
           duration={1.2}
           className="relative z-10 px-margin-mobile md:px-margin-desktop"
         >
-          <h2 className="font-display text-display-mobile md:text-display-lg font-bold uppercase text-primary text-balance">
-            {title}
-          </h2>
+          {title && (
+            <h2 className="font-display text-display-mobile md:text-display-lg font-bold uppercase text-primary text-balance">
+              {title}
+            </h2>
+          )}
 
           {actions.length > 0 && (
             <div className="mt-10 flex w-full max-w-xs flex-col items-stretch gap-4 sm:max-w-none sm:flex-row sm:justify-center sm:gap-8">

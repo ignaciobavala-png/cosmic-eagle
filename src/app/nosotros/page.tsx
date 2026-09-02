@@ -3,12 +3,13 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { PageHero, renderTitle } from "@/components/ui/PageHero";
-import { CreamSection } from "@/components/ui/CreamSection";
 import { WordSequence } from "@/components/ui/WordSequence";
 import { MediaStatement } from "@/components/ui/MediaStatement";
 import { StickyStory } from "@/components/ui/StickyStory";
 import { ClosingHero } from "@/components/ui/ClosingHero";
-import { RevealItem, RevealLine } from "@/components/ui/Reveal";
+import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
+import { SymbolRow } from "@/components/ui/NosSymbols";
+import { ScrollHintButton } from "@/components/ui/ScrollHintButton";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 
 export const metadata: Metadata = {
@@ -21,10 +22,15 @@ export const metadata: Metadata = {
  * /nosotros según el rediseño de Julia (`NOSOTROS.html`, ver
  * docs/REDISENO_JULIA_HTML.md §4).
  *
- * Recorrido: hero → cuatro palabras sobre crema → Nuestro enfoque → Nuestro
- * propósito → frase sobre imagen → relato sticky → cierre.
+ * Recorrido: hero → cuatro palabras sobre crema + símbolo 1 → Nuestro enfoque +
+ * símbolo 2 → Nuestro propósito → frase sobre imagen → relato sticky → cierre.
  *
- * Dos decisiones que se ven en el código:
+ * Las dos filas de símbolos decorativos (arte final entregado el 2/9 junto con
+ * este mockup) replican `.nos-symbol-row`/`nosCenterSymbol()` del original: el
+ * centrado se mide en runtime contra los textos vecinos, no con valores fijos.
+ * El símbolo 2 usa su propio observer (umbral 0.6), no el de las pantallas.
+ *
+ * Tres decisiones que se ven en el código:
  *
  * 1. **Donde Julia puso video va la imagen que ya está cargada.** Los videos no
  *    llegaron todavía; `MediaStatement` se cambia a `<video>` sin tocar la
@@ -34,6 +40,9 @@ export const metadata: Metadata = {
  *    y `nosotros.metodologia.image`) se reusan acá con la misma key, así lo que
  *    la clienta ya subió desde /admin/multimedia sigue apareciendo. Renombrarlas
  *    hubiera dejado las filas huérfanas y la página con los assets del repo.
+ * 3. **Los botones de scroll internos del mockup** (IR MÁS PROFUNDO → video,
+ *    SOBRE NOSOTROS → relato, CONTINUAR → cierre) se portan como anclas, con el
+ *    mismo lenguaje visual que el hint del hero.
  *
  * El copy es de la clienta y está literal del mockup. El texto viejo de
  * metodología (hongos, dosis, seres de luz) que esta versión deja afuera quedó
@@ -41,6 +50,7 @@ export const metadata: Metadata = {
  */
 export default async function NosotrosPage() {
   const content = await getSiteContent();
+  const cierreTitle = content("nosotros.cierre.title").trim();
 
   return (
     <>
@@ -57,20 +67,49 @@ export default async function NosotrosPage() {
           overlay={isEnabled(content("nosotros.hero.overlay"))}
         />
 
-        <CreamSection id="enfoque">
-          <WordSequence
-            words={["Liberar", "Recordar", "Reconectar", "Encarnar"]}
+        {/* Pantalla 1 — las cuatro palabras sobre crema. En mobile el copy queda
+            arriba con aire fijo (mockup 2/9: `justify-start`, padding-top 110px,
+            sin alto minimo) y el simbolo lo sigue en flujo; en desktop la fila
+            se centra verticalmente y el simbolo viaja absoluto medido. */}
+        <section
+          id="enfoque"
+          className="relative flex w-full flex-col items-center justify-start bg-[#fff7ea] px-margin-mobile pt-[110px] text-[#05125a] md:min-h-[100svh] md:justify-center md:px-margin-desktop md:py-24"
+        >
+          <div id="nos-words-seq">
+            <WordSequence
+              words={["Liberar", "Recordar", "Reconectar", "Encarnar"]}
+            />
+          </div>
+          {/* Símbolo 1: se revela con su pantalla (delay 2.2s para no competir
+              con la cascada de palabras) y se centra medido entre el final de
+              las palabras y el título de la pantalla siguiente. */}
+          <SymbolRow
+            variant={1}
+            id="nos-symbol-row-1"
+            aboveId="nos-words-seq"
+            belowId="nos-enfoque-title"
+            minGap={95}
+            maxGap={95}
+            amount={0.4}
+            delay={2.2}
           />
-        </CreamSection>
+        </section>
 
-        <CreamSection reveal={{ amount: 0.25, once: false, stagger: 0 }}>
-          {/* Umbral 0.25 y REVERSIBLE: en /nosotros y /viajes las animaciones
-              se deshacen al volver hacia arriba (`nosObserveToggle`). El titulo
-              entra en 1s, la linea crece de 0 a 64px en 1.2s y los parrafos van
-              de a 14px con 0.15s de escalon. La frase itálica del cierre lleva
-              0.65s, que es el unico retardo que Julia escribe a mano. */}
+        {/* Pantalla 2 — "Nuestro enfoque". Umbral 0.25 y REVERSIBLE: en
+            /nosotros y /viajes las animaciones se deshacen al volver hacia
+            arriba (`nosObserveToggle`). El titulo entra en 1s, la linea crece de
+            0 a 64px en 1.2s y los parrafos van de a 14px con 0.15s de escalon.
+            La frase itálica del cierre lleva 0.65s, que es el unico retardo que
+            Julia escribe a mano. Padding mobile 35px como el mockup 2/9. */}
+        <Reveal
+          as="section"
+          amount={0.25}
+          once={false}
+          stagger={0}
+          className="relative flex w-full flex-col items-center justify-center bg-[#fff6eb] px-margin-mobile py-[35px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
+        >
           <div className="mx-auto max-w-3xl">
-            <RevealItem y={0} duration={1}>
+            <RevealItem y={0} duration={1} id="nos-enfoque-title">
               <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
                 Nuestro enfoque
               </h2>
@@ -106,7 +145,7 @@ export default async function NosotrosPage() {
               </p>
               </RevealItem>
             </div>
-            <RevealItem y={14} duration={0.8} delay={0.65}>
+            <RevealItem y={14} duration={0.8} delay={0.65} id="nos-enfoque-close">
               <p className="mt-8 border-t border-[#05125a]/15 pt-6 font-display text-xl italic leading-relaxed text-[#05125a]">
                 Nuestro rol no es definir lo que alguien debe experimentar o en
                 qué debe convertirse, sino crear las condiciones para que su
@@ -114,14 +153,34 @@ export default async function NosotrosPage() {
               </p>
             </RevealItem>
           </div>
-        </CreamSection>
+          {/* Símbolo 2: vive al límite entre esta pantalla y la de propósito, por
+              eso usa su propio observer (umbral 0.6) y no el de ninguna de las
+              dos. */}
+          <SymbolRow
+            variant={2}
+            id="nos-symbol-row-2"
+            aboveId="nos-enfoque-close"
+            belowId="nos-proposito-title"
+            minGap={32}
+            maxGap={121}
+            amount={0.6}
+            delay={0.3}
+          />
+        </Reveal>
 
-        <CreamSection
+        {/* Pantalla 3 — "Nuestro propósito", mismo estilo que la pantalla 2.
+            En mobile min-height 81vh y padding 35px (mockup 2/9): el contenido
+            es corto y ese recorte es lo que deja el hueco del símbolo parejo. */}
+        <Reveal
+          as="section"
           id="proposito"
-          reveal={{ amount: 0.25, once: false, stagger: 0 }}
+          amount={0.25}
+          once={false}
+          stagger={0}
+          className="relative flex w-full flex-col items-center justify-center bg-[#fff6eb] px-margin-mobile py-[35px] text-[#05125a] min-h-[81svh] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
         >
           <div className="mx-auto max-w-3xl">
-            <RevealItem y={0} duration={1}>
+            <RevealItem y={0} duration={1} id="nos-proposito-title">
               <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
                 Nuestro propósito
               </h2>
@@ -150,14 +209,22 @@ export default async function NosotrosPage() {
               </RevealItem>
             </div>
           </div>
-        </CreamSection>
+          <ScrollHintButton
+            label="Ir más profundo"
+            target="#video"
+            tone="dark"
+            className="bottom-3 md:bottom-6"
+          />
+        </Reveal>
 
         {/* Julia pidió video acá; va la imagen hasta que llegue. La key del slot
             es la del bloque "Evolución Consciente" que el rediseño elimina, para
             no perder la foto que la clienta ya subió. */}
         {/* Fade simple: umbral 0.4, 1.2s y SIN transform ni retardo — es el
-            unico bloque del sitio que solo cambia de opacidad. */}
+            unico bloque del sitio que solo cambia de opacidad. Velo al 0.3 como
+            en el mockup. */}
         <MediaStatement
+          id="video"
           image={content("nosotros.proposito.image")}
           imageAlt="Círculo de ceremonia iluminado"
           text={content("nosotros.frase")}
@@ -165,7 +232,9 @@ export default async function NosotrosPage() {
           once={false}
           y={0}
           duration={1.2}
+          veil={0.3}
           overlay={isEnabled(content("nosotros.proposito.overlay"))}
+          scrollHint={{ label: "Sobre nosotros", target: "#somos" }}
         />
 
         <StickyStory
@@ -180,19 +249,14 @@ export default async function NosotrosPage() {
               que existen dentro de nosotros.
             </span>,
           ]}
+          scrollHint={{ label: "Continuar", target: "#vision" }}
         />
 
         <ClosingHero
           id="vision"
           image={content("nosotros.metodologia.image")}
           imageAlt="Textura cósmica"
-          title={
-            <>
-              Un viaje hacia el
-              <br />
-              Humano Luminoso
-            </>
-          }
+          title={cierreTitle ? <CierreTitle text={cierreTitle} /> : null}
           actions={[
             { label: "Explorar experiencias", href: "/viajes" },
             {
@@ -206,6 +270,23 @@ export default async function NosotrosPage() {
       </main>
       <Footer />
       <BackToTop />
+    </>
+  );
+}
+
+/** El quiebre del título de cierre en 2 líneas es diseño visual: cada salto de
+    línea del campo CMS parte el título, en todos los anchos (a diferencia de
+    `renderTitle`, que solo quiebra en desktop). */
+function CierreTitle({ text }: { text: string }) {
+  const lines = text.split("\n");
+  return (
+    <>
+      {lines.map((line, i) => (
+        <span key={i}>
+          {i > 0 && <br />}
+          {i > 0 ? ` ${line}` : line}
+        </span>
+      ))}
     </>
   );
 }

@@ -12,6 +12,10 @@ export const IMAGES = {
   almas: "/img/almas-particulas.webp",
   nosotrosProposito: "/img/nosotros-proposito.webp",
   nosotrosMetodologia: "/img/nosotros-metodologia.webp",
+  // Simbolos decorativos de /nosotros (arte final de Julia, PNG con alpha
+  // servidos desde /public, igual que el logo). Giran 30s/vuelta antihorario.
+  nosSymbol1: "/img/nos-symbol-1.png",
+  nosSymbol2: "/img/nos-symbol-2.png",
   // Rediseno de la home (docs/HOME_REDISENO.md). Los degrades de "La humanidad",
   // la banda dorada y el fondo del footer NO estan aca: se hacen en CSS.
   homeHero: "/img/home/hero.webp",

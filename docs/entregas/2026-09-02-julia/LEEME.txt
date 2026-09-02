@@ -3,6 +3,10 @@ Entrega de Julia del 02/09/2026. Copiada tal cual, sin editar.
 HOMEPAGE/  homepage_correccion.html (mockup aprobado, tres rondas de correccion
            del 1/9) + design-system-homepage.md + notas de implementacion + el
            logo real en PNG.
+NOSOTROS/  nosotros_corregida.html (mockup aprobado, rondas del 1-2/9) +
+           design-system-nosotros.md + notas de implementacion + los dos PNG de
+           simbolos decorativos (arte final). Copiado desde ~/Descargas/julia_front/NOSOTROS
+           el 02/09 al implementar la paridad de /nosotros.
 tarjetas/  el modal "¿Quieres seguir explorando?" (gate de sesion), componente
            aislado + su design system + sus notas.
 

@@ -2,6 +2,7 @@
 
 import { motion, useTransform, useReducedMotion, type MotionValue } from "framer-motion";
 import { useSectionProgress } from "@/lib/use-section-progress";
+import { ScrollHintButton } from "./ScrollHintButton";
 
 /**
  * Bloque de texto que queda fijo en pantalla mientras el scroll revela un
@@ -25,9 +26,12 @@ import { useSectionProgress } from "@/lib/use-section-progress";
 export function StickyStory({
   paragraphs,
   id,
+  scrollHint,
 }: {
   paragraphs: readonly React.ReactNode[];
   id?: string;
+  /** Indicador de scroll al pie del panel sticky ("CONTINUAR" en /nosotros). */
+  scrollHint?: { label: string; target: string };
 }) {
   const reduced = useReducedMotion();
   const { ref, progress: scrollYProgress } = useSectionProgress(!reduced);
@@ -53,7 +57,7 @@ export function StickyStory({
       ref={ref}
       className="relative w-full bg-[linear-gradient(180deg,#05125a_0%,#0079b3_100%)] h-[260vh] md:h-[280vh]"
     >
-      <div className="sticky top-0 flex h-[100svh] items-center justify-center overflow-hidden px-margin-mobile md:px-margin-desktop">
+      <div className="sticky top-0 relative flex h-[100svh] items-center justify-center overflow-hidden px-margin-mobile md:px-margin-desktop">
         <div className="max-w-3xl space-y-6 text-body-md text-primary md:text-body-lg">
           {paragraphs.map((paragraph, i) => (
             <StoryParagraph
@@ -66,6 +70,13 @@ export function StickyStory({
             </StoryParagraph>
           ))}
         </div>
+        {scrollHint && (
+          <ScrollHintButton
+            label={scrollHint.label}
+            target={scrollHint.target}
+            tone="light"
+          />
+        )}
       </div>
     </section>
   );
