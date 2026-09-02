@@ -1,0 +1,31 @@
+﻿En este texto voy a dejar todas las correcciones de la página subida, porque tiene discrepancias respecto al diseño enviado por Julia.
+Nar bar:
+En el Nabvbar, la tipografía de las páginas nosotros experiencias contenidos y mi cuenta o unirme al círculo debe ser Domine.
+El botón unirme al círculo debe ser piel, es decir, con esquinas redondeadas al 100 el texto adentro también debe ser tipografía domine y debe estar en color azul. El color más oscuro de la paleta que es el código.
+El estilo de este botón es igual al botón explorar experiencias que se encuentra en la seccion about de la homepage
+Al posicionar el Mouse sobre la el título experiencias se despliega un menú de sesiones y viajes. Este menú no respeta el estilo visual de Cosmic Eagle, adaptar al estilo de Cosmic Eagle, debe ser con fondo azul, título, obsesiones y viajes, en domine y sus descripciones en Monserrat.
+Homepage
+En la Home Page, los tamaños de las Screen estan bien pero los botones de Scroll no respetan el diseño que se envió. la palabra Debe estar un poco más alejada de la flecha que está animada y la tipografía de los textos que están en los botones de control debe ser domine
+El texto, un viaje hacia la evolución humana y la sabiduría del alma tiene los colores invertidos. La primera parte de la frase va en blanco y la segunda parte de la frase va en amarillo
+En la sección About de la Home Page, donde está el párrafo que dice “a medida que expandimos nuestra conciencia, comenzamos a descubrir que somos mucho más… “, Luego se anima la aparición del botón explorar experiencias y con el siguiente Scroll se anima por fade in el botón indicador de Scroll, que es una flecha hacia abajo. Eso está en el diseño y no quedó bien subido en la web. Si el usuario toca este boton, se desplaza a la siguiente seccion
+El carrusel de calendario de viajes no debe estar visible en la página, sino que se abre al tocar el botón explorar experiencias. Cuando el usuario toca el botón explorar experiencia se despliega el carrusel cartelera calendario de viajes. Si el usuario no toca el botoncito, el calendario queda oculto y no se despliega.
+dentro de este calendario de viajes también hay correcciones: 
+el calendario de viajes diseñado que se compartió es autoplay en desktop. Por hover se detiene para que el usuario pueda clickear.
+Ademas , el carrusel diseñado tiene un diseño de tarjetas diferente y también tiene un efecto de Feeding, fede Out en la animación del carrusel: las tarjetas hacen scroll hacia la izquierda y se funden en el dorado al entrar y al salir (Ver archivo calendariodeviajes_design.png)
+
+
+Si un usuario toca una de estas experiencias sin estar logueado, debe abrirse la tarjeta de solicitud de inicio de sesion. El diseño html con su respectivo design.md y su explicacion.txt ya fueron compartidos con nacho.
+
+
+La sección testimonios no fue respetada en absoluto respecto al diseño enviado, sino que se mantuvo la anterior. Es muy importante que se respete el diseño enviado que tiene un título voces de luz subtítulo en lo que dice nuestros viajeros, con unas líneas de cada lado del texto y luego es un carrusel de nueve tarjetas desplazables, manualmente por el usuario y estos contenidos son manejables desde el panel de control. Además, en el diseño enviado hay una un placeholder de imagen en la parte inferior de la Screen, y también hay un efecto de grade de azules que integran esta imagen con el fondo de los testimonios.
+Sección tecnología del alma:
+En mobile el placeholder de imagen debe estar completamente ocultado de modo que solo se ve el texto de esta sección. El placeholder de imagen solo es visible en desktop. Revisar diseño enviado.
+Nota sobre botones con texto: 
+el diseño respetado en el botón “explorar experiencias” debe replicarse para: unirme al circulo , ir más profundo (seccion nuestro proposito), ir más profundo (seccion tecnologia del alma)
+Los cuadros de texto que se superponen en los distintos banners de la home deben tener una transición de entrada por opacidad y por movimiento sutil de abajo hacia arriba.
+Nosotros:
+En la página, nosotros tenemos el mismo problema con los indicadores de Scroll. Los textos no respetan la tipografía la tipografía del diseño enviado es dominé, así que hay que corregirlo y todos los textos de los indicadores de Crl deben ser dominé y estar más separados de la flecha animada que tienen debajo.
+En Mobile, la animación de las cuatro palabras, liberar, recordar, reconectar, encarnar y las tres flechas que la acompañan se desarrolla muy rápido, y esto no es bueno para la experiencia de usuario y para la interfaz.
+En desktop se ve mejor.
+En Mobile, la última Screen de la página que contiene un placeholder de imagen, un cuadro de texto y dos botones bajo los nombres, explorar, experiencias e ir más profundo. Hay un problema de posicionamiento de los botones, ya que no están centrados junto al texto y los márgenes que separan. El texto de los bordes es muy pequeño. Es importante ajustar esto, pero conservar que el texto se tenga dos líneas nada más no podemos tener más que dos líneas por habrá que achicar el tamaño de la tipografía en la versión Mobile
+otra cuestión importante de esta sección es que los botones, explorar, experiencias e ir más profundo, no respetan los botones en el diseño enviado, así que debes revisar el archivo de diseño compartido para respetar el mismo diseño de botones.

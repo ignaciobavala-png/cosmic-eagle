@@ -55,68 +55,117 @@ export function TripCard({
           : "group flex flex-col overflow-hidden rounded-2xl glass-card transition-colors duration-300 hover:border-primary-fixed-dim/35"
       }
     >
-      <TripCover tripId={trip.id} imageUrl={trip.image_url} variant="card">
-        <div className="absolute inset-0 bg-[#05102a]/20" />
-        <div className="absolute left-4 top-4 flex flex-wrap gap-2">
-          {isTripType(trip.type) && (
-            <span className="rounded-full bg-primary-container/90 px-3 py-1 text-label-sm uppercase text-on-primary backdrop-blur-md">
-              {tripTypeLabel(trip.type)}
+      {light ? (
+        /* La tarjeta de la cartelera, segun `calendariodeviajes_design.png`
+           (correccion del 02/09): la portada es una franja apaisada y limpia, y
+           los DOS tags van debajo de ella, no superpuestos. El de tipo es la
+           pildora dorada y el de lugar el azul translucido con borde. */
+        <>
+          <TripCover tripId={trip.id} imageUrl={trip.image_url} variant="strip">
+            {trip.status && STATUS_LABEL[trip.status] && (
+              <span className="absolute right-3 top-3 rounded-full bg-[#05125a]/80 px-3 py-1 text-label-sm uppercase text-white backdrop-blur-md">
+                {STATUS_LABEL[trip.status]}
+              </span>
+            )}
+          </TripCover>
+
+          <div className="flex flex-1 flex-col p-5">
+            <div className="mb-4 flex flex-wrap gap-2.5">
+              {isTripType(trip.type) && (
+                <span className="rounded-full bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-3.5 py-1.5 font-display text-[11px] font-semibold uppercase tracking-[0.11em] text-white">
+                  {tripTypeLabel(trip.type)}
+                </span>
+              )}
+              {trip.location && (
+                <span className="rounded-full border border-[#0079b3]/40 bg-[linear-gradient(135deg,rgba(0,121,179,0.2),rgba(5,18,90,0.2))] px-3.5 py-1.5 font-display text-[11px] font-semibold uppercase tracking-[0.11em] text-[#05125a]">
+                  {trip.location}
+                </span>
+              )}
+            </div>
+
+            <h3 className="font-display text-headline-md text-[#05125a]">
+              {trip.title}
+            </h3>
+            {trip.description && (
+              <p className="mt-2 line-clamp-4 flex-1 text-[13px] leading-relaxed text-[#05125a]/85">
+                {trip.description}
+              </p>
+            )}
+
+            <div className="mt-4 flex items-end justify-between gap-4 border-t border-[#e0e0e0] pt-4">
+              <div>
+                {/* El label va en `on-primary-container` y no en el `#b3964b`
+                    del mockup: ese oro sobre blanco da 3,4:1 en un texto de
+                    10px (ver la sesion del 28/08). Mismo rol de la paleta, un
+                    tono mas oscuro. */}
+                <span className="block font-display text-[10px] font-semibold uppercase tracking-[0.12em] text-on-primary-container">
+                  Fecha
+                </span>
+                <span className="mt-1 block font-display text-[13px] font-bold uppercase tracking-[0.04em] text-[#05125a]">
+                  {formatDateRangeCompact(trip.start_date, trip.end_date)}
+                </span>
+              </div>
+              <span
+                aria-hidden="true"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#05125a]/25 text-[#05125a] transition-colors group-hover:bg-[#05125a] group-hover:text-white"
+              >
+                <ArrowUpRight size={16} />
+              </span>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+        <TripCover tripId={trip.id} imageUrl={trip.image_url} variant="card">
+          <div className="absolute inset-0 bg-[#05102a]/20" />
+          <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+            {isTripType(trip.type) && (
+              <span className="rounded-full bg-primary-container/90 px-3 py-1 text-label-sm uppercase text-on-primary backdrop-blur-md">
+                {tripTypeLabel(trip.type)}
+              </span>
+            )}
+            {trip.location && (
+              <span className="rounded-full border border-primary-fixed-dim/40 bg-[#05060a]/70 px-3 py-1 text-label-sm uppercase text-primary-fixed-dim backdrop-blur-md">
+                {trip.location}
+              </span>
+            )}
+          </div>
+          {trip.status && STATUS_LABEL[trip.status] && (
+            <span className="absolute right-4 top-4 rounded-full border border-outline/40 bg-[#05060a]/70 px-3 py-1 text-label-sm uppercase text-on-surface-variant backdrop-blur-md">
+              {STATUS_LABEL[trip.status]}
             </span>
           )}
-          {trip.location && (
-            <span className="rounded-full border border-primary-fixed-dim/40 bg-[#05060a]/70 px-3 py-1 text-label-sm uppercase text-primary-fixed-dim backdrop-blur-md">
-              {trip.location}
-            </span>
+        </TripCover>
+
+        <div className="flex flex-1 flex-col p-5 sm:p-6">
+          <h3 className="font-display text-headline-md text-on-surface">
+            {trip.title}
+          </h3>
+          {trip.description && (
+            <p className="mt-3 line-clamp-4 text-body-md text-on-surface-variant">
+              {trip.description}
+            </p>
           )}
-        </div>
-        {trip.status && STATUS_LABEL[trip.status] && (
-          <span className="absolute right-4 top-4 rounded-full border border-outline/40 bg-[#05060a]/70 px-3 py-1 text-label-sm uppercase text-on-surface-variant backdrop-blur-md">
-            {STATUS_LABEL[trip.status]}
-          </span>
-        )}
-      </TripCover>
 
-      <div className="flex flex-1 flex-col p-5 sm:p-6">
-        <h3
-          className={`font-display text-headline-md ${light ? "text-[#05125a]" : "text-on-surface"}`}
-        >
-          {trip.title}
-        </h3>
-        {trip.description && (
-          <p
-            className={`mt-3 text-body-md line-clamp-4 ${light ? "text-[#666]" : "text-on-surface-variant"}`}
-          >
-            {trip.description}
-          </p>
-        )}
-
-        <div
-          className={`mt-6 flex items-end justify-between gap-4 border-t pt-4 ${light ? "border-[#05125a]/10" : "border-primary-fixed-dim/12"}`}
-        >
-          <div>
+          <div className="mt-6 flex items-end justify-between gap-4 border-t border-primary-fixed-dim/12 pt-4">
+            <div>
+              <span className="block text-label-sm uppercase text-on-surface-variant/60">
+                Fecha
+              </span>
+              <span className="mt-1 block text-body-md text-on-surface">
+                {formatDateRangeCompact(trip.start_date, trip.end_date)}
+              </span>
+            </div>
             <span
-              className={`block text-label-sm uppercase ${light ? "text-on-primary-container" : "text-on-surface-variant/60"}`}
+              aria-hidden="true"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary-fixed-dim/35 text-primary-fixed-dim transition-colors group-hover:bg-primary-container group-hover:text-on-primary"
             >
-              Fecha
-            </span>
-            <span
-              className={`mt-1 block text-body-md ${light ? "text-[#05125a]" : "text-on-surface"}`}
-            >
-              {formatDateRangeCompact(trip.start_date, trip.end_date)}
+              <ArrowUpRight size={18} />
             </span>
           </div>
-          <span
-            aria-hidden="true"
-            className={
-              light
-                ? "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#05125a]/25 text-[#05125a] transition-colors group-hover:bg-[#05125a] group-hover:text-white"
-                : "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary-fixed-dim/35 text-primary-fixed-dim transition-colors group-hover:bg-primary-container group-hover:text-on-primary"
-            }
-          >
-            <ArrowUpRight size={18} />
-          </span>
         </div>
-      </div>
+        </>
+      )}
     </Link>
   );
 }

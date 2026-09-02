@@ -1,121 +1,122 @@
+"use client";
+
 import Image from "next/image";
-import { HOME_COPY, IMAGES } from "@/lib/constants";
+import { useRef } from "react";
+import { HOME_COPY } from "@/lib/constants";
 import type { Testimonial } from "@/lib/testimonials";
 import { SectionHeading } from "./ui/SectionHeading";
 
 /**
- * "Voces de Luz" — los testimonios de la home.
+ * "Voces de Luz" — los testimonios de la home, reescritos sobre el diseño de
+ * Julia (`.testimonios` del mockup + la corrección del 02/09, que marcaba que
+ * esta sección era la única que no se había respetado).
  *
- * Reescrita sobre el mockup del rediseno: encabezado P7 (`SectionHeading`) y
- * tarjetas de vidrio sobre el slide de fondo. Antes eran tres cards con cinco
- * estrellas y un borde de color alternado, que no estan en el diseno nuevo.
+ * Tres cosas que la separan de la versión anterior, que era una grilla de tres
+ * tarjetas de vidrio:
  *
- * Las tarjetas son HTML y no un recorte del slide: tienen que crecer con el texto
- * (los tres testimonios miden distinto) y caer a una columna en mobile.
+ * - **Es un carrusel horizontal arrastrable**, no una grilla. El diseño prevé
+ *   nueve testimonios y una grilla de nueve tarjetas ocuparía tres pantallas.
+ * - **El fondo es el degradé azul** (`#0079b3` → `#05125a` al 45%) y no una
+ *   foto: la foto pasó a ser una franja al pie que se funde con ese azul.
+ * - **La franja del pie es editable** (`home.voces.image`), como el resto de las
+ *   imágenes de la home.
  *
- * El avatar es un CONTENEDOR, no una letra suelta: hoy muestra la inicial, y el
- * dia que haya fotos reales de los viajeros pasa a ser un `<Image>` adentro del
- * mismo box, sin tocar el layout. Mismo patron que el avatar del navbar.
+ * El arrastre con el mouse es explícito porque un `overflow-x` sólo se arrastra
+ * con el dedo: en escritorio hay que empujar la barra o usar shift+rueda, y el
+ * diseño pide poder tomar las tarjetas. En touch no se toca nada — lo maneja el
+ * scroll nativo, que es mejor que cualquier emulación.
  *
- * Los testimonios llegan por props desde la tabla `testimonials` (seccion
- * `home`), que carga la clienta desde /admin/testimonios. Si no hay ninguno, la
- * seccion no se dibuja: mejor eso que un encabezado sobre un vacio.
- *
- * **No tiene animacion de entrada, a proposito**: en el codigo aprobado de Julia
- * este bloque es el unico sin IntersectionObserver — el carrusel esta siempre
- * visible. Antes lo enviamos envuelto en `Reveal` y entraba con fundido.
+ * **No tiene animación de entrada, a propósito**: en el código aprobado de Julia
+ * este bloque es el único sin IntersectionObserver.
  */
 export function TestimonialsSection({
   id,
   testimonials,
+  image,
 }: {
   id?: string;
   testimonials: Testimonial[];
+  /** La franja de imagen del pie (slot `home.voces.image`). */
+  image: string;
 }) {
+  const track = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; left: number } | null>(null);
+
   if (testimonials.length === 0) return null;
+
+  function onPointerDown(e: React.PointerEvent) {
+    // Sólo mouse: en touch el scroll nativo ya arrastra, y secuestrarlo rompe
+    // el desplazamiento con inercia.
+    if (e.pointerType !== "mouse" || !track.current) return;
+    drag.current = { x: e.clientX, left: track.current.scrollLeft };
+    track.current.setPointerCapture(e.pointerId);
+  }
+
+  function onPointerMove(e: React.PointerEvent) {
+    if (!drag.current || !track.current) return;
+    track.current.scrollLeft = drag.current.left - (e.clientX - drag.current.x);
+  }
+
+  function endDrag(e: React.PointerEvent) {
+    if (!drag.current || !track.current) return;
+    drag.current = null;
+    track.current.releasePointerCapture(e.pointerId);
+  }
 
   return (
     <section
       id={id}
-      className="relative w-full overflow-hidden"
+      className="relative flex w-full flex-col overflow-hidden bg-[linear-gradient(180deg,#0079b3_0%,#05125a_45%)]"
     >
-      {/* El fondo es `voces-de-luz.webp`, el slide de Julia para esta seccion.
+      <div className="mx-auto w-full max-w-narrative px-margin-mobile pt-24 pb-10 text-center md:px-margin-desktop md:pt-[7.5rem]">
+        <SectionHeading
+          title={HOME_COPY.voces.title}
+          label={HOME_COPY.voces.label}
+        />
 
-          El slide trae el polvo dorado en su borde SUPERIOR, y ese dorado es el
-          mismo plano que "Cuatro promesas" ya dibuja en su pie: apilados tal
-          cual, el reflejo salia dos veces con una costura recta en el medio. Por
-          eso el envoltorio arranca un 30% MAS ARRIBA que la seccion (`-top-[30%]`
-          contra `bottom-0`) y el `overflow-hidden` de la seccion se come esa
-          franja: queda el campo azul, que es lo que levanta el bloque del negro
-          del pie de la pagina, sin repetir el dorado.
+        {/* La máscara del borde derecho avisa que la fila sigue. La izquierda
+            queda a filo: el carrusel arranca ahí y un desvanecido en el
+            arranque se lee como un error de recorte. */}
+        <div
+          ref={track}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          className="mt-12 flex cursor-grab gap-5 overflow-x-auto px-2.5 pb-3.5 select-none active:cursor-grabbing [mask-image:linear-gradient(to_right,#000_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,#000_92%,transparent_100%)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {testimonials.map((t) => (
+            <figure
+              key={t.id}
+              className="flex min-h-[14rem] w-[18.75rem] shrink-0 flex-col justify-center rounded-xl border border-white/20 bg-white/[0.08] p-8 text-left"
+            >
+              <blockquote className="text-body-md italic leading-relaxed text-primary">
+                &ldquo;{t.quote}&rdquo;
+              </blockquote>
+              <figcaption className="mt-3 text-label-sm font-bold text-primary-container">
+                {t.author_name}
+                {t.author_location && ` — ${t.author_location}`}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
 
-          La mascara entra desvanecida (asi engancha con el desvanecido del pie de
-          las promesas, en vez de arrancar con un filo). Ojo con los porcentajes:
-          se miden sobre el ENVOLTORIO, que es un 30% mas alto que la seccion, asi
-          que el borde de arriba de la seccion cae recien en el 23% de la mascara
-          — arrancar el degrade en 0% dejaba la imagen ya medio opaca justo en ese
-          borde, que es la costura que se queria evitar.
-
-          ABAJO NO se desvanece (`#000 100%`): sale con filo recto contra el borde
-          de la seccion. Antes salia en `transparent`, y como `ClosingBanner`
-          ademas ENTRA desvanecido, entre los dos quedaba una franja sin imagen
-          donde asomaba el degrade del `body` — que a esta altura del documento ya
-          va por `#060b1a`, o sea negro. El filo no se ve porque el banner sube con
-          `-mt` y lo tapa justo donde ya es opaco: los dos se cruzan.
-
-          Ojo con el `z-index`: no puede ser negativo. `body` pinta su propio
-          degrade despues de los descendientes de z negativo del contexto raiz (y
-          `body::before`, el campo de estrellas, ya vive en `z-index: -1`), asi
-          que un `-z-10` deja la imagen tapada por el fondo de la pagina. Va
-          envoltorio en `z-0` y contenido en `z-10`. */}
-      <div className="absolute inset-x-0 -top-[30%] bottom-0 z-0 [mask-image:linear-gradient(to_bottom,transparent_0%,transparent_23%,rgba(0,0,0,0.5)_33%,#000_45%,#000_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,transparent_23%,rgba(0,0,0,0.5)_33%,#000_45%,#000_100%)]">
+      {/* La franja del pie: la imagen entra desvanecida desde arriba
+          (`.testi-bottom-img` del mockup) para que se integre con el azul en vez
+          de cortar contra él. El alto va por `aspect-ratio` y con un piso, para
+          que en una pantalla ancha no quede una tira de dos centímetros. */}
+      <div className="relative aspect-[16/6] min-h-[13rem] w-full [mask-image:linear-gradient(to_bottom,transparent_0%,#000_18%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,#000_18%)]">
+        {/* `object-bottom`: el asset del repo lleva el polvo dorado arriba y el
+            campo azul abajo, y es el azul el que tiene que quedar a la vista
+            bajo la mascara. */}
         <Image
-          src={IMAGES.homeVoces}
+          src={image}
           alt=""
           fill
           sizes="100vw"
           className="object-cover object-bottom"
         />
-      </div>
-
-      <div className="relative z-10 mx-auto w-full max-w-narrative px-margin-mobile pt-24 pb-20 md:px-margin-desktop md:pt-[9rem] md:pb-section">
-        <div>
-          <SectionHeading
-            title={HOME_COPY.voces.title}
-            label={HOME_COPY.voces.label}
-          />
-
-          <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {testimonials.map((t) => (
-              <figure
-                key={t.id}
-                className="glass-card flex flex-col rounded-2xl p-7 text-left"
-              >
-                <blockquote className="font-display text-body-md leading-relaxed text-on-surface">
-                  &ldquo;{t.quote}&rdquo;
-                </blockquote>
-
-                {/* `mt-auto` alinea el pie de las tres tarjetas aunque las citas
-                    tengan largos distintos. */}
-                <figcaption className="mt-auto flex items-center gap-3 pt-8">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-variant/70 font-display text-primary-fixed-dim">
-                    {t.author_name.charAt(0).toUpperCase()}
-                  </span>
-                  <span>
-                    <span className="block font-display text-body-md text-on-surface">
-                      {t.author_name}
-                    </span>
-                    {t.author_location && (
-                      <span className="block text-label-sm uppercase text-on-surface-variant/70">
-                        {t.author_location}
-                      </span>
-                    )}
-                  </span>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
       </div>
     </section>
   );

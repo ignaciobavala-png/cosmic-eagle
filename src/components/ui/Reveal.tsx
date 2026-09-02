@@ -202,13 +202,19 @@ export function RevealItem({
     );
   }
 
+  // El `delay` sólo se emite si es distinto de cero. **No es un detalle de
+  // estilo**: cuando el padre orquesta con `staggerChildren`, Framer implementa
+  // el escalón como el `delay` de cada hijo, y un `delay: 0` escrito acá lo pisa
+  // — los hijos entran todos juntos. Los bloques que llevan retardos a mano
+  // (el panel Sesiones/Viajes, Tecnología del Alma) siguen igual: ahí el padre
+  // va con `stagger={0}` y el escalón es justamente ese `delay`.
   const variants: Variants = {
     hidden: { opacity: 0, y, ...(scaleFrom !== undefined && { scale: scaleFrom }) },
     visible: {
       opacity: 1,
       y: 0,
       ...(scaleFrom !== undefined && { scale: 1 }),
-      transition: { duration, delay, ease: EASE },
+      transition: { duration, ease: EASE, ...(delay ? { delay } : {}) },
     },
   };
 

@@ -9,6 +9,7 @@ import { ScrollStory } from "@/components/ui/ScrollStory";
 import { MediaStatement } from "@/components/ui/MediaStatement";
 import { CreamSection } from "@/components/ui/CreamSection";
 import { TripCarousel } from "@/components/ui/TripCarousel";
+import { Collapsible } from "@/components/ui/Collapsible";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
 import type { TripCardData } from "@/components/ui/TripCard";
@@ -89,13 +90,17 @@ export default async function Home() {
               es el `transition-delay` que Julia le pone al `.line-reveal` que
               sigue. Van de 40px y en 1.6s, mas lento que el resto del sitio. */}
           <div className="mx-auto w-full max-w-[75rem]">
-            <h2 className="font-display text-[clamp(3rem,9vw,7rem)] leading-[1.04] text-primary-container">
+            {/* Los colores van en este orden y no al reves: en el mockup
+                (`.about-statement`) la PRIMERA linea es crema y la segunda
+                dorada en italica. Estaban invertidos y es la correccion del
+                02/09 de Julia. */}
+            <h2 className="font-display text-[clamp(3rem,9vw,7rem)] leading-[1.04] text-primary">
               <RevealItem as="span" className="inline-block" y={40} duration={1.6}>
                 {content("home.frase.left")}
               </RevealItem>
               <br />
               <RevealItem as="span" className="inline-block" y={40} duration={1.6}>
-                <em className="not-italic text-primary">
+                <em className="italic text-primary-container">
                   {content("home.frase.right")}
                 </em>
               </RevealItem>
@@ -112,6 +117,7 @@ export default async function Home() {
           ]}
           keywords={["conciencia", "potencial", "dimensión", "evolución"]}
           cta={{ label: "Explorar experiencias", href: "#calendario" }}
+          next="atmosferica"
         />
 
         {/* La cartelera en la home. Va sobre el mismo azul con el que termina el
@@ -122,20 +128,33 @@ export default async function Home() {
             No son dos carruseles separados: a la sección específica de cada
             tipo se accede desde el panel o desde /viajes. El "Explorar
             experiencias" del relato ancla hasta acá. */}
-        <section id="calendario" className="w-full bg-[#020c41] py-20">
-          <div className="w-full">
-            <TripCarousel
-              caption="Calendario de viajes"
-              title="Próximos Viajes"
-              trips={trips}
-              emptyLabel="No hay experiencias publicadas por el momento. Vuelve a visitarnos pronto."
-            />
-          </div>
+        {/* La cartelera arranca CERRADA y la despliega el botón "Explorar
+            experiencias" del relato (correción del 02/09 de Julia: "si el
+            usuario no toca el botoncito, el calendario queda oculto"). El
+            disparador está 400vh más arriba, dentro del sticky del relato, así
+            que el panel no lleva botón propio: se abre por hash, que es lo que
+            fija `StoryCta`.
+
+            La sección no lleva padding vertical propio — cerrada tiene que
+            medir cero, o queda una franja azul vacía en el medio de la home. El
+            aire lo pone el panel cuando se abre. */}
+        <section id="calendario" className="w-full bg-[#020c41]">
+          <Collapsible openOnHash="calendario">
+            <div className="w-full py-20">
+              <TripCarousel
+                caption="Calendario de viajes"
+                title="Próximos Viajes"
+                trips={trips}
+                emptyLabel="No hay experiencias publicadas por el momento. Vuelve a visitarnos pronto."
+              />
+            </div>
+          </Collapsible>
         </section>
 
         {/* Julia pidió imagen a pantalla completa con una frase encima. La key
             del slot es la de las cuatro promesas, que el rediseño elimina. */}
         <MediaStatement
+          id="atmosferica"
           image={content("home.promesas.image")}
           imageAlt="Figura en meditación con un núcleo de luz dorada"
           text={content("home.atmos.text")}
@@ -178,8 +197,9 @@ export default async function Home() {
             </p>
             </RevealItem>
             <RevealItem y={30} duration={0.9} delay={0.75}>
-              <CtaLink href="/nosotros" className="mt-14 rounded-full">
+              <CtaLink href="/nosotros" variant="pill" className="mt-14 px-10 py-4">
                 Ir más profundo
+                <span aria-hidden="true">↗</span>
               </CtaLink>
             </RevealItem>
           </div>
@@ -269,7 +289,11 @@ export default async function Home() {
           </div>
         </Reveal>
 
-        <TestimonialsSection id="voces" testimonials={testimonials} />
+        <TestimonialsSection
+          id="voces"
+          testimonials={testimonials}
+          image={content("home.voces.image")}
+        />
 
         {/* Tecnología del Alma: la puerta a /contenidos. */}
         {/* Tecnología del Alma: la puerta a /contenidos.
@@ -313,13 +337,17 @@ export default async function Home() {
                 </RevealItem>
               </div>
               <RevealItem duration={0.8} delay={0.6}>
-                <CtaLink href="/contenidos" className="mt-8 rounded-full">
+                <CtaLink href="/contenidos" variant="pill" className="mt-8 px-7 py-3.5">
                   Ir más profundo
+                  <span aria-hidden="true">↗</span>
                 </CtaLink>
               </RevealItem>
             </div>
 
-            <RevealItem className="w-full flex-1" y={0} duration={1} scaleFrom={0.98}>
+            {/* En mobile la imagen se oculta ENTERA y queda solo el texto
+                (`.tec-image` es `display:none` abajo de 768px en el mockup).
+                Antes se apilaba arriba del texto. */}
+            <RevealItem className="hidden w-full flex-1 md:block" y={0} duration={1} scaleFrom={0.98}>
               <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl md:aspect-[4/4.4]">
                 <Image
                   src={content("home.tecnologia.image")}

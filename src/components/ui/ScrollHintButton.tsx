@@ -29,9 +29,9 @@ export function ScrollHintButton({
   return (
     <a
       href={target}
-      className={`absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 transition-colors ${color} ${className}`}
+      className={`absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 transition-colors ${color} ${className}`}
     >
-      <span className="font-display text-label-sm font-normal uppercase tracking-[0.18em]">
+      <span className="font-display text-[13px] font-normal uppercase tracking-[0.23em]">
         {label}
       </span>
       <ChevronDown size={18} className="animate-float" />

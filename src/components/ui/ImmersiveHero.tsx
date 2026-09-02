@@ -93,12 +93,17 @@ export function ImmersiveHero({
         </div>
       </div>
 
+      {/* El texto va en Domine con `tracking` de 3px y a 8px de la flecha
+          (`.hero-discover` del mockup). Antes heredaba Montserrat del `body` y
+          quedaba pegado al chevron: es la correccion del 02/09 de Julia. */}
       {scrollHint && scrollTo && (
         <a
           href={`#${scrollTo}`}
-          className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-1 text-primary-fixed-dim/80 transition-colors hover:text-primary-fixed-dim"
+          className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-2 text-primary-container/85 transition-colors hover:text-primary-container"
         >
-          <span className="text-label-sm uppercase">{scrollHint}</span>
+          <span className="font-display text-[13px] uppercase tracking-[0.23em]">
+            {scrollHint}
+          </span>
           <ChevronDown size={18} className="animate-float" />
         </a>
       )}

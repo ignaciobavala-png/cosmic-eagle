@@ -49,26 +49,39 @@ export function ClosingHero({
           once={false}
           y={20}
           duration={1.2}
-          className="relative z-10 px-margin-mobile md:px-margin-desktop"
+          /* 28px de margen lateral en mobile y no los 20 del sitio: con el
+             titulo a pantalla completa el texto quedaba pegado a los bordes
+             (correccion del 02/09 de Julia). */
+          className="relative z-10 px-7 md:px-margin-desktop"
         >
           {title && (
-            <h2 className="font-display text-display-mobile md:text-display-lg font-bold uppercase text-primary text-balance">
+            /* `clamp(1.5rem,5vw,3rem)`, el del mockup: en mobile el titulo
+               tiene que entrar en DOS lineas y con la escala anterior se pasaba.
+               `text-balance` reparte el corte entre las dos. */
+            <h2 className="font-display text-[clamp(1.5rem,5vw,3rem)] font-bold uppercase leading-[1.3] text-primary text-balance">
               {title}
             </h2>
           )}
 
           {actions.length > 0 && (
-            <div className="mt-10 flex w-full max-w-xs flex-col items-stretch gap-4 sm:max-w-none sm:flex-row sm:justify-center sm:gap-8">
+            /* `mx-auto`: sin el, la columna de botones de mobile se apoyaba a
+               la izquierda del bloque en vez de quedar centrada bajo el titulo.
+               Es el otro reclamo del 02/09. */
+            <div className="mx-auto mt-10 flex w-full max-w-[20rem] flex-col items-stretch gap-4 sm:max-w-none sm:flex-row sm:justify-center sm:gap-8">
               {actions.map((action) => (
                 <CtaLink
                   key={action.href + action.label}
                   href={action.href}
                   variant={action.variant ?? "solid"}
-                  className={
+                  /* Los dos botones del mockup (`.nos-btn-glow` y
+                     `.nos-btn-glass`): pildora, Domine bold con tracking, y el
+                     "glass" con fondo dorado al 30% y blur — no el blanco al 3%
+                     del ghost generico del sistema. */
+                  className={`rounded-full px-9 py-4 font-display font-bold tracking-[0.07em] ${
                     action.variant === "ghost"
-                      ? "rounded-full"
-                      : "rounded-full shadow-[0_0_22px_rgba(249,215,143,0.6),0_0_43px_rgba(249,215,143,0.32)]"
-                  }
+                      ? "border-primary-container/50 bg-primary-container/30 backdrop-blur-[10px] hover:bg-primary-container/[0.42] hover:-translate-y-0.5"
+                      : "shadow-[0_0_22px_rgba(249,215,143,0.6),0_0_43px_rgba(249,215,143,0.32)] hover:shadow-[0_0_29px_rgba(249,215,143,0.77),0_0_58px_rgba(249,215,143,0.45)] hover:-translate-y-0.5"
+                  }`}
                 >
                   {action.label}
                 </CtaLink>

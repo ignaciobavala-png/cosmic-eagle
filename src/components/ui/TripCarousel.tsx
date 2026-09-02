@@ -1,3 +1,4 @@
+import { ExperienceGate } from "./ExperienceGate";
 import { TripCard, type TripCardData } from "./TripCard";
 
 /**
@@ -11,10 +12,14 @@ import { TripCard, type TripCardData } from "./TripCard";
  * Las tarjetas van en `tone="light"`: sobre el dorado, la tarjeta de vidrio
  * oscuro del resto del sitio desaparece.
  *
- * La fila scrollea en horizontal en vez de animarse sola en loop como en el
- * HTML de Julia. Un carrusel en movimiento continuo no se puede leer ni tocar
- * en mobile, y acá cada tarjeta es un link a la inscripción: la fila es
- * arrastrable y el desvanecido de los bordes avisa que sigue.
+ * El calendario se mueve solo en escritorio (`.carousel-inner-scroll` del
+ * mockup) y se frena al pasar el mouse, que es como pide la correccion del
+ * 02/09. En mobile no: ahi la fila se arrastra con el dedo, y una animacion en
+ * curso pelea con el scroll tactil.
+ *
+ * Los bordes se desvanecen contra el dorado con una `mask-image` horizontal
+ * (transparente en el 8% de cada punta): es el efecto de fundido que pide el
+ * diseno, y sale gratis porque el panel de atras ya es el degrade.
  */
 export function TripCarousel({
   caption,
@@ -41,18 +46,38 @@ export function TripCarousel({
           {emptyLabel}
         </p>
       ) : (
-        // `-mx-5 px-5` para que la primera y la ultima tarjeta no queden pegadas
-        // al borde del panel cuando la fila esta scrolleada a un extremo.
-        <div className="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {trips.map((trip) => (
-            <div
-              key={trip.id}
-              className="w-[17rem] shrink-0 snap-start sm:w-[19rem]"
-            >
-              <TripCard trip={trip} tone="light" />
-            </div>
-          ))}
+        // La pista lleva las tarjetas dos veces en escritorio para que el
+        // loop cierre en `-50%`; el segundo juego es `aria-hidden` y sin foco,
+        // porque son los mismos links repetidos.
+        //
+        // `-mx-5 px-5` para que la primera y la ultima tarjeta no queden
+        // pegadas al borde del panel cuando la fila esta arrastrada al extremo.
+        <ExperienceGate>
+        <div className="marquee-track -mx-5 overflow-x-auto px-5 pb-3 [mask-image:linear-gradient(to_right,transparent_0%,#000_8%,#000_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_8%,#000_92%,transparent_100%)] [scrollbar-width:none] md:overflow-hidden [&::-webkit-scrollbar]:hidden">
+          {/* El separador va como `mr` de cada tarjeta y NO como `gap` de la
+              pista: con `gap`, el recorrido de `-50%` cae medio separador
+              corrido del arranque del segundo juego y el loop pega un saltito
+              en cada vuelta. Con el margen adentro de cada item el ancho es
+              exactamente `2n * (tarjeta + separador)` y `-50%` cierra justo. */}
+          <div className="animate-marquee flex w-max">
+            {trips.map((trip) => (
+              <div key={trip.id} className="mr-5 w-[17rem] shrink-0 sm:w-[20rem]">
+                <TripCard trip={trip} tone="light" />
+              </div>
+            ))}
+            {trips.map((trip) => (
+              <div
+                key={`copia-${trip.id}`}
+                aria-hidden="true"
+                tabIndex={-1}
+                className="mr-5 hidden w-[17rem] shrink-0 sm:w-[20rem] md:block"
+              >
+                <TripCard trip={trip} tone="light" />
+              </div>
+            ))}
+          </div>
         </div>
+        </ExperienceGate>
       )}
     </div>
   );

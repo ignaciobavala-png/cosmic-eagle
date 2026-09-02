@@ -249,6 +249,39 @@
 
 /* Rotacion continua de los simbolos decorativos de /nosotros: 360° antihorario
    en 30s, infinita. Arranca apenas el elemento existe, no depende de scroll. */
+/**
+ * Marquesina del calendario de viajes (`.carousel-inner-scroll` del mockup de
+ * Julia): la fila se desplaza a la izquierda en loop continuo y se frena al
+ * pasar el mouse, para poder leer y tocar una tarjeta.
+ *
+ * El loop cierra porque la pista lleva las tarjetas DOS veces y el recorrido es
+ * exactamente `-50%`: al terminar, el segundo juego esta donde arrancaba el
+ * primero y el salto no se ve. La copia va `aria-hidden`.
+ *
+ * Solo corre en escritorio: en mobile la fila se arrastra con el dedo, y una
+ * animacion en curso pelea con el scroll tactil. La regla vive dentro de la
+ * media query por eso.
+ */
+@media (min-width: 48rem) {
+  .animate-marquee {
+    animation: marquee 40s linear infinite;
+  }
+
+  .marquee-track:hover .animate-marquee,
+  .marquee-track:focus-within .animate-marquee {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 @keyframes nos-symbol-spin {
   from {
     transform: rotate(0deg);
@@ -268,7 +301,8 @@
   .animate-hero-zoom,
   .animate-float,
   .animate-auth-card,
-  .animate-nos-spin {
+  .animate-nos-spin,
+  .animate-marquee {
     animation: none;
   }
 

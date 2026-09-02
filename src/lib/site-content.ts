@@ -123,6 +123,15 @@ export const SITE_GROUPS = [
         fallback: "true",
       },
       {
+        key: "home.voces.image",
+        label: "Imagen del pie de “Voces de Luz”",
+        help: "La franja de imagen que cierra la sección de testimonios. Se funde con el azul de arriba, así que conviene una foto atmosférica sin nada importante en el borde superior.",
+        type: "image",
+        fallback: IMAGES.homeVoces,
+        ratio: "16/9",
+        maxPx: 1920,
+      },
+      {
         key: "home.tecnologia.image",
         label: "Imagen de “Tecnología del Alma”",
         help: "La foto vertical que acompaña al texto de Tecnología del Alma, sobre el fondo claro.",

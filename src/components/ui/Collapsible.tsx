@@ -29,13 +29,19 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
  * tiene que pasar `tone="dark"`.
  */
 export function Collapsible({
-  label,
+  label = null,
   children,
   defaultOpen = false,
   openOnHash,
   tone = "light",
 }: {
-  label: string;
+  /**
+   * El texto del boton. `null` deja el panel SIN boton propio: es lo que hace
+   * la cartelera de la home, cuyo disparador es el "Explorar experiencias" del
+   * relato —400vh mas arriba, dentro del sticky— y que por eso se abre solo por
+   * `openOnHash`.
+   */
+  label?: string | null;
   children: React.ReactNode;
   defaultOpen?: boolean;
   /** Se abre solo cuando la URL apunta a este id (sin `#`). */
@@ -64,6 +70,7 @@ export function Collapsible({
 
   return (
     <div className="w-full">
+      {label !== null && (
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -79,6 +86,7 @@ export function Collapsible({
           →
         </span>
       </button>
+      )}
 
       <AnimatePresence initial={false}>
         {open && (
@@ -91,7 +99,7 @@ export function Collapsible({
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="overflow-hidden"
           >
-            <div className="pt-11">{children}</div>
+            <div className={label === null ? "" : "pt-11"}>{children}</div>
           </motion.div>
         )}
       </AnimatePresence>

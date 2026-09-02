@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-type Variant = "solid" | "ghost";
+type Variant = "solid" | "ghost" | "pill";
 
 const VARIANTS: Record<Variant, string> = {
   // CTA solido: oro champagne con texto oscuro (primary-container / on-primary)
@@ -12,6 +12,13 @@ const VARIANTS: Record<Variant, string> = {
   // oro quedaba en ~4:1, abajo del minimo de 4,5:1. Con este llega a 4,9:1.
   ghost:
     "border border-primary-container/55 text-primary-container backdrop-blur-md hover:border-primary-container hover:text-primary-fixed bg-white/[0.03]",
+  // La pildora dorada del mockup de Julia. Es UN solo boton repetido en todo el
+  // sitio: `.about-btn-ghost` (Explorar experiencias), `.proposito-btn`,
+  // `.tec-btn` y `.navbar-cta` son el mismo diseno y solo cambian el padding.
+  // Degrade 135deg del oro claro al oscuro, borde 1.5px del oro claro, texto
+  // AZUL en Domine bold con tracking — no lleva `text-on-primary`.
+  pill:
+    "rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,#f9d78f,#b3964b)] font-display font-bold tracking-[0.08em] text-[#05125a] transition-[filter,transform] hover:brightness-110",
 };
 
 /**
@@ -38,7 +45,7 @@ export function CtaLink({
   return (
     <Link
       href={href}
-      className={`inline-flex items-center justify-center gap-2 rounded-lg px-7 py-3 text-label-sm uppercase transition-all duration-300 ${VARIANTS[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 px-7 py-3 text-label-sm uppercase transition-all duration-300 ${variant === "pill" ? "" : "rounded-lg"} ${VARIANTS[variant]} ${className}`}
     >
       {children}
     </Link>

@@ -119,7 +119,7 @@ export function Header() {
                 <li key={link.href} className="relative group">
                   <Link
                     href={link.href}
-                    className={`flex items-center gap-1.5 whitespace-nowrap px-4 py-2 text-label-sm uppercase transition-colors duration-200 ${
+                    className={`flex items-center gap-1.5 whitespace-nowrap px-4 py-2 font-display text-label-sm uppercase transition-colors duration-200 ${
                       isActive
                         ? "text-primary-fixed-dim"
                         : "text-on-surface-variant hover:text-on-surface"
@@ -141,17 +141,23 @@ export function Header() {
                       cierra al bajar el mouse en diagonal. */}
                   {link.children && (
                     <div className="invisible absolute left-0 top-full z-50 pt-2 opacity-0 transition-opacity duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                      <ul className="min-w-56 rounded-2xl border border-primary-fixed-dim/20 bg-[#05060a]/95 p-2 shadow-2xl backdrop-blur-xl">
+                      {/* La caja sale del mockup (`.dropdown-experiences`):
+                          azul de la paleta al 95%, borde dorado al 20%, radio
+                          12px y 20px de padding. El titulo va en Domine dorado
+                          y la descripcion en Montserrat al 70% — antes era la
+                          caja negra generica con todo en Montserrat, que es lo
+                          que Julia marca como "no respeta el estilo visual". */}
+                      <ul className="w-80 rounded-xl border border-primary-container/20 bg-[#05125a]/95 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.4)] backdrop-blur-xl">
                         {link.children.map((child) => (
-                          <li key={child.href}>
+                          <li key={child.href} className="[&:not(:last-child)]:mb-1">
                             <Link
                               href={child.href}
-                              className="block rounded-lg px-3 py-2 transition-colors hover:bg-primary-container/10"
+                              className="block rounded-lg p-3 transition-colors hover:bg-primary-container/[0.08]"
                             >
-                              <span className="block text-label-sm uppercase text-on-surface">
+                              <span className="block font-display text-base font-bold tracking-[0.03em] text-primary-container">
                                 {child.label}
                               </span>
-                              <span className="mt-0.5 block text-xs text-on-surface-variant">
+                              <span className="mt-1.5 block text-[13px] font-light leading-relaxed text-primary-container/70">
                                 {child.description}
                               </span>
                             </Link>
@@ -180,7 +186,7 @@ export function Header() {
                 ) : (
                   <CircleUser size={20} />
                 )}
-                <span className="text-label-sm uppercase">
+                <span className="font-display text-label-sm uppercase">
                   {profile.fullName?.split(" ")[0] || "Mi Cuenta"}
                 </span>
               </Link>
@@ -190,7 +196,8 @@ export function Header() {
               <div className="hidden lg:flex">
                 <CtaLink
                   href="/cuenta?modo=registro"
-                  className="whitespace-nowrap rounded-xl px-5 py-2"
+                  variant="pill"
+                  className="whitespace-nowrap px-6 py-3"
                 >
                   Unirme al círculo
                   <ArrowRight size={14} />
@@ -261,7 +268,7 @@ export function Header() {
                         }`}
                       >
                         <Icon size={20} />
-                        <span className="tracking-[0.1em] font-semibold text-sm uppercase">
+                        <span className="font-display tracking-[0.1em] font-semibold text-sm uppercase">
                           {link.label}
                         </span>
                       </Link>
@@ -275,7 +282,7 @@ export function Header() {
                               <Link
                                 href={child.href}
                                 onClick={() => setDrawerOpen(false)}
-                                className="block rounded-lg px-3 py-2 text-sm tracking-[0.05em] text-on-surface-variant uppercase transition-colors hover:bg-surface-variant/30 hover:text-on-surface"
+                                className="block rounded-lg px-3 py-2 font-display text-sm tracking-[0.05em] text-on-surface-variant uppercase transition-colors hover:bg-surface-variant/30 hover:text-on-surface"
                               >
                                 {child.label}
                               </Link>
@@ -295,7 +302,8 @@ export function Header() {
                 >
                   <CtaLink
                     href="/cuenta?modo=registro"
-                    className="w-full"
+                    variant="pill"
+                    className="w-full py-4"
                   >
                     Unirme al círculo
                     <ArrowRight size={14} />

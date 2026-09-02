@@ -39,6 +39,7 @@ const PHASE1_END = 0.28; // termina el reveal de los párrafos
 const PHASE2_END = 0.55; // termina el apagado de los tramos de texto
 const PHASE3_END = 0.78; // las palabras llegan al centro
 const CTA_TRIGGER = 0.8; // umbral del botón (no es scrubbing: entra y sale entero)
+const HINT_TRIGGER = 0.9; // umbral de la flecha que baja a la sección siguiente
 
 /** Cuánto dura, en progreso, el apagado de cada tramo de texto. */
 const SEGMENT_FADE = 0.1;
@@ -61,11 +62,19 @@ export function ScrollStory({
   paragraphs,
   keywords,
   cta,
+  next,
   id,
 }: {
   paragraphs: readonly string[];
   keywords: readonly string[];
   cta: Cta;
+  /**
+   * Ancla de la seccion siguiente. Dibuja la flecha del mockup
+   * (`#aboutScrollInd`), que entra por fundido detras del boton y baja a esa
+   * seccion. Faltaba: en la correccion del 02/09 Julia la marca como parte del
+   * diseno ("con el siguiente scroll se anima por fade in el boton indicador").
+   */
+  next?: string;
   id?: string;
 }) {
   const reduced = useReducedMotion();
@@ -79,6 +88,9 @@ export function ScrollStory({
   const travel = useTransform(progress, [PHASE2_END, PHASE3_END], [0, 1]);
 
   const ctaVisible = useThreshold(progress, CTA_TRIGGER, !reduced);
+  // La flecha entra despues del boton, no junto con el: en el mockup aparece
+  // "con el siguiente scroll".
+  const hintVisible = useThreshold(progress, HINT_TRIGGER, !reduced);
 
   if (reduced) {
     return (
@@ -103,6 +115,7 @@ export function ScrollStory({
           <div className="pt-6">
             <StoryCta {...cta} />
           </div>
+          {next && <StoryScrollHint target={next} />}
         </div>
       </section>
     );
@@ -175,6 +188,18 @@ export function ScrollStory({
         >
           <StoryCta {...cta} />
         </motion.div>
+
+        {next && (
+          <motion.div
+            initial={false}
+            animate={{ opacity: hintVisible ? 1 : 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="absolute inset-x-0 bottom-10 z-[4] text-center"
+            style={{ pointerEvents: hintVisible ? "auto" : "none" }}
+          >
+            <StoryScrollHint target={next} />
+          </motion.div>
+        )}
       </div>
     </section>
   );
@@ -380,4 +405,24 @@ function splitStory(paragraphs: readonly string[], keywords: readonly string[]) 
 
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * La flecha del pie del relato (`.scroll-ind` del mockup): sin texto, solo el
+ * signo, y baja a la seccion siguiente. Es un ancla comun — el destino esta
+ * fuera del sticky, asi que el salto nativo alcanza y respeta el
+ * `scroll-padding-top` con el que el sitio compensa el navbar.
+ */
+function StoryScrollHint({ target }: { target: string }) {
+  return (
+    <a
+      href={`#${target}`}
+      aria-label="Seguir bajando"
+      className="inline-block text-2xl leading-none text-primary-container/80 transition-[transform,color] duration-300 hover:scale-125 hover:text-primary-container"
+    >
+      <span aria-hidden="true" className="animate-float inline-block">
+        ↓
+      </span>
+    </a>
+  );
 }

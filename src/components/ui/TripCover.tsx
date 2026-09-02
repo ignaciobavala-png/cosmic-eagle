@@ -28,6 +28,15 @@ const VARIANTS = {
     sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw",
   },
   /**
+   * Tarjeta de la cartelera (el carrusel dorado). Es la proporcion en la que se
+   * GUARDA la portada, asi que no recorta nada, y deja la franja apaisada del
+   * diseno de Julia (`calendariodeviajes_design.png`) en vez del 4:3 alto.
+   */
+  strip: {
+    aspect: "aspect-[16/9]",
+    sizes: "(min-width: 640px) 20rem, 17rem",
+  },
+  /**
    * Banner del detalle. En mobile se acerca al 4:3 porque el titulo va encima:
    * con 21:9 en pantalla angosta la franja queda mas baja que el propio titulo.
    */
@@ -67,7 +76,7 @@ export function TripCover({
         sizes={sizes}
         priority={priority}
         className={`object-cover ${
-          variant === "card"
+          variant === "card" || variant === "strip"
             ? "transition-transform duration-1000 group-hover:scale-105"
             : ""
         }`}
