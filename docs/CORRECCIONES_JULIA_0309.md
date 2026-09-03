@@ -131,17 +131,7 @@ Las once correcciones están **mergeadas a `main` y en producción** (commits
 
 **Esperando respuesta de Julia** por tres cosas:
 
-1. **El desplegable de «Experiencias»**, que Sofía vio "medio cuadrado". La
-   auditoría y las tres versiones propuestas están en
-   `~/Escritorio/desplegable-experiencias.html` (fuera del repo). Resumen: lo
-   cuadrado viene de su propio mockup aprobado —fondo plano, radio 12px, dos
-   bloques de texto sin ningún indicio de ser links—, en un sitio donde todo lo
-   demás es degradé. La versión 1 ("filete y rombo") está implementada en la
-   rama **`desplegable-experiencias`**, sin mergear: falta que Ignacio elija
-   entre las tres y que Julia confirme, porque el componente es suyo. Esa rama
-   trae además tres arreglos que valen gane la versión que gane —el panel
-   centrado bajo el link (su `left:50%`, teníamos `left-0`), la entrada con
-   desplazamiento y el copy de su mockup.
+1. ~~**El desplegable de «Experiencias»**~~ — **CERRADO el mismo día**, ver §6.
 2. **El título derivado de las experiencias** ("Sesión Cósmica en Santiago"
    cuando la clienta lo deja vacío): su pedido literal es no poner título, pero
    la columna es `NOT NULL` y el nombre se usa en el asunto de cada correo, en
@@ -153,3 +143,43 @@ Las once correcciones están **mergeadas a `main` y en producción** (commits
 De la entrega de Julia del 02/09 seguían abiertas, y siguen: el destino real de
 "Contacta soporte", una foto pensada para la franja de Voces de Luz, y el tag de
 tipo con texto blanco sobre dorado.
+
+## 6. El desplegable de «Experiencias» — cerrado el 03/09
+
+Sofía lo vio "medio cuadrado". Se auditó, se propusieron tres versiones (el
+comparador con el navbar real y el hover funcionando quedó en
+`~/Escritorio/desplegable-experiencias.html`, fuera del repo) y **Julia eligió la
+opción 1 con un 30% menos de opacidad, "para darle menos peso al contenedor"**.
+Mergeado a `main` y en producción.
+
+**El hallazgo de la auditoría**: lo cuadrado venía de su propio mockup aprobado
+(`.dropdown-experiences` de `homepage_correccion.html`) — fondo plano, radio
+12px y dos bloques de texto sin ningún indicio de ser links, en un sitio donde
+todo lo demás es degradé. No era una desviación nuestra.
+
+Lo que quedó en el código:
+
+- fondo en degradé de la familia del navbar y el footer, radio 18px, filete
+  dorado con el rombo de cuatro puntas centrado bajo el link, separador entre
+  los ítems y flecha que avanza en el hover;
+- las opacidades que pidió Julia: `0.22 / 0.68 / 0.69` (eran `0.32 / 0.97 /
+  0.98`);
+- **y tres correcciones a su propia spec, de las que nos habíamos apartado**: el
+  panel va CENTRADO bajo el link (`left:50%`; teníamos `left-0`, colgando de una
+  esquina), entra con 6px de desplazamiento además del fundido, y toma el copy
+  de su mockup — el nuestro decía "Encuentros ceremoniales de un dia", sin
+  tilde. `TRIP_TYPES[].description` sólo lo consume este desplegable.
+
+**Ojo con la transparencia, que trae un caso que antes no existía.** El navbar
+es fijo, así que el panel se abre sobre lo que haya debajo. Con la franja crema
+de "Tecnología del Alma" atrás, el panel al 68% se aclaraba entero y la
+descripción dorada al 70% se caía a ~2:1. Se arregla oscureciendo **lo de
+atrás** (`backdrop-brightness-[0.45]`) y no subiendo la opacidad del panel, que
+es justo lo que ella pidió bajar: el contenedor sigue liviano y deja ver el
+fondo. Medido sobre la crema, que es el peor caso del sitio: descripción
+**4,82:1** y título **8,04:1**. Si algún día se saca ese filtro, hay que
+devolver la opacidad.
+
+Verificado: `tsc`, lint, build, los 17 tests públicos, y el panel abierto sobre
+los cuatro fondos que puede tocar (el hero de la home, `/viajes`, `/contenidos`
+y la franja crema).
