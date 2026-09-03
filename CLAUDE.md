@@ -1746,3 +1746,98 @@ Todo lo que vivía suelto en el escritorio se juntó en
 **`~/Escritorio/things/cosmic-eagle-material/`**: `entregas-sofia/`,
 `entregas-julia/`, `capturas-flujo-inscripcion/` (las 19 del embudo) y
 `reportes/`. Las capturas de verificación se borraron: las regenera el script.
+
+### Sesión del 2026-09-03 (quinquies) — las correcciones de Julia y el desplegable
+
+Todo lo de abajo está **mergeado a `main` y en producción**, verificado contra el
+sitio en vivo. `main` volvió a ser la única rama (se borraron `cobros`, que ya
+estaba contenida, y `desplegable-experiencias`, mergeada).
+
+Julia mandó dos cosas, copiadas el mismo día a
+`docs/entregas/2026-09-03-julia/`: un `.txt` con **12 correcciones** más las
+capturas del estado actual y deseado de testimonios, y la **v3 del fix mobile**
+de "Tecnología del Alma" (HTML autocontenido + design system + notas). Checklist
+cruzado contra el código en **`docs/CORRECCIONES_JULIA_0309.md`**.
+
+**Once de las doce entraron.** Lo que hay que recordar:
+
+- **La línea negra del scroll era global, no de testimonios.** `globals.css`
+  tenía `* { scrollbar-color: #e3c37d #0e0e0b }` — el riel en el negro de la
+  paleta vieja, detrás del pulgar dorado. Ahora va **transparente** y toma el
+  fondo de cada sección.
+- **El botón de la cartelera alterna con un evento, no con el hash.** El
+  disparador vive 400vh más arriba, dentro del sticky del relato, y el panel se
+  abría por `hashchange`: al segundo click el hash ya apuntaba ahí y no pasaba
+  nada. Ahora despacha un evento **cancelable** (`COLLAPSIBLE_TOGGLE`, en
+  `Collapsible.tsx`) y el panel alterna; el salto lo hace el panel **sólo al
+  abrir**, y si no hay ninguno escuchando el evento vuelve sin cancelar y el
+  botón se comporta como el ancla que es.
+- **El título de una experiencia es opcional pero nunca queda vacío**: la
+  columna es `NOT NULL` y el nombre se usa en el asunto de cada correo, en el
+  panel y en el `<title>`. Vacío se **deriva** del tipo y la ciudad ("Sesión
+  Cósmica en Santiago"). **A confirmar con Julia**, cuyo pedido literal es no
+  poner título.
+- **La tarjeta de testimonio es de alto fijo (225px) y más ancha que los 300px
+  del mockup**, que se dibujó con placeholders de una línea: con 250 caracteres
+  reales, 300px no alcanzan para las seis líneas que entran en ese alto. El tope
+  de 250 vive en el formulario y en el server action
+  (`TESTIMONIAL_MAX_CHARS`), **no en la base**: un CHECK habría fallado con uno
+  de los tres testimonios sembrados, que tiene 274 caracteres y hoy se recorta.
+- **La sección de testimonios suma la altura del navbar a su padding de mobile**:
+  mide una pantalla justa y la banda opaca le tapaba el título.
+- El fix v3 de Tecnología es **sólo mobile**; el `<br>` del título de dos líneas
+  es fijo y el cuerpo va **negro puro** en mobile, que es spec explícita.
+- Los dos botones del cierre de `/nosotros` son la misma píldora con distinto
+  relleno: entró la variante **`glass`** de `CtaLink` (degradé azul al 50% con
+  blur). Ojo con pisar el fondo de una variante desde `className` — dos degradés
+  arbitrarios sobre la misma propiedad los resuelve el orden de la hoja
+  generada, no el orden en que se escriben.
+
+**La que NO entró es la repetición de fechas de las sesiones**
+(`docs/CORRECCIONES_JULIA_0309.md` §3): no es diseño, cambia el modelo de datos
+y el embudo — pide tabla hija de fechas, que la solicitud registre a cuál se
+postula, cupo por fecha y revisar el correo [7] y el programa por jornada.
+Además es el mismo trabajo que la pregunta abierta desde el 06/08 sobre si una
+Sesión es siempre de un día. **Espera a Estela y Sofía.**
+
+#### El desplegable de «Experiencias» (§6 de ese documento)
+
+Sofía lo vio "medio cuadrado". **Lo cuadrado venía del mockup aprobado de
+Julia** —fondo plano, radio 12px y dos bloques de texto sin ningún indicio de
+ser links, en un sitio donde todo lo demás es degradé—, no de una desviación
+nuestra. Se le propusieron tres versiones (comparador con el navbar real en
+`~/Escritorio/desplegable-experiencias.html`, fuera del repo) y eligió la 1
+("filete y rombo") **con un 30% menos de opacidad**.
+
+- Quedaron además **tres correcciones a su propia spec**: el panel va CENTRADO
+  bajo el link (`left:50%`; teníamos `left-0`), entra con desplazamiento además
+  del fundido, y toma el copy de su mockup — el nuestro decía "Encuentros
+  ceremoniales de un dia", sin tilde.
+- **Ojo con el vidrio bajo un navbar fijo**: el panel se abre sobre lo que haya
+  debajo, y con la franja crema de "Tecnología del Alma" atrás el texto dorado
+  se caía a ~2:1. Se arregla oscureciendo **el fondo**
+  (`backdrop-brightness-[0.45]`), nunca subiendo la opacidad del panel — eso
+  desharía lo que ella pidió. Medido sobre la crema: descripción 4,82:1 y título
+  8,04:1.
+
+#### Verificado
+
+`tsc`, lint (los 2 errores de `multimedia/SlotEditor.tsx` son previos), build de
+producción, los **17 tests públicos** y los **18 del panel**, y medición en
+Chrome real a 1440×900 y 390×844 sobre el build y después contra producción: la
+frase manifiesto en 2 líneas exactas, "Voces de Luz" en exactamente una pantalla
+(900/900 y 844/844) con la imagen del pie visible en los dos anchos, Tecnología
+del Alma en una pantalla en mobile, la cartelera 0 → 876 → 0 px con dos clicks, y
+el desplegable sobre los cuatro fondos que puede tocar.
+
+**Ojo al verificar en local**: si el `next start` quedó levantado de un build
+anterior, sirve el **HTML nuevo con el CSS viejo** y las mediciones dan cualquier
+cosa (una sección de `100svh` midiendo 2415px, con `display:block` pese a la
+clase `flex`). Hay que matarlo por puerto (`fuser -k 3000/tcp`): un
+`pkill -f "next start"` se lleva puesto al propio shell, porque su línea de
+comando también contiene el patrón, y el `pnpm start` que viene después nunca
+corre.
+
+**Sin verificar end-to-end** (requiere sesión de admin): cargar una experiencia
+sin título y ver el nombre derivado, y cargar un testimonio de más de 250
+caracteres para ver el aviso.
