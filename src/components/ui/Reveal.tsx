@@ -30,6 +30,30 @@ import { motion, useInView, useReducedMotion, type Variants } from "framer-motio
  * todo apenas carga la página. Con `once` eso es irreversible: la sección queda
  * revelada para siempre.
  *
+ * ## Reducir movimiento: por que NO se puede devolver un div pelado
+ *
+ * La version anterior hacia `if (reduced) return <div>{children}</div>`. Se
+ * veia razonable y **dejaba el sitio entero invisible** para quien tiene
+ * "reducir movimiento" activado.
+ *
+ * `useReducedMotion()` no puede saber la preferencia en el servidor: ahi
+ * devuelve `false` y el HTML sale con el `style="opacity:0"` que corresponde a
+ * `initial="hidden"`. En el cliente devuelve `true`, la rama corta renderiza un
+ * `<div>` sin estilo, y React avisa *"some attributes of the server rendered
+ * HTML didn't match... **this won't be patched up**"*: el atributo del servidor
+ * se queda pegado al nodo. Como esa rama tampoco monta observador, nada vuelve
+ * a tocar la opacidad y la seccion queda en 0 para siempre.
+ *
+ * Por eso el arbol es **el mismo en los dos casos** y la preferencia solo
+ * cambia la **transicion**: con `reduce` el bloque va derecho a "visible" con
+ * duracion cero, o sea que aparece puesto y no se ve ningun movimiento.
+ *
+ * Por el mismo motivo el estado `hidden` **no** se toca cuando hay `reduce`:
+ * es el que pinta el servidor, asi que cambiarle el `y` o el `scale` vuelve a
+ * abrir la misma grieta (`transform: translateY(24px)` contra `none`).
+ * Verificado en Chrome con `prefers-reduced-motion: reduce`: cero errores de
+ * hidratacion y cero bloques invisibles.
+ *
  * Por eso no se empieza a observar hasta `load` + dos `requestAnimationFrame`.
  * Y la espera tiene que gatear el **observador**, no el resultado: se le pasa a
  * `useInView` una ref vacía hasta que está armado, así la primera medición
@@ -121,21 +145,12 @@ export function Reveal({
 
   const inView = useInView(armed ? nodeRef : idleRef, { amount, once });
 
-  // Con "reducir movimiento" no hay entrada ni observador: el contenido está.
-  if (reduced) {
-    return as === "section" ? (
-      <section id={id} className={className}>
-        {children}
-      </section>
-    ) : (
-      <div id={id} className={className}>
-        {children}
-      </div>
-    );
-  }
-
   const orchestrating = stagger !== undefined;
   const Tag = as === "section" ? motion.section : motion.div;
+
+  // Con "reducir movimiento" el contenido aparece igual, pero sin recorrido ni
+  // espera: se pasa a "visible" con duracion cero apenas monta.
+  const show = reduced || inView;
 
   return (
     <Tag
@@ -143,16 +158,18 @@ export function Reveal({
       ref={nodeRef}
       className={className}
       initial="hidden"
-      animate={inView ? "visible" : "hidden"}
+      animate={show ? "visible" : "hidden"}
       variants={
         orchestrating
           ? {
               hidden: {},
               visible: {
-                transition: { staggerChildren: stagger, delayChildren: delay },
+                transition: reduced
+                  ? { staggerChildren: 0, delayChildren: 0 }
+                  : { staggerChildren: stagger, delayChildren: delay },
               },
             }
-          : enterVariants(y, duration, delay)
+          : enterVariants(y, reduced ? 0 : duration, reduced ? 0 : delay)
       }
     >
       {children}
@@ -194,14 +211,6 @@ export function RevealItem({
   const reduced = useReducedMotion();
   const Tag = as === "span" ? motion.span : motion.div;
 
-  if (reduced) {
-    return as === "span" ? (
-      <span id={id} className={className}>{children}</span>
-    ) : (
-      <div id={id} className={className}>{children}</div>
-    );
-  }
-
   // El `delay` sólo se emite si es distinto de cero. **No es un detalle de
   // estilo**: cuando el padre orquesta con `staggerChildren`, Framer implementa
   // el escalón como el `delay` de cada hijo, y un `delay: 0` escrito acá lo pisa
@@ -214,7 +223,9 @@ export function RevealItem({
       opacity: 1,
       y: 0,
       ...(scaleFrom !== undefined && { scale: 1 }),
-      transition: { duration, ease: EASE, ...(delay ? { delay } : {}) },
+      transition: reduced
+        ? { duration: 0 }
+        : { duration, ease: EASE, ...(delay ? { delay } : {}) },
     },
   };
 
@@ -246,15 +257,16 @@ export function RevealLine({
 }) {
   const reduced = useReducedMotion();
 
-  if (reduced) return <div aria-hidden="true" className={className} />;
-
   return (
     <motion.div
       aria-hidden="true"
       className={`origin-left ${className}`}
       variants={{
         hidden: { scaleX: 0 },
-        visible: { scaleX: 1, transition: { duration, delay, ease: EASE } },
+        visible: {
+          scaleX: 1,
+          transition: reduced ? { duration: 0 } : { duration, delay, ease: EASE },
+        },
       }}
     />
   );
