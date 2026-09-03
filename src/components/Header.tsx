@@ -160,7 +160,10 @@ export function Header() {
                             oscuro), que es como esta pintado el resto del sitio.
                             Las opacidades son las que eligio Julia (03/09): un
                             30% menos que la primera version, "para darle menos
-                            peso al contenedor". Lo que sostiene esa
+                            peso al contenedor", y bajadas otra vez en la
+                            segunda vuelta del mismo dia ("un poco mas de
+                            transparencia, que no parezca una caja solida").
+                            Lo que sostiene esa
                             transparencia es el filtro del fondo, y el
                             `backdrop-brightness` **no es decorativo**: el
                             navbar es fijo, asi que el panel se abre sobre lo
@@ -183,7 +186,7 @@ export function Header() {
                           El panel entra ademas subiendo 6px. El desplazamiento
                           va aca adentro y no en el wrapper, que tiene que
                           quedarse pegado al link (ver arriba). */}
-                      <ul className="relative w-[22rem] rounded-[18px] border border-primary-container/25 bg-[linear-gradient(160deg,rgba(0,121,179,0.22)_0%,rgba(5,18,90,0.68)_55%,rgba(2,12,65,0.69)_100%)] p-6 pt-7 shadow-[0_18px_50px_rgba(2,12,65,0.45)] backdrop-blur-2xl backdrop-brightness-[0.45] backdrop-saturate-150 transition-transform duration-200 translate-y-1.5 group-hover:translate-y-0 group-focus-within:translate-y-0">
+                      <ul className="relative w-[22rem] rounded-[18px] border border-primary-container/25 bg-[linear-gradient(160deg,rgba(0,121,179,0.16)_0%,rgba(5,18,90,0.55)_55%,rgba(2,12,65,0.56)_100%)] p-6 pt-7 shadow-[0_18px_50px_rgba(2,12,65,0.45)] backdrop-blur-2xl backdrop-brightness-[0.38] backdrop-saturate-150 transition-transform duration-200 translate-y-1.5 group-hover:translate-y-0 group-focus-within:translate-y-0">
                         {/* El filete y el rombo son decoracion pura: van en
                             elementos vacios para que ningun lector de pantalla
                             los anuncie, igual que los filetes de
@@ -292,7 +295,7 @@ export function Header() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 z-[60] w-80 max-w-[85vw] bg-surface-container-low/95 backdrop-blur-2xl backdrop-brightness-[0.45] backdrop-saturate-150 border-r border-parchment/10 shadow-2xl flex flex-col py-6 md:hidden"
+              className="fixed inset-y-0 left-0 z-[60] w-80 max-w-[85vw] bg-surface-container-low/95 backdrop-blur-2xl border-r border-parchment/10 shadow-2xl flex flex-col py-6 md:hidden"
             >
               <div className="px-6 py-4 border-b border-parchment/5 flex justify-between items-center">
                 <Link href="/" onClick={() => setDrawerOpen(false)}>
