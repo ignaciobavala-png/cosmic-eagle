@@ -332,8 +332,9 @@ del 15/08 en `CLAUDE.md`, punto 1 de "lo próximo").
 
 ## 4. Cruce contra lo implementado
 
-Tenemos **4 de 14**, y son justo las que ella marca como automatizables sin
-discusión. Ver `docs/EMAIL.md` (Resend) y `docs/NOTIFICACIONES.md` (la casilla
+Tenemos **9 de las 15 del embudo** (la tabla de abajo; [C1] y [C2] van aparte,
+o sea 17 piezas de copy en total, aunque el PDF las cuente como "14"). Las nueve
+son las que ella marca como automatizables sin discusión. Ver `docs/EMAIL.md` (Resend) y `docs/NOTIFICACIONES.md` (la casilla
 interna, que es el otro canal y no se confunde con este).
 
 | # | Comunicación | Estado |
@@ -344,15 +345,15 @@ interna, que es el otro canal y no se confunde con este).
 | [2B] | No aprobada | ✅ `SolicitudRechazada` |
 | [3] | Pago confirmado | ✅ `PagoRegistrado` |
 | [3A] | Cupo reservado | ✅ `PagoRegistrado` con saldo, estado `deposit_paid` (02/09) |
-| [3B] | Recordatorio de saldo | ❌ falta el envío programado |
+| [3B] | Recordatorio de saldo | ✅ `RecordatorioSaldo`, por el cron diario (03/09) |
 | [3C] | Saldo completado | ✅ `PagoRegistrado`, al pasar de seña a pagado (02/09) |
 | [4] | Formularios recibidos | ❌ falta el consentimiento |
-| [4A] | Formularios pendientes | ❌ ídem + no hay envíos programados |
+| [4A] | Formularios pendientes | ✅ `FormulariosPendientes`, por el cron diario (03/09). Nombra sólo el formulario de salud: el consentimiento no existe |
 | [5] | Bienvenido | ❌ no existe "formulario de salud aprobado" |
-| [6] | Comienza tu preparación | ❌ no hay envíos programados ni `/preparacion` |
-| [7] | Datos finales | ❌ ídem + faltan los campos de `trips` |
-| [8] | Material de integración | ❌ ídem + no hay material de integración |
-| [9] | Tu mirada | ❌ ídem + no hay formulario de feedback |
+| [6] | Comienza tu preparación | ❌ falta `/preparacion` (el motor de envíos ya está) |
+| [7] | Datos finales | ❌ faltan los campos de logística de `trips` |
+| [8] | Material de integración | ❌ falta el material |
+| [9] | Tu mirada | ❌ falta el formulario de feedback |
 
 Lo que falta **no es escribir diez templates**. Son cinco piezas de sistema:
 
@@ -365,11 +366,9 @@ Lo que falta **no es escribir diez templates**. Son cinco piezas de sistema:
    son de la clienta. Sin eso no hay [4] ni [5]. El estado "salud aprobada"
    tampoco existe: hoy la etapa 2 se completa y no hay nada que revisar
    formalmente después.
-4. **Envíos programados por fecha del viaje** ([3B], [4A], [6], [7], [8], [9]).
-   No hay ningún cron de mails: `vercel.json` sólo tiene el keep-alive diario.
-   Lo natural es colgar un segundo cron del mismo mecanismo, con una tabla de
-   envíos para no remandar (mismo criterio que `reviewApplication`, que relee el
-   estado anterior).
+4. ~~**Envíos programados por fecha del viaje.**~~ **HECHO el 03/09**, ver §8.
+   El motor existe y manda [3B] y [4A]; a [6], [7], [8] y [9] les falta el
+   contenido, no la maquinaria.
 5. **Formulario de contacto** ([C1]) y **formulario de feedback** ([9]), que hoy
    no existen como ruta.
 
@@ -516,3 +515,62 @@ puede pagar en cuotas y cuántas, el plazo de corte, qué pasa si no lo paga, si
 la tarjeta cobra la seña o el total, y si el saldo va por el mismo riel. Ninguna
 bloquea lo construido; la 4 y la 5 bloquean el recordatorio [3B], que además
 necesita el envío programado.
+
+---
+
+## 8. El motor de envíos programados (03/09)
+
+Migración `20260903030000_scheduled_emails.sql`. Es la pieza 4 de §4: la que
+convierte "faltan diez correos" en "faltan cinco piezas de contenido".
+
+Hasta hoy **todos** los mails de la app salían de un server action — siempre
+había alguien apretando un botón, y por eso ninguno de los correos que dispara el
+calendario existía.
+
+```
+vercel.json (cron 13:00 UTC)
+  └─ GET /api/cron/emails          exige CRON_SECRET
+     └─ runScheduledEmails()       src/lib/email/scheduled.ts
+        ├─ createAdminClient()     service role: el cron no tiene sesión
+        ├─ dueEmails(app, hoy)     las reglas, una por correo
+        └─ scheduled_email_log     una fila por (solicitud, tipo)
+```
+
+**Lo que hay que saber:**
+
+- **`scheduled_email_log` es el "no remandar".** Los mails con botón releen el
+  estado anterior antes del update para no repetirse; acá no hay estado anterior
+  que leer —el disparador es el paso del tiempo— así que el registro es
+  explícito, con índice único sobre (solicitud, tipo).
+- **`not_configured` no escribe fila.** Si Resend no está configurado —el estado
+  de hoy mismo, sin el dominio verificado— el barrido cuenta el envío como
+  salteado y no deja rastro. Si dejara la fila, el día que Sofía conecte el DNS
+  todos los correos pendientes ya estarían dados por enviados. Un fallo **real**
+  de Resend sí deja fila (`ok = false`) y no se reintenta: se avisa en la casilla
+  del panel y alguien escribe a mano, igual que los otros mails.
+- **Un correo programado por persona y por corrida.** Las dos reglas pueden caer
+  el mismo día sobre la misma solicitud; el segundo sale al día siguiente.
+- **Corre con la service role key** (`src/lib/supabase/admin.ts`). Un cron no
+  tiene sesión, y con `anon` la RLS de `applications` no le muestra una sola
+  fila. Es el único consumidor de esa llave en todo el proyecto y la ruta exige
+  `CRON_SECRET` **sin excepción** — a diferencia del keep-alive, donde la falta
+  del secreto deja la ruta abierta porque lo peor que consigue un desconocido es
+  un `select` de una fila. Acá mandaría correos.
+- **Los plazos están todos en `src/lib/email/schedule-config.ts`**, y casi todos
+  son provisorios: los seis que sugirió Sofía al pie de su documento, más dos
+  inventados. Confirmarlos es cambiar un número.
+
+**Los cuatro correos que faltan ya tienen su valor de enum y su plazo**, pero no
+se mandan: `preparation` necesita `/preparacion`, `final_details` los campos de
+logística de `trips` (dirección, hora, qué llevar), `integration` el material y
+`feedback` el formulario. Agregar cada uno es una regla más en `dueEmails()` y su
+template — el motor no se toca.
+
+**Dos cosas que sólo se ven corriéndolo, y que ya costaron un 500:**
+
+- `health_form_first_time` vuelve como **objeto o `null`**, no como arreglo: la FK
+  es one-to-one. `scheduled_email_log`, en cambio, sí es arreglo, porque su único
+  es compuesto.
+- El `!inner` del embed de `trips` no es decorativo: sin él, un filtro sobre una
+  tabla embebida **no descarta la fila padre** y el `.gte` sobre `start_date` no
+  filtra nada.

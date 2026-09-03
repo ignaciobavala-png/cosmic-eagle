@@ -528,6 +528,48 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_email_log: {
+        Row: {
+          application_id: string
+          error: string | null
+          id: string
+          kind: Database["public"]["Enums"]["scheduled_email_kind"]
+          ok: boolean
+          sent_at: string
+        }
+        Insert: {
+          application_id: string
+          error?: string | null
+          id?: string
+          kind: Database["public"]["Enums"]["scheduled_email_kind"]
+          ok?: boolean
+          sent_at?: string
+        }
+        Update: {
+          application_id?: string
+          error?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["scheduled_email_kind"]
+          ok?: boolean
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_email_log_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_email_log_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "my_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_content: {
         Row: {
           key: string
@@ -720,6 +762,13 @@ export type Database = {
       article_status: "draft" | "published"
       faq_placement: "general" | "sesiones" | "viajes"
       payment_status: "pending" | "deposit_paid" | "paid" | "waived"
+      scheduled_email_kind:
+        | "payment_reminder"
+        | "forms_pending"
+        | "preparation"
+        | "final_details"
+        | "integration"
+        | "feedback"
       testimonial_placement: "home" | "sesiones" | "viajes"
       trip_status: "draft" | "open" | "closed" | "completed"
       trip_type: "retiro" | "ceremonia"
@@ -867,6 +916,14 @@ export const Constants = {
       article_status: ["draft", "published"],
       faq_placement: ["general", "sesiones", "viajes"],
       payment_status: ["pending", "deposit_paid", "paid", "waived"],
+      scheduled_email_kind: [
+        "payment_reminder",
+        "forms_pending",
+        "preparation",
+        "final_details",
+        "integration",
+        "feedback",
+      ],
       testimonial_placement: ["home", "sesiones", "viajes"],
       trip_status: ["draft", "open", "closed", "completed"],
       trip_type: ["retiro", "ceremonia"],

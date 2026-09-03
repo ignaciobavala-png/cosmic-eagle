@@ -45,6 +45,13 @@ Para que salga un mail hacen falta tres cosas, en orden:
 | `RESEND_FROM` | `Cosmic Eagle <hola@mail.cosmiceaglejourney.com>` | Cae al sandbox `onboarding@resend.dev`, que solo entrega a la casilla dueña de la cuenta |
 | `RESEND_REPLY_TO` | `contacto@cosmiceaglejourney.com` | Usa esa misma dirección por defecto |
 | `NEXT_PUBLIC_SITE_URL` | `https://cosmic-eagle.vercel.app` | Usa la URL de Vercel |
+| `SUPABASE_SERVICE_ROLE_KEY` | `eyJ...` | El cron de correos programados no corre (devuelve `ok: false`) |
+| `CRON_SECRET` | cualquier cadena larga | El cron de correos devuelve **401 y no manda nada** |
+
+**Ojo con `SUPABASE_SERVICE_ROLE_KEY`**: saltea la RLS por completo. La usa un
+solo archivo (`src/lib/supabase/admin.ts`) y un solo consumidor (el cron de
+correos programados). Nunca lleva el prefijo `NEXT_PUBLIC_` — con él, Next la
+inlinearía en el JavaScript que se descarga el visitante.
 
 ## Archivos
 
@@ -56,8 +63,18 @@ Para que salga un mail hacen falta tres cosas, en orden:
 | `src/emails/SolicitudAprobada.tsx` | Aprobación. Cableado a `reviewApplication` |
 | `src/emails/SolicitudRechazada.tsx` | Rechazo. Cableado a `reviewApplication` |
 | `src/emails/PagoRegistrado.tsx` | Cupo reservado. Cableado a `markPayment` |
+| `src/emails/SolicitudConversemos.tsx` | Requiere conversación. Cableado a `reviewApplication` |
+| `src/emails/RecordatorioSaldo.tsx` | [3B]. Lo manda el **cron**, no un botón |
+| `src/emails/FormulariosPendientes.tsx` | [4A]. Ídem |
+| `src/lib/email/scheduled.ts` | El barrido diario: qué correo le toca hoy a cada solicitud |
+| `src/lib/email/schedule-config.ts` | Los plazos, casi todos provisorios |
+| `src/lib/supabase/admin.ts` | Cliente service role. Sólo lo usa el cron |
+| `src/app/api/cron/emails/route.ts` | La ruta del cron (`vercel.json`, 13:00 UTC) |
 
-## Los cuatro mails, y cuándo sale cada uno
+## Los mails con botón, y cuándo sale cada uno
+
+Estos salen de un server action: alguien aprieta algo en el panel y el correo
+sale. Los que dispara el calendario están en la seccion siguiente.
 
 Todos salen **solo en la transición**: se relee el estado anterior antes del
 update, así que volver a apretar el mismo botón no le vuelve a escribir a nadie.
@@ -119,3 +136,30 @@ El plan free de Resend son ~100 mails/día y ~3.000/mes. Para avisos de aprobaci
 sobra. Si alguna vez se manda una campaña al newsletter, leer la sección de
 campañas masivas del skill `react-email-resend` **antes**: la cuota diaria se
 agota en silencio y se parece a un rate limit, y diagnosticarla mal cuesta medio día.
+
+## Los mails que no tiene botón (cron diario)
+
+Desde el 03/09 hay un segundo canal: un cron diario barre las solicitudes y manda
+lo que corresponda por fecha. La arquitectura completa está en
+`docs/COMUNICACIONES.md` §8; lo mínimo para operarlo:
+
+| | |
+|---|---|
+| Ruta | `GET /api/cron/emails` |
+| Cuándo | `vercel.json`, 13:00 UTC (una hora después del keep-alive) |
+| Auth | `Authorization: Bearer $CRON_SECRET`, **obligatorio** |
+| Hoy manda | [3B] recordatorio de saldo, [4A] formularios pendientes |
+| No remanda | `scheduled_email_log`, índice único (solicitud, tipo) |
+
+Probarlo a mano, con el server local levantado:
+
+```bash
+CRON_SECRET=lo-que-sea pnpm dev
+curl -H "Authorization: Bearer lo-que-sea" localhost:3000/api/cron/emails
+# {"ok":true,"sent":0,"failed":0,"skipped":3,"deferred":0,...}
+```
+
+`skipped` son los correos que correspondían pero no salieron porque Resend
+todavía no está configurado. **Ese número es la medida de lo que va a salir el
+día que se verifique el dominio**, y no deja rastro en la base: los envíos siguen
+pendientes.

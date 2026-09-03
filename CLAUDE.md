@@ -1478,3 +1478,75 @@ renderiza el contenido siempre, aunque el panel esté cerrado, justamente para q
 las tarjetas estén en el HTML para Google y para un lector de pantalla — pero el
 código las monta recién al abrir (`{open && ...}`). Es previo (viene de
 `/viajes`) y ahora también aplica a la home.
+
+### Sesión del 2026-09-03 — el motor de correos programados
+
+Migración `20260903030000_scheduled_emails.sql`, aplicada y verificada contra
+producción. Es la pieza 4 de `docs/COMUNICACIONES.md` §4 — la que sola destraba
+seis de los correos que faltaban. Arquitectura y decisiones en el §8 nuevo de ese
+documento, y la parte operativa en `docs/EMAIL.md`.
+
+Vamos **9 de las 15 comunicaciones** del embudo de Sofía (eran 7).
+
+- **Hasta hoy todos los mails salían de un server action**: siempre había alguien
+  apretando un botón. Los correos que dispara el calendario no existían porque no
+  existía el disparador, no porque faltaran templates.
+- `vercel.json` suma un segundo cron (13:00 UTC) que pega a `/api/cron/emails`.
+  Ese barrido manda hoy **[3B] recordatorio de saldo** y **[4A] formularios
+  pendientes**, con sus dos templates nuevos.
+- **`scheduled_email_log` es el "no remandar"**: una fila por (solicitud, tipo),
+  índice único. Los mails con botón releen el estado anterior para no repetirse;
+  acá el disparador es el paso del tiempo y no hay estado anterior que leer.
+- **`not_configured` no escribe fila, a propósito.** Sin `RESEND_API_KEY` —el
+  estado de hoy— el barrido cuenta el envío como salteado y no deja rastro. Si
+  dejara la fila, el día que se verifique el dominio todos los correos pendientes
+  ya estarían dados por enviados. Un fallo real de Resend sí deja fila
+  (`ok = false`), no se reintenta, y se avisa en la casilla del panel.
+- **Un correo programado por persona y por corrida**: dos reglas pueden caer el
+  mismo día sobre la misma solicitud, y dos automáticos juntos se leen como un
+  sistema descontrolado. El segundo sale al día siguiente.
+- **Entra `SUPABASE_SERVICE_ROLE_KEY` al proyecto**, en `src/lib/supabase/admin.ts`
+  y sólo ahí: un cron no tiene sesión y con `anon` la RLS de `applications` no le
+  muestra una fila. Si aparece un segundo consumidor, hay que justificar por qué
+  no puede usar `createClient` de server.ts.
+- **La ruta exige `CRON_SECRET` sin excepción** (401 si falta), al revés del
+  keep-alive, que sin el secreto queda abierto. Allá lo peor que consigue un
+  desconocido es un `select`; acá mandaría correos y gastaría cuota.
+- **Los plazos viven todos en `src/lib/email/schedule-config.ts`** y casi todos
+  son provisorios: las seis sugerencias que Sofía dejó al pie de su documento más
+  dos inventados. Mismo criterio que los umbrales del CRM.
+- **La firma de la clienta ("Con cariño, Equipo Cosmic Eagle / Un viaje hacia el
+  Humano Luminoso") faltaba en los siete templates.** Se agregó **dentro de
+  `BaseLayout`**, no en cada uno: es una regla del documento y escribirla siete
+  veces garantiza que el octavo se la olvide.
+- **[4A] nombra sólo el formulario de salud**, no el consentimiento como pide el
+  copy: esa pantalla no existe. Mandar a alguien a completar algo que no puede
+  completar es peor que pedirle una cosa sola.
+
+Los cuatro correos que faltan ([6] preparación, [7] datos finales, [8]
+integración, [9] feedback) **ya tienen su valor de enum y su plazo**. Lo que les
+falta es contenido —`/preparacion`, los campos de logística de `trips`, el
+material de integración, el formulario de feedback—, no maquinaria: cada uno es
+una regla más en `dueEmails()` y su template.
+
+**Dos trampas que sólo se ven corriéndolo** (las dos costaron un 500 real):
+`health_form_first_time` vuelve como **objeto o `null`** y no como arreglo (la FK
+es one-to-one), y el `!inner` del embed de `trips` no es decorativo — sin él, un
+filtro sobre una tabla embebida no descarta la fila padre.
+
+Verificado: `tsc`, lint, build de producción, y **el barrido corrido de verdad
+contra la base** con seis solicitudes de prueba que cubren los casos (viaje
+pasado, borrador, pago demasiado reciente, fuera de ventana, y los dos que sí
+corresponden): selecciona exactamente las tres esperadas, el registro deja de
+mandar lo ya mandado, la segunda regla toma el relevo cuando la primera ya salió,
+y con Resend sin configurar la tabla de log queda en cero. Los dos templates
+renderizados y leídos enteros. Filas de prueba borradas, advisors sin novedades.
+
+**Lo que falta para que salga un solo correo sigue siendo el DNS**: verificar
+`mail.cosmiceaglejourney.com` en Resend (Cloudflare del dominio). El barrido ya
+dice cuántos correos están esperando ese momento — es el `skipped` de la
+respuesta.
+
+**Sin verificar end-to-end**: que Vercel dispare el cron nuevo en producción
+(requiere el deploy y `SUPABASE_SERVICE_ROLE_KEY` cargada en las tres
+environments), y el envío real, que depende del dominio.

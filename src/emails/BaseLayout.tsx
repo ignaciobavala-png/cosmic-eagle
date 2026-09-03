@@ -95,7 +95,10 @@ export function BaseLayout({
                   >
                     <tbody>
                       <tr>
-                        <td style={{ padding: "32px 28px" }}>{children}</td>
+                        <td style={{ padding: "32px 28px" }}>
+                          {children}
+                          <Signature />
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -205,5 +208,31 @@ export function CtaButton({ href, children }: { href: string; children: React.Re
         </tr>
       </tbody>
     </table>
+  );
+}
+
+/**
+ * Firma de **todos** los correos, literal de la clienta (docs/COMUNICACIONES.md
+ * §3). Va dentro del `BaseLayout` y no en cada template a proposito: es una
+ * regla del documento —"firma de todos los correos"— y escribirla siete veces
+ * garantiza que el octavo mail se olvide de ponerla.
+ */
+function Signature() {
+  return (
+    <Text
+      style={{
+        margin: "28px 0 0",
+        color: c.muted,
+        fontSize: "15px",
+        lineHeight: "24px",
+        fontFamily: "Georgia, 'Times New Roman', serif",
+      }}
+    >
+      Con cariño,
+      <br />
+      Equipo Cosmic Eagle
+      <br />
+      <em>Un viaje hacia el Humano Luminoso.</em>
+    </Text>
   );
 }
