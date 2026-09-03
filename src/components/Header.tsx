@@ -138,28 +138,76 @@ export function Header() {
                   {/* El wrapper arranca pegado al link (`top-full`) y la
                       separacion visual la da su `pt-2`: con un `top` desplazado
                       queda un hueco muerto entre las dos cajas y el menu se
-                      cierra al bajar el mouse en diagonal. */}
+                      cierra al bajar el mouse en diagonal. Por eso el
+                      desplazamiento de entrada lo hace el panel de adentro y no
+                      este wrapper: moverlo a el abriria ese hueco.
+
+                      Va CENTRADO bajo el link (`left-1/2 -translate-x-1/2`),
+                      que es lo que dice el CSS de Julia (`left:50%`) y no lo
+                      que teniamos: pegado al borde izquierdo, el panel colgaba
+                      de una esquina y se leia como una caja suelta. */}
                   {link.children && (
-                    <div className="invisible absolute left-0 top-full z-50 pt-2 opacity-0 transition-opacity duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                      {/* La caja sale del mockup (`.dropdown-experiences`):
-                          azul de la paleta al 95%, borde dorado al 20%, radio
-                          12px y 20px de padding. El titulo va en Domine dorado
-                          y la descripcion en Montserrat al 70% — antes era la
-                          caja negra generica con todo en Montserrat, que es lo
-                          que Julia marca como "no respeta el estilo visual". */}
-                      <ul className="w-80 rounded-xl border border-primary-container/20 bg-[#05125a]/95 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+                    <div className="invisible absolute left-1/2 top-full z-50 -translate-x-1/2 pt-2 opacity-0 transition-opacity duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                      {/* La caja sale del mockup (`.dropdown-experiences`) y
+                          conserva su ADN: azul de la paleta, borde dorado,
+                          titulo en Domine dorado y descripcion en Montserrat al
+                          70%. Lo que cambia es lo que la hacia leerse "medio
+                          cuadrada" (Sofia, 03/09), sin salirse de la paleta:
+
+                          - el fondo deja de ser un plano: degrade de la misma
+                            familia que el navbar y el footer (el celeste
+                            #0079b3 apenas insinuado arriba sobre el azul
+                            oscuro), que es como esta pintado el resto del sitio;
+                          - radio de 12 a 18px, y mas aire adentro;
+                          - un filete dorado corona el panel y lo ata al navbar,
+                            con el rombo de 4 puntas del sistema centrado
+                            encima, bajo el link;
+                          - los dos items se separan con una linea dorada tenue
+                            en vez de quedar apilados a la misma altura;
+                          - cada item tiene su flecha, que entra y avanza en
+                            hover: sin ella nada decia que eran links.
+
+                          El panel entra ademas subiendo 6px. El desplazamiento
+                          va aca adentro y no en el wrapper, que tiene que
+                          quedarse pegado al link (ver arriba). */}
+                      <ul className="relative w-[22rem] rounded-[18px] border border-primary-container/25 bg-[linear-gradient(160deg,rgba(0,121,179,0.32)_0%,rgba(5,18,90,0.97)_55%,rgba(2,12,65,0.98)_100%)] p-6 pt-7 shadow-[0_18px_50px_rgba(2,12,65,0.55)] backdrop-blur-xl transition-transform duration-200 translate-y-1.5 group-hover:translate-y-0 group-focus-within:translate-y-0">
+                        {/* El filete y el rombo son decoracion pura: van en
+                            elementos vacios para que ningun lector de pantalla
+                            los anuncie, igual que los filetes de
+                            `SectionHeading`. */}
+                        {/* El filete no llega a las esquinas (`inset-x-8`):
+                            con el radio de 18px, una linea de borde a borde se
+                            escapa de la curva y deja dos puntas sueltas. */}
+                        <span
+                          aria-hidden="true"
+                          className="absolute inset-x-8 top-0 h-px bg-[linear-gradient(to_right,transparent,#f9d78f,transparent)]"
+                        />
+                        <span
+                          aria-hidden="true"
+                          className="absolute left-1/2 top-0 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-primary-container shadow-[0_0_10px_rgba(249,215,143,0.55)]"
+                        />
                         {link.children.map((child) => (
-                          <li key={child.href} className="[&:not(:last-child)]:mb-1">
+                          <li
+                            key={child.href}
+                            className="[&:not(:last-child)]:mb-1 [&:not(:last-child)]:border-b [&:not(:last-child)]:border-primary-container/12 [&:not(:last-child)]:pb-1"
+                          >
                             <Link
                               href={child.href}
-                              className="block rounded-lg p-3 transition-colors hover:bg-primary-container/[0.08]"
+                              className="group/item flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-primary-container/[0.08]"
                             >
-                              <span className="block font-display text-base font-bold tracking-[0.03em] text-primary-container">
-                                {child.label}
+                              <span className="min-w-0 flex-1">
+                                <span className="block font-display text-base font-bold tracking-[0.03em] text-primary-container">
+                                  {child.label}
+                                </span>
+                                <span className="mt-1.5 block text-[13px] font-light leading-relaxed text-primary-container/70">
+                                  {child.description}
+                                </span>
                               </span>
-                              <span className="mt-1.5 block text-[13px] font-light leading-relaxed text-primary-container/70">
-                                {child.description}
-                              </span>
+                              <ArrowRight
+                                size={16}
+                                aria-hidden="true"
+                                className="mt-1 shrink-0 text-primary-container/40 transition-[transform,color] duration-200 group-hover/item:translate-x-1 group-hover/item:text-primary-container"
+                              />
                             </Link>
                           </li>
                         ))}
