@@ -10,6 +10,8 @@ import { TripCover } from "@/components/ui/TripCover";
 import { formatScheduleDay, formatAmount } from "@/lib/format";
 import { groupScheduleByDay, parseSchedule } from "@/lib/trip-schedule";
 import { tripTypeLabel } from "@/lib/trip-type";
+import { formatTripHours, tripCategoryLabel } from "@/lib/trip-fields";
+import { getSiteContent } from "@/lib/site-content";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -55,7 +57,7 @@ async function getTrip(id: string) {
   const { data } = await supabase
     .from("trips")
     .select(
-      "id, title, description, location, start_date, end_date, capacity, price, deposit_amount, status, image_url, type, schedule, terms"
+      "id, title, description, location, start_date, end_date, capacity, price, deposit_amount, status, image_url, type, schedule, terms, category, start_time, end_time, venue_type, includes"
     )
     .eq("id", id)
     .single();
@@ -93,6 +95,12 @@ export default async function ViajePage({ params }: Props) {
   const solicitarHref = `/viajes/${trip.id}/solicitar`;
   const isOpen = trip.status === "open";
   const schedule = groupScheduleByDay(parseSchedule(trip.schedule));
+  const hours = formatTripHours(trip.start_time, trip.end_time);
+  const categoria = tripCategoryLabel(trip.category);
+  const content = await getSiteContent();
+  // Una sola politica para todas las experiencias (decision del 03/09): vive en
+  // /admin/multimedia y no en `trips`. Vacia = la seccion no se dibuja.
+  const cancelacion = content("condiciones.cancelacion").trim();
 
   const details = [
     {
@@ -105,10 +113,24 @@ export default async function ViajePage({ params }: Props) {
       label: "Duración",
       value: nightsLabel(trip.start_date, trip.end_date),
     },
+    // Las horas van pegadas a las fechas y no como dato aparte: "11:00 a 21:00"
+    // sin fecha no dice nada, y en una Sesion de un dia es la mitad del dato.
+    ...(hours ? [{ icon: Clock, label: "Horario", value: hours }] : []),
     ...(trip.location
-      ? [{ icon: MapPin, label: "Lugar", value: trip.location }]
+      ? [
+          {
+            icon: MapPin,
+            label: "Lugar",
+            // El tipo de establecimiento acompaña a la ciudad: "Casa de retiro ·
+            // Guangualí, Los Vilos, Chile". La direccion exacta NO sale aca.
+            value: trip.venue_type
+              ? `${trip.venue_type} · ${trip.location}`
+              : trip.location,
+          },
+        ]
       : []),
     { icon: Users, label: "Cupo", value: `${trip.capacity} personas` },
+    ...(categoria ? [{ icon: Users, label: "Dirigido a", value: categoria }] : []),
     {
       icon: Wallet,
       label: "Aporte",
@@ -309,6 +331,31 @@ export default async function ViajePage({ params }: Props) {
                       {trip.terms}
                     </p>
                   )}
+                </div>
+              )}
+
+              {/* "Que incluye" es propio del Viaje: en una Sesion de un dia no
+                  hay alojamiento ni traslados que enumerar, y por eso el
+                  formulario del panel ni siquiera muestra el campo. */}
+              {trip.includes && (
+                <div className="mt-6 border-t border-primary-fixed-dim/20 pt-5">
+                  <p className="text-xs uppercase tracking-widest text-on-surface-variant mb-2">
+                    Qué incluye
+                  </p>
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-on-surface">
+                    {trip.includes}
+                  </p>
+                </div>
+              )}
+
+              {cancelacion && (
+                <div className="mt-6 border-t border-primary-fixed-dim/20 pt-5">
+                  <p className="text-xs uppercase tracking-widest text-on-surface-variant mb-2">
+                    Cancelaciones
+                  </p>
+                  <p className="whitespace-pre-line text-xs leading-relaxed text-on-surface-variant">
+                    {cancelacion}
+                  </p>
                 </div>
               )}
             </aside>

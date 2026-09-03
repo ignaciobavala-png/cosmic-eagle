@@ -6,6 +6,7 @@ import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { getActivePaymentMethods } from "@/lib/payments";
 import { formatAmount } from "@/lib/format";
+import { formatTripHours } from "@/lib/trip-fields";
 import { ScreeningForm } from "./ScreeningForm";
 import { PaymentProofUpload } from "./PaymentProofUpload";
 
@@ -117,7 +118,7 @@ export default async function SolicitarPage({
   const { data: trip } = await supabase
     .from("trips")
     .select(
-      "id, title, location, start_date, end_date, status, price, deposit_amount, payment_url"
+      "id, title, location, start_date, end_date, status, price, deposit_amount, payment_url, start_time, end_time, address, map_url, arrival_notes, packing_list"
     )
     .eq("id", id)
     .single();
@@ -148,6 +149,33 @@ export default async function SolicitarPage({
     (existing.payment_status === "pending" ||
       existing.payment_status === "deposit_paid");
   const paymentMethods = enPago ? await getActivePaymentMethods() : [];
+
+  // La logistica se muestra recien con el cupo pagado, y no antes: la direccion
+  // exacta no es publica (por eso tampoco sale en /viajes/[id]) y "que llevar"
+  // no le sirve a quien todavia no sabe si entra. Es el mismo contenido del
+  // correo [7] de Sofia, para quien lo perdio o lo lee desde el sitio.
+  const pagado =
+    existing?.status === "approved" &&
+    (existing.payment_status === "paid" ||
+      existing.payment_status === "deposit_paid" ||
+      existing.payment_status === "waived");
+  const horario = formatTripHours(trip.start_time, trip.end_time);
+  const logistica = pagado
+    ? [
+        trip.address && { label: "Dónde", value: trip.address, href: trip.map_url },
+        horario && { label: "Horario", value: horario, href: null },
+        trip.arrival_notes && {
+          label: "Llegadas y salidas",
+          value: trip.arrival_notes,
+          href: null,
+        },
+        trip.packing_list && {
+          label: "Qué llevar",
+          value: trip.packing_list,
+          href: null,
+        },
+      ].filter((x): x is { label: string; value: string; href: string | null } => !!x)
+    : [];
 
   return (
     <>
@@ -347,6 +375,39 @@ export default async function SolicitarPage({
                 applicationId={existing.id}
                 yaSubio={!!existing.payment_proof_submitted}
               />
+            </div>
+          )}
+
+          {logistica.length > 0 && (
+            <div className="glass-card mt-8 rounded-2xl p-6 md:p-8">
+              <h2 className="font-display text-headline-md text-primary-fixed-dim">
+                Para tu llegada
+              </h2>
+              <dl className="mt-5 flex flex-col gap-5">
+                {logistica.map((item) => (
+                  <div key={item.label}>
+                    <dt className="text-xs uppercase tracking-widest text-on-surface-variant mb-1.5">
+                      {item.label}
+                    </dt>
+                    <dd className="whitespace-pre-line text-sm leading-relaxed text-on-surface">
+                      {item.value}
+                      {item.href && (
+                        <>
+                          {" "}
+                          <a
+                            href={item.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary-container underline underline-offset-4"
+                          >
+                            ver en el mapa
+                          </a>
+                        </>
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           )}
         </div>

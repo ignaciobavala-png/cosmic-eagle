@@ -332,8 +332,8 @@ del 15/08 en `CLAUDE.md`, punto 1 de "lo próximo").
 
 ## 4. Cruce contra lo implementado
 
-Tenemos **9 de las 15 del embudo** (la tabla de abajo; [C1] y [C2] van aparte,
-o sea 17 piezas de copy en total, aunque el PDF las cuente como "14"). Las nueve
+Tenemos **10 de las 15 del embudo** (la tabla de abajo; [C1] y [C2] van aparte,
+o sea 17 piezas de copy en total, aunque el PDF las cuente como "14"). Las diez
 son las que ella marca como automatizables sin discusión. Ver `docs/EMAIL.md` (Resend) y `docs/NOTIFICACIONES.md` (la casilla
 interna, que es el otro canal y no se confunde con este).
 
@@ -351,7 +351,7 @@ interna, que es el otro canal y no se confunde con este).
 | [4A] | Formularios pendientes | ✅ `FormulariosPendientes`, por el cron diario (03/09). Nombra sólo el formulario de salud: el consentimiento no existe |
 | [5] | Bienvenido | ❌ no existe "formulario de salud aprobado" |
 | [6] | Comienza tu preparación | ❌ falta `/preparacion` (el motor de envíos ya está) |
-| [7] | Datos finales | ❌ faltan los campos de logística de `trips` |
+| [7] | Datos finales | ✅ `DatosFinales`, por el cron (03/09). No sale si el viaje no tiene dirección ni lista cargada |
 | [8] | Material de integración | ❌ falta el material |
 | [9] | Tu mirada | ❌ falta el formulario de feedback |
 
@@ -560,10 +560,10 @@ vercel.json (cron 13:00 UTC)
   son provisorios: los seis que sugirió Sofía al pie de su documento, más dos
   inventados. Confirmarlos es cambiar un número.
 
-**Los cuatro correos que faltan ya tienen su valor de enum y su plazo**, pero no
-se mandan: `preparation` necesita `/preparacion`, `final_details` los campos de
-logística de `trips` (dirección, hora, qué llevar), `integration` el material y
-`feedback` el formulario. Agregar cada uno es una regla más en `dueEmails()` y su
+**Los tres correos que faltan ya tienen su valor de enum y su plazo**, pero no
+se mandan: `preparation` necesita `/preparacion`, `integration` el material de
+integración y `feedback` el formulario. (`final_details` se destrabó el 03/09,
+cuando entraron los campos de logística de `trips`.) Agregar cada uno es una regla más en `dueEmails()` y su
 template — el motor no se toca.
 
 **Dos cosas que sólo se ven corriéndolo, y que ya costaron un 500:**
@@ -574,3 +574,26 @@ template — el motor no se toca.
 - El `!inner` del embed de `trips` no es decorativo: sin él, un filtro sobre una
   tabla embebida **no descarta la fila padre** y el `.gte` sobre `start_date` no
   filtra nada.
+
+---
+
+## 9. Los campos de logística (03/09)
+
+Migración `20260903060000_trip_logistics_fields.sql`. Es lo que destrabó el
+correo **[7] Datos finales**, que estaba bloqueado desde el 15/08 y no por falta
+de template: tres de sus cuatro variables (`{dirección}`, `{fecha y hora}`,
+`{lista}`) no existían como campo.
+
+- `trips` sumó ciudad, país, barrio, tipo de lugar, dirección, mapa, horas de
+  inicio y cierre, categoría, qué incluye, llegadas y salidas, y qué llevar.
+- **`location` pasó a ser columna generada** (`[area, ]city, country`): el
+  nombre y el valor son los de siempre, así que las cuatro pantallas que la leen
+  no se tocaron, pero ya no se escribe. Detalle en `docs/DATA_MODEL.md`.
+- **La dirección exacta no es pública.** No sale en `/viajes/[id]`; aparece en el
+  correo [7] y en la pantalla de estado de quien ya pagó, que es el mismo
+  contenido para quien perdió el correo.
+- **La política de cancelación NO es un campo de viaje**: es la misma para todas
+  y quedó como slot de `/admin/multimedia` (grupo "Condiciones"). Sale vacía a
+  propósito — el texto es de la clienta. Sin texto, la sección no se dibuja.
+- **[7] no sale si el viaje no tiene dirección ni lista cargada.** Un correo que
+  dice "acá van los datos" y no trae ninguno es peor que no escribir.

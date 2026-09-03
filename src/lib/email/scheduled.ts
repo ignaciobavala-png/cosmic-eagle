@@ -4,6 +4,8 @@ import { sendEmail } from "./resend";
 import { MAX_SENDS_PER_RUN, SCHEDULE, SEND_INTERVAL_MS } from "./schedule-config";
 import { RecordatorioSaldo } from "@/emails/RecordatorioSaldo";
 import { FormulariosPendientes } from "@/emails/FormulariosPendientes";
+import { DatosFinales } from "@/emails/DatosFinales";
+import { formatTripHours } from "@/lib/trip-fields";
 import { formatDateRangeCompact } from "@/lib/format";
 import type { Enums } from "@/lib/supabase/types";
 
@@ -94,6 +96,11 @@ type Candidate = {
     end_date: string;
     price: number;
     status: Enums<"trip_status">;
+    address: string | null;
+    arrival_notes: string | null;
+    packing_list: string | null;
+    start_time: string | null;
+    end_time: string | null;
   } | null;
   /**
    * **Objeto o `null`, no un arreglo.** La FK es one-to-one (indice unico sobre
@@ -142,6 +149,45 @@ function dueEmails(app: Candidate, today: Date): Pending[] {
   const fechas = formatDateRangeCompact(trip.start_date, trip.end_date);
   const due: Pending[] = [];
 
+  const pago =
+    app.payment_status === "paid" ||
+    app.payment_status === "deposit_paid" ||
+    app.payment_status === "waived";
+
+  // ---------------------------------------------------------------------
+  // [7] Datos finales
+  //
+  // Va primero de las tres: es la unica con una fecha dura detras (el viaje
+  // empieza), y como sale un correo programado por corrida, el que se posterga
+  // tiene que ser el que puede esperar un dia.
+  // ---------------------------------------------------------------------
+  if (
+    !yaEnviado.has("final_details") &&
+    pago &&
+    daysUntilStart <= SCHEDULE.FINAL_DETAILS_DAYS &&
+    // Sin direccion ni lista no hay datos que dar, y un correo que promete
+    // "aca van los datos" y no trae ninguno es peor que no escribir.
+    (trip.address || trip.packing_list)
+  ) {
+    const hora = formatTripHours(trip.start_time, trip.end_time);
+
+    due.push({
+      applicationId: app.id,
+      kind: "final_details",
+      to: app.email,
+      subject: `Todo lo que necesitas saber para llegar a ${trip.title}`,
+      react: DatosFinales({
+        nombre,
+        viaje: trip.title,
+        cuando: hora ? `${fechas}, de ${hora}` : fechas,
+        donde: trip.address,
+        queLlevar: trip.packing_list,
+        llegadas: trip.arrival_notes,
+        url: `${SITE_URL}/viajes/${app.trip_id}/solicitar`,
+      }),
+    });
+  }
+
   // ---------------------------------------------------------------------
   // [3B] Recordatorio de saldo
   // ---------------------------------------------------------------------
@@ -184,11 +230,6 @@ function dueEmails(app: Candidate, today: Date): Pending[] {
   // ---------------------------------------------------------------------
   // [4A] Formularios pendientes
   // ---------------------------------------------------------------------
-  const pago =
-    app.payment_status === "paid" ||
-    app.payment_status === "deposit_paid" ||
-    app.payment_status === "waived";
-
   if (
     !yaEnviado.has("forms_pending") &&
     pago &&
@@ -240,7 +281,8 @@ export async function runScheduledEmails(): Promise<
     .select(
       `id, full_name, email, trip_id, previous_ceremonies, payment_status,
        amount_paid, paid_at,
-       trips!inner (title, start_date, end_date, price, status),
+       trips!inner (title, start_date, end_date, price, status,
+                    address, arrival_notes, packing_list, start_time, end_time),
        health_form_first_time (id),
        scheduled_email_log (kind)`
     )

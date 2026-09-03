@@ -1550,3 +1550,70 @@ respuesta.
 **Sin verificar end-to-end**: que Vercel dispare el cron nuevo en producción
 (requiere el deploy y `SUPABASE_SERVICE_ROLE_KEY` cargada en las tres
 environments), y el envío real, que depende del dominio.
+
+### Sesión del 2026-09-03 (bis) — los campos de logística y el correo [7]
+
+Migración `20260903060000_trip_logistics_fields.sql`, aplicada y verificada
+contra producción. Pendiente desde el 15/08. Detalle en `docs/COMUNICACIONES.md`
+§9 y la tabla completa en `docs/DATA_MODEL.md`.
+
+Vamos **10 de las 15 comunicaciones** (eran 9): entró **[7] Datos finales**, que
+no estaba bloqueado por el template sino porque tres de sus cuatro variables
+—`{dirección}`, `{fecha y hora}`, `{lista}`— no existían como campo.
+
+- `trips` sumó `city`, `country`, `area`, `venue_type`, `address`, `map_url`,
+  `start_time`, `end_time`, `category` (enum nuevo `trip_category`), `includes`,
+  `arrival_notes` y `packing_list`.
+- **`location` pasó a ser columna generada** (`[area, ]city, country`). Se eligió
+  eso y no partirla a mano porque la leen cuatro pantallas: con el mismo nombre y
+  el mismo valor, ninguna se tocó. **Los ocho viajes cargados salieron byte a
+  byte iguales**, y por eso hizo falta `area`: cuatro de ellos llevan barrio o
+  paraje ("El Arrayán, Santiago, Chile") y con sólo ciudad y país lo perdían.
+  **Escribirla ahora es un error de Postgres** — se escriben las tres de abajo.
+- **La expresión usa `||` y `coalesce`, no `concat_ws`**: concat y concat_ws son
+  STABLE y Postgres no las acepta en una columna generada, que exige IMMUTABLE.
+- **`city` y `country` son NOT NULL** y el formulario los pide. Un viaje sin
+  ciudad no se puede publicar ni comunicar.
+- **La política de cancelación NO quedó en `trips`** (decisión de Ignacio): es la
+  misma para todas, así que como columna había que reescribirla en cada carga y
+  dos experiencias iban a decir cosas distintas por un descuido. Es un slot de
+  `/admin/multimedia`, grupo nuevo **"Condiciones"**, y sale vacío a propósito
+  porque el texto es de la clienta. `trips.terms` se quedó con lo que sí es por
+  viaje.
+- **La dirección exacta no es pública.** No sale en `/viajes/[id]` (verificado en
+  el browser); aparece en el correo [7] y en el bloque "Para tu llegada" de la
+  pantalla de estado, que sólo se dibuja con el cupo pagado.
+- **El formulario del panel se partió en secciones** (Dónde, Cuándo, Quiénes y
+  cuánto, Programa, Condiciones) y **"Antes de llegar" va plegado**, que son los
+  campos que se completan cuando la fecha se acerca. Los demás bloques son
+  `fieldset` y no `<details>`: **un control `required` dentro de un `details`
+  cerrado bloquea el submit sin poder mostrar el aviso** ("An invalid form
+  control is not focusable"). El plegable se puede plegar justamente porque
+  adentro no hay nada obligatorio.
+- **La única diferencia de campos entre los dos tipos es "Qué incluye"**, que es
+  del Viaje (sale de ellas mismas, 06/08). Lo demás cambia de redacción.
+  **Sigue sin confirmarse si una Sesión es siempre de un día**: mientras tanto el
+  formulario pide las dos fechas para los dos tipos.
+- **`/cuenta` ahora dice los montos**: "Reservá con USD 450 o pagá USD 900",
+  "Falta el saldo de USD 450". Antes decía "Falta el pago" a secas porque esa
+  tabla no leía el viaje. Es lo que prometen seis de los catorce correos cuando
+  dicen "tu espacio personal".
+- **[7] no sale si el viaje no tiene dirección ni lista cargada** (verificado con
+  dos viajes gemelos, uno con datos y otro sin).
+
+**Los tests del panel estaban rotos desde el 02/09 y nadie se había enterado**:
+`panel.panel.spec.ts` seguía apuntando a `/admin/retiros`, `/admin/ceremonias` y
+`/admin/viajes/nuevo`, las tres rutas que se renombraron ese día. Arreglados, más
+assertions nuevas sobre el formulario (ciudad y país obligatorios, el plegable
+que abre, y que "Qué incluye" no exista en una Sesión). **18 de 18 en verde.**
+
+Verificado: `tsc`, lint, build, los 18 tests del panel y los 34 públicos, el
+detalle público mirado en el browser (muestra horario, tipo de lugar, qué incluye
+y la política; **no** muestra la dirección), la política de cancelación
+renderizando desde el slot, y el cron corrido de verdad. Filas y viajes de prueba
+borrados, los datos inventados que le puse a Los Vilos revertidos a null,
+advisors sin novedades.
+
+**Ojo al verificar a mano en `next dev`**: la primera respuesta de una ruta queda
+cacheada y un cambio en `site_content` no se ve hasta agregarle una query string
+distinta a la URL. Costó veinte minutos creer que el slot no funcionaba.

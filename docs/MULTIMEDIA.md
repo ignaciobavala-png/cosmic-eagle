@@ -153,3 +153,17 @@ tope de 8 MB es la red de contención para cuando la compresión no corre.
 `loop`, `preload="metadata"` y `aria-hidden` — es decoración, no contenido. En el
 hero, además, **el zoom lento no se aplica cuando lo cargado es un video**: el
 clip ya tiene su propio movimiento.
+
+## Grupo "Condiciones" (03/09)
+
+Un solo slot, `condiciones.cancelacion`, de tipo `multiline`: la **política de
+cancelación**, que se muestra al pie de la página de cada experiencia.
+
+Es la única cosa del panel que reemplaza a un campo que iba a ser de `trips`. Se
+decidió así (Ignacio, 03/09) porque la política es la misma para todas: como
+columna, había que reescribirla en cada carga y dos experiencias iban a terminar
+diciendo cosas distintas por un descuido. `trips.terms` se quedó para lo que sí
+cambia entre una y otra (la seña, los requisitos).
+
+**Sale vacío a propósito**: el texto es de la clienta, igual que las FAQs. Sin
+texto cargado, la sección no se dibuja en ninguna página.

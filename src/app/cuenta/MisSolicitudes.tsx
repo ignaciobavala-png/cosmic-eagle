@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatAmount } from "@/lib/format";
 
 const STATUS_LABEL: Record<string, string> = {
   pending_review: "En revisión",
@@ -21,10 +22,19 @@ type Application = {
   trip_id: string;
   status: string;
   payment_status: string;
+  /** Acumulado que registro Estela, no lo del ultimo pago. */
+  amount_paid: number;
   is_first_time: boolean;
   health_form_submitted: boolean;
   created_at: string;
-  trip: { title: string; location: string | null; start_date: string; end_date: string } | null;
+  trip: {
+    title: string;
+    location: string | null;
+    start_date: string;
+    end_date: string;
+    price: number;
+    deposit_amount: number | null;
+  } | null;
 };
 
 /**
@@ -39,12 +49,27 @@ function pendingStep(a: Application): { label: string; href?: string } {
   // privado (ver el correo [2A] en docs/COMUNICACIONES.md).
   if (a.status === "needs_conversation") return { label: "Te vamos a escribir" };
   if (a.status !== "approved") return { label: "—" };
-  // "Falta el pago" y no "la seña": la seña es opcional y por viaje
-  // (trips.deposit_amount), y esta tabla no lee el viaje. El detalle de las dos
-  // opciones lo da la pantalla de estado.
-  if (a.payment_status === "pending") return { label: "Falta el pago" };
-  if (a.payment_status === "deposit_paid" && !(a.is_first_time && !a.health_form_submitted))
-    return { label: "Falta el saldo", href: `/viajes/${a.trip_id}/solicitar` };
+  // Desde el 03/09 la tabla si lee el viaje (precio y seña), asi que el paso
+  // siguiente puede decir cuanto: "USD 900" y "faltan USD 450" en vez de "falta
+  // el pago" a secas. Es lo que promete "tu espacio personal" en seis de los
+  // correos de docs/COMUNICACIONES.md.
+  if (a.payment_status === "pending") {
+    return {
+      label: a.trip?.deposit_amount
+        ? `Reservá con ${formatAmount(a.trip.deposit_amount)} o pagá ${formatAmount(a.trip.price)}`
+        : a.trip
+          ? `Falta el pago de ${formatAmount(a.trip.price)}`
+          : "Falta el pago",
+      href: `/viajes/${a.trip_id}/solicitar`,
+    };
+  }
+  if (a.payment_status === "deposit_paid" && !(a.is_first_time && !a.health_form_submitted)) {
+    const saldo = a.trip ? Math.max(0, a.trip.price - a.amount_paid) : 0;
+    return {
+      label: saldo > 0 ? `Falta el saldo de ${formatAmount(saldo)}` : "Falta el saldo",
+      href: `/viajes/${a.trip_id}/solicitar`,
+    };
+  }
   if (a.is_first_time && !a.health_form_submitted) {
     return {
       label: "Completar formulario de salud",

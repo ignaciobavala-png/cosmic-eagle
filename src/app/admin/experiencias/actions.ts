@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/lib/supabase/types";
 import { parseSchedule, sortSchedule } from "@/lib/trip-schedule";
 import { TRIP_TYPES, isTripType, tripAdminPath } from "@/lib/trip-type";
+import { isTripCategory } from "@/lib/trip-fields";
 import { uploadTripCover } from "@/lib/trip-cover";
 
 export type TripFormState = { error: string | null };
@@ -35,10 +36,17 @@ function parseScheduleField(value: FormDataEntryValue | null) {
   }
 }
 
+/** Campo de texto opcional: `null` si vino vacio, sin espacios de mas. */
+function optionalText(formData: FormData, name: string): string | null {
+  const value = formData.get(name);
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
 function parseTripForm(formData: FormData) {
   const title = formData.get("title");
   const description = formData.get("description");
-  const location = formData.get("location");
+  const country = formData.get("country");
+  const city = formData.get("city");
   const start_date = formData.get("start_date");
   const end_date = formData.get("end_date");
   const capacity = formData.get("capacity");
@@ -53,6 +61,10 @@ function parseTripForm(formData: FormData) {
   if (
     typeof title !== "string" ||
     !title.trim() ||
+    typeof country !== "string" ||
+    !country.trim() ||
+    typeof city !== "string" ||
+    !city.trim() ||
     typeof start_date !== "string" ||
     !start_date ||
     typeof end_date !== "string" ||
@@ -104,6 +116,19 @@ function parseTripForm(formData: FormData) {
     } as const;
   }
 
+  // El mapa se pega desde Google Maps, o sea tipeado a mano y a parar en un
+  // `href`. Mismo criterio que el link de pago: `https://` o nada.
+  const mapUrlValue = optionalText(formData, "map_url");
+
+  if (mapUrlValue !== null && !/^https:\/\/[^\s]+$/.test(mapUrlValue)) {
+    return { error: "El link del mapa tiene que empezar con https://", data: null } as const;
+  }
+
+  // Un valor raro en el desplegable cae a 'mixto', que es el default de la
+  // columna: la categoria no puede tumbar el guardado de un viaje entero.
+  const rawCategory = formData.get("category");
+  const categoryValue = isTripCategory(rawCategory) ? rawCategory : "mixto";
+
   return {
     error: null,
     data: {
@@ -112,10 +137,20 @@ function parseTripForm(formData: FormData) {
         typeof description === "string" && description.trim()
           ? description.trim()
           : null,
-      location:
-        typeof location === "string" && location.trim()
-          ? location.trim()
-          : null,
+      // `location` NO se manda: desde la migracion 20260903060000 es una columna
+      // generada a partir de estas tres. Escribirla es un error de Postgres.
+      country: country.trim(),
+      city: city.trim(),
+      area: optionalText(formData, "area"),
+      venue_type: optionalText(formData, "venue_type"),
+      address: optionalText(formData, "address"),
+      map_url: mapUrlValue,
+      category: categoryValue,
+      start_time: optionalText(formData, "start_time"),
+      end_time: optionalText(formData, "end_time"),
+      includes: optionalText(formData, "includes"),
+      arrival_notes: optionalText(formData, "arrival_notes"),
+      packing_list: optionalText(formData, "packing_list"),
       start_date,
       end_date,
       capacity: Number(capacity),

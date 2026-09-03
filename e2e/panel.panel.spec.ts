@@ -12,8 +12,12 @@ import { test, expect } from "@playwright/test";
 
 const SECCIONES = [
   { href: "/admin", titulo: /Dashboard|Panel/i },
-  { href: "/admin/retiros", titulo: /Retiros/i },
-  { href: "/admin/ceremonias", titulo: /Ceremonias/i },
+  // Ojo con los nombres: el 02/09 las rutas se renombraron con la nomenclatura
+  // de Julia (Sesiones / Viajes) y el CRUD se mudo a /admin/experiencias. Estas
+  // tres lineas quedaron apuntando a las viejas y el suite fallaba desde
+  // entonces.
+  { href: "/admin/sesiones", titulo: /Sesiones/i },
+  { href: "/admin/viajes", titulo: /Viajes/i },
   { href: "/admin/solicitudes", titulo: /Solicitudes/i },
   { href: "/admin/pagos", titulo: /Pagos|cobro/i },
   { href: "/admin/multimedia", titulo: /Multimedia/i },
@@ -56,7 +60,7 @@ test("el desplegable de secciones lista todas y navega", async ({ page }) => {
   // panel la esconde sin avisar y nadie se entera.
   await expect(items).toHaveCount(11);
   for (const label of [
-    "Dashboard", "Retiros", "Ceremonias", "Solicitudes", "Pagos",
+    "Dashboard", "Sesiones", "Viajes", "Solicitudes", "Pagos",
     "Multimedia", "Contenidos", "Testimonios", "Preguntas frecuentes",
     "CRM", "Suscriptores",
   ]) {
@@ -110,8 +114,26 @@ test("los formularios de alta abren con sus campos", async ({ page }) => {
   await expect(page.getByLabel("Pregunta")).toBeVisible();
   await expect(page.getByLabel("Respuesta")).toBeVisible();
 
-  await page.goto("/admin/viajes/nuevo?tipo=ceremonia");
+  await page.goto("/admin/experiencias/nuevo?tipo=ceremonia");
   await expect(page.getByLabel(/Título/i).first()).toBeVisible();
+
+  // Los campos de logistica del 03/09. Ciudad y pais son obligatorios porque
+  // `trips.location` se genera de ellos.
+  await expect(page.getByLabel("Ciudad")).toBeVisible();
+  await expect(page.getByLabel("País")).toBeVisible();
+  await expect(page.getByLabel("Hora de inicio")).toBeVisible();
+  await expect(page.getByLabel("A quién está dirigida")).toBeVisible();
+  // "Antes de llegar" arranca plegado: son los campos que se completan cuando
+  // la fecha se acerca, no al crear la experiencia.
+  await expect(page.getByLabel("Qué llevar")).toBeHidden();
+  await page.getByText(/Antes de llegar/).click();
+  await expect(page.getByLabel("Qué llevar")).toBeVisible();
+  // "Qué incluye" es solo del Viaje: en una Sesion no existe ni plegado.
+  await expect(page.getByLabel("Qué incluye")).toHaveCount(0);
+
+  await page.goto("/admin/experiencias/nuevo?tipo=retiro");
+  await page.getByText(/Antes de llegar/).click();
+  await expect(page.getByLabel("Qué incluye")).toBeVisible();
 
   await page.goto("/admin/pagos");
   await expect(page.getByText(/medio de cobro|instrucciones/i).first()).toBeVisible();

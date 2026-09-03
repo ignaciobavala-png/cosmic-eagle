@@ -1,9 +1,12 @@
-insert into public.trips (title, description, location, start_date, end_date, capacity, status, price, type, schedule, terms)
+-- `location` ya no se inserta: desde la migracion 20260903060000 es una columna
+-- generada a partir de `area`, `city` y `country`.
+insert into public.trips (title, description, city, country, start_date, end_date, capacity, status, price, type, schedule, terms)
 values
   (
     'Despertar en la Montaña Sagrada',
     'Un viaje de 7 dias de inmersion profunda y silencio consciente para reconectar con el origen.',
-    'Valle Sagrado, Peru',
+    'Valle Sagrado',
+    'Peru',
     '2026-09-10',
     '2026-09-17',
     12,
@@ -18,7 +21,8 @@ values
   (
     'Equinoccio Galactico',
     'Ceremonia de una jornada en honor al equinoccio, con acompañamiento y contencion durante todo el proceso.',
-    'Tepoztlan, Mexico',
+    'Tepoztlan',
+    'Mexico',
     '2026-09-22',
     '2026-09-22',
     20,

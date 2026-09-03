@@ -9,13 +9,34 @@
 | id | uuid | PK |
 | title | text | — |
 | description | text | — |
-| location | text | — |
+| city | text | NOT NULL |
+| country | text | NOT NULL |
+| area | text | Barrio o paraje. Opcional |
+| location | text | **GENERADA**: `[area, ]city, country`. No se escribe |
+| venue_type | text | Casa de retiro, hotel… |
+| address | text | Dirección exacta. **No pública**: sólo el correo [7] y la pantalla de quien ya pagó |
+| map_url | text | https:// obligatorio |
 | start_date | date | — |
 | end_date | date | — |
+| start_time | time | — |
+| end_time | time | — |
 | capacity | integer | Cupo maximo |
+| category | enum `trip_category` | mixto (default, no se muestra), mujeres, hombres, avanzados |
 | status | enum | draft, open, closed, completed |
-| price | numeric | 0 si gratuito |
+| price | numeric | 0 si gratuito. Siempre USD |
+| deposit_amount | numeric | Seña. Nulo = se paga completo |
+| payment_url | text | Link de Encuadrado, uno por viaje |
+| includes | text | Qué incluye. **Sólo Viajes**: el form no lo muestra en Sesiones |
+| arrival_notes | text | Llegadas y salidas |
+| packing_list | text | Qué llevar. Es la `{lista}` del correo [7] |
+| schedule | jsonb | Programa. Ver `src/lib/trip-schedule.ts` |
+| terms | text | Condiciones de ESTA experiencia. La política de cancelación **no** está acá: es la misma para todas y vive en `site_content` |
 | created_at | timestamptz | — |
+
+**Ojo con `location`**: desde la migración `20260903060000` es una columna
+generada. Se lee igual que siempre (mismo nombre, mismo valor: los ocho viajes
+cargados salieron byte a byte iguales), pero **escribirla es un error de
+Postgres**. Lo que se escribe son `city`, `country` y `area`.
 
 ## Solicitudes (`applications`) — etapa 1, el filtro corto
 

@@ -633,6 +633,18 @@ export type Database = {
       trips: {
         Row: {
           capacity: number
+          address: string | null
+          area: string | null
+          arrival_notes: string | null
+          category: Database["public"]["Enums"]["trip_category"]
+          city: string
+          country: string
+          end_time: string | null
+          includes: string | null
+          map_url: string | null
+          packing_list: string | null
+          start_time: string | null
+          venue_type: string | null
           created_at: string
           deposit_amount: number | null
           description: string | null
@@ -651,13 +663,25 @@ export type Database = {
         }
         Insert: {
           capacity: number
+          address?: string | null
+          area?: string | null
+          arrival_notes?: string | null
+          category?: Database["public"]["Enums"]["trip_category"]
+          city: string
+          country: string
+          end_time?: string | null
+          includes?: string | null
+          map_url?: string | null
+          packing_list?: string | null
+          start_time?: string | null
+          venue_type?: string | null
           created_at?: string
           deposit_amount?: number | null
           description?: string | null
           end_date: string
           id?: string
           image_url?: string | null
-          location?: string | null
+          location?: never
           payment_url?: string | null
           price?: number
           schedule?: Json
@@ -669,13 +693,25 @@ export type Database = {
         }
         Update: {
           capacity?: number
+          address?: string | null
+          area?: string | null
+          arrival_notes?: string | null
+          category?: Database["public"]["Enums"]["trip_category"]
+          city?: string
+          country?: string
+          end_time?: string | null
+          includes?: string | null
+          map_url?: string | null
+          packing_list?: string | null
+          start_time?: string | null
+          venue_type?: string | null
           created_at?: string
           deposit_amount?: number | null
           description?: string | null
           end_date?: string
           id?: string
           image_url?: string | null
-          location?: string | null
+          location?: never
           payment_url?: string | null
           price?: number
           schedule?: Json
@@ -770,6 +806,7 @@ export type Database = {
         | "integration"
         | "feedback"
       testimonial_placement: "home" | "sesiones" | "viajes"
+      trip_category: "mixto" | "mujeres" | "hombres" | "avanzados"
       trip_status: "draft" | "open" | "closed" | "completed"
       trip_type: "retiro" | "ceremonia"
     }
@@ -925,6 +962,7 @@ export const Constants = {
         "feedback",
       ],
       testimonial_placement: ["home", "sesiones", "viajes"],
+      trip_category: ["mixto", "mujeres", "hombres", "avanzados"],
       trip_status: ["draft", "open", "closed", "completed"],
       trip_type: ["retiro", "ceremonia"],
     },

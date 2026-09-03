@@ -404,6 +404,22 @@ export const SITE_GROUPS = [
       },
     ],
   },
+  {
+    id: "condiciones",
+    title: "Condiciones",
+    href: "/viajes",
+    slots: [
+      {
+        key: "condiciones.cancelacion",
+        label: "Política de cancelación",
+        help: "Qué pasa si alguien no puede venir: hasta cuándo se devuelve, cuánto, si el cupo se puede transferir a otra fecha. Es la misma para todas las experiencias y se muestra en la página de cada una.",
+        type: "multiline",
+        // Sale vacía a propósito: el texto es de la clienta y no se inventa
+        // (mismo criterio que las FAQs). Sin texto, la sección no se dibuja.
+        fallback: "",
+      },
+    ],
+  },
 ] as const satisfies readonly SlotGroup[];
 
 export type SlotKey = (typeof SITE_GROUPS)[number]["slots"][number]["key"];
