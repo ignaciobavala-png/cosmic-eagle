@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { TESTIMONIAL_PLACEMENTS } from "@/lib/testimonials";
+import { TESTIMONIAL_PLACEMENTS, TESTIMONIAL_MAX_CHARS } from "@/lib/testimonials";
 import type { TestimonialFormState } from "./actions";
 
 type Values = {
@@ -68,11 +68,14 @@ export function TestimonialForm({
           name="quote"
           rows={6}
           required
+          maxLength={TESTIMONIAL_MAX_CHARS}
           defaultValue={values?.quote}
           className={FIELD}
         />
         <p className="mt-1.5 text-xs text-on-surface-variant">
-          Se muestra entre comillas. No hace falta escribirlas.
+          Se muestra entre comillas. No hace falta escribirlas. Máximo{" "}
+          {TESTIMONIAL_MAX_CHARS} caracteres: la tarjeta del carrusel tiene alto
+          fijo y un texto más largo se corta.
         </p>
       </div>
 

@@ -4,6 +4,18 @@ import { useEffect, useId, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 /**
+ * Evento con el que un disparador de otra parte de la pagina abre o CIERRA un
+ * panel. El `detail` es el `openOnHash` del panel al que va dirigido.
+ *
+ * Es cancelable a proposito: el panel que lo atiende llama a `preventDefault()`,
+ * asi el disparador sabe que alguien lo escucho y no tiene que hacer el salto
+ * por su cuenta. Si no hay ningun panel montado, el evento vuelve sin cancelar
+ * y el disparador se comporta como el ancla que es.
+ */
+export const COLLAPSIBLE_TOGGLE = "cosmic:collapsible-toggle";
+
+
+/**
  * Botón que despliega un panel debajo, del rediseño de /viajes (`.exp-cta-btn`
  * + `.exp-cartelera-wrap`): el calendario de cada tipo de experiencia no se ve
  * hasta que se lo pide.
@@ -59,9 +71,33 @@ export function Collapsible({
       if (window.location.hash === `#${openOnHash}`) setOpen(true);
     };
     sync();
+
+    // El disparador de afuera ALTERNA, no abre: si el panel ya esta abierto y
+    // se vuelve a tocar el boton, se cierra (correccion del 03/09 de Julia).
+    // Por eso no alcanza con el `hashchange` de arriba — el hash ya apunta aca
+    // y no vuelve a cambiar.
+    const toggle = (event: Event) => {
+      if ((event as CustomEvent<string>).detail !== openOnHash) return;
+      event.preventDefault();
+      setOpen(!open);
+      // El salto solo tiene sentido al abrir: al cerrar, saltar al panel que
+      // acaba de desaparecer deja la pagina en cualquier lado.
+      if (!open) {
+        requestAnimationFrame(() =>
+          document
+            .getElementById(openOnHash)
+            ?.scrollIntoView({ behavior: "instant", block: "start" })
+        );
+      }
+    };
+
     window.addEventListener("hashchange", sync);
-    return () => window.removeEventListener("hashchange", sync);
-  }, [openOnHash]);
+    window.addEventListener(COLLAPSIBLE_TOGGLE, toggle);
+    return () => {
+      window.removeEventListener("hashchange", sync);
+      window.removeEventListener(COLLAPSIBLE_TOGGLE, toggle);
+    };
+  }, [openOnHash, open]);
 
   const toneClasses =
     tone === "dark"

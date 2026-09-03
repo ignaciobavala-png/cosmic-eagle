@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/lib/supabase/types";
 import { parseSchedule, sortSchedule } from "@/lib/trip-schedule";
-import { TRIP_TYPES, isTripType, tripAdminPath } from "@/lib/trip-type";
+import { TRIP_TYPES, isTripType, tripAdminPath, tripTypeLabel } from "@/lib/trip-type";
 import { isTripCategory } from "@/lib/trip-fields";
 import { uploadTripCover } from "@/lib/trip-cover";
 
@@ -60,7 +60,6 @@ function parseTripForm(formData: FormData) {
 
   if (
     typeof title !== "string" ||
-    !title.trim() ||
     typeof country !== "string" ||
     !country.trim() ||
     typeof city !== "string" ||
@@ -132,7 +131,13 @@ function parseTripForm(formData: FormData) {
   return {
     error: null,
     data: {
-      title: title.trim(),
+      // El titulo es OPCIONAL desde la correccion del 03/09 ("por el momento el
+      // cliente prefiere no poner titulo"), pero la columna es NOT NULL y el
+      // nombre del viaje se usa en todos lados: el asunto de cada correo, el
+      // panel, la pantalla del postulante y el `<title>` de la pagina. Asi que
+      // vacio no se guarda vacio: se deriva del tipo y la ciudad
+      // ("Sesion Cosmica en Santiago"), que describe sin inventar copy.
+      title: title.trim() || `${tripTypeLabel(type)} en ${city.trim()}`,
       description:
         typeof description === "string" && description.trim()
           ? description.trim()

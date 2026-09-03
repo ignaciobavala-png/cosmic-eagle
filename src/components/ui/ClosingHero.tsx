@@ -72,15 +72,16 @@ export function ClosingHero({
                 <CtaLink
                   key={action.href + action.label}
                   href={action.href}
-                  variant={action.variant ?? "solid"}
-                  /* Los dos botones del mockup (`.nos-btn-glow` y
-                     `.nos-btn-glass`): pildora, Domine bold con tracking, y el
-                     "glass" con fondo dorado al 30% y blur — no el blanco al 3%
-                     del ghost generico del sistema. */
-                  className={`rounded-full px-9 py-4 font-display font-bold tracking-[0.07em] ${
+                  /* Los dos botones son la misma PÍLDORA del sistema y sólo
+                     cambia el relleno (corrección del 03/09): el principal es
+                     la dorada con glow (`pill`) y el segundo la de vidrio con
+                     degradé azul al 50% (`glass`). Antes el segundo era el
+                     dorado translúcido y los dos se leían casi igual. */
+                  variant={action.variant === "ghost" ? "glass" : "pill"}
+                  className={`px-9 py-4 hover:-translate-y-0.5 ${
                     action.variant === "ghost"
-                      ? "border-primary-container/50 bg-primary-container/30 backdrop-blur-[10px] hover:bg-primary-container/[0.42] hover:-translate-y-0.5"
-                      : "shadow-[0_0_22px_rgba(249,215,143,0.6),0_0_43px_rgba(249,215,143,0.32)] hover:shadow-[0_0_29px_rgba(249,215,143,0.77),0_0_58px_rgba(249,215,143,0.45)] hover:-translate-y-0.5"
+                      ? ""
+                      : "shadow-[0_0_22px_rgba(249,215,143,0.6),0_0_43px_rgba(249,215,143,0.32)] hover:shadow-[0_0_29px_rgba(249,215,143,0.77),0_0_58px_rgba(249,215,143,0.45)]"
                   }`}
                 >
                   {action.label}

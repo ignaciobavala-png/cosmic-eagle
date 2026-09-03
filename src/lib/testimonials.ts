@@ -1,6 +1,13 @@
 import { createPublicClient } from "./supabase/public";
 import type { Database } from "./supabase/types";
 
+/**
+ * Tope de largo del testimonio. Sale del diseño: la tarjeta del carrusel de la
+ * home tiene alto fijo y un texto más largo se recorta (corrección del 03/09 de
+ * Julia). Lo comparten el formulario del panel y su server action.
+ */
+export const TESTIMONIAL_MAX_CHARS = 250;
+
 export type TestimonialPlacement =
   Database["public"]["Enums"]["testimonial_placement"];
 

@@ -90,12 +90,19 @@ export default async function Home() {
           {/* Las dos lineas entran por separado, la segunda 0.15s despues:
               es el `transition-delay` que Julia le pone al `.line-reveal` que
               sigue. Van de 40px y en 1.6s, mas lento que el resto del sitio. */}
-          <div className="mx-auto w-full max-w-[75rem]">
+          {/* El ancho de la caja y el tope de la escala van juntos: la
+              corrección del 03/09 pide que en escritorio la frase entre en DOS
+              líneas (una por mitad), y con el `clamp` anterior (9vw, tope 5rem)
+              cada mitad envolvía sola. La medida del texto crece con el
+              viewport igual que la caja — por eso el tamaño es sobre todo `vw`
+              y el tope está calculado contra los 80rem de la caja, no elegido a
+              ojo: 4rem × ~34 caracteres queda debajo de 1280px. */}
+          <div className="mx-auto w-full max-w-[80rem]">
             {/* Los colores van en este orden y no al reves: en el mockup
                 (`.about-statement`) la PRIMERA linea es crema y la segunda
                 dorada en italica. Estaban invertidos y es la correccion del
                 02/09 de Julia. */}
-            <h2 className="font-display text-[clamp(3rem,9vw,5rem)] leading-[1.04] text-primary">
+            <h2 className="font-display text-[clamp(2.25rem,4.4vw,4rem)] leading-[1.12] text-primary md:leading-[1.04]">
               <RevealItem as="span" className="inline-block" y={40} duration={1.6}>
                 {content("home.frase.left")}
               </RevealItem>
@@ -317,20 +324,29 @@ export default async function Home() {
             Umbral 0.25 y un solo observador para texto e imagen: en el mockup
             entran juntos. Titulo, linea e imagen a 0ms; los tres parrafos a
             150/300/450 y el boton a 600. La imagen ademas escala desde 0.98. */}
+        {/* En mobile la sección tiene que entrar en UNA pantalla, con el texto
+            centrado en vertical (fix v3 de Julia, docs/entregas/2026-09-03-julia).
+            En escritorio no cambia nada: sigue siendo el par texto/imagen. */}
         <CreamSection
           id="tecnologia"
           full={false}
+          className="max-md:flex max-md:min-h-[100svh] max-md:items-center"
           reveal={{ amount: 0.25, stagger: 0 }}
         >
-          <div className="mx-auto flex max-w-narrative flex-col items-center gap-12 md:flex-row md:gap-16">
-            <div className="flex-1">
+          <div className="mx-auto flex w-full max-w-narrative flex-col items-center gap-12 md:flex-row md:gap-16">
+            <div className="w-full md:flex-1">
               <RevealItem duration={0.8}>
-                <h2 className="mb-3 font-display text-[32px] font-bold leading-tight text-[#05125a] md:text-[40px]">
-                  Tecnología del Alma
+                {/* El quiebre en dos renglones es fijo, no un wrap por ancho:
+                    es decisión de diseño de la v2 del fix. */}
+                <h2 className="mb-3.5 font-display text-[clamp(24px,7vw,30px)] font-bold leading-tight text-[#05125a] md:mb-3 md:text-[40px]">
+                  Tecnología Humana y<br />
+                  Ciencia del Alma
                 </h2>
               </RevealItem>
-              <RevealLine className="mb-6 h-0.5 w-16 bg-[#f9d78f]" />
-              <div className="max-w-[480px] space-y-6 text-[16px] leading-[1.8] text-[#333]">
+              <RevealLine className="mb-5 h-0.5 w-20 bg-[#f9d78f] md:mb-6 md:w-16" />
+              {/* El cuerpo va negro puro en mobile y gris en escritorio: es un
+                  cambio de spec explícito de Julia, no un descuido. */}
+              <div className="space-y-5 text-[clamp(13px,3.6vw,15px)] leading-[1.8] text-black md:max-w-[480px] md:space-y-6 md:text-[16px] md:text-[#333]">
                 <RevealItem duration={0.8} delay={0.15}>
                   <p>
                     A medida que expandimos nuestra conciencia, emergen nuevas

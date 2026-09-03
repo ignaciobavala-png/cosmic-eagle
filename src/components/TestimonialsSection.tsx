@@ -66,14 +66,23 @@ export function TestimonialsSection({
   return (
     <section
       id={id}
-      className="relative flex min-h-[100svh] w-full flex-col overflow-hidden bg-[linear-gradient(180deg,#0079b3_0%,#05125a_45%)]"
+      className="relative flex h-[100svh] w-full flex-col overflow-hidden bg-[linear-gradient(180deg,#0079b3_0%,#05125a_45%)]"
     >
-      <div className="mx-auto w-full max-w-narrative px-margin-mobile pt-24 pb-10 text-center md:px-margin-desktop md:pt-[7.5rem]">
+      {/* El `pt` de mobile suma la altura del navbar: la sección mide una
+          pantalla justa y la banda opaca le tapaba el título. En escritorio los
+          120px del mockup ya alcanzan.
+
+          La cabecera no se estira ni se encoge: el alto sobrante es para la
+          franja de imagen del pie. `min-h-0` deja que el bloque se comprima si
+          la pantalla es baja, en vez de empujar la imagen fuera de la vista —
+          era lo que la hacía desaparecer en mobile. */}
+      <div className="mx-auto w-full min-h-0 max-w-narrative shrink-0 px-margin-mobile pt-[calc(3rem+var(--navbar-h))] pb-6 text-center md:px-margin-desktop md:pt-[7.5rem] md:pb-5">
         <SectionHeading
           title={HOME_COPY.voces.title}
           label={HOME_COPY.voces.label}
-          titleClassName="text-[32px] md:text-[42px]"
+          titleClassName="text-[32px] font-bold md:text-[42px]"
           labelClassName="text-[13px] tracking-[0.115em] text-[#f9d78f]"
+          lineClassName="max-w-[180px]"
         />
 
         {/* La máscara del borde derecho avisa que la fila sigue. La izquierda
@@ -85,17 +94,29 @@ export function TestimonialsSection({
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
-          className="mx-auto mt-10 flex max-w-[1000px] cursor-grab gap-5 overflow-x-auto px-2.5 pb-3.5 select-none active:cursor-grabbing [mask-image:linear-gradient(to_right,#000_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,#000_92%,transparent_100%)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="mx-auto mt-9 flex max-w-[1000px] cursor-grab gap-5 overflow-x-auto px-2.5 pb-3.5 select-none active:cursor-grabbing [mask-image:linear-gradient(to_right,#000_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,#000_92%,transparent_100%)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {testimonials.map((t) => (
+            /* La tarjeta es RECTANGULAR y de alto fijo (300×225 del mockup):
+               más ancha que alta. El alto no puede depender del texto — con
+               nueve testimonios de largo distinto la fila quedaba dispareja y
+               la sección se pasaba de una pantalla. El panel limita el
+               testimonio a 250 caracteres justamente para que entre; el
+               `line-clamp` es la red por si alguno viejo es más largo.
+
+               La tarjeta es más ancha que los 300px del mockup (que se dibujó
+               con placeholders de una línea): con 250 caracteres reales, 300px
+               de ancho no alcanzan para las seis líneas que entran en 225px de
+               alto. Más ancha entra el texto y queda más rectangular, que es
+               justo lo que pide la corrección. */
             <figure
               key={t.id}
-              className="flex min-h-[14rem] w-[18.75rem] shrink-0 flex-col justify-center rounded-xl border border-white/20 bg-white/[0.08] p-8 text-left"
+              className="flex h-[225px] w-[320px] shrink-0 flex-col justify-center overflow-hidden rounded-xl border border-white/20 bg-white/[0.08] p-7 text-left sm:w-[360px]"
             >
-              <blockquote className="text-[14px] italic leading-relaxed text-primary">
+              <blockquote className="line-clamp-6 text-[13px] sm:text-[14px] italic leading-relaxed text-primary">
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
-              <figcaption className="mt-3 text-[12px] font-bold tracking-normal text-primary-container">
+              <figcaption className="mt-3 shrink-0 text-[12px] font-bold tracking-normal text-primary-container">
                 {t.author_name}
                 {t.author_location && ` — ${t.author_location}`}
               </figcaption>
@@ -104,11 +125,12 @@ export function TestimonialsSection({
         </div>
       </div>
 
-      {/* La franja del pie: la imagen entra desvanecida desde arriba
-          (`.testi-bottom-img` del mockup) para que se integre con el azul en vez
-          de cortar contra él. El alto va por `aspect-ratio` y con un piso, para
-          que en una pantalla ancha no quede una tira de dos centímetros. */}
-      <div className="relative aspect-[16/6] min-h-[13rem] w-full [mask-image:linear-gradient(to_bottom,transparent_0%,#000_18%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,#000_18%)]">
+      {/* La franja del pie ocupa TODO el alto que sobra y termina con la
+          pantalla (`flex-1` del mockup, no un `aspect-ratio`): con una relación
+          de aspecto fija se pasaba de la pantalla en escritorio y se comía a sí
+          misma en mobile. La imagen entra desvanecida desde arriba para
+          integrarse con el azul en vez de cortar contra él. */}
+      <div className="relative min-h-[9rem] flex-1 [mask-image:linear-gradient(to_bottom,transparent_0%,#000_18%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,#000_18%)]">
         {/* `object-bottom`: el asset del repo lleva el polvo dorado arriba y el
             campo azul abajo, y es el azul el que tiene que quedar a la vista
             bajo la mascara. */}

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-type Variant = "solid" | "ghost" | "pill";
+type Variant = "solid" | "ghost" | "pill" | "glass";
 
 const VARIANTS: Record<Variant, string> = {
   // CTA solido: oro champagne con texto oscuro (primary-container / on-primary)
@@ -19,6 +19,13 @@ const VARIANTS: Record<Variant, string> = {
   // AZUL en Domine bold con tracking — no lleva `text-on-primary`.
   pill:
     "rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,#f9d78f,#b3964b)] font-display font-bold tracking-[0.08em] text-[#05125a] transition-[filter,transform] hover:brightness-110",
+  // La MISMA pildora en "liquid glass": degrade azul al 50% con desenfoque
+  // detras, borde y texto dorados. Es el segundo boton del cierre de /nosotros
+  // ("IR MAS PROFUNDO") desde la correccion del 03/09 — antes era el dorado
+  // translucido, que junto al principal se leian como dos botones iguales.
+  // El brillo de arriba (`inset`) es lo que le da el canto de vidrio.
+  glass:
+    "rounded-full border-[1.5px] border-primary-container/50 bg-[linear-gradient(135deg,rgba(0,121,179,0.5),rgba(5,18,90,0.5))] font-display font-bold tracking-[0.08em] text-primary-container shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-[10px] hover:brightness-125",
 };
 
 /**
@@ -45,7 +52,7 @@ export function CtaLink({
   return (
     <Link
       href={href}
-      className={`inline-flex items-center justify-center gap-2 px-7 py-3 text-label-sm uppercase transition-all duration-300 ${variant === "pill" ? "" : "rounded-lg"} ${VARIANTS[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 px-7 py-3 text-label-sm uppercase transition-all duration-300 ${variant === "pill" || variant === "glass" ? "" : "rounded-lg"} ${VARIANTS[variant]} ${className}`}
     >
       {children}
     </Link>

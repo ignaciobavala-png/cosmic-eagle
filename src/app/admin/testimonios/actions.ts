@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { isTestimonialPlacement } from "@/lib/testimonials";
+import { isTestimonialPlacement, TESTIMONIAL_MAX_CHARS } from "@/lib/testimonials";
 
 export type TestimonialFormState = { error: string | null };
 
@@ -34,6 +34,17 @@ function parseForm(formData: FormData) {
   ) {
     return {
       error: "Completa la sección, el testimonio y el nombre.",
+      data: null,
+    } as const;
+  }
+
+  // El tope no es una manía: la tarjeta de "Voces de Luz" es de alto fijo
+  // (300×225 del mockup) y un testimonio más largo se cortaba con puntos
+  // suspensivos. Se avisa acá, al cargarlo, en vez de dejar que se recorte solo
+  // en la home. Está escrito también en el `maxLength` del formulario.
+  if (quote.trim().length > TESTIMONIAL_MAX_CHARS) {
+    return {
+      error: `El testimonio no puede pasar de ${TESTIMONIAL_MAX_CHARS} caracteres (tiene ${quote.trim().length}). Recortalo para que entre en la tarjeta.`,
       data: null,
     } as const;
   }

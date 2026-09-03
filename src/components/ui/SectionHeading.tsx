@@ -15,6 +15,7 @@ export function SectionHeading({
   className = "",
   titleClassName = "text-headline-md md:text-headline-lg",
   labelClassName = "text-label-sm text-primary-fixed-dim/85",
+  lineClassName = "max-w-[120px]",
 }: {
   title: string;
   label?: string;
@@ -22,6 +23,8 @@ export function SectionHeading({
   /** El mockup fija el px por seccion ("Voces de Luz" va en 42). */
   titleClassName?: string;
   labelClassName?: string;
+  /** El largo de los dos filetes. Crecen hasta este tope. */
+  lineClassName?: string;
 }) {
   return (
     <div className={`text-center ${className}`}>
@@ -33,14 +36,14 @@ export function SectionHeading({
         <div className="mt-[14px] flex items-center justify-center gap-5">
           <div
             aria-hidden="true"
-            className="h-px w-12 max-w-[120px] flex-1 bg-gradient-to-r from-transparent to-primary-fixed-dim/60 md:w-20"
+            className={`h-px w-12 flex-1 bg-gradient-to-r from-transparent to-primary-fixed-dim/60 md:w-20 ${lineClassName}`}
           />
           <span className={`uppercase ${labelClassName}`}>
             {label}
           </span>
           <div
             aria-hidden="true"
-            className="h-px w-12 max-w-[120px] flex-1 bg-gradient-to-l from-transparent to-primary-fixed-dim/60 md:w-20"
+            className={`h-px w-12 flex-1 bg-gradient-to-l from-transparent to-primary-fixed-dim/60 md:w-20 ${lineClassName}`}
           />
         </div>
       )}

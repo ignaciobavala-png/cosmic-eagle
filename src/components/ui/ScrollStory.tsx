@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { motion, useTransform, useReducedMotion, type MotionValue } from "framer-motion";
 import { useSectionProgress } from "@/lib/use-section-progress";
+import { COLLAPSIBLE_TOGGLE } from "./Collapsible";
 
 type Cta = { label: string; href: string };
 
@@ -273,6 +274,17 @@ function StoryCta({ label, href }: Cta) {
         const target = document.getElementById(href.slice(1));
         if (!target) return;
         event.preventDefault();
+
+        // Si hay un panel escuchando (la cartelera), el que decide es el:
+        // alterna entre abierto y cerrado y hace el salto cuando corresponde.
+        // Se entera de que lo atendieron porque el evento vuelve cancelado.
+        const toggle = new CustomEvent(COLLAPSIBLE_TOGGLE, {
+          detail: href.slice(1),
+          cancelable: true,
+        });
+        const handled = !window.dispatchEvent(toggle);
+        if (handled) return;
+
         window.location.hash = href;
         requestAnimationFrame(() =>
           target.scrollIntoView({ behavior: "instant", block: "start" })

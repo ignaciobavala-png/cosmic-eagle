@@ -117,16 +117,21 @@ export function TripForm({
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="title" className={labelClass}>
-          Título
+          Título <span className="text-on-surface-variant">(opcional)</span>
         </label>
         <input
           id="title"
           name="title"
           type="text"
-          required
           defaultValue={trip?.title ?? ""}
           className={inputClass}
         />
+        <p className="text-xs text-on-surface-variant">
+          Si lo dejás vacío se arma solo con el tipo y la ciudad («
+          {TRIP_TYPES[type].label} en
+          Santiago»). El nombre se usa en los correos y en el buscador, así que
+          nunca queda del todo en blanco.
+        </p>
       </div>
 
       <div className="flex flex-col gap-1.5">
