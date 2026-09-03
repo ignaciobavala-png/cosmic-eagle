@@ -70,7 +70,10 @@ export const TRIP_TYPES = [
     label: "Sesiones",
     singular: "Sesión",
     upcoming: "Próximas Sesiones",
-    description: "Encuentros ceremoniales de un dia",
+    // El copy del desplegable es el del mockup aprobado de Julia
+    // (`.dropdown-desc`), que teniamos reescrito y sin tilde. Es el unico lugar
+    // donde se usa esta descripcion.
+    description: "Encuentros de un día para ir más profundo",
   },
   {
     value: "retiro",
@@ -80,7 +83,7 @@ export const TRIP_TYPES = [
     // El titulo va armado y no concatenado con "Proximos": "Proximos Viajes"
     // pero "Proximas Sesiones", el genero cambia.
     upcoming: "Próximos Viajes",
-    description: "Viajes de varios dias en grupo",
+    description: "Experiencias de una semana en portales sagrados",
   },
 ] as const;
 
