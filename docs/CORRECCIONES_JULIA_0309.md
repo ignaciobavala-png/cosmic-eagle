@@ -162,8 +162,10 @@ Lo que quedó en el código:
 - fondo en degradé de la familia del navbar y el footer, radio 18px, filete
   dorado con el rombo de cuatro puntas centrado bajo el link, separador entre
   los ítems y flecha que avanza en el hover;
-- las opacidades que pidió Julia: `0.22 / 0.68 / 0.69` (eran `0.32 / 0.97 /
-  0.98`);
+- las opacidades que pidió Julia: `0.16 / 0.55 / 0.56` (eran `0.32 / 0.97 /
+  0.98`). Fueron dos vueltas el mismo día — primero un 30% menos "para darle
+  menos peso al contenedor" y después otro tanto, "que no parezca una caja
+  sólida";
 - **y tres correcciones a su propia spec, de las que nos habíamos apartado**: el
   panel va CENTRADO bajo el link (`left:50%`; teníamos `left-0`, colgando de una
   esquina), entra con 6px de desplazamiento además del fundido, y toma el copy
@@ -177,7 +179,7 @@ descripción dorada al 70% se caía a ~2:1. Se arregla oscureciendo **lo de
 atrás** (`backdrop-brightness-[0.45]`) y no subiendo la opacidad del panel, que
 es justo lo que ella pidió bajar: el contenedor sigue liviano y deja ver el
 fondo. Medido sobre la crema, que es el peor caso del sitio: descripción
-**4,82:1** y título **8,04:1**. Si algún día se saca ese filtro, hay que
+**4,80:1** y título **7,99:1** (sobre el hero, 6,52:1 y 12,34:1). Si algún día se saca ese filtro, hay que
 devolver la opacidad.
 
 Verificado: `tsc`, lint, build, los 17 tests públicos, y el panel abierto sobre

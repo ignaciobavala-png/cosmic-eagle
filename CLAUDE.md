@@ -1816,9 +1816,13 @@ nuestra. Se le propusieron tres versiones (comparador con el navbar real en
 - **Ojo con el vidrio bajo un navbar fijo**: el panel se abre sobre lo que haya
   debajo, y con la franja crema de "Tecnología del Alma" atrás el texto dorado
   se caía a ~2:1. Se arregla oscureciendo **el fondo**
-  (`backdrop-brightness-[0.45]`), nunca subiendo la opacidad del panel — eso
-  desharía lo que ella pidió. Medido sobre la crema: descripción 4,82:1 y título
-  8,04:1.
+  (`backdrop-brightness-[0.38]`), nunca subiendo la opacidad del panel — eso
+  desharía lo que ella pidió. Medido sobre la crema: descripción 4,80:1 y título
+  7,99:1.
+- **Ojo con los reemplazos de clases por texto**: al agregarle el filtro al
+  panel, el `backdrop-blur-2xl` que se buscaba estaba **dos veces** en
+  `Header.tsx` y el filtro se coló también en el drawer mobile, que llegó así a
+  producción. Corregido en el commit siguiente.
 
 #### Verificado
 
