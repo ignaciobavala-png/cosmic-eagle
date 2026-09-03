@@ -14,7 +14,7 @@ import { ARTICLE_CATEGORY_LIST, isArticleCategory } from "@/lib/article";
 export const metadata: Metadata = {
   title: "Contenidos | Cosmic Eagle",
   description:
-    "Biblioteca, ciencia almática y testimonios: material de lectura para acompañar el camino.",
+    "Preparación e integración, salud, evolución, tecnología humana y testimonios: la biblioteca de contenidos de Cosmic Eagle.",
 };
 
 /**

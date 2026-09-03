@@ -73,3 +73,29 @@ el panel, publicarlo y verlo en `/contenidos` y en su página. Lo verificado por
 código: build de producción, y las policies probadas con `set role` — `anon` y un
 usuario logueado no admin solo ven los publicados y no pueden escribir; el admin
 ve borradores, escribe, y el trigger registra autor y fecha de publicación.
+
+---
+
+## Actualizacion 03/09/2026 — la biblioteca de Sofia
+
+Sofia mando la especificacion de como tiene que funcionar esta seccion y los
+primeros contenidos reales. **El documento vive en `docs/BIBLIOTECA.md`** y lo
+que sigue es lo que cambio de lo escrito arriba:
+
+- **Las categorias pasaron de tres a cinco** (migracion
+  `20260903190000_article_categories_biblioteca.sql`): Preparación e
+  Integración, Salud y Bienestar, Evolución y Conciencia, Tecnología Humana,
+  Testimonios. Se reemplazo el enum entero en vez de sumarle valores porque la
+  tabla estaba en cero filas.
+- **El cuerpo ya no es "parrafo y `## ` y nada mas"**: entiende tambien `### `,
+  listas con `- `, citas con `> ` y una entradilla en negrita al empezar un
+  item. Sigue sin ser markdown y sigue sin aceptar HTML.
+- **El render del detalle se mudo a `src/components/ui/ArticleBody.tsx`**, que
+  es la plantilla de lectura unica que pide el documento. La grafica definitiva
+  la tiene que definir Julia.
+- **Hay un cargador por linea de comandos** (`scripts/cargar-contenidos.mjs`)
+  que sube los `.md` de `docs/contenidos/` sin pasar por el panel. El panel
+  sigue igual y sigue siendo la via de la clienta.
+- Lo que **todavia no existe** y el documento pide: niveles de acceso,
+  navegacion tipo Netflix, Manual Evolutivo, marca de agua y newsletter de
+  contenidos. Ver el plan en `docs/BIBLIOTECA.md` §7.

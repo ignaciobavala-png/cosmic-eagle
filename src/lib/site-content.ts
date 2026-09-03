@@ -336,7 +336,7 @@ export const SITE_GROUPS = [
         help: "La frase corta debajo del título de Contenidos.",
         type: "text",
         fallback:
-          "Lecturas, ciencia almática y testimonios para acompañar el camino.",
+          "Textos para preparar el viaje, sostener la integración y seguir el camino.",
       },
       {
         key: "contenidos.hero.overlay",

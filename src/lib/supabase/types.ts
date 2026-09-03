@@ -794,7 +794,12 @@ export type Database = {
         | "approved"
         | "rejected"
         | "expired"
-      article_category: "biblioteca" | "ciencia" | "testimonios"
+      article_category:
+        | "preparacion"
+        | "salud"
+        | "evolucion"
+        | "tecnologia"
+        | "testimonios"
       article_status: "draft" | "published"
       faq_placement: "general" | "sesiones" | "viajes"
       payment_status: "pending" | "deposit_paid" | "paid" | "waived"
@@ -949,7 +954,13 @@ export const Constants = {
         "rejected",
         "expired",
       ],
-      article_category: ["biblioteca", "ciencia", "testimonios"],
+      article_category: [
+        "preparacion",
+        "salud",
+        "evolucion",
+        "tecnologia",
+        "testimonios",
+      ],
       article_status: ["draft", "published"],
       faq_placement: ["general", "sesiones", "viajes"],
       payment_status: ["pending", "deposit_paid", "paid", "waived"],
