@@ -24,7 +24,11 @@ import {
 
 const DESTINO =
   process.env.CAPTURAS_DIR ??
-  path.join(process.env.HOME ?? "", "Escritorio", "flujo de pagos y formulario");
+  path.join(
+    process.env.HOME ?? "",
+    "Escritorio/things/cosmic-eagle-material",
+    "capturas-flujo-inscripcion"
+  );
 
 const CLAVE = "e2e-Prueba-2026!";
 

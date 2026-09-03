@@ -6,7 +6,7 @@ documento que **redefine `/contenidos`**, que hoy en produccion es un hub
 publico de articulos con filtro por categoria (ver `docs/CONTENIDOS.md`).
 
 Junto con el llegaron los primeros contenidos reales. El PDF y los otros cuatro
-archivos viven en `~/Escritorio/entregas-sofia/2026-09-03-contenidos/`, **fuera
+archivos viven en `~/Escritorio/things/cosmic-eagle-material/entregas-sofia/2026-09-03-contenidos/`, **fuera
 del repo** (41 MB de PDF de Canva). La transcripcion de todo lo que sirve esta
 en `docs/contenidos/`.
 
@@ -113,7 +113,7 @@ el acceso respete los niveles, y registro de envios con opcion de baja.
 
 Es el punto que hay que resolver antes de escribir el gate.
 
-- **El video de Julia del 02/09** (`~/Escritorio/entregas-julia/2026-09-02-contenidos-mobile.mp4`)
+- **El video de Julia del 02/09** (`~/Escritorio/things/cosmic-eagle-material/entregas-julia/2026-09-02-contenidos-mobile.mp4`)
   muestra `/contenidos` con candados y un modal dorado: *"SOLO PARA MIEMBROS —
   Introduce tu codigo de acceso"*.
 - **Este documento** dice que el acceso se gestiona desde la cuenta, y lo

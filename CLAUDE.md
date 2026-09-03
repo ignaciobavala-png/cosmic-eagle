@@ -1293,7 +1293,7 @@ día — es la regla que ya nos costó tres documentos (`~/Descargas` se vacía 
   de **`/contenidos`** rediseñada, y trae la novedad más pesada del paquete (ver
   abajo). Es lo único de la entrega que **no** está en el repo — son 3 MB y la
   regla de binarios es "solo assets fijos de layout". Vive en
-  `~/Escritorio/entregas-julia/2026-09-02-contenidos-mobile.mp4`, fuera de
+  `~/Escritorio/things/cosmic-eagle-material/entregas-julia/2026-09-02-contenidos-mobile.mp4`, fuera de
   `~/Descargas` para que no se lo lleve la limpieza.
 
 **El código de acceso volvió, y con diseño.** El video muestra `/contenidos`
@@ -1399,7 +1399,7 @@ contra el sitio en vivo con marcadores exclusivos del commit).
 `inscripcion.escritura.spec.ts` y **captura cada pantalla**, incluidas las
 cuatro del panel donde interviene Estela. `e2e/armar-indice.mjs` arma un
 `index.html` con las capturas y un epígrafe por paso. Las imágenes van a
-`~/Escritorio/flujo de pagos y formulario/`, **fuera del repo**.
+`~/Escritorio/things/cosmic-eagle-material/capturas-flujo-inscripcion/`, **fuera del repo**.
 
 Tres cosas que hay que dejar como están o las capturas salen mal:
 
@@ -1659,3 +1659,90 @@ proyecto nuevo y migrar a mano **no** es una opción: se pierden datos e histori
 `contacto@cosmiceaglejourney.com`. Es el `reply_to` por defecto de todos los
 correos y Resend no tiene bandeja de entrada — si no existe, cada respuesta a un
 correo automático se pierde sin que nadie se entere.
+
+### Sesión del 2026-09-03 (quater) — la biblioteca de contenidos
+
+Sofía mandó `Biblioteca-Contenidos-Estructura.pdf` más los primeros contenidos
+reales, como PDF de Canva. **Todo el análisis está en `docs/BIBLIOTECA.md`**:
+transcripción de su especificación, cruce contra lo que existe, respuesta a sus
+seis preguntas y el plan por fases. Los PDF originales viven en
+`~/Escritorio/things/cosmic-eagle-material/entregas-sofia/2026-09-03-contenidos/`.
+
+El documento **redefine `/contenidos`**: cinco categorías, navegación tipo
+Netflix, plantilla única de lectura, tres niveles de acceso, Manual Evolutivo en
+tres etapas, marca de agua y newsletter desde la biblioteca.
+
+Hecho (mergeado a `main` y en producción, commit `b4db780`):
+
+- **Las categorías pasaron de tres a cinco** (migración
+  `20260903190000_article_categories_biblioteca.sql`): preparacion / salud /
+  evolucion / tecnologia / testimonios. Se **reemplazó el enum entero** en vez de
+  sumarle valores: la tabla estaba en cero filas, y `alter type ... add value`
+  obliga a partir la migración en dos (van cuatro veces con esa trampa). La
+  migración lleva un guard que la hace fallar si alguien la corre con artículos
+  cargados.
+- **El parser del cuerpo entiende cinco reglas**, no dos: `## `, `### `, listas
+  con `- `, citas con `> ` y una entradilla en negrita al empezar un item
+  (`**Título.** resto`). Esa última existe porque los textos de la clienta son
+  listas de "concepto + explicación". **Sigue sin ser markdown y sin aceptar
+  HTML**: cada regla elige una etiqueta, el texto sale como texto.
+- **`src/components/ui/ArticleBody.tsx`** es la plantilla de lectura única que
+  pide el documento. La gráfica definitiva la tiene que definir Julia.
+- **`scripts/cargar-contenidos.mjs`** carga los `.md` de `docs/contenidos/` sin
+  pasar por el panel. Idempotente (upsert por slug, y por autor + sección en
+  testimonios). Es el **segundo consumidor de la service role key** después del
+  cron de correos, y la justificación está escrita en el encabezado del script:
+  corre fuera de Next, sin sesión, y las policies exigen `private.is_admin()`.
+- Quedaron publicados **dos ensayos** (Preparación e Integración) y **ocho
+  testimonios**, que llevan Voces de Luz de tres tarjetas a once.
+
+**Ojo con el orden en que se hicieron las cosas**: el script escribe contra la
+base de producción, así que los contenidos estuvieron vivos en el sitio **antes**
+del deploy, renderizados por el código viejo (la etiqueta de categoría salía en
+crudo, en minúscula). No rompió nada porque el filtro con un valor de enum
+inexistente cae en el estado vacío, pero conviene deployar primero.
+
+#### El bug que apareció de paso: el sitio era invisible con "reducir movimiento"
+
+`Reveal`, `RevealItem` y `RevealLine` hacían `if (reduced) return <div>` y esa
+rama dejaba el contenido en **opacidad 0 para siempre**. Afectaba al sitio
+entero, no sólo a lo nuevo.
+
+`useReducedMotion` no puede saber la preferencia en el servidor: ahí devuelve
+`false` y el HTML sale con el `style="opacity:0"` de `initial="hidden"`. En el
+cliente devuelve `true`, la rama corta renderiza un `<div>` sin estilo, y React
+avisa *"some attributes of the server rendered HTML didn't match... **this won't
+be patched up**"*: el atributo del servidor se queda pegado al nodo. Como esa
+rama tampoco monta observador, nada vuelve a tocar la opacidad.
+
+Ahora el árbol es el mismo en los dos casos y la preferencia sólo cambia la
+**transición**, que va a duración cero. **El estado `hidden` no se toca**: es el
+que pinta el servidor, y cambiarle el `y` reabre la misma grieta con el
+`transform`. Guardado en el skill `scroll-driven-animations-no-confiar` de
+brain-data.
+
+**Al verificar animaciones en Chrome headless**: viene con `reduce` por defecto,
+así que un test que quiere ver la animación necesita `reducedMotion:
+"no-preference"` explícito, y uno que quiere probar esto necesita `"reduce"`.
+
+#### Lo que queda abierto
+
+1. **Niveles de acceso**, que es lo que destraba el Manual Evolutivo. Hay un
+   **conflicto a resolver**: el video de Julia gatea con un *código de acceso*,
+   este documento dice que el acceso se gestiona *desde la cuenta* y lo
+   recomienda explícitamente. Coinciden en las tres etapas (Foundations /
+   Evolution / Advanced). Recomendación en `docs/BIBLIOTECA.md` §3: por cuenta.
+2. Navegación tipo Netflix, plantilla de lectura definitiva y marca de agua.
+3. **Pedirle a Julia portadas propias**: las dos que hay salieron del PDF y son
+   chicas (602×339 y 450×253), alcanzan para la tarjeta pero no para el banner.
+4. **Avisarle a Sofía tres cosas** (detalle en `docs/BIBLIOTECA.md` §4): los tres
+   testimonios de la página 12 de su deck están firmados los tres "Laura,
+   Brasil"; aparece una casilla nueva, `estela@cosmiceaglejourney.com`; y el deck
+   se pisa con el copy de `/nosotros`.
+
+#### El material fuera del repo, ordenado
+
+Todo lo que vivía suelto en el escritorio se juntó en
+**`~/Escritorio/things/cosmic-eagle-material/`**: `entregas-sofia/`,
+`entregas-julia/`, `capturas-flujo-inscripcion/` (las 19 del embudo) y
+`reportes/`. Las capturas de verificación se borraron: las regenera el script.

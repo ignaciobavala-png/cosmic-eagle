@@ -9,7 +9,7 @@ source: Cosmic Eagle Journey _ Español.pdf (Canva, 15pp apaisadas, 32 MB)
 **Esto NO es un articulo de la biblioteca todavia.** Es el material de venta del
 "Retiro Guangualí" que hoy reparten por WhatsApp, y cierra pidiendo que la
 informacion se mantenga en privado. Se transcribe para que no se pierda (el PDF
-vive fuera del repo, en `~/Escritorio/entregas-sofia/2026-09-03-contenidos/`) y
+vive fuera del repo, en `~/Escritorio/things/cosmic-eagle-material/entregas-sofia/2026-09-03-contenidos/`) y
 porque **tres de sus bloques son articulos de biblioteca casi listos**, marcados
 abajo con `[CANDIDATO]`.
 
