@@ -123,3 +123,33 @@ propio shell, porque su línea de comando también contiene el patrón.
 **Sin verificar end-to-end**: cargar una experiencia sin título desde el panel y
 ver el nombre derivado, y cargar un testimonio de más de 250 caracteres para ver
 el aviso.
+
+## 5. Estado al cerrar la sesión (03/09, 18:50)
+
+Las once correcciones están **mergeadas a `main` y en producción** (commits
+`3214773` y `66134dc`), verificadas contra el sitio en vivo.
+
+**Esperando respuesta de Julia** por tres cosas:
+
+1. **El desplegable de «Experiencias»**, que Sofía vio "medio cuadrado". La
+   auditoría y las tres versiones propuestas están en
+   `~/Escritorio/desplegable-experiencias.html` (fuera del repo). Resumen: lo
+   cuadrado viene de su propio mockup aprobado —fondo plano, radio 12px, dos
+   bloques de texto sin ningún indicio de ser links—, en un sitio donde todo lo
+   demás es degradé. La versión 1 ("filete y rombo") está implementada en la
+   rama **`desplegable-experiencias`**, sin mergear: falta que Ignacio elija
+   entre las tres y que Julia confirme, porque el componente es suyo. Esa rama
+   trae además tres arreglos que valen gane la versión que gane —el panel
+   centrado bajo el link (su `left:50%`, teníamos `left-0`), la entrada con
+   desplazamiento y el copy de su mockup.
+2. **El título derivado de las experiencias** ("Sesión Cósmica en Santiago"
+   cuando la clienta lo deja vacío): su pedido literal es no poner título, pero
+   la columna es `NOT NULL` y el nombre se usa en el asunto de cada correo, en
+   el panel y en el `<title>`.
+3. **La repetición de fechas de las sesiones** (§3), que además necesita a
+   Estela: es la misma decisión que la pregunta abierta desde el 06/08 sobre si
+   una Sesión es siempre de un día.
+
+De la entrega de Julia del 02/09 seguían abiertas, y siguen: el destino real de
+"Contacta soporte", una foto pensada para la franja de Voces de Luz, y el tag de
+tipo con texto blanco sobre dorado.
