@@ -94,12 +94,12 @@ export function Header() {
 
           Ojo: el navbar paso a ser OPACO. Antes era vidrio y el hero le pasaba
           por debajo; en el mockup es una banda solida y el contenido arranca
-          abajo. Por eso cada `main` compensa con `pt-16 lg:pt-21`. */}
+          abajo. Por eso cada `main` compensa con `pt-18 md:pt-24`. */}
       <header className="fixed top-0 w-full z-50 bg-[linear-gradient(to_right,#05125a_0%,#0079b3_100%)]">
         {/* La barra horizontal arranca en lg, no en md: entre 768 y 1024 el
             logo + los 3 links + "Unirme al circulo" no entran y el CTA termina
             pisando el logo. Hasta 1024 manda el drawer, que entra siempre. */}
-        <nav className="flex items-center justify-between gap-4 px-margin-mobile lg:px-margin-desktop h-16 lg:h-21 w-full max-w-narrative mx-auto">
+        <nav className="flex items-center justify-between gap-4 px-margin-mobile md:px-margin-desktop h-18 md:h-24 w-full max-w-narrative mx-auto">
           <Link href="/" className="shrink-0">
             <Image
               src={IMAGES.logo}
@@ -108,18 +108,18 @@ export function Header() {
               height={267}
               priority
               sizes="(min-width: 1024px) 280px, 220px"
-              className="h-9 lg:h-14 w-auto object-contain"
+              className="h-10 md:h-16 w-auto object-contain"
             />
           </Link>
 
-          <ul className="hidden lg:flex items-center gap-2">
+          <ul className="hidden md:flex items-center gap-2">
             {NAV_LINKS.filter((l) => l.href !== "/cuenta").map((link) => {
               const isActive = pathname.startsWith(link.href);
               return (
                 <li key={link.href} className="relative group">
                   <Link
                     href={link.href}
-                    className={`flex items-center gap-1.5 whitespace-nowrap px-4 py-2 font-display text-label-sm uppercase transition-colors duration-200 ${
+                    className={`flex items-center gap-1.5 whitespace-nowrap px-[1.75rem] py-2 font-display text-[13px] uppercase tracking-[0.115em] transition-colors duration-200 ${
                       isActive
                         ? "text-primary-fixed-dim"
                         : "text-on-surface-variant hover:text-on-surface"
@@ -175,7 +175,7 @@ export function Header() {
             {profile ? (
               <Link
                 href={profile.isAdmin ? "/admin" : "/cuenta"}
-                className="hidden lg:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
+                className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
               >
                 {profile.avatarUrl ? (
                   <img
@@ -193,7 +193,7 @@ export function Header() {
             ) : (
               // El `hidden` va en el wrapper, no en el CtaLink: su base trae
               // `inline-flex` y le gana a `hidden` por orden de la hoja.
-              <div className="hidden lg:flex">
+              <div className="hidden md:flex">
                 <CtaLink
                   href="/cuenta?modo=registro"
                   variant="pill"
@@ -207,7 +207,7 @@ export function Header() {
 
             <button
               onClick={toggleDrawer}
-              className="lg:hidden active:scale-95 transition-transform"
+              className="md:hidden active:scale-95 transition-transform"
               aria-label="Abrir menú"
             >
               <Menu className="text-primary-fixed-dim" size={24} />
@@ -223,7 +223,7 @@ export function Header() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[60] bg-void-black/60 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-[60] bg-void-black/60 backdrop-blur-sm md:hidden"
               onClick={() => setDrawerOpen(false)}
             />
             <motion.div
@@ -231,7 +231,7 @@ export function Header() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 z-[60] w-80 max-w-[85vw] bg-surface-container-low/95 backdrop-blur-2xl border-r border-parchment/10 shadow-2xl flex flex-col py-6 lg:hidden"
+              className="fixed inset-y-0 left-0 z-[60] w-80 max-w-[85vw] bg-surface-container-low/95 backdrop-blur-2xl border-r border-parchment/10 shadow-2xl flex flex-col py-6 md:hidden"
             >
               <div className="px-6 py-4 border-b border-parchment/5 flex justify-between items-center">
                 <Link href="/" onClick={() => setDrawerOpen(false)}>

@@ -62,7 +62,7 @@ export default async function ContenidosPage({
   return (
     <>
       <Header />
-      <main className="pt-16 lg:pt-21">
+      <main className="pt-18 md:pt-24">
         <PageHero
           image={content("contenidos.hero.image")}
           title={content("contenidos.hero.title")}

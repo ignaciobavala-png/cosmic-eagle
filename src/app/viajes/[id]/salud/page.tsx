@@ -53,7 +53,7 @@ export default async function SaludPage({
   return (
     <>
       <Header />
-      <main className="pt-16 lg:pt-21 min-h-screen">
+      <main className="pt-18 md:pt-24 min-h-screen">
         <div className="px-5 max-w-3xl mx-auto py-16 md:py-20">
           <div className="mb-10">
             <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block mb-2">

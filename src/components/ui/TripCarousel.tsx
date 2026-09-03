@@ -34,15 +34,15 @@ export function TripCarousel({
 }) {
   return (
     <div className="rounded-[20px] bg-[linear-gradient(135deg,#7a6329_0%,#f9d78f_30%,#fbe9c0_50%,#b3964b_75%,#6b551f_100%)] px-5 py-11">
-      <p className="text-center text-label-sm uppercase text-[#05125a]/70">
+      <p className="text-center text-[12px] uppercase tracking-[0.167em] text-[#05125a]/70">
         {caption}
       </p>
-      <h3 className="mb-8 mt-2 text-center font-display text-headline-md text-[#05125a]">
+      <h3 className="mb-[30px] mt-2 text-center font-display text-[32px] text-[#05125a]">
         {title}
       </h3>
 
       {trips.length === 0 ? (
-        <p className="pb-2 text-center text-body-md text-[#05125a]/80">
+        <p className="pb-2 text-center text-[14px] text-[#05125a]/80">
           {emptyLabel}
         </p>
       ) : (
@@ -61,7 +61,7 @@ export function TripCarousel({
               exactamente `2n * (tarjeta + separador)` y `-50%` cierra justo. */}
           <div className="animate-marquee flex w-max">
             {trips.map((trip) => (
-              <div key={trip.id} className="mr-5 w-[17rem] shrink-0 sm:w-[20rem]">
+              <div key={trip.id} className="mr-[22px] w-[17rem] shrink-0 sm:w-[20rem]">
                 <TripCard trip={trip} tone="light" />
               </div>
             ))}
@@ -70,7 +70,7 @@ export function TripCarousel({
                 key={`copia-${trip.id}`}
                 aria-hidden="true"
                 tabIndex={-1}
-                className="mr-5 hidden w-[17rem] shrink-0 sm:w-[20rem] md:block"
+                className="mr-[22px] hidden w-[17rem] shrink-0 sm:w-[20rem] md:block"
               >
                 <TripCard trip={trip} tone="light" />
               </div>

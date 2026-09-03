@@ -129,7 +129,7 @@ export function ScrollStory({
     >
       {/* El `pt` compensa el navbar: el sticky se pega al techo de la pantalla,
           que es justo donde está la banda opaca. */}
-      <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden pt-16 lg:pt-21">
+      <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden pt-18 md:pt-24">
         <motion.div
           style={{ opacity: textOpacity }}
           className="relative z-[3] mx-auto max-w-[760px] px-[6vw]"
@@ -257,7 +257,7 @@ function useThreshold(progress: MotionValue<number>, at: number, enabled: boolea
  */
 function StoryCta({ label, href }: Cta) {
   const className =
-    "inline-flex items-center gap-2 rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-10 py-4 font-display text-label-sm font-bold uppercase text-[#05125a] transition-[filter] duration-300 hover:brightness-110";
+    "inline-flex items-center gap-2 rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-10 py-4 font-display text-[14px] font-bold uppercase tracking-[0.071em] text-[#05125a] transition-[filter] duration-300 hover:brightness-110";
   const content = (
     <>
       {label}
@@ -418,11 +418,9 @@ function StoryScrollHint({ target }: { target: string }) {
     <a
       href={`#${target}`}
       aria-label="Seguir bajando"
-      className="inline-block text-2xl leading-none text-primary-container/80 transition-[transform,color] duration-300 hover:scale-125 hover:text-primary-container"
+      className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-full border-[1.5px] border-current text-sm leading-none text-primary-container transition-[transform,filter] duration-[250ms] hover:scale-[1.2] hover:brightness-75"
     >
-      <span aria-hidden="true" className="animate-float inline-block">
-        ↓
-      </span>
+      <span aria-hidden="true">↓</span>
     </a>
   );
 }

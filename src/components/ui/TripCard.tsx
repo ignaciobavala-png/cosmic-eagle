@@ -51,7 +51,7 @@ export function TripCard({
       href={`/viajes/${trip.id}`}
       className={
         light
-          ? "group flex h-full flex-col overflow-hidden rounded-xl bg-white transition-shadow duration-300 hover:shadow-[0_10px_30px_rgba(5,18,90,0.25)]"
+          ? "group flex h-full flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.15)] transition-[transform,box-shadow] duration-300 hover:-translate-y-2 hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)]"
           : "group flex flex-col overflow-hidden rounded-2xl glass-card transition-colors duration-300 hover:border-primary-fixed-dim/35"
       }
     >
@@ -107,7 +107,7 @@ export function TripCard({
               </div>
               <span
                 aria-hidden="true"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#05125a]/25 text-[#05125a] transition-colors group-hover:bg-[#05125a] group-hover:text-white"
+                className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[10px] border-2 border-[#05125a] text-lg text-[#05125a] transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#05125a] group-hover:text-white"
               >
                 <ArrowUpRight size={16} />
               </span>

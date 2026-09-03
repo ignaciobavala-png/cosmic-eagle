@@ -52,7 +52,7 @@ export function PageHero({
     // la cuenta y el hint de scroll cae debajo del pliegue visible.
     //
     // Y se le RESTA el alto del navbar. La banda es opaca y fija, y todos los
-    // `main` la esquivan con `pt-16 lg:pt-21`, asi que una seccion de `100svh`
+    // `main` la esquivan con `pt-18 md:pt-24`, asi que una seccion de `100svh`
     // adentro de ese `main` mide una pantalla ENTERA empezando debajo del
     // navbar: termina 84px mas abajo del pliegue y se lleva puesto el indicador
     // de scroll, que va anclado al pie. Es el primer reclamo de la entrega de

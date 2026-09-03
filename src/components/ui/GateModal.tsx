@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 /**
@@ -34,14 +34,53 @@ export function GateModal({
   next?: string;
 }) {
   const reduced = useReducedMotion();
+  const card = useRef<HTMLDivElement>(null);
 
+  /**
+   * Lo que la spec marca como pendiente en su §9: el foco no se puede escapar
+   * del modal mientras está abierto, y al cerrar vuelve a quien lo disparó.
+   * El fondo además deja de scrollear — con el velo puesto, ver la página
+   * moverse detrás se lee como que el modal no capturó nada.
+   */
   useEffect(() => {
     if (!open) return;
+
+    const returnTo = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    // El primer foco va a la tarjeta y no al botón de cerrar: entrar con el
+    // foco puesto en "cerrar" invita a cerrar, no a leer.
+    card.current?.focus();
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || !card.current) return;
+      const focusables = card.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === card.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
+
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = overflow;
+      returnTo?.focus?.();
+    };
   }, [open, onClose]);
 
   const query = next ? `&next=${encodeURIComponent(next)}` : "";
@@ -63,6 +102,8 @@ export function GateModal({
           className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 p-6"
         >
           <motion.div
+            ref={card}
+            tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-labelledby="gate-title"
@@ -70,7 +111,7 @@ export function GateModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={reduced ? undefined : { opacity: 0, scale: 0.92, y: 16 }}
             transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
-            className="relative w-full max-w-[27.5rem] rounded-[1.625rem] bg-[linear-gradient(160deg,#0079b3_0%,#0a1a6e_45%,#05125a_100%)] px-7 pb-8 pt-12 text-center shadow-[0_24px_60px_rgba(0,0,0,0.45)] sm:rounded-[2rem] sm:px-10 sm:pb-10 sm:pt-14"
+            className="relative w-full max-w-[27.5rem] rounded-[1.625rem] bg-[linear-gradient(150deg,#0079b3_0%,#0a1a6e_45%,#05125a_100%)] px-7 pb-8 pt-12 text-center shadow-[0_30px_80px_rgba(0,0,0,0.45)] min-[481px]:rounded-[2rem] min-[481px]:px-10 min-[481px]:pb-10 min-[481px]:pt-14"
           >
             <button
               type="button"
@@ -88,12 +129,12 @@ export function GateModal({
               ¿Quieres seguir explorando?
             </h2>
 
-            <p className="mx-auto mt-4 max-w-[21.25rem] text-body-md text-primary-container/85">
+            <p className="mx-auto mt-[22px] max-w-[21.25rem] text-body-md text-primary-container/85">
               Para explorar los detalles de esta experiencia cósmica,
               necesitamos conocerte primero.
             </p>
 
-            <div className="mt-8 flex flex-col gap-4">
+            <div className="mt-9 flex flex-col gap-4">
               <Link
                 href={`/cuenta?${query.slice(1)}`}
                 className={GATE_BTN}
@@ -114,7 +155,7 @@ export function GateModal({
                 destino real (¿mail?, ¿página de contacto?) todavía no está
                 definido. Mismo criterio que los links apagados del footer:
                 antes que mandar a ningún lado, no linkear. */}
-            <p className="mt-6 text-label-sm normal-case text-primary/75">
+            <p className="mt-7 text-[13px] normal-case tracking-normal text-primary/75">
               ¿Necesitas ayuda? Contacta soporte
             </p>
           </motion.div>
