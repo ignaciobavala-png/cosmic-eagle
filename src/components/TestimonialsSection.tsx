@@ -66,12 +66,14 @@ export function TestimonialsSection({
   return (
     <section
       id={id}
-      className="relative flex w-full flex-col overflow-hidden bg-[linear-gradient(180deg,#0079b3_0%,#05125a_45%)]"
+      className="relative flex min-h-[100svh] w-full flex-col overflow-hidden bg-[linear-gradient(180deg,#0079b3_0%,#05125a_45%)]"
     >
       <div className="mx-auto w-full max-w-narrative px-margin-mobile pt-24 pb-10 text-center md:px-margin-desktop md:pt-[7.5rem]">
         <SectionHeading
           title={HOME_COPY.voces.title}
           label={HOME_COPY.voces.label}
+          titleClassName="text-[32px] md:text-[42px]"
+          labelClassName="text-[13px] tracking-[0.115em] text-[#f9d78f]"
         />
 
         {/* La máscara del borde derecho avisa que la fila sigue. La izquierda
@@ -83,17 +85,17 @@ export function TestimonialsSection({
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
-          className="mt-12 flex cursor-grab gap-5 overflow-x-auto px-2.5 pb-3.5 select-none active:cursor-grabbing [mask-image:linear-gradient(to_right,#000_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,#000_92%,transparent_100%)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="mx-auto mt-10 flex max-w-[1000px] cursor-grab gap-5 overflow-x-auto px-2.5 pb-3.5 select-none active:cursor-grabbing [mask-image:linear-gradient(to_right,#000_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,#000_92%,transparent_100%)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {testimonials.map((t) => (
             <figure
               key={t.id}
               className="flex min-h-[14rem] w-[18.75rem] shrink-0 flex-col justify-center rounded-xl border border-white/20 bg-white/[0.08] p-8 text-left"
             >
-              <blockquote className="text-body-md italic leading-relaxed text-primary">
+              <blockquote className="text-[14px] italic leading-relaxed text-primary">
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
-              <figcaption className="mt-3 text-label-sm font-bold text-primary-container">
+              <figcaption className="mt-3 text-[12px] font-bold tracking-normal text-primary-container">
                 {t.author_name}
                 {t.author_location && ` — ${t.author_location}`}
               </figcaption>

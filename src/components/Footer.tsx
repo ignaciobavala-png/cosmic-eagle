@@ -17,7 +17,7 @@ export function Footer() {
             width={914}
             height={267}
             sizes="280px"
-            className="h-10 w-auto object-contain"
+            className="h-12 w-auto object-contain md:h-[60px]"
           />
         </Link>
 

@@ -27,7 +27,7 @@ export default async function NuevaClavePage() {
   return (
     <>
       <Header />
-      <main className="pt-16 lg:pt-21">
+      <main className="pt-18 md:pt-24">
         <AuthScreen
           image={content("cuenta.acceso.image")}
           eyebrow="Nueva contraseña"

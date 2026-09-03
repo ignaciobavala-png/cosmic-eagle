@@ -12,6 +12,7 @@ import { TripCarousel } from "@/components/ui/TripCarousel";
 import { Collapsible } from "@/components/ui/Collapsible";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
+import { ScrollIndicator } from "@/components/ui/ScrollIndicator";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { createPublicClient } from "@/lib/supabase/public";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
@@ -67,7 +68,7 @@ export default async function Home() {
   return (
     <>
       <Header />
-      <main className="pt-16 lg:pt-21">
+      <main className="pt-18 md:pt-24">
         <ImmersiveHero
           image={content("home.hero.image")}
           imageAlt="Figura de partículas mirando hacia el cosmos"
@@ -94,7 +95,7 @@ export default async function Home() {
                 (`.about-statement`) la PRIMERA linea es crema y la segunda
                 dorada en italica. Estaban invertidos y es la correccion del
                 02/09 de Julia. */}
-            <h2 className="font-display text-[clamp(3rem,9vw,7rem)] leading-[1.04] text-primary">
+            <h2 className="font-display text-[clamp(3rem,9vw,5rem)] leading-[1.04] text-primary">
               <RevealItem as="span" className="inline-block" y={40} duration={1.6}>
                 {content("home.frase.left")}
               </RevealItem>
@@ -160,6 +161,12 @@ export default async function Home() {
           text={content("home.atmos.text")}
           veil={0.35}
           overlay={isEnabled(content("home.promesas.overlay"))}
+          height={900}
+          textClassName="text-[22px] md:text-[28px]"
+          scrollIndicator={{
+            label: "Nuestro propósito",
+            target: "#proposito",
+          }}
         />
 
         <Reveal
@@ -167,25 +174,25 @@ export default async function Home() {
           id="proposito"
           amount={0.3}
           stagger={0}
-          className="flex min-h-[100svh] w-full flex-col items-center justify-center bg-[linear-gradient(180deg,#0a1660_0%,#05125a_55%,#030b38_100%)] px-margin-mobile py-24 text-center md:px-margin-desktop"
+          className="relative flex min-h-[100svh] w-full flex-col items-center justify-center bg-[linear-gradient(180deg,#0a1660_0%,#05125a_55%,#030b38_100%)] px-6 pb-[90px] pt-[100px] text-center md:pb-[120px] md:pt-[140px]"
         >
           {/* Umbral 0.3. El titulo y la linea van juntos en 1.6s; la linea
               crece de 0 a 70px en ese mismo tiempo (en la home SI crece, en
               /viajes es estatica). El cuerpo todavia entra como un bloque: el
               efecto real es palabra por palabra, agrupadas por renglon, y esta
               pendiente como paso aparte. */}
-          <div className="mx-auto max-w-2xl">
+          <div className="mx-auto w-full max-w-3xl">
             <RevealItem y={30} duration={1.6}>
-              <h2 className="font-display text-headline-lg font-bold text-primary-container md:text-display-lg">
+              <h2 className="font-display text-[34px] font-bold tracking-[0.5px] text-primary-container md:text-[56px]">
                 Nuestro propósito
               </h2>
             </RevealItem>
             <RevealLine
               duration={1.6}
-              className="mx-auto mt-5 h-0.5 w-[70px] bg-primary-container"
+              className="mx-auto mt-4 h-0.5 w-[70px] bg-primary-container md:mt-5"
             />
             <RevealItem y={30} duration={0.9} delay={0.45}>
-            <p className="mt-12 text-body-lg leading-loose text-[#d0c5b4]">
+            <p className="mx-auto mt-[30px] max-w-[640px] text-[16px] leading-[1.8] tracking-[0.3px] text-[#d0c5b4] md:mt-[50px] md:text-[20px] md:leading-[1.9]">
               Acompañamos procesos de transformación interior y expansión de
               conciencia.{" "}
               <span className="text-primary-container">
@@ -197,12 +204,21 @@ export default async function Home() {
             </p>
             </RevealItem>
             <RevealItem y={30} duration={0.9} delay={0.75}>
-              <CtaLink href="/nosotros" variant="pill" className="mt-14 px-10 py-4">
+              <CtaLink
+                href="/nosotros"
+                variant="pill"
+                className="mt-[50px] px-7 py-3.5 text-[14px] tracking-[0.071em] md:mt-20 md:px-10 md:py-4"
+              >
                 Ir más profundo
                 <span aria-hidden="true">↗</span>
               </CtaLink>
             </RevealItem>
           </div>
+
+          <ScrollIndicator
+            label="Nuestras experiencias"
+            target="#experiencias"
+          />
         </Reveal>
 
         {/* Panel doble: arriba Sesiones (azul) y abajo Viajes (dorado), APILADOS
@@ -225,21 +241,21 @@ export default async function Home() {
           stagger={0}
           className="w-full"
         >
-          <div className="flex w-full items-center bg-[linear-gradient(135deg,#0079b3,#05125a)] px-margin-mobile py-16 text-primary-container md:min-h-[50svh] md:px-14 md:py-20">
-            <div className="max-w-md">
+          <div className="flex w-full items-center bg-[linear-gradient(135deg,#0079b3,#05125a)] px-6 py-[50px] text-primary-container md:min-h-[50svh] md:p-20">
+            <div className="max-w-[460px]">
               <RevealItem duration={0.8}>
-                <h2 className="font-display text-headline-md">
+                <h2 className="mb-3 font-display text-[34px] leading-tight">
                   Sesiones Cósmicas
                 </h2>
               </RevealItem>
-              <RevealLine className="mt-3 mb-5 h-0.5 w-14 bg-primary-container" />
+              <RevealLine className="mb-[18px] h-0.5 w-14 bg-primary-container" />
               <RevealItem duration={0.8} delay={0.15}>
-                <p className="mb-4 text-body-md opacity-85">
+                <p className="mb-[18px] text-[15px] opacity-85">
                   Un espacio para ir más profundo
                 </p>
               </RevealItem>
               <RevealItem duration={0.8} delay={0.3}>
-                <p className="mb-6 text-body-md leading-relaxed opacity-90">
+                <p className="mb-[22px] text-[14px] leading-[1.6] opacity-90">
                   Nuestras sesiones de un día están diseñadas para sostener un
                   trabajo interior profundo y la conexión con la dimensión del
                   alma.
@@ -248,7 +264,7 @@ export default async function Home() {
               <RevealItem duration={0.8} delay={0.45}>
                 <Link
                   href="/viajes#sesiones"
-                  className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,rgba(0,121,179,0.35),rgba(5,18,90,0.35))] px-7 py-3 font-display text-label-sm uppercase tracking-wide text-primary-container transition-[filter,box-shadow] duration-300 hover:brightness-110 hover:shadow-[0_0_20px_rgba(0,121,179,0.55)]"
+                  className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,rgba(0,121,179,0.35),rgba(5,18,90,0.35))] px-7 py-[11px] font-display text-[13px] uppercase tracking-[0.038em] text-primary-container transition-[filter,box-shadow,transform] duration-[250ms] hover:scale-[1.06] hover:brightness-110 hover:shadow-[0_0_20px_rgba(0,121,179,0.55)]"
                 >
                   Explorar próximas sesiones
                   <span aria-hidden="true">→</span>
@@ -257,21 +273,21 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="flex w-full items-center bg-[linear-gradient(to_bottom_right,#6b551f_0%,#b3964b_22%,#f9d78f_50%,#b3964b_78%,#6b551f_100%)] px-margin-mobile py-16 text-[#05125a] md:min-h-[50svh] md:px-14 md:py-20">
-            <div className="max-w-md">
+          <div className="flex w-full items-center bg-[linear-gradient(to_bottom_right,#6b551f_0%,#b3964b_22%,#f9d78f_50%,#b3964b_78%,#6b551f_100%)] px-6 py-[50px] text-[#05125a] md:min-h-[50svh] md:p-20">
+            <div className="max-w-[460px]">
               <RevealItem duration={0.8}>
-                <h2 className="font-display text-headline-md">
+                <h2 className="mb-3 font-display text-[34px] leading-tight">
                   Viajes Cósmicos
                 </h2>
               </RevealItem>
-              <RevealLine className="mt-3 mb-5 h-0.5 w-14 bg-[#05125a]" />
+              <RevealLine className="mb-[18px] h-0.5 w-14 bg-[#05125a]" />
               <RevealItem duration={0.8} delay={0.15}>
-                <p className="mb-4 text-body-md opacity-85">
+                <p className="mb-[18px] text-[15px] opacity-85">
                   Un espacio para ir más profundo
                 </p>
               </RevealItem>
               <RevealItem duration={0.8} delay={0.3}>
-                <p className="mb-6 text-body-md leading-relaxed opacity-90">
+                <p className="mb-[22px] text-[14px] leading-[1.6] opacity-90">
                   Experiencias de una semana en portales sagrados alrededor del
                   mundo, para quienes están listos para un proceso más profundo.
                 </p>
@@ -279,7 +295,7 @@ export default async function Home() {
               <RevealItem duration={0.8} delay={0.45}>
                 <Link
                   href="/viajes#viajes"
-                  className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#05125a] bg-[linear-gradient(135deg,rgba(249,215,143,0.4),rgba(179,150,75,0.2))] px-7 py-3 font-display text-label-sm uppercase tracking-wide text-[#05125a] transition-[filter,box-shadow] duration-300 hover:brightness-110 hover:shadow-[0_0_34px_rgba(249,215,143,0.9)]"
+                  className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#05125a] bg-[linear-gradient(135deg,rgba(249,215,143,0.4),rgba(179,150,75,0.2))] px-7 py-[11px] font-display text-[13px] uppercase tracking-[0.038em] text-[#05125a] transition-[filter,box-shadow,transform] duration-[250ms] hover:scale-[1.1] hover:brightness-110 hover:shadow-[0_0_34px_rgba(249,215,143,0.9)]"
                 >
                   Ir más allá
                   <span aria-hidden="true">→</span>
@@ -309,12 +325,12 @@ export default async function Home() {
           <div className="mx-auto flex max-w-narrative flex-col items-center gap-12 md:flex-row md:gap-16">
             <div className="flex-1">
               <RevealItem duration={0.8}>
-                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                <h2 className="mb-3 font-display text-[32px] font-bold leading-tight text-[#05125a] md:text-[40px]">
                   Tecnología del Alma
                 </h2>
               </RevealItem>
-              <RevealLine className="mt-3 mb-6 h-0.5 w-16 bg-[#f9d78f]" />
-              <div className="space-y-6 text-body-md leading-relaxed text-[#333]">
+              <RevealLine className="mb-6 h-0.5 w-16 bg-[#f9d78f]" />
+              <div className="max-w-[480px] space-y-6 text-[16px] leading-[1.8] text-[#333]">
                 <RevealItem duration={0.8} delay={0.15}>
                   <p>
                     A medida que expandimos nuestra conciencia, emergen nuevas
@@ -337,7 +353,11 @@ export default async function Home() {
                 </RevealItem>
               </div>
               <RevealItem duration={0.8} delay={0.6}>
-                <CtaLink href="/contenidos" variant="pill" className="mt-8 px-7 py-3.5">
+                <CtaLink
+                  href="/contenidos"
+                  variant="pill"
+                  className="mt-10 px-7 py-3.5 text-[14px] tracking-[0.071em]"
+                >
                   Ir más profundo
                   <span aria-hidden="true">↗</span>
                 </CtaLink>
@@ -367,6 +387,8 @@ export default async function Home() {
           text="Un viaje hacia el Humano Luminoso"
           veil={0.3}
           overlay={isEnabled(content("home.cierre.overlay"))}
+          height={600}
+          textClassName="text-[22px] md:text-[32px]"
         />
       </main>
       <Footer />

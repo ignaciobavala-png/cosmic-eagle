@@ -64,7 +64,7 @@ export default async function ViajesPage() {
   return (
     <>
       <Header />
-      <main className="pt-16 lg:pt-21">
+      <main className="pt-18 md:pt-24">
         <PageHero
           image={content("viajes.hero.image")}
           imageAlt="Portal de luz sobre un cielo estrellado"

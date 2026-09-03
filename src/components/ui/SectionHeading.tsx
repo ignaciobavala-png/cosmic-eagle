@@ -13,29 +13,34 @@ export function SectionHeading({
   title,
   label,
   className = "",
+  titleClassName = "text-headline-md md:text-headline-lg",
+  labelClassName = "text-label-sm text-primary-fixed-dim/85",
 }: {
   title: string;
   label?: string;
   className?: string;
+  /** El mockup fija el px por seccion ("Voces de Luz" va en 42). */
+  titleClassName?: string;
+  labelClassName?: string;
 }) {
   return (
     <div className={`text-center ${className}`}>
-      <h2 className="font-display text-headline-md text-primary md:text-headline-lg">
+      <h2 className={`font-display text-primary ${titleClassName}`}>
         {title}
       </h2>
 
       {label && (
-        <div className="mt-4 flex items-center justify-center gap-4">
+        <div className="mt-[14px] flex items-center justify-center gap-5">
           <div
             aria-hidden="true"
-            className="h-px w-12 bg-gradient-to-r from-transparent to-primary-fixed-dim/60 md:w-20"
+            className="h-px w-12 max-w-[120px] flex-1 bg-gradient-to-r from-transparent to-primary-fixed-dim/60 md:w-20"
           />
-          <span className="text-label-sm uppercase text-primary-fixed-dim/85">
+          <span className={`uppercase ${labelClassName}`}>
             {label}
           </span>
           <div
             aria-hidden="true"
-            className="h-px w-12 bg-gradient-to-l from-transparent to-primary-fixed-dim/60 md:w-20"
+            className="h-px w-12 max-w-[120px] flex-1 bg-gradient-to-l from-transparent to-primary-fixed-dim/60 md:w-20"
           />
         </div>
       )}

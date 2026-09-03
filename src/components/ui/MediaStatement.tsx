@@ -1,4 +1,5 @@
 import { BackgroundMedia } from "./BackgroundMedia";
+import { ScrollIndicator } from "./ScrollIndicator";
 import { Reveal } from "./Reveal";
 import { ScrollHintButton } from "./ScrollHintButton";
 
@@ -24,6 +25,9 @@ export function MediaStatement({
   veil = 0.45,
   overlay = true,
   scrollHint,
+  scrollIndicator,
+  height,
+  textClassName,
   width = "narrow",
   amount = 0.4,
   once = true,
@@ -48,6 +52,22 @@ export function MediaStatement({
    * aunque el overlay este apagado, como el hint del hero: es navegacion.
    */
   scrollHint?: { label: string; target: string };
+  /**
+   * El indicador circular con etiqueta debajo (`.scroll-ind-labeled`). En la
+   * home lo llevan Atmosférica ("NUESTRO PROPÓSITO") y Nuestro propósito
+   * ("NUESTRAS EXPERIENCIAS"); es distinto de `scrollHint`, ver
+   * `ScrollIndicator`.
+   */
+  scrollIndicator?: { label: string; target: string };
+  /**
+   * Alto fijo en px. En el mockup dos de estos bloques NO son de pantalla
+   * completa: Atmosférica mide 900px y el Cierre 600px, y el design system lo
+   * marca como "fijos, no responsive de alto". Sin este valor el bloque sigue
+   * siendo `100svh`, que es lo que piden /viajes y /nosotros.
+   */
+  height?: number;
+  /** Tamaño de la frase cuando el mockup fija un px (28px en Atmosférica, 32px en el Cierre). */
+  textClassName?: string;
   width?: "narrow" | "prose";
   /**
    * Los valores por defecto son los de la frase atmosferica de la home (umbral
@@ -62,7 +82,10 @@ export function MediaStatement({
   return (
     <section
       id={id}
-      className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden"
+      className={`relative flex w-full items-center justify-center overflow-hidden ${
+        height ? "" : "min-h-[100svh]"
+      }`}
+      style={height ? { height: `${height}px` } : undefined}
     >
       <BackgroundMedia src={image} alt={imageAlt} />
       {overlay && (
@@ -82,13 +105,23 @@ export function MediaStatement({
             }`}
           >
             {text && (
-              <p className="font-display text-headline-md text-primary md:text-headline-lg text-balance">
+              <p
+                className={`font-display text-primary text-balance ${
+                  textClassName ?? "text-headline-md md:text-headline-lg"
+                }`}
+              >
                 {text}
               </p>
             )}
             {children}
           </Reveal>
         </>
+      )}
+      {scrollIndicator && (
+        <ScrollIndicator
+          label={scrollIndicator.label}
+          target={scrollIndicator.target}
+        />
       )}
       {scrollHint && (
         <ScrollHintButton
