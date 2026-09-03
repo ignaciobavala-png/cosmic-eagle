@@ -1,0 +1,62 @@
+﻿pagina homepage:
+
+
+statemente “un viaje hacia la evolución humana y la sabiduría del alma”
+ajustar tamaño de texto para que solo queden 2 lineas en desktop de modo que
+“un viaje hacia la evolución humana /
+ y la sabiduría del alma”
+
+
+CARRUSEL CARTELERA EXPLORAR EXPERIENCIAS
+cuando el carrusel ya está abierto, si el usuario toca el botón “explorar experiencias” el carrusel debe cerrarse
+carrusel de “explorar experiencias” en homepage debe ir más lento
+
+
+TARJETAS EXPERIENCIAS
+El body de texto de las tarjetas de calendario de experiencias debe tener una ellipsis más corta. Mostrar solo 3 líneas de la descripcion de la experiencia y dejar puntos suspensivos.
+
+
+PANEL DE CONTROL PARA PERSONALIZAR TARJETAS DE EXPERIENCIAS
+* el cuadro de texto “título” en el panel de control debe ser opcional para sesiones y experiencias. por el momento el cliente prefiere no poner título.
+* las sesiones duran un solo dia. actualmente el panel de control ofrece “fecha inicio” y “fecha fin” . en su lugar, el panel de control debe dar la opción de agregar repetición de evento para que el usuario seleccione la fecha deseada. example: mismo evento se da 15, 16 y 17 de septiembre. el admin pone las tres opciones de fecha. el usuario ve las 3 opciones y selecciona el casillero de la fecha a la cual quiere solicitar inscripcion.
+
+
+SECCION TESTIMONIOS
+la sección testimonios sigue sin respetar el diseño enviado.
+a veces aparece una linea negra detrás de la linea amarilla que indica el scroll horizontal. arreglar para que ese fondo siempre sea azul.
+
+
+la seccion testimonios debe ocupar una screen y debe mostrar: titulo, subtitulo, cards, placeholder de imagen en la parte inferior.
+
+
+ver imagen adjuntada de estado_actual_testimonios_homepage
+ver imagen adjuntada de estado_deseado_testimonios_homepage
+
+
+revisar los archivos de diseños compartidos el 2 de septiembre para subir correctamente el diseño de la seccion testimonios
+
+
+seccion testimonios en panel de control:
+limitar los textos de testimonios a 250 caracteres como máximo. esto es importante para que no se rompa el diseño.
+
+
+
+
+revisar diseño compartido porque en la sección testimonios:
+* la seccion testimonios ocupa 1 screen en el diseño enviado. actualmente ocupa mas de un screen.
+* titulo “Voces de luz” bold
+* lineas doradas mas largas
+* tarjetas de testimonios personalizables son rectangulares de modo que son mas anchas que largas.. es un carrusel de 9 tarjetas deslizable por el usuario. extraer medidas del diseño compartido.
+* en la parte inferior de la pantalla hay un placeholder que termina al terminar la screen. no debe extenderse a otra screen.
+* ademas, la imagen no se ve en la version mobile. esto debe corregirse.
+
+
+En mobile, la screen de los testimonios no encaja bien . se ven bordes de las otras screens arriba (dorado) y abajo (crema)
+  
+
+
+
+pagina nosotros:
+corregir botones de ultima screen de la pagina nosotros.
+el boton “explorar experiencias”  debe ser pill con efecto degradé dorado.
+el botón IR MÁS PROFUNDO debe ser pill con efecto liquid glass y un degradé azul en opacity 50%

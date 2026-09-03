@@ -1,0 +1,119 @@
+NOTAS DE IMPLEMENTACIÓN — Fix mobile de "Tecnología Humana y Ciencia del Alma" (Homepage, Cosmic Eagle)
+Para el agente de desarrollo (Claude) que ya portó (o está por portar) homepage.html.
+Escrito por el Claude que diseñó/mockupeó el sitio junto con Julia (la clienta/diseñadora). Este
+archivo es contexto de PROCESO — el detalle técnico de valores exactos está en el archivo adjunto
+"design-system-tecnologia-mobile-fix.md", léanlo junto a este.
+
+ACTUALIZACIÓN — v2 (ronda de corrección, léanla primero si ya tenían la v1 de este paquete)
+La primera entrega de este fix (descrita más abajo, 100% CSS de mobile) fue rechazada por Julia
+("tu entrega no fue correcta") tras comparar contra un mockup de referencia que mandó. Señaló dos
+problemas puntuales, y ambos son cambios de HTML, no del CSS de mobile (ese ya estaba bien):
+1. El título tiene que ser de DOS líneas fijas: "Tecnología Humana y" / "Ciencia del Alma" — antes
+   decía "Tecnología del Alma" en una sola línea. El quiebre se hizo con un `<br>` literal (mismo
+   patrón que `.nos-cierre-title` en nosotros.html) — no es un wrap automático por ancho de caja,
+   es un salto de línea fijo, se vea donde se vea.
+2. El botón "IR MÁS PROFUNDO" tiene que navegar a la página Contenidos — antes era un `<button>`
+   sin ningún href ni acción. Ahora es `<a href="contenidos.html" class="tec-btn">`. Al pasar de
+   `<button>` a `<a>` hubo que agregar `text-decoration:none` a `.tec-btn`, porque los navegadores
+   subrayan los links por defecto y el `<button>` original nunca había tenido ese problema — si se
+   portan estos cambios sin ese detalle, el botón se ve con un subrayado que no es parte del diseño.
+Ver design-system-tecnologia-mobile-fix.md §8 para el antes/después exacto de ambos cambios. Si ya
+habían portado la v1 (el CSS de mobile), alcanza con aplicar estos dos cambios de HTML encima — el
+CSS no cambió en esa ronda.
+
+ACTUALIZACIÓN — v3 (esta entrega, léanla si ya tenían la v2)
+Julia confirmó que el título y el botón de la v2 quedaron bien, pero marcó un problema distinto,
+que en realidad venía arrastrado desde la v1 y nadie lo había cuestionado hasta ahora: la caja de
+texto en mobile (el `max-width:min(256px,60vw)` original, que era spec explícita de Julia en el
+pedido que originó todo este fix) quedaba demasiado angosta frente a su imagen de referencia — su
+frase textual fue que el bloque se veía "achicado hacia el centro", con demasiado aire muerto en
+los márgenes. Esto SÍ es un cambio de CSS de mobile (no de HTML como la v2):
+1. La caja de texto (`.tec-text`) pierde el tope de 256px/60vw y pasa a `max-width:100%` — ocupa
+   todo el ancho disponible dentro del padding ya existente de la sección (24px a cada lado, el
+   mismo que usan todas las demás secciones del sitio en mobile), no un ancho artificialmente
+   angosto y centrado.
+2. Título y cuerpo pasan de tamaños fijos (22px/12px) a `clamp()` responsivos y más grandes:
+   título `clamp(24px,7vw,30px)`, cuerpo `clamp(13px,3.6vw,15px)`.
+3. Espaciados internos (línea decorativa, márgenes entre bloques) aumentados en proporción.
+Estos valores no fueron "a ojo" — se midieron directamente sobre los píxeles de la imagen de
+referencia que mandó Julia (analizando dónde empieza y termina el texto en cada línea) y se
+tradujeron a proporciones responsive. Ver design-system-tecnologia-mobile-fix.md §9 para la tabla
+completa de medidas y el CSS exacto.
+DETALLE IMPORTANTE PARA NO REINTRODUCIR EL PROBLEMA ORIGINAL: agrandar la tipografía normalmente
+agregaría alto a la sección, con riesgo de que vuelva a ocupar más de una pantalla (el problema que
+motivó este fix desde el principio). Acá no pasó, porque al ensanchar la caja de ~60% a 100% del
+ancho, cada párrafo envuelve en MENOS líneas — esa reducción compensa el tamaño de fuente mayor.
+Verificado que la sección sigue entrando en una sola pantalla en los 3 anchos de referencia. Si en
+el futuro se agranda la tipografía todavía más sin ensanchar también la caja, ese equilibrio se
+puede romper — revisar el encaje de una pantalla de nuevo en ese caso, no asumir que se sostiene solo.
+Si ya habían portado la v2, alcanza con aplicar este ajuste de CSS de mobile encima — título y
+botón de la v2 no cambiaron.
+
+QUÉ ES ESTE ARCHIVO Y QUÉ NO ES
+Esto NO es una página nueva ni un componente nuevo. Es un fix puntual sobre una sección que ya
+existe y ya está aprobada dentro de homepage.html: "Tecnología Humana y Ciencia del Alma"
+(`#tecnologia`). Homepage ya se les había entregado como paquete completo (HTML +
+design-system-homepage.md + notas-implementacion-homepage.txt + el logo extraído) — este archivo es
+un complemento a ese paquete, no un reemplazo. La v1 de este fix era 100% CSS (sin tocar el
+markup); la v2 (ver arriba) sí toca el HTML, puntualmente en el título y el botón — el resto de la
+sección y todo el comportamiento de desktop sigue igual salvo por esos dos cambios de copy/link,
+que también se ven en desktop porque es el mismo HTML.
+
+Junto a este .txt reciben:
+- El archivo `tecnologia-del-alma-seccion-corregida.html`: un HTML autocontenido con SOLO esta
+  sección (más el navbar, incluido nada más que para dar contexto visual — no cambió, es el mismo
+  navbar de siempre). Se armó así, en vez de reenviar todo homepage.html, porque Julia pidió
+  explícitamente no reenviar el archivo completo para este ajuste puntual. El resto de homepage.html
+  (Hero, About, Atmosférica, Propósito, Sesiones/Viajes, Testimonios, Cierre, Footer) NO está en
+  este archivo y no se tocó — sigue siendo el mismo que ya tienen del paquete anterior.
+- `design-system-tecnologia-mobile-fix.md`: el detalle técnico de qué CSS cambió, con el
+  before/after exacto.
+
+CONTEXTO DEL PEDIDO
+Julia reportó dos problemas mirando la sección en mobile: (1) ocupaba más de una pantalla de alto
+(scroll largo antes de llegar al botón "IR MÁS PROFUNDO"), y (2) el bloque de texto quedaba muy
+pegado al margen izquierdo, sin aire. Mandó dos capturas (estado actual vs. estado deseado) más una
+spec puntual: título Domine bold #05125A 22px, cuerpo Montserrat #000000 12px alineado a la
+izquierda, con la caja de texto usando 256px de ancho de referencia (tomando el iPhone 16 Pro Max
+como base), aclarando explícitamente que ese ancho debe ser responsive/adaptable, no un valor fijo
+para todos los dispositivos.
+
+QUÉ HAY QUE APLICAR, EN UNA FRASE
+Reemplazar, dentro del `@media (max-width:768px)` de homepage.html (o su equivalente ya portado a
+Tailwind/CSS-in-JS), las reglas `.tecnologia`, `.tec-text`, `.tec-image` que ya tenían por las
+nuevas del .md adjunto, y agregar las 4 reglas nuevas (`.tec-text h2`, `.tec-deco-line`, `.tec-text
+p`, `.tec-text .tec-p3`) que no existían antes como overrides de mobile. Nada de esto toca las
+reglas de desktop de esos mismos selectores — coexisten sin conflicto porque están dentro del media
+query.
+
+EL DETALLE MÁS IMPORTANTE PARA NO PERDER TIEMPO DEBUGUEANDO
+Si en el proceso de portar esto arman el centrado vertical (`justify-content:center`) y no ven
+ningún efecto — el texto se sigue viendo pegado arriba, con todo el espacio de sobra amontonado
+abajo — el motivo casi seguro es que `.tec-text` sigue heredando `flex:1` de la regla de desktop.
+Nos pasó exactamente eso armando este fix: `.tec-text{flex:1}` (que en desktop tiene sentido, ahí
+compite por espacio con `.tec-image`) en mobile termina siendo el ÚNICO hijo flex del contenedor
+(la imagen está en `display:none`), así que `flex:1` lo hace estirarse para llenar TODO el alto
+disponible — y si el ítem ya ocupa todo el alto, no queda ningún espacio libre que `justify-content:
+center` pueda repartir. La solución fue un simple `flex:none` en `.tec-text`, pero SOLO dentro del
+media query de mobile (no tocar el `flex:1` de desktop, que sigue siendo necesario ahí para el
+layout de dos columnas con la imagen). Es un gotcha fácil de pasar por alto si arman el fix desde
+cero en vez de copiar el CSS final tal cual — mejor copiarlo literal que reconstruirlo a mano.
+
+DECISIONES YA CONFIRMADAS CON JULIA
+- El ancho de 256px es una referencia de diseño para el dispositivo más grande de la familia
+  (iPhone 16 Pro Max, 430px de viewport), no un valor fijo — la fórmula `min(256px, 60vw)` lo
+  escala hacia abajo en pantallas más chicas. Si tienen un sistema de breakpoints más granular
+  (ej. Tailwind con `sm`/`md` intermedios dentro del rango mobile), pueden reemplazar el `60vw` por
+  el equivalente que usen, pero el criterio debe ser el mismo: proporcional al ancho de pantalla,
+  con 256px como techo en el dispositivo de referencia.
+- El color del cuerpo en mobile es #000000 puro (negro), distinto del gris `#333` que usa la misma
+  sección en desktop — no es un error, es un cambio de spec explícito solo para mobile.
+- La tipografía (Domine para el título, Montserrat para el cuerpo) no cambió respecto a lo que ya
+  tenían — solo el tamaño y el color del cuerpo.
+
+CÓMO INTERPRETAR ESTE PAQUETE SI SON UN AGENTE DE IA
+Este es un diff acotado sobre un archivo que ya tienen — no hace falta releer todo
+design-system-homepage.md de nuevo, alcanza con aplicar el diff de acá sobre la sección
+`#tecnologia` que ya portaron. Si esa sección todavía no la portaron, el .md adjunto trae todo lo
+necesario para portarla ya con este fix incluido, sin tener que portar primero la versión vieja y
+corregirla después.
