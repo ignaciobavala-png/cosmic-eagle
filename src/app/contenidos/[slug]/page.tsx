@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
+import { ArticleBody } from "@/components/ui/ArticleBody";
 import { createClient } from "@/lib/supabase/server";
 import {
   articleCategoryLabel,
@@ -106,22 +107,10 @@ export default async function ContenidoPage({
             </p>
           )}
 
-          <div className="mt-10 flex flex-col gap-5 border-t border-primary-fixed-dim/12 pt-10">
-            {blocks.map((block, index) =>
-              block.type === "heading" ? (
-                <h2
-                  key={index}
-                  className="mt-4 font-display text-headline-md text-primary-fixed-dim"
-                >
-                  {block.text}
-                </h2>
-              ) : (
-                <p key={index} className="text-body-md text-on-surface leading-relaxed">
-                  {block.text}
-                </p>
-              )
-            )}
+          <div className="mt-10 border-t border-primary-fixed-dim/12 pt-10">
+            <ArticleBody blocks={blocks} />
           </div>
+
         </article>
       </main>
       <Footer />

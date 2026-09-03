@@ -180,7 +180,7 @@ export function ArticleForm({
           <select
             id="category"
             name="category"
-            defaultValue={article?.category ?? "biblioteca"}
+            defaultValue={article?.category ?? "preparacion"}
             className={inputClass}
           >
             {ARTICLE_CATEGORY_LIST.map((category) => (
