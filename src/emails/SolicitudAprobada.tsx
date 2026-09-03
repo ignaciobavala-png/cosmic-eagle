@@ -85,7 +85,7 @@ export function SolicitudAprobada({
         <>
           <Paragraph>
             Para reservar tu cupo falta el pago. Estos son los medios
-            disponibles; elegí el que te sirva y enviános el comprobante desde
+            disponibles; elige el que te sirva y envíanos el comprobante desde
             tu cuenta.
           </Paragraph>
 
@@ -166,7 +166,7 @@ export function SolicitudAprobada({
 
       <Paragraph>
         En tu cuenta vas a encontrar los detalles de la experiencia, y ahí mismo
-        podés subirnos el comprobante del pago.
+        puedes subirnos el comprobante del pago.
       </Paragraph>
 
       <CtaButton href={url}>Ver la experiencia y pagar</CtaButton>
