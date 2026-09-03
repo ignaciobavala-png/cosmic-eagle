@@ -43,12 +43,15 @@ suelta porque no había dominio. Las dos premisas cambiaron:
    exactamente el problema del mailer de Supabase.
 
 El plan quedó al revés de lo que decía este doc: se verifica el dominio, pero
-**un subdominio de envío** (`mail.cosmiceaglejourney.com`), no la raíz. Eso
+**un subdominio de envío** (`envios.cosmiceaglejourney.com`, **no `mail.`**, que
+ya está ocupado por un CNAME al sitio viejo — ver `docs/EMAIL.md`), no la raíz. Eso
 aísla la reputación del envío automático del correo humano de Workspace, y sobre
 todo **no toca el A record ni el MX raíz**: el sitio viejo y las casillas de ellas
 siguen funcionando igual. Se puede hacer hoy, sin esperar la mudanza a Vercel.
 
-**Ojo con el SPF**: si el dominio ya tiene un TXT `v=spf1` de Workspace, no se
+**Ojo con el SPF** (matizado el 03/09: **no aplica** si se manda desde un
+subdominio, porque los subdominios no heredan el SPF del apex): si se mandara
+desde la raíz y el dominio ya tiene un TXT `v=spf1` de Workspace, no se
 agrega un segundo registro — DNS solo respeta uno por dominio. Se fusiona el
 `include:` de Resend en la línea existente.
 

@@ -25,10 +25,25 @@ casilla, o una respuesta se pierde en el vacío.
 
 Para que salga un mail hacen falta tres cosas, en orden:
 
-1. **Verificar `mail.cosmiceaglejourney.com` en Resend** (registros DNS en el
+1. **Verificar un subdominio de envío en Resend** (registros DNS en el
    Cloudflare del dominio). Es el bloqueante: Resend no entrega a terceros sin
    dominio verificado. Un subdominio y no la raíz, para no tocar el MX de
-   Workspace ni el A record del sitio viejo. Ojo de fusionar el SPF si ya existe.
+   Workspace ni el A record del sitio viejo.
+
+   **NO puede ser `mail.`** (corregido el 03/09, mirando la zona de verdad):
+   `mail.cosmiceaglejourney.com` ya existe como **CNAME al sitio viejo** —
+   probablemente el webmail del hosting anterior— y un CNAME **no convive** con
+   los TXT y MX que Resend necesita en el mismo nombre. Va `envios.` o
+   `notificaciones.`, que están libres, y así no se toca nada del sitio viejo.
+
+   **El SPF no hay que fusionarlo.** El apex tiene
+   `v=spf1 include:_spf.google.com ~all`, pero **los subdominios no heredan el
+   SPF del apex**: el del subdominio de envío es independiente. La advertencia de
+   fusionar aplica sólo si algún día se manda desde la raíz.
+
+   **No hay DMARC** (`_dmarc` no existe). Conviene tenerlo, pero **no se toca
+   ahora**: un DMARC estricto puesto de apuro afecta también al correo humano de
+   ellas por Workspace.
 2. Cargar las variables de entorno (abajo) en `.env.local` y en Vercel.
 3. ~~Cablear el envío al flujo que corresponda~~ **HECHO**: aprobar una solicitud
    manda `SolicitudAprobada` (18/08), y desde el 29/08 están también el acuse de
@@ -42,7 +57,7 @@ Para que salga un mail hacen falta tres cosas, en orden:
 | Variable | Ejemplo | Si falta |
 |---|---|---|
 | `RESEND_API_KEY` | `re_...` | No se manda nada (se loguea) |
-| `RESEND_FROM` | `Cosmic Eagle <hola@mail.cosmiceaglejourney.com>` | Cae al sandbox `onboarding@resend.dev`, que solo entrega a la casilla dueña de la cuenta |
+| `RESEND_FROM` | `Cosmic Eagle <hola@envios.cosmiceaglejourney.com>` | Cae al sandbox `onboarding@resend.dev`, que solo entrega a la casilla dueña de la cuenta |
 | `RESEND_REPLY_TO` | `contacto@cosmiceaglejourney.com` | Usa esa misma dirección por defecto |
 | `NEXT_PUBLIC_SITE_URL` | `https://cosmic-eagle.vercel.app` | Usa la URL de Vercel |
 | `SUPABASE_SERVICE_ROLE_KEY` | `eyJ...` | El cron de correos programados no corre (devuelve `ok: false`) |
@@ -163,3 +178,40 @@ curl -H "Authorization: Bearer lo-que-sea" localhost:3000/api/cron/emails
 todavía no está configurado. **Ese número es la medida de lo que va a salir el
 día que se verifique el dominio**, y no deja rastro en la base: los envíos siguen
 pendientes.
+
+## De quién es cada cuenta (definido el 03/09)
+
+Hasta hoy **todo el proyecto vivía en cuentas de Ignacio**, incluida la base de
+datos. Se reparte así:
+
+| Servicio | Dueño | Estado |
+|---|---|---|
+| Dominio + Cloudflare | ellas | ya lo tienen; Sofía confirmó que tiene acceso |
+| Google Workspace (correo humano) | ellas | ya |
+| Supabase | **pasa a Sofía** | pendiente de transferir |
+| Resend | **se crea con una casilla de ellas** | pendiente |
+| Vercel | Ignacio (plan Pro) | se queda así, a propósito |
+
+El criterio: **ellas son dueñas del dominio, de los datos y del correo; el deploy
+queda del lado de quien da el servicio técnico.** Nada de eso es una jaula — un
+proyecto de Vercel se puede transferir— pero mientras haya mantenimiento, el
+deploy vive donde está el que mantiene.
+
+**Dos consecuencias prácticas del reparto:**
+
+1. **El sandbox de Resend entrega SÓLO a la casilla dueña de la cuenta.** Si la
+   cuenta se crea con el mail de ellas, se pierde la prueba barata contra el
+   Gmail de Ignacio. Se arregla pidiendo que esa casilla sea un alias que
+   reenvíe, o que lo agreguen como miembro del equipo en Resend (verificar si el
+   plan free lo permite).
+2. **Al transferir el proyecto de Supabase hay que quedar como miembro con
+   permisos.** Sin eso se pierden el SQL, las migraciones y el MCP, que es con lo
+   que se trabaja todos los días. El `project ref`, la URL y las llaves **no
+   cambian** en una transferencia entre organizaciones: no hay que tocar las env
+   vars de Vercel. Lo que **nunca** se hace es crear un proyecto nuevo y migrar a
+   mano: ahí se pierden los datos y el historial de migraciones.
+
+**Falta confirmar que `contacto@cosmiceaglejourney.com` existe**: es el
+`reply_to` por defecto de todos los correos (`src/lib/email/resend.ts`). Si esa
+casilla no existe, cada respuesta a un correo automático se pierde y nadie se
+entera — Resend no tiene bandeja de entrada.

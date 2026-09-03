@@ -1617,3 +1617,45 @@ advisors sin novedades.
 **Ojo al verificar a mano en `next dev`**: la primera respuesta de una ruta queda
 cacheada y un cambio en `site_content` no se ve hasta agregarle una query string
 distinta a la URL. Costó veinte minutos creer que el slot no funcionaba.
+
+### Sesión del 2026-09-03 (ter) — de quién es cada cuenta, y el DNS mirado de verdad
+
+Hasta hoy **todo el proyecto vivía en cuentas de Ignacio**, base de datos
+incluida (Supabase con `ethoslogliberty+cosmiceagle@gmail.com`, Vercel en la org
+`ethoslogs-projects`). Se repartió así (decisión de Ignacio):
+
+| Servicio | Dueño |
+|---|---|
+| Dominio + Cloudflare | ellas — Sofía confirmó que tiene acceso |
+| Google Workspace | ellas |
+| Supabase | **pasa a Sofía** (pendiente) |
+| Resend | **se crea con una casilla de ellas** (pendiente) |
+| Vercel Pro | Ignacio, a propósito: es el vínculo del servicio técnico |
+
+Detalle y las dos consecuencias prácticas en `docs/EMAIL.md` §"De quién es cada
+cuenta". La que hay que no olvidarse: **al transferir el proyecto de Supabase,
+quedar como miembro con permisos** o se pierden el SQL, las migraciones y el MCP.
+El `project ref`, la URL y las llaves **no cambian** en una transferencia entre
+organizaciones, así que las env vars de Vercel quedan como están. Crear un
+proyecto nuevo y migrar a mano **no** es una opción: se pierden datos e historial.
+
+**El DNS mirado de verdad, y dos cosas que el repo tenía mal:**
+
+- **El subdominio de envío NO puede ser `mail.`**: `mail.cosmiceaglejourney.com`
+  ya existe como **CNAME al sitio viejo** (el webmail del hosting anterior,
+  probablemente) y un CNAME **no convive** con los TXT y MX que pide Resend en el
+  mismo nombre. Va `envios.` o `notificaciones.`, que están libres. Corregido en
+  `docs/EMAIL.md` y `docs/AUTH_EMAIL.md`, que decían `mail.` en varios lados.
+- **El SPF no hay que fusionarlo.** El apex tiene
+  `v=spf1 include:_spf.google.com ~all`, pero **los subdominios no heredan el SPF
+  del apex**. La advertencia de fusionar aplicaba sólo a mandar desde la raíz.
+- **No hay DMARC** (`_dmarc` no existe). Conviene, pero no se toca de apuro:
+  afecta también al correo humano de ellas.
+- Confirmado lo que ya estaba escrito: MX de Google, A al `5.181.161.73` del
+  sitio viejo, NS de Cloudflare, DKIM de Google presente, y **sin comodín** en la
+  zona (un subdominio inventado no resuelve).
+
+**Pendiente de confirmarle a Sofía**: que exista
+`contacto@cosmiceaglejourney.com`. Es el `reply_to` por defecto de todos los
+correos y Resend no tiene bandeja de entrada — si no existe, cada respuesta a un
+correo automático se pierde sin que nadie se entere.
