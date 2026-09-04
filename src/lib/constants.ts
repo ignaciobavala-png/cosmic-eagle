@@ -145,11 +145,11 @@ export const FOOTER_COLUMNS = [
   {
     title: "Legal",
     links: [
-      // Privacidad no tiene ruta NI texto a mano: el anexo de Sofia que lo traia
-      // (`web-cosmic-journey-ES.md`) se perdio y nunca se copio al repo. Hay que
-      // pedirlo de nuevo — ver docs/FAQS.md.
-      { label: "Privacidad", href: null },
-      { label: "Términos de Servicio", href: null },
+      // Las dos existen desde el 04/09 y las edita la clienta desde
+      // /admin/legales. Salieron con un texto preliminar nuestro, no con el
+      // anexo de Sofia, que se perdio con `web-cosmic-journey-ES.md`.
+      { label: "Privacidad", href: "/privacidad" },
+      { label: "Términos de Servicio", href: "/terminos" },
       { label: "Contacto", href: "mailto:contacto@cosmiceaglejourney.com" },
       { label: "Soporte", href: null },
     ],

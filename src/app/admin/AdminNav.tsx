@@ -24,6 +24,7 @@ const LINKS = [
   { href: "/admin/contenidos", label: "Contenidos" },
   { href: "/admin/testimonios", label: "Testimonios" },
   { href: "/admin/faqs", label: "Preguntas frecuentes" },
+  { href: "/admin/legales", label: "Privacidad y Términos" },
   { href: "/admin/crm", label: "CRM" },
   { href: "/admin/suscriptores", label: "Suscriptores" },
 ];
