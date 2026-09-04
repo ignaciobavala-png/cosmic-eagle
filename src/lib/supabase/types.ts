@@ -268,6 +268,7 @@ export type Database = {
         Row: {
           answer: string
           created_at: string
+          group_label: string | null
           id: string
           is_published: boolean
           placement: Database["public"]["Enums"]["faq_placement"]
@@ -279,6 +280,7 @@ export type Database = {
         Insert: {
           answer: string
           created_at?: string
+          group_label?: string | null
           id?: string
           is_published?: boolean
           placement: Database["public"]["Enums"]["faq_placement"]
@@ -290,6 +292,7 @@ export type Database = {
         Update: {
           answer?: string
           created_at?: string
+          group_label?: string | null
           id?: string
           is_published?: boolean
           placement?: Database["public"]["Enums"]["faq_placement"]

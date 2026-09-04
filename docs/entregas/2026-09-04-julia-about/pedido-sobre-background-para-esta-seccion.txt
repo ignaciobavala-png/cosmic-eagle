@@ -1,0 +1,7 @@
+﻿El background de la scree about-scroll-story debe ser un placeholder de imagen que se mantiene fijo (no se anima). Colocar placeholder de imagen del tamaño de la seccion (full screen)
+esta imagen la carga Julia luego desde el panel de control
+
+
+
+
+aclaracion: el background de la seccion anterior statement con la frase “Un viaje hacia la evolución humana y la sabiduría del alma.” debe quedar IGUAL. su animación también. esa screen NO SE TOCA.

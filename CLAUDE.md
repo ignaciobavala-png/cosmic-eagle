@@ -1845,3 +1845,146 @@ corre.
 **Sin verificar end-to-end** (requiere sesión de admin): cargar una experiencia
 sin título y ver el nombre derivado, y cargar un testimonio de más de 250
 caracteres para ver el aviso.
+
+### Sesión del 2026-09-04 — el recorrido para mostrar, las páginas legales y las FAQs que volvieron
+
+Sofía pidió ver el flujo de usuario completo en una videollamada y el dominio
+todavía no se puede migrar (`cosmiceaglejourney.com` sigue sirviendo el sitio
+viejo). Todo lo de abajo está **mergeado a `main` y en producción**.
+
+#### 1. El recorrido del sitio en capturas, y el visor
+
+Ya existía `e2e/capturas.escritura.spec.ts` (el embudo, 19 pantallas). Faltaba
+la mitad de adelante. Entró `e2e/capturas-sitio.lectura.spec.ts`: home, Nosotros,
+Experiencias, Contenidos y FAQs, **22 pantallas**. Salida en
+`~/Escritorio/things/cosmic-eagle-material/capturas-flujo-inscripcion/`, fuera del repo.
+
+**Son dos recorridos con criterios opuestos y conviven a propósito.** El embudo
+va con `reducedMotion: "reduce"` porque ahí importa el contenido del formulario.
+El del sitio va con las animaciones **encendidas** y `"no-preference"` EXPLÍCITO
+—Chrome headless trae `reduce` por defecto y sirve la versión aplanada—, la
+captura se toma después de scrollear de verdad en pasos chicos, y es del
+**viewport y no `fullPage`**, que reencuadra el documento y desarma los bloques
+`sticky` que son justo lo que se quiere mostrar. `irA(sel, fraccion)` fotografía
+un bloque de 400vh en varios momentos del efecto.
+
+- **La cartelera es una marquesina infinita y nunca se estabiliza**: la
+  comprobación de actionability de Playwright espera hasta el timeout, en
+  `click()` y también en `hover()`, y `force: true` clickea en coordenadas
+  viejas. Va `mouse.move` (dispara el hover que frena la pista) + `mouse.click`
+  sobre el `boundingBox` releído.
+- **Lleva dos juegos de tarjetas** para el loop, así que el primer `<a>` del DOM
+  es la copia recortada contra el borde: hay que elegir la primera que entre
+  entera en pantalla.
+
+`e2e/armar-indice.mjs` pasó de página larga a **visor de a una pantalla por vez**
+(flechas, contador, índice por capítulos, hash por paso). Cuatro trampas de CSS
+que costaron rato: contar las filas del grid (cuatro hijos con `auto 1fr auto`
+deja el lienzo en una fila implícita y la imagen desborda sobre el pie),
+`max-height:100%` contra un padre de alto automático se ignora (el wrapper va
+`height:100%`), `#indice button` se llevaba puesto el botón de cerrar, y el velo
+tiene que ser opaco de verdad.
+
+**La portada del visor adelanta lo que todavía no está** y avisa que el paso
+«Cómo pagar» muestra los datos bancarios reales cargados en el panel.
+
+Guardado en el skill `playwright-e2e-delivery` de brain-data.
+
+#### 2. `/privacidad` y `/terminos` — ver `20260904140000_legal_documents.sql`
+
+Los dos eran links **apagados** en el footer. Y Privacidad no era sólo un hueco
+de navegación: el embudo pide datos de salud y no había página que dijera qué se
+hace con ellos.
+
+- **Sigue el patrón de `site_content`, NO el de `faqs`.** Ahí la cantidad la
+  decide la clienta; acá la decide el código: hay dos documentos porque hay dos
+  rutas. El `slug` es la PK, las filas las siembra la migración, y
+  `authenticated` **no tiene insert ni delete ni siendo admin** — nadie borra
+  /privacidad desde el panel y deja el footer en 404.
+- **No hay borrador ni despublicado**: un aviso de privacidad escondido deja al
+  sitio pidiendo datos de salud sin decir qué hace con ellos. Lo que se marca es
+  `is_provisional`, que pinta un aviso en la página pública mientras el texto no
+  pasó por revisión legal. Sale en `true`.
+- **Se siembran CON texto**, al revés de `faqs` y `payment_methods`: ahí el
+  contenido era un dato que sólo tiene la clienta, acá es la descripción de algo
+  que ya sabemos. Todo lo técnico que afirma es cierto del sitio de hoy
+  (permisos por fila, bucket privado con URLs firmadas a 10 min, las respuestas
+  de salud fuera de `my_applications`) — **si eso cambia, el texto cambia**.
+- Reusa `ArticleBody` y `parseArticleBody` tal cual. **No lleva `PageHero`**: el
+  resto del sitio abre con imagen a pantalla completa y acá eso obligaría a
+  scrollear una pantalla para buscar un dato puntual. El `Reveal` observa sólo el
+  encabezado, por lo mismo que `/faqs`.
+- Panel en `/admin/legales`, sin botón de nuevo ni de borrar.
+- **Falta completar cuatro corchetes**: `[casilla de contacto]`,
+  `[nombre legal de la organización]`, `[ciudad y país]` y `[país]`. El último
+  define qué ley aplica (Ley 19.628 chilena vs. RGPD, que trata la salud como
+  categoría especial).
+
+Hay un borrador previo en `~/Escritorio/privacidad-datos-de-salud.txt`, ya
+superado por la página.
+
+#### 3. Las FAQs volvieron, y traen un tercer nivel
+
+Sofía mandó el texto que se había perdido con `web-cosmic-journey-ES.md`, más una
+foto del diseño aprobado. Todo en `docs/entregas/2026-09-04-sofia-faqs/`.
+
+**Cargadas las 29** (13 de Sesiones, 16 de Viajes). Cinco ya estaban cargadas a
+mano desde el panel: se respetaron y sólo se les completó el grupo.
+
+- Migración `20260904150000_faq_group_label.sql`: `faqs.group_label`, **texto
+  libre y no enum** —los grupos no coinciden entre los dos juegos, son un título
+  de sección y no una taxonomía—. Nulo = pregunta suelta.
+- **Ojo**: una columna nueva en `faqs` necesita entrar en los **grants por
+  columna** o el panel no la puede escribir.
+
+**Pendiente, y es lo que falta para que se vea como la foto**: `FaqList` no
+dibuja el chip de grupo, así que hoy salen 29 preguntas en lista plana. Y **el
+verde del chip no existe en la paleta** (todo el sistema de Julia es azul, oro y
+crema) — está aprobado por Sofía, pero conviene que Julia lo sepa.
+
+**Sin decidir**: si las FAQs van sólo en `/faqs` (que es para lo que se diseñó el
+schema y ya funciona), si además se muestran dentro de `#sesiones` y `#viajes` de
+`/viajes`, o si van a rutas propias.
+
+#### 4. Corrección de Julia sobre About — SIN IMPLEMENTAR
+
+Entrega en `docs/entregas/2026-09-04-julia-about/`. Es la segunda pantalla de
+`#about` (el párrafo que se destila). Tres cambios:
+
+1. **El fondo pasa de degradé a imagen fija a pantalla completa, sin velo.** Es
+   un slot nuevo de `site_content` + `BackgroundMedia`. El "sin velo" es decisión
+   de diseño explícita; la legibilidad sobre el asset real hay que conversarla.
+2. **`KEYWORD_START_OFFSETS` (hardcodeado, `ScrollStory.tsx:55`) se tiene que ir.**
+   Las posiciones se miden con `getBoundingClientRect()` y **se re-miden en cada
+   frame** hasta que arranca la Fase 3: el contenedor es `sticky` y una medición
+   única al montar da coordenadas de cuando la sección estaba debajo del
+   viewport. El síntoma es que todas las frases parecen salir del mismo lugar.
+   Es primo del bug de `useScroll`/`ViewTimeline` del 28/08.
+3. **La lista final lleva degradé de tres colores por línea**
+   (`#F9D78F → #B3964B → #F9D78F` con `background-clip:text`). Las palabras
+   resaltadas *dentro del párrafo* siguen sólidas — dos reglas distintas que ella
+   pide no fusionar.
+
+La pantalla anterior (la frase "Un viaje hacia la evolución humana…") **no se
+toca**.
+
+#### 5. Auditoría de RLS
+
+Chequeada contra producción: RLS activa en las 15 tablas y **una sola policy de
+escritura alcanza a `anon`** en todo el esquema, la del newsletter, que es a
+propósito. Los grants amplios de `anon` son los defaults de Supabase y quedan
+inertes sin policy. `my_applications` sigue `security definer` con **sólo grant
+de SELECT**, así que no se puede escribir puenteando la RLS.
+
+**Accionable**: la protección de contraseñas filtradas está apagada en el
+dashboard de Supabase. Es un toggle y acá la gente se crea cuenta con contraseña.
+
+#### 6. Resend, de quién es la cuenta
+
+Confirmado el criterio del 03/09: la crea **una casilla de ellas**, del dominio y
+compartida, no la personal de nadie. Hay que pedir tres cosas distintas que se
+confunden: la casilla dueña de la cuenta, **el acceso a Cloudflare** (camino
+crítico, y la misma llave para mudar el sitio después) y que confirmen que
+`contacto@cosmiceaglejourney.com` existe, porque es el `reply_to` de todo y
+Resend no tiene bandeja de entrada. Recordatorio: el subdominio de envío **no
+puede ser `mail.`**, ya existe como CNAME al sitio viejo.

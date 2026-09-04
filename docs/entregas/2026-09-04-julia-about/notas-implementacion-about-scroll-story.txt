@@ -1,0 +1,77 @@
+NOTAS DE IMPLEMENTACIÓN — "About" / segunda screen (párrafo animado), Homepage (Cosmic Eagle)
+Para el agente de desarrollo (Claude) que porte esta sección de homepage.html.
+Escrito por el Claude que diseñó/mockupeó el sitio junto con Julia (la clienta/diseñadora). Este
+archivo es contexto de PROCESO — el detalle técnico de valores exactos está en el archivo adjunto
+"design-system-about-scroll-story-final.md", léanlo junto a este.
+
+QUÉ ES ESTE ARCHIVO Y QUÉ NO ES
+Esta es la documentación FINAL de esta screen — reemplaza cualquier versión anterior que hayan
+recibido de estos mismos archivos. No es un diff ni un historial de rondas de corrección: describe
+únicamente cómo funciona y se ve la sección HOY, tal como se reproduce en el archivo
+`about-scroll-story-seccion-corregida-v2.html`, ya aprobado por Julia como versión definitiva
+("quedó perfecto"). Si tienen una implementación previa de esta sección que no coincide con lo
+descripto acá, lo que está en este documento es lo que vale.
+
+QUÉ HAY EN ESTA ENTREGA
+- `about-scroll-story-seccion-corregida-v2.html`: HTML autocontenido con la sección About completa
+  (las dos screens, `.cartelera-wrap` y el indicador de scroll — el botón "Explorar experiencias"
+  los necesita para funcionar), más el navbar, incluido solo para dar contexto visual. Es la
+  versión a portar.
+- `design-system-about-scroll-story-final.md`: spec técnica completa de esta screen — estructura,
+  CSS de cada bloque, HTML del párrafo y la lista final, y la lógica del motor de animación por
+  scroll, con el código JS relevante.
+
+ALCANCE
+Esta documentación cubre únicamente la SEGUNDA screen de la sección `#about` — `.scroll-story` (el
+párrafo animado + lista de palabras + botón). No cubre el resto de homepage.html (Hero,
+Atmosférica, Propósito, Sesiones/Viajes, Tecnología, Testimonios, Cierre, Footer, ni la primera
+screen de About) — esas partes se documentan por separado si corresponde.
+
+EL PUNTO MÁS IMPORTANTE PARA NO PERDER TIEMPO DEBUGUEANDO
+La posición de origen de cada frase resaltada (usada para el efecto de "despegue" hacia la lista
+final) se mide en vivo con `getBoundingClientRect()` sobre los spans `.keyword` del párrafo — NO es
+un valor hardcodeado. Esto funciona correctamente porque la medición se repite en tres momentos:
+al cargar la página, en cada resize, y en cada frame de scroll mientras el progreso todavía no
+llegó al punto donde ese valor se usa (antes de que arranque la Fase 3 de la animación).
+
+Ese tercer punto es el más fácil de perder si se reimplementa esta lógica desde cero: el contenedor
+de esta screen usa `position:sticky`, y un elemento sticky solo tiene su posición "pegada" final
+una vez que el scroll efectivamente llegó a activarlo. Si la medición se hace una sola vez al
+montar/cargar el componente (antes de que el usuario haya scrolleado hasta esta sección), el
+elemento todavía está en su posición natural muy por debajo del viewport, y la medición da
+coordenadas sin relación con dónde se ve la frase en pantalla — el síntoma visible es que todas las
+frases parecen "salir del mismo lugar genérico" en vez de cada una desde su posición real dentro
+del párrafo. Ver design-system-about-scroll-story-final.md §5 para el código completo de la
+solución (re-medir en cada frame de scroll mientras el valor todavía no se usa).
+
+SI SE PORTA A REACT/FRAMER MOTION EN VEZ DE MANTENER ESTE JS TAL CUAL: el principio a preservar no
+es el código literal sino la regla general — cualquier medición de posición real de un elemento
+(`getBoundingClientRect`, un ref con `useLayoutEffect`, `scroll-timeline` nativo, etc.) que dependa
+de que un ancestro `sticky`/`fixed` ya esté en su posición final de scroll, tiene que ejecutarse (o
+re-ejecutarse) en un momento donde eso ya sea cierto — nunca en el montaje inicial del componente,
+si ese componente vive lejos del tope de la página. La solución es medir de forma perezosa/continua
+durante el scroll, no una sola vez al montar.
+
+OTRO PUNTO A NO CONFUNDIR
+Las frases resaltadas dentro del párrafo (`.keyword`) y los `<span>` de la lista final
+(`.story-keywords span`) comparten la misma tipografía (Domine bold) y son fáciles de confundir por
+eso, pero son dos reglas CSS distintas con tratamientos de color diferentes: `.keyword` usa color
+sólido `#F9D78F`; `.story-keywords span` usa el degradé horizontal de 3 colores. No son
+intercambiables.
+
+CÓMO INTERPRETAR ESTE PAQUETE SI SON UN AGENTE DE IA
+Este documento describe el estado final de la sección, no un cambio incremental — se puede portar
+directamente desde acá sin necesidad de reconstruir una versión anterior primero. Si ya tienen una
+implementación de esta screen que difiere de lo descripto en el .md adjunto, corregirla para que
+coincida con esta spec (que es la aprobada), no al revés.
+
+VERIFICACIÓN REALIZADA (útil para revalidar después de portar a React/Tailwind, sobre todo la
+lógica de medición de posición, que puede comportarse distinto según cómo se implemente el
+scroll-tracking en ese stack)
+Verificado con Playwright en 1512×858 (desktop) y 390×844 (mobile), sobre el archivo
+`about-scroll-story-seccion-corregida-v2.html`: sin errores de consola; primera oración del párrafo
+legible desde que se entra a la screen, sin superposición con el placeholder de fondo; reveal de
+párrafos y fade-out de segmentos funcionando correctamente; degradé de 3 colores presente en la
+lista final (confirmado con muestreo de píxeles); cada frase de la lista despegándose visiblemente
+desde su posición real dentro del párrafo, tanto en desktop como en mobile; botón "Explorar
+experiencias" probado con click real, abre la cartelera sin errores.
