@@ -92,6 +92,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           phone: string | null
           previous_ceremonies: number
+          residence_country: string
           reviewed_at: string | null
           reviewed_by: string | null
           serious_illness: boolean
@@ -117,6 +118,7 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           phone?: string | null
           previous_ceremonies?: number
+          residence_country: string
           reviewed_at?: string | null
           reviewed_by?: string | null
           serious_illness: boolean
@@ -142,6 +144,7 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           phone?: string | null
           previous_ceremonies?: number
+          residence_country?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
           serious_illness?: boolean

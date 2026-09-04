@@ -25,6 +25,7 @@ import {
  */
 
 const CLAVE = "e2e-Prueba-2026!";
+const DETALLE_DE_PRUEBA = "E2E: primera vez, sin experiencia previa.";
 
 // Un PNG de 1x1 en memoria: el comprobante sólo tiene que ser un archivo válido
 // de un tipo aceptado, no una imagen de verdad.
@@ -72,6 +73,19 @@ async function registrarse(page: Page, email: string, next: string) {
 // entra en el minuto por defecto de Playwright.
 test.setTimeout(180_000);
 
+
+/**
+ * Responde que NO en todas las preguntas de sí/no del formulario que esté en
+ * pantalla. Desde la corrección del 04/09/2026 son dos opciones obligatorias y
+ * no una casilla tildable: dejarlas en blanco ya no envía.
+ */
+async function responderQueNo(page: Page) {
+  const opciones = page.locator('input[type="radio"][value="no"]');
+  for (let i = 0; i < (await opciones.count()); i++) {
+    await opciones.nth(i).check();
+  }
+}
+
 test("el embudo completo: del registro al formulario de salud", async ({ page, browser }) => {
   const viaje = await viajeDePrueba();
   const email = emailDePrueba();
@@ -104,8 +118,10 @@ test("el embudo completo: del registro al formulario de salud", async ({ page, b
     // ─── 2. Filtro corto ─────────────────────────────────────────────────────
     await page.locator('input[name="full_name"]').fill(NOMBRE_DE_PRUEBA);
     await page.locator('input[name="previous_ceremonies"]').fill("0");
-    // Las tres preguntas de salud quedan sin tildar: el detalle sólo es
-    // obligatorio cuando la respuesta es sí.
+    await page.locator('input[name="residence_country"]').fill("Argentina");
+    await responderQueNo(page);
+    // Se responde que no a las tres: el detalle sólo es obligatorio cuando la
+    // respuesta es sí.
     await page.getByRole("button", { name: /Enviar/i }).click();
 
     await expect(page.getByText("Tu solicitud está en revisión")).toBeVisible({ timeout: 20_000 });
@@ -179,16 +195,26 @@ test("el embudo completo: del registro al formulario de salud", async ({ page, b
     await page.locator('input[name="weight"]').fill("65kg");
     await page.locator('input[name="country"]').fill("Argentina");
     await page.locator('input[name="occupation"]').fill("Prueba automatizada");
+    await responderQueNo(page);
+    // "Primera vez con plantas" guarda su detalle en `plants_detail`, no en
+    // `first_time_plants_detail`: se responde que sí acá para que la asserción
+    // de abajo detecte si el nombre se vuelve a desalinear.
+    await page
+      .locator('input[type="radio"][name="first_time_plants"][value="si"]')
+      .check();
+    await page.locator('textarea[name="plants_detail"]').fill(DETALLE_DE_PRUEBA);
     await page.getByRole("button", { name: /Enviar/i }).click();
 
     await page.waitForURL(`**${ruta}`, { timeout: 30_000 });
     await expect(page.getByText("Estás dentro de este viaje")).toBeVisible();
 
-    const { count } = await adminClient()
+    const { data: salud } = await adminClient()
       .from("health_form_first_time")
-      .select("id", { count: "exact", head: true })
-      .eq("application_id", solicitud!.id);
-    expect(count).toBe(1);
+      .select("id, first_time_plants, plants_detail")
+      .eq("application_id", solicitud!.id)
+      .single();
+    expect(salud?.first_time_plants).toBe(true);
+    expect(salud?.plants_detail).toBe(DETALLE_DE_PRUEBA);
 
     await admin.context.close();
   } finally {

@@ -1,44 +1,13 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
+import {
+  NumberInput,
+  YesNoQuestion,
+  inputClass,
+  labelClass,
+} from "@/components/forms/fields";
 import { submitHealthForm, type HealthFormState } from "./actions";
-
-const inputClass =
-  "bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors";
-const labelClass = "text-sm text-on-surface-variant tracking-[0.02em]";
-
-function BoolQuestion({
-  name,
-  label,
-  detailPlaceholder = "Contanos más...",
-}: {
-  name: string;
-  label: string;
-  detailPlaceholder?: string;
-}) {
-  const [checked, setChecked] = useState(false);
-  return (
-    <div className="flex flex-col gap-2 py-4 border-b border-outline-variant/40 last:border-0">
-      <label className="flex items-center gap-3 text-on-surface cursor-pointer">
-        <input
-          type="checkbox"
-          name={name}
-          onChange={(e) => setChecked(e.target.checked)}
-          className="w-4 h-4 accent-primary-fixed-dim"
-        />
-        {label}
-      </label>
-      {checked && (
-        <textarea
-          name={`${name}_detail`}
-          placeholder={detailPlaceholder}
-          rows={2}
-          className={inputClass}
-        />
-      )}
-    </div>
-  );
-}
 
 export function HealthForm({
   tripId,
@@ -64,7 +33,7 @@ export function HealthForm({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
         <div className="flex flex-col gap-1.5">
           <label className={labelClass}>Edad</label>
-          <input name="age" type="number" min={18} required className={inputClass} />
+          <NumberInput name="age" required />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className={labelClass}>Altura</label>
@@ -75,7 +44,7 @@ export function HealthForm({
           <input name="weight" type="text" placeholder="65kg" required className={inputClass} />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>País</label>
+          <label className={labelClass}>País de origen</label>
           <input name="country" type="text" required className={inputClass} />
         </div>
         <div className="flex flex-col gap-1.5">
@@ -92,39 +61,41 @@ export function HealthForm({
         contención. Sirve para preparar la ceremonia y acompañarte mejor.
       </p>
 
-      <BoolQuestion
+      <YesNoQuestion
         name="health_condition"
         label="¿Tienes alguna condición de salud física o mental?"
       />
-      <BoolQuestion
+      <YesNoQuestion
         name="trauma"
         label="¿Atravesaste algún evento traumático relevante?"
       />
-      <BoolQuestion
+      <YesNoQuestion
         name="substance_use"
         label="¿Consumís medicación, alcohol u otras sustancias regularmente?"
       />
-      <BoolQuestion
+      <YesNoQuestion
         name="stress_anxiety"
         label="¿Sufrís de estrés o ansiedad con frecuencia?"
       />
-      <BoolQuestion
+      <YesNoQuestion
         name="allergies"
         label="¿Tienes alergias alimentarias o a medicamentos?"
       />
-      <BoolQuestion
+      <YesNoQuestion
         name="spiritual_practice"
         label="¿Tienes una práctica espiritual o de meditación activa?"
       />
-      <BoolQuestion
+      <YesNoQuestion
         name="first_time_plants"
+        detailName="plants_detail"
         label="¿Es tu primera vez trabajando con plantas maestras?"
       />
-      <BoolQuestion
+      <YesNoQuestion
         name="has_themes"
+        detailName="themes_detail"
         label="¿Hay temas específicos que te gustaría trabajar en la ceremonia?"
       />
-      <BoolQuestion
+      <YesNoQuestion
         name="fears"
         label="¿Tienes miedos particulares respecto a la experiencia?"
       />

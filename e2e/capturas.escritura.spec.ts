@@ -108,6 +108,19 @@ async function comoAdmin(browser: Browser) {
 
 test.setTimeout(300_000);
 
+
+/**
+ * Responde que NO en todas las preguntas de sí/no del formulario que esté en
+ * pantalla. Desde la corrección del 04/09/2026 son dos opciones obligatorias y
+ * no una casilla tildable: dejarlas en blanco ya no envía.
+ */
+async function responderQueNo(page: Page) {
+  const opciones = page.locator('input[type="radio"][value="no"]');
+  for (let i = 0; i < (await opciones.count()); i++) {
+    await opciones.nth(i).check();
+  }
+}
+
 test("recorrido de la inscripción, pantalla por pantalla", async ({ page, browser }) => {
   fs.mkdirSync(DESTINO, { recursive: true });
 
@@ -166,6 +179,8 @@ test("recorrido de la inscripción, pantalla por pantalla", async ({ page, brows
 
     await page.locator('input[name="full_name"]').fill(NOMBRE_DE_PRUEBA);
     await page.locator('input[name="previous_ceremonies"]').fill("0");
+    await page.locator('input[name="residence_country"]').fill("Argentina");
+    await responderQueNo(page);
     await capturar(
       page,
       "Formulario de inscripción completado",
@@ -295,6 +310,7 @@ test("recorrido de la inscripción, pantalla por pantalla", async ({ page, brows
     await page.locator('input[name="weight"]').fill("65kg");
     await page.locator('input[name="country"]').fill("Argentina");
     await page.locator('input[name="occupation"]').fill("Prueba automatizada");
+    await responderQueNo(page);
     await capturar(
       page,
       "Formulario de salud completado",

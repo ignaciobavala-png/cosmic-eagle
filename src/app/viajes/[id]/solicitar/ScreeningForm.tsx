@@ -1,56 +1,13 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
+import {
+  NumberInput,
+  YesNoQuestion,
+  inputClass,
+  labelClass,
+} from "@/components/forms/fields";
 import { submitApplication, type ApplicationFormState } from "./actions";
-
-const inputClass =
-  "bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors";
-const labelClass = "text-sm text-on-surface-variant tracking-[0.02em]";
-
-/**
- * Cada pregunta del filtro es abierta ("¿por qué motivo y hace cuánto?"), pero
- * se guarda como sí/no + detalle: el booleano es lo que le deja al trigger
- * marcar la solicitud como "requiere revisión manual" sin leer prosa. Por eso
- * el detalle es obligatorio cuando la respuesta es sí.
- */
-function Question({
-  name,
-  label,
-  hint,
-  placeholder,
-}: {
-  name: string;
-  label: string;
-  hint?: string;
-  placeholder: string;
-}) {
-  const [checked, setChecked] = useState(false);
-  return (
-    <div className="flex flex-col gap-2 py-4 border-b border-outline-variant/40 last:border-0">
-      <label className="flex items-start gap-3 text-on-surface cursor-pointer">
-        <input
-          type="checkbox"
-          name={name}
-          onChange={(e) => setChecked(e.target.checked)}
-          className="w-4 h-4 mt-1 shrink-0 accent-primary-fixed-dim"
-        />
-        <span>{label}</span>
-      </label>
-      {hint && (
-        <p className="text-xs text-on-surface-variant pl-7">{hint}</p>
-      )}
-      {checked && (
-        <textarea
-          name={`${name}_detail`}
-          required
-          placeholder={placeholder}
-          rows={3}
-          className={inputClass}
-        />
-      )}
-    </div>
-  );
-}
 
 /**
  * El filtro corto: lo llenan todos, primerizos y recurrentes.
@@ -126,17 +83,19 @@ export function ScreeningForm({
           <input name="phone" type="tel" className={inputClass} />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>
-            Ceremonias que hiciste con Estela
-          </label>
+          <label className={labelClass}>País de residencia</label>
           <input
-            name="previous_ceremonies"
-            type="number"
-            min={0}
-            defaultValue={0}
+            name="residence_country"
+            type="text"
             required
             className={inputClass}
           />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>
+            Ceremonias que hiciste con Estela
+          </label>
+          <NumberInput name="previous_ceremonies" defaultValue={0} required />
           <span className="text-xs text-on-surface-variant">
             Si es tu primera vez, deja el 0.
           </span>
@@ -147,20 +106,23 @@ export function ScreeningForm({
         Por eso nos gustaría que nos cuentes
       </h2>
 
-      <Question
+      <YesNoQuestion
         name="serious_illness"
+        detailRequired
         label="¿Tienes o has tenido alguna enfermedad grave?"
         hint="Cardíaca, neurológica, epilepsia, hepática, oncológica, autoinmune u otra."
         placeholder="Contanos cuál y cuándo."
       />
-      <Question
+      <YesNoQuestion
         name="mental_health_treatment"
+        detailRequired
         label="¿Estás o has estado en tratamiento psiquiátrico o psicológico?"
         hint="Si es así, cuéntanos por qué motivo y hace cuánto."
         placeholder="Motivo y hace cuánto tiempo."
       />
-      <Question
+      <YesNoQuestion
         name="current_medication"
+        detailRequired
         label="¿Estás en algún tratamiento médico actualmente?"
         hint="Qué medicamentos tomás, con o sin receta. Incluí antidepresivos, ansiolíticos, analgésicos, suplementos y hierbas."
         placeholder="Medicamentos, suplementos y hierbas."

@@ -14,8 +14,14 @@ function str(formData: FormData, key: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function bool(formData: FormData, key: string) {
-  return formData.get(key) === "on";
+/**
+ * El sí/no de una pregunta. Devuelve `null` cuando no vino ninguna de las dos
+ * opciones: con la casilla tildable de antes eso era indistinguible de un "no",
+ * y una respuesta de salud que nadie dio no puede guardarse como negativa.
+ */
+function yesNo(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return value === "si" ? true : value === "no" ? false : null;
 }
 
 /**
@@ -36,10 +42,29 @@ export async function submitApplication(
 
   const full_name = str(formData, "full_name");
   const email = str(formData, "email");
-  const previous_ceremonies = str(formData, "previous_ceremonies");
+  const residence_country = str(formData, "residence_country");
+  const previous_ceremonies = Number(str(formData, "previous_ceremonies"));
 
-  if (!full_name || !email || !previous_ceremonies) {
+  if (!full_name || !email || !residence_country) {
     return { error: "Completa todos los campos requeridos." };
+  }
+  if (!Number.isInteger(previous_ceremonies) || previous_ceremonies < 0) {
+    return { error: "Las ceremonias previas tienen que ser un número entero." };
+  }
+
+  // Las tres preguntas de Sofía (19/08/2026). Ninguna rechaza sola: el encuadre
+  // es informativo, todas las solicitudes las lee Estela. Lo que sí exige el
+  // trigger de aviso es que estén contestadas.
+  const serious_illness = yesNo(formData, "serious_illness");
+  const mental_health_treatment = yesNo(formData, "mental_health_treatment");
+  const current_medication = yesNo(formData, "current_medication");
+
+  if (
+    serious_illness === null ||
+    mental_health_treatment === null ||
+    current_medication === null
+  ) {
+    return { error: "Responde sí o no en las tres preguntas de salud." };
   }
 
   const { error } = await supabase.from("applications").insert({
@@ -48,15 +73,14 @@ export async function submitApplication(
     full_name,
     email,
     phone: str(formData, "phone") || null,
-    previous_ceremonies: Number(previous_ceremonies),
-    // Las tres preguntas de Sofía (19/08/2026). Ninguna rechaza sola: el
-    // encuadre es informativo, todas las solicitudes las lee Estela.
-    serious_illness: bool(formData, "serious_illness"),
+    residence_country,
+    previous_ceremonies,
+    serious_illness,
     serious_illness_detail: str(formData, "serious_illness_detail") || null,
-    mental_health_treatment: bool(formData, "mental_health_treatment"),
+    mental_health_treatment,
     mental_health_treatment_detail:
       str(formData, "mental_health_treatment_detail") || null,
-    current_medication: bool(formData, "current_medication"),
+    current_medication,
     current_medication_detail:
       str(formData, "current_medication_detail") || null,
     theme: str(formData, "theme") || null,

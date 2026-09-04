@@ -44,6 +44,7 @@ export type FieldSpec<T> = PlainField<T> | BoolField<T>;
 export const SCREENING_FIELDS: FieldSpec<ApplicationRow>[] = [
   { kind: "plain", key: "email", label: "Email" },
   { kind: "plain", key: "phone", label: "Teléfono" },
+  { kind: "plain", key: "residence_country", label: "País de residencia" },
   {
     kind: "plain",
     key: "previous_ceremonies",
@@ -79,7 +80,7 @@ export const HEALTH_FIELDS: FieldSpec<HealthFormRow>[] = [
   { kind: "plain", key: "age", label: "Edad" },
   { kind: "plain", key: "height", label: "Altura" },
   { kind: "plain", key: "weight", label: "Peso" },
-  { kind: "plain", key: "country", label: "País" },
+  { kind: "plain", key: "country", label: "País de origen" },
   { kind: "plain", key: "occupation", label: "Ocupación" },
   {
     kind: "bool",
