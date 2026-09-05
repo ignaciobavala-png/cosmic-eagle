@@ -96,11 +96,24 @@ export function Header() {
           por debajo; en el mockup es una banda solida y el contenido arranca
           abajo. Por eso cada `main` compensa con `pt-18 md:pt-24`. */}
       <header className="fixed top-0 w-full z-50 bg-[linear-gradient(to_right,#05125a_0%,#0079b3_100%)]">
-        {/* La barra horizontal arranca en lg, no en md: entre 768 y 1024 el
-            logo + los 3 links + "Unirme al circulo" no entran y el CTA termina
-            pisando el logo. Hasta 1024 manda el drawer, que entra siempre. */}
-        <nav className="flex items-center justify-between gap-4 px-margin-mobile md:px-margin-desktop h-18 md:h-24 w-full max-w-narrative mx-auto">
-          <Link href="/" className="shrink-0">
+        {/* La barra horizontal arranca en `xl` (1280), no en `md`. El
+            comentario viejo decia "arranca en lg" pero el codigo nunca lo
+            cumplio: se mostraba desde 768, y ahi el logo + los 3 links + el CTA
+            miden ~1120px, asi que el CTA se salia de la pantalla (medido: en un
+            viewport de 768 terminaba en el pixel 1081). Hasta 1280 manda el
+            drawer, que entra siempre. */}
+        {/* La barra va a TODO el ancho: el `max-w-narrative` (1200px
+            centrados) era un desvio nuestro — el mockup de Julia no tiene tope,
+            solo `padding: 0 60px`. En una pantalla de 1920 dejaba 360px muertos
+            a cada lado y la barra se leia vacia con todo apretado en el medio,
+            que es lo que Sofia describio como "comprimido" (reunion del 04/09).
+
+            Es una grilla de tres columnas y no un `justify-between`: con
+            `1fr auto 1fr` las secciones quedan centradas contra el VIEWPORT y
+            no contra el hueco que dejan el logo y el CTA, que miden distinto
+            (y el derecho cambia de ancho segun haya sesion o no). */}
+        <nav className="grid grid-cols-[auto_1fr] xl:grid-cols-[1fr_auto_1fr] items-center gap-4 px-margin-mobile md:px-margin-desktop h-18 md:h-24 w-full">
+          <Link href="/" className="shrink-0 justify-self-start">
             <Image
               src={IMAGES.logo}
               alt="Cosmic Eagle"
@@ -112,7 +125,7 @@ export function Header() {
             />
           </Link>
 
-          <ul className="hidden md:flex items-center gap-2">
+          <ul className="hidden xl:flex items-center justify-center gap-2">
             {NAV_LINKS.filter((l) => l.href !== "/cuenta").map((link) => {
               const isActive = pathname.startsWith(link.href);
               return (
@@ -237,11 +250,11 @@ export function Header() {
             })}
           </ul>
 
-          <div className="flex shrink-0 items-center gap-4">
+          <div className="flex shrink-0 items-center justify-end gap-4 justify-self-end">
             {profile ? (
               <Link
                 href={profile.isAdmin ? "/admin" : "/cuenta"}
-                className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
+                className="hidden xl:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
               >
                 {profile.avatarUrl ? (
                   <img
@@ -259,7 +272,7 @@ export function Header() {
             ) : (
               // El `hidden` va en el wrapper, no en el CtaLink: su base trae
               // `inline-flex` y le gana a `hidden` por orden de la hoja.
-              <div className="hidden md:flex">
+              <div className="hidden xl:flex">
                 <CtaLink
                   href="/cuenta?modo=registro"
                   variant="pill"
@@ -273,7 +286,7 @@ export function Header() {
 
             <button
               onClick={toggleDrawer}
-              className="md:hidden active:scale-95 transition-transform"
+              className="xl:hidden active:scale-95 transition-transform"
               aria-label="Abrir menú"
             >
               <Menu className="text-primary-fixed-dim" size={24} />
@@ -289,7 +302,7 @@ export function Header() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[60] bg-void-black/60 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-[60] bg-void-black/60 backdrop-blur-sm xl:hidden"
               onClick={() => setDrawerOpen(false)}
             />
             <motion.div
@@ -297,7 +310,7 @@ export function Header() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 z-[60] w-80 max-w-[85vw] bg-surface-container-low/95 backdrop-blur-2xl border-r border-parchment/10 shadow-2xl flex flex-col py-6 md:hidden"
+              className="fixed inset-y-0 left-0 z-[60] w-80 max-w-[85vw] bg-surface-container-low/95 backdrop-blur-2xl border-r border-parchment/10 shadow-2xl flex flex-col py-6 xl:hidden"
             >
               <div className="px-6 py-4 border-b border-parchment/5 flex justify-between items-center">
                 <Link href="/" onClick={() => setDrawerOpen(false)}>
