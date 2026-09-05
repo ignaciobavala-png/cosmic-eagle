@@ -3,6 +3,12 @@
 import { useActionState, useRef, useState } from "react";
 import { Paperclip } from "lucide-react";
 import { compressImage } from "@/lib/compress-image";
+import {
+  fieldInput,
+  fieldLabel,
+  ghostButton,
+  pillButton,
+} from "@/components/forms/styles";
 import { uploadPaymentProof, type PaymentProofState } from "./actions";
 
 const initialState: PaymentProofState = { error: null };
@@ -61,7 +67,7 @@ export function PaymentProofUpload({
       <div>
         <label
           htmlFor="proof"
-          className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-primary-container/55 px-4 py-2.5 text-sm font-medium text-primary-container transition-colors hover:bg-primary-container/10"
+          className={ghostButton}
         >
           <Paperclip size={15} />
           {yaSubio ? "Subir otro comprobante" : "Elegir el comprobante"}
@@ -77,9 +83,9 @@ export function PaymentProofUpload({
           onChange={onPick}
         />
         {fileName && (
-          <p className="mt-2 text-sm text-on-surface-variant">{fileName}</p>
+          <p className="mt-2 text-sm text-white/70">{fileName}</p>
         )}
-        <p className="mt-2 text-xs text-on-surface-variant">
+        <p className="mt-2 text-xs text-white/55">
           Una foto, una captura o el PDF del banco. Hasta 5MB.
         </p>
       </div>
@@ -87,7 +93,7 @@ export function PaymentProofUpload({
       <div>
         <label
           htmlFor="note"
-          className="mb-1.5 block text-sm text-on-surface-variant"
+          className={fieldLabel}
         >
           ¿Querés aclarar algo? (opcional)
         </label>
@@ -95,12 +101,12 @@ export function PaymentProofUpload({
           id="note"
           name="note"
           placeholder="Transferí la primera mitad"
-          className="w-full rounded-lg border border-outline bg-surface-container px-4 py-2.5 text-on-surface outline-none focus:border-primary-fixed-dim"
+          className={fieldInput}
         />
       </div>
 
       {state.error && (
-        <p className="text-sm text-error" role="alert">
+        <p className="text-sm text-[#ffb4a8]" role="alert">
           {state.error}
         </p>
       )}
@@ -108,7 +114,7 @@ export function PaymentProofUpload({
       <button
         type="submit"
         disabled={pending || preparando}
-        className="rounded-lg bg-primary-container px-5 py-2.5 font-medium tracking-[0.05em] text-on-primary transition-colors hover:bg-primary-fixed disabled:opacity-60"
+        className={pillButton}
       >
         {preparando
           ? "Preparando el archivo..."

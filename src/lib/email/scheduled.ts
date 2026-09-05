@@ -109,6 +109,7 @@ type Candidate = {
    * arreglo, porque su unico es compuesto (solicitud + tipo).
    */
   health_form_first_time: { id: string } | null;
+  consents: { id: string } | null;
   scheduled_email_log: { kind: Kind }[] | null;
 };
 
@@ -230,12 +231,16 @@ function dueEmails(app: Candidate, today: Date): Pending[] {
   // ---------------------------------------------------------------------
   // [4A] Formularios pendientes
   // ---------------------------------------------------------------------
+  // Solo las primerizas tienen etapa 2: no existe `health_form_returning`. El
+  // consentimiento, en cambio, lo firma todo el mundo.
+  const faltaSalud =
+    app.previous_ceremonies === 0 && !app.health_form_first_time;
+  const faltaConsentimiento = !app.consents;
+
   if (
     !yaEnviado.has("forms_pending") &&
     pago &&
-    // Solo las primerizas tienen etapa 2: no existe `health_form_returning`.
-    app.previous_ceremonies === 0 &&
-    !app.health_form_first_time &&
+    (faltaSalud || faltaConsentimiento) &&
     diasDesdePago >= SCHEDULE.FORMS_GRACE_DAYS
   ) {
     due.push({
@@ -247,7 +252,10 @@ function dueEmails(app: Candidate, today: Date): Pending[] {
         nombre,
         viaje: trip.title,
         fechas,
-        url: `${SITE_URL}/viajes/${app.trip_id}/salud`,
+        falta: faltaSalud ? "ambos" : "consentimiento",
+        // El link va al paso que corresponde; el de salud, cuando falta,
+        // siempre va primero.
+        url: `${SITE_URL}/viajes/${app.trip_id}/${faltaSalud ? "salud" : "consentimiento"}`,
       }),
     });
   }
@@ -284,6 +292,7 @@ export async function runScheduledEmails(): Promise<
        trips!inner (title, start_date, end_date, price, status,
                     address, arrival_notes, packing_list, start_time, end_time),
        health_form_first_time (id),
+       consents (id),
        scheduled_email_log (kind)`
     )
     .eq("status", "approved")

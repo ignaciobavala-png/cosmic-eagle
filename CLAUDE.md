@@ -2023,3 +2023,85 @@ Verificado: `tsc`, lint (queda el warning previo del `<img>` del avatar), build 
 producción, los **38 tests públicos en verde**, y medición en Chrome real a
 1440×900 y 390×844 — los dos paneles con sus ítems y hrefs, los tres anclajes
 frenando bajo el navbar, y el drawer listando los cinco hijos.
+
+### Sesión del 2026-09-05 (bis) — el embudo se pone al día: estilo nuevo y consentimiento
+
+#### 1. Las pantallas del embudo dejaron el fondo viejo
+
+Reporte de Ignacio: los formularios y "Cómo pagar" seguían en el azul oscuro de
+antes mientras el resto del sitio es más claro. Era exacto: `glass-card` sobre el
+tramo **negro** del degradé del `body`, que es el fondo más oscuro que tiene la
+página, justo donde caen esas rutas.
+
+La referencia ya estaba en el repo: **la pantalla de acceso que entregó Julia el
+27/08** es el único formulario que ella diseñó. Los estilos se mudaron de
+`src/app/cuenta/fields.ts` a **`src/components/forms/styles.ts`** (el de /cuenta
+quedó como reexport) y ahora los comparten los dos lados: filtro corto,
+formulario de salud, consentimiento, pantalla de estado, Cómo pagar, "Para tu
+llegada" y **la cuenta con sesión**, que era el único lugar donde `/cuenta`
+cambiaba de estilo entre estar deslogueada y logueada.
+
+- **La sección pinta su propio fondo azul** (`funnelSurface`), en el `main`.
+- **No llega hasta el celeste `#0079b3`** como sí hace el acceso: ahí la sección
+  mide una pantalla, acá el formulario mide tres y el texto blanco al 75% se
+  quedaría sin contraste en todo el tramo final (regla del 28/08).
+- **No se inventó ningún hex**: los dos azules son los de la pantalla de acceso.
+
+Siguen con el sistema anterior el detalle público de una experiencia y
+`/contenidos`: son las dos que Julia todavía no rediseñó.
+
+#### 2. El consentimiento informado — ver `docs/CONSENTIMIENTO.md`
+
+Faltaba desde siempre y era lo que Sofía marcó al revisar el flujo. Ignacio pasó
+el **link del formulario de Google que usan hoy** y de ahí salió el texto: los
+cinco bloques, las cuatro confirmaciones y la firma, **literales**. Quedaron
+transcriptos los **dos idiomas** en el doc; el inglés no se implementa (no hay
+i18n) pero ya no hay que volver a extraerlo.
+
+Migración `20260905160000_consents_flow.sql`, aplicada y verificada contra
+producción. **No agregó columnas**: el schema del 25/07 ya calzaba. Lo que
+arregló es el permiso, que se había escrito cuando no había pantalla:
+
+- **El insert exige la solicitud propia y aprobada.** Antes alcanzaba con
+  `auth.uid() = user_id`: cualquiera podía firmar apuntando al `application_id`
+  de otra persona, o al suyo sin estar aprobado.
+- **`user_id` y `trip_id` los pone un trigger** leyendo la solicitud. Eran
+  redundantes con `application_id` y podían quedar colgados del viaje
+  equivocado sin que ninguna policy lo notara.
+- **Un consentimiento firmado es inmutable**: se revocó UPDATE y DELETE a
+  `authenticated`, **que incluye al admin**. Si hay que corregirlo, se firma de
+  nuevo.
+- **Ojo con el orden trigger/policy** (medido, no deducido): un trigger BEFORE
+  corre **antes** de que se evalúe el `with check`, así que la RLS ve la fila ya
+  corregida — un insert con el `user_id` de otra persona sobre una solicitud
+  propia **pasa**, porque el trigger lo reescribe primero. Lo que sostiene la
+  seguridad acá es `owns_approved_application`, no el `auth.uid() = user_id`.
+
+En el código: `/viajes/[id]/consentimiento`, el texto en **`src/lib/consent.ts`**
+con `CONSENT_VERSION` (se sube cuando la clienta cambie una frase), y en la fila
+se guardan **las etiquetas literales** de lo que se aceptó, no sólo el tildado —
+el panel lista las guardadas, no las del código.
+
+- **Va después del formulario de salud**, no antes: una de las cuatro
+  confirmaciones dice "he rellenado el formulario de salud obligatorio". A una
+  primeriza que no lo mandó, la página la manda ahí.
+- **Lo firma todo el mundo**, a diferencia de la etapa 2, que sólo existe para
+  las primerizas.
+- **Las cuatro confirmaciones son obligatorias**: en Google el grupo es
+  "requerido", que ahí significa *al menos una*.
+- **La fecha la pone el servidor.** El formulario la pide escrita a mano y una
+  fecha declarada por quien firma no sirve como registro.
+- El correo **[4A]** ya no nombra sólo el formulario de salud: se dispara también
+  cuando falta sólo la firma, y el texto cambia según qué falte. Vamos **11 de
+  las 15 comunicaciones**, y [4] queda destrabado.
+
+**Falta que Estela y Sofía confirmen que ese es el texto vigente**: se extrajo del
+formulario publicado, no de un documento que ellas hayan mandado. Y quien firma
+no se lleva ningún comprobante — no hay PDF ni copia por mail.
+
+Verificado: `tsc`, lint, build, la RLS probada con `set role` contra la base real
+(firma propia OK, solicitud ajena y solicitud sin aprobar rechazadas, el trigger
+corrigiendo el viaje equivocado y la fecha, update del admin bloqueado, `anon`
+sin grants, el índice único), filas de prueba borradas, y **el embudo completo
+corrido de punta a punta** con el consentimiento adentro (los dos specs de
+escritura en verde). Las capturas del recorrido pasaron de 19 a 22.

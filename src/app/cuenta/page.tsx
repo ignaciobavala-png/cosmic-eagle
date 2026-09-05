@@ -10,6 +10,7 @@ import { SignupForm } from "./SignupForm";
 import { logout } from "./actions";
 import { MisSolicitudes } from "./MisSolicitudes";
 import { AvatarUpload } from "./AvatarUpload";
+import { funnelSurface } from "@/components/forms/styles";
 
 // Avisos que llegan por querystring desde /auth/confirm y desde updatePassword.
 const ERROR_MESSAGES: Record<string, string> = {
@@ -64,6 +65,7 @@ export default async function CuentaPage({
     amount_paid: number;
     is_first_time: boolean;
     health_form_submitted: boolean;
+    consent_submitted: boolean;
     created_at: string;
     trip: {
       title: string;
@@ -95,7 +97,7 @@ export default async function CuentaPage({
     const { data: mine } = await supabase
       .from("my_applications")
       .select(
-        "id, trip_id, status, payment_status, amount_paid, is_first_time, health_form_submitted, created_at"
+        "id, trip_id, status, payment_status, amount_paid, is_first_time, health_form_submitted, consent_submitted, created_at"
       )
       .order("created_at", { ascending: false });
 
@@ -116,6 +118,7 @@ export default async function CuentaPage({
               amount_paid: a.amount_paid ?? 0,
               is_first_time: a.is_first_time ?? false,
               health_form_submitted: a.health_form_submitted ?? false,
+              consent_submitted: a.consent_submitted ?? false,
               created_at: a.created_at,
             },
           ]
@@ -141,18 +144,20 @@ export default async function CuentaPage({
   return (
     <>
       <Header />
-      <main className="pt-18 md:pt-24">
+      {/* Con sesión la página pinta el azul del embudo; sin sesión el fondo lo
+          pone `AuthScreen`, que trae su propio degradé. */}
+      <main className={`pt-18 md:pt-24 ${user ? funnelSurface : ""}`}>
         {user ? (
-          <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-5 py-12">
+          <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-5 py-16">
             <AvatarUpload
               avatarUrl={profile?.avatar_url ?? null}
               fallbackLabel={(profile?.full_name?.trim()?.[0] ?? user.email?.[0] ?? "?").toUpperCase()}
             />
             <div className="text-center">
-              <h1 className="font-display text-[28px] md:text-[36px] font-medium text-primary-fixed-dim">
+              <h1 className="font-display text-[clamp(1.75rem,3.4vw,2.25rem)] font-bold text-white">
                 {profile?.full_name?.trim() || "Mi Cuenta"}
               </h1>
-              <p className="text-on-surface-variant text-sm mt-1">{user.email}</p>
+              <p className="mt-1 text-sm text-white/65">{user.email}</p>
             </div>
 
             {aviso && AVISO_MESSAGES[aviso] && (
@@ -164,7 +169,7 @@ export default async function CuentaPage({
             <form action={logout}>
               <button
                 type="submit"
-                className="mt-2 text-sm text-on-surface-variant hover:text-primary-fixed-dim transition-colors underline"
+                className="mt-2 text-sm text-white/60 underline transition-colors hover:text-primary-container"
               >
                 Cerrar sesión
               </button>

@@ -348,7 +348,7 @@ interna, que es el otro canal y no se confunde con este).
 | [3B] | Recordatorio de saldo | ✅ `RecordatorioSaldo`, por el cron diario (03/09) |
 | [3C] | Saldo completado | ✅ `PagoRegistrado`, al pasar de seña a pagado (02/09) |
 | [4] | Formularios recibidos | ❌ falta el consentimiento |
-| [4A] | Formularios pendientes | ✅ `FormulariosPendientes`, por el cron diario (03/09). Nombra sólo el formulario de salud: el consentimiento no existe |
+| [4A] | Formularios pendientes | ✅ `FormulariosPendientes`, por el cron diario (03/09). Desde el 05/09 nombra los dos: se dispara también cuando falta sólo el consentimiento |
 | [5] | Bienvenido | ❌ no existe "formulario de salud aprobado" |
 | [6] | Comienza tu preparación | ❌ falta `/preparacion` (el motor de envíos ya está) |
 | [7] | Datos finales | ✅ `DatosFinales`, por el cron (03/09). No sale si el viaje no tiene dirección ni lista cargada |
@@ -361,11 +361,13 @@ Lo que falta **no es escribir diez templates**. Son cinco piezas de sistema:
    ver §6.
 2. ~~**Seña + saldo.**~~ **HECHO el 02/09**, ver §7. Queda pendiente sólo el
    recordatorio [3B], que necesita el envío programado del punto 4.
-3. **Consentimiento informado + aprobación del formulario de salud.** La tabla
-   `consents` existe desde el schema original y sigue sin UI, y los textos legales
-   son de la clienta. Sin eso no hay [4] ni [5]. El estado "salud aprobada"
-   tampoco existe: hoy la etapa 2 se completa y no hay nada que revisar
-   formalmente después.
+3. **~~Consentimiento informado~~ + aprobación del formulario de salud.** El
+   consentimiento **se hizo el 05/09** (`/viajes/[id]/consentimiento`, ver
+   `docs/CONSENTIMIENTO.md`): Ignacio pasó el formulario de Google que usan hoy y
+   de ahí salió el texto literal. Eso destraba **[4] Formularios recibidos**, que
+   ahora sí puede afirmar que llegaron los dos. Sigue faltando [5]: el estado
+   "salud aprobada" no existe — hoy la etapa 2 se completa y no hay nada que
+   revisar formalmente después.
 4. ~~**Envíos programados por fecha del viaje.**~~ **HECHO el 03/09**, ver §8.
    El motor existe y manda [3B] y [4A]; a [6], [7], [8] y [9] les falta el
    contenido, no la maquinaria.
@@ -377,9 +379,10 @@ Lo que falta **no es escribir diez templates**. Son cinco piezas de sistema:
 - **El pago va antes de los formularios**, y eso ya lo implementamos: es la
   inscripción en dos etapas del 19/08 (`docs/FLUJO_INSCRIPCION.md`). El documento
   lo confirma, no lo contradice.
-- **[3] y [3A] mandan los formularios y el consentimiento juntos.** Nuestra etapa
-  2 hoy es sólo el formulario de salud; el consentimiento quedaría en la misma
-  pantalla.
+- **[3] y [3A] mandan los formularios y el consentimiento juntos.** Desde el
+  05/09 los dos existen, pero **encadenados y no en la misma pantalla**: primero
+  el formulario de salud y después la firma, porque una de las cuatro
+  confirmaciones dice justamente que el de salud está completo.
 - **"Tu espacio personal"** aparece en seis de los catorce correos (saldo,
   formularios, preparación, integración). Hoy `/cuenta` muestra perfil +
   solicitudes; todo lo demás de esa lista no existe. **`/cuenta` es la ruta más

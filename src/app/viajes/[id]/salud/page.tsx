@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
+import { funnelSurface } from "@/components/forms/styles";
 import { HealthForm } from "./HealthForm";
 
 /**
@@ -53,16 +54,16 @@ export default async function SaludPage({
   return (
     <>
       <Header />
-      <main className="pt-18 md:pt-24 min-h-screen">
-        <div className="px-5 max-w-3xl mx-auto py-16 md:py-20">
+      <main className={`pt-18 md:pt-24 ${funnelSurface}`}>
+        <div className="mx-auto max-w-3xl px-5 py-16 md:py-20">
           <div className="mb-10">
-            <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block mb-2">
+            <span className="mb-3.5 block text-label-sm font-bold uppercase tracking-[0.21em] text-primary-container">
               Formulario de salud
             </span>
-            <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary-fixed-dim mb-2">
+            <h1 className="mb-2.5 font-display text-[clamp(1.875rem,3.4vw,2.375rem)] font-bold text-white">
               {trip.title}
             </h1>
-            <p className="text-on-surface-variant">{trip.location}</p>
+            <p className="text-sm text-white/65">{trip.location}</p>
           </div>
 
           <HealthForm tripId={id} applicationId={app.id!} />

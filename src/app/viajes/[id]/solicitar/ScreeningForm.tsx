@@ -7,6 +7,13 @@ import {
   inputClass,
   labelClass,
 } from "@/components/forms/fields";
+import {
+  panel,
+  panelBody,
+  panelDivider,
+  panelTitle,
+  submitButton,
+} from "@/components/forms/styles";
 import { submitApplication, type ApplicationFormState } from "./actions";
 
 /**
@@ -34,10 +41,12 @@ export function ScreeningForm({
   return (
     <form
       action={formAction}
-      className="glass-card rounded-2xl p-6 md:p-8 flex flex-col gap-2 max-w-2xl"
+      className={`flex max-w-2xl flex-col gap-2 p-6 md:p-8 ${panel}`}
     >
-      <div className="flex flex-col gap-3 text-on-surface-variant text-sm leading-relaxed border-b border-outline-variant/40 pb-6 mb-2">
-        <p className="text-on-surface">
+      <div
+        className={`mb-2 flex flex-col gap-3 border-b pb-6 text-sm leading-relaxed ${panelDivider} ${panelBody}`}
+      >
+        <p className="text-white">
           Qué bueno que quieras ser parte de este espacio. Te compartimos
           algunas cosas antes de avanzar.
         </p>
@@ -59,9 +68,7 @@ export function ScreeningForm({
         </p>
       </div>
 
-      <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
-        Datos personales
-      </h2>
+      <h2 className={`mb-2 ${panelTitle}`}>Datos personales</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
         <div className="flex flex-col gap-1.5">
@@ -96,13 +103,13 @@ export function ScreeningForm({
             Ceremonias que hiciste con Estela
           </label>
           <NumberInput name="previous_ceremonies" defaultValue={0} required />
-          <span className="text-xs text-on-surface-variant">
+          <span className="text-xs text-white/55">
             Si es tu primera vez, deja el 0.
           </span>
         </div>
       </div>
 
-      <h2 className="font-display text-xl text-primary-fixed-dim mt-4 mb-1">
+      <h2 className={`mb-1 mt-4 ${panelTitle}`}>
         Por eso nos gustaría que nos cuentes
       </h2>
 
@@ -128,7 +135,9 @@ export function ScreeningForm({
         placeholder="Medicamentos, suplementos y hierbas."
       />
 
-      <p className="text-sm text-on-surface-variant leading-relaxed py-4 border-b border-outline-variant/40">
+      <p
+        className={`border-b py-4 text-sm leading-relaxed ${panelDivider} ${panelBody}`}
+      >
         Te pedimos responder con la mayor honestidad y detalle posible. Esta
         información es confidencial y su único propósito es cuidarte. Nada de lo
         que nos cuentes cierra la puerta de entrada: solo nos permite saber qué
@@ -150,7 +159,7 @@ export function ScreeningForm({
       </div>
 
       {state.error && (
-        <p className="text-error text-sm" role="alert">
+        <p className="text-sm text-[#ffb4a8]" role="alert">
           {state.error}
         </p>
       )}
@@ -158,7 +167,7 @@ export function ScreeningForm({
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-fixed transition-colors disabled:opacity-60"
+        className={`mt-4 ${submitButton}`}
       >
         {pending ? "Enviando..." : "Enviar solicitud"}
       </button>

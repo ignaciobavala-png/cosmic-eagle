@@ -50,7 +50,7 @@ export default async function SolicitudDetallePage({
   const { data: application } = await supabase
     .from("applications")
     .select(
-      "*, trips(title, start_date, end_date, price, deposit_amount), health_form_first_time(*)"
+      "*, trips(title, start_date, end_date, price, deposit_amount), health_form_first_time(*), consents(*)"
     )
     .eq("id", id)
     .single();
@@ -63,6 +63,9 @@ export default async function SolicitudDetallePage({
   const health = Array.isArray(application.health_form_first_time)
     ? application.health_form_first_time[0]
     : application.health_form_first_time;
+  const consent = Array.isArray(application.consents)
+    ? application.consents[0]
+    : application.consents;
 
   // Espejo de la regla de los triggers `private.notify_new_application`
   // (migración 20260819194408, las 3 preguntas de Sofía) y
@@ -192,6 +195,65 @@ export default async function SolicitudDetallePage({
           </>
         )}
       </div>
+
+      {/* El consentimiento es de sólo lectura, y no por diseño de pantalla: la
+          migración 20260905160000 le revocó UPDATE y DELETE a `authenticated`,
+          que incluye al admin. Un registro firmado no se edita; si hay que
+          corregirlo, se vuelve a firmar. */}
+      <div className="glass-card rounded-2xl p-6 md:p-8 mt-6">
+        <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
+          Consentimiento informado
+        </h2>
+
+        {!consent ? (
+          <p className="text-on-surface-variant text-sm">
+            Todavía no lo firmó. Se abre después del formulario de salud.
+          </p>
+        ) : (
+          <dl className="flex flex-col gap-4">
+            <div>
+              <dt className="text-xs uppercase tracking-widest text-on-surface-variant mb-1">
+                Firma digital
+              </dt>
+              <dd className="font-display text-lg text-on-surface">
+                {consent.digital_signature}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-widest text-on-surface-variant mb-1">
+                Firmado
+              </dt>
+              <dd className="text-sm text-on-surface">
+                {new Date(consent.created_at).toLocaleString("es-CL")} · versión
+                del texto {consent.consent_version}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-widest text-on-surface-variant mb-1">
+                Confirmaciones
+              </dt>
+              {/* Se listan las etiquetas GUARDADAS y no las del código: si la
+                  clienta cambia el texto, esta pantalla tiene que seguir
+                  mostrando lo que esa persona aceptó. */}
+              <dd className="flex flex-col gap-1.5 text-sm text-on-surface">
+                {confirmationLabels(consent.confirmations).map((label) => (
+                  <span key={label}>✓ {label}</span>
+                ))}
+              </dd>
+            </div>
+          </dl>
+        )}
+      </div>
     </div>
+  );
+}
+
+/** `confirmations` es jsonb: se lee defensivamente, no se castea. */
+function confirmationLabels(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) =>
+    item && typeof item === "object" && typeof (item as { label?: unknown }).label === "string"
+      ? [(item as { label: string }).label]
+      : []
   );
 }

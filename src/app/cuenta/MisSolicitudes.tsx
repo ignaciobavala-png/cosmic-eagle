@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { formatAmount } from "@/lib/format";
+import { panel, panelDivider } from "@/components/forms/styles";
 
 const STATUS_LABEL: Record<string, string> = {
   pending_review: "En revisión",
@@ -9,12 +10,15 @@ const STATUS_LABEL: Record<string, string> = {
   expired: "Expirada",
 };
 
+// Sobre el azul del embudo los tokens de superficie no se ven: las píldoras de
+// estado van con los colores literales de la paleta de Julia, igual que el
+// resto de la pantalla (ver `@/components/forms/styles`).
 const STATUS_CLASS: Record<string, string> = {
-  pending_review: "bg-secondary/20 text-secondary border-secondary/40",
-  needs_conversation: "bg-tertiary-container/20 text-tertiary-container border-tertiary-container/40",
-  approved: "bg-primary-container/20 text-primary-fixed-dim border-primary-fixed-dim/40",
-  rejected: "bg-error/20 text-error border-error/40",
-  expired: "bg-outline-variant/30 text-on-surface-variant border-outline/40",
+  pending_review: "border-white/25 bg-white/10 text-white/80",
+  needs_conversation: "border-[#f9d78f]/40 bg-[#f9d78f]/15 text-[#f9d78f]",
+  approved: "border-[#f9d78f]/60 bg-[#f9d78f]/20 text-[#f9d78f]",
+  rejected: "border-[#ffb4a8]/40 bg-[#ffb4a8]/10 text-[#ffb4a8]",
+  expired: "border-white/15 bg-white/5 text-white/50",
 };
 
 type Application = {
@@ -26,6 +30,7 @@ type Application = {
   amount_paid: number;
   is_first_time: boolean;
   health_form_submitted: boolean;
+  consent_submitted: boolean;
   created_at: string;
   trip: {
     title: string;
@@ -63,17 +68,25 @@ function pendingStep(a: Application): { label: string; href?: string } {
       href: `/viajes/${a.trip_id}/solicitar`,
     };
   }
-  if (a.payment_status === "deposit_paid" && !(a.is_first_time && !a.health_form_submitted)) {
+  const faltaSalud = a.is_first_time && !a.health_form_submitted;
+  if (a.payment_status === "deposit_paid" && !faltaSalud) {
     const saldo = a.trip ? Math.max(0, a.trip.price - a.amount_paid) : 0;
     return {
       label: saldo > 0 ? `Falta el saldo de ${formatAmount(saldo)}` : "Falta el saldo",
       href: `/viajes/${a.trip_id}/solicitar`,
     };
   }
-  if (a.is_first_time && !a.health_form_submitted) {
+  if (faltaSalud) {
     return {
       label: "Completar formulario de salud",
       href: `/viajes/${a.trip_id}/solicitar`,
+    };
+  }
+  // El consentimiento es el ultimo paso del embudo, despues del de salud.
+  if (!a.consent_submitted) {
+    return {
+      label: "Firmar el consentimiento",
+      href: `/viajes/${a.trip_id}/consentimiento`,
     };
   }
   return { label: "Al día" };
@@ -101,9 +114,9 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
 
   if (applications.length === 0) {
     return (
-      <p className="text-on-surface-variant text-center max-w-md">
+      <p className="max-w-md text-center text-white/70">
         Todavía no tienes solicitudes. Elige un viaje en{" "}
-        <Link href="/viajes" className="text-primary-fixed-dim underline">
+        <Link href="/viajes" className="text-primary-container underline">
           Viajes
         </Link>{" "}
         para postularte.
@@ -115,13 +128,15 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
     <div className="w-full flex flex-col gap-8 mt-4">
       {approved.length > 0 && (
         <section>
-          <h2 className="text-lg font-medium text-primary-fixed-dim mb-3">Viajes aprobados</h2>
+          <h2 className="mb-3 font-display text-lg font-bold text-primary-container">
+            Viajes aprobados
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {approved.map((a) => (
-              <div key={a.id} className="glass-card rounded-xl p-4">
-                <p className="text-on-surface font-medium">{a.trip?.title ?? "Viaje"}</p>
+              <div key={a.id} className={`p-4 ${panel}`}>
+                <p className="font-medium text-white">{a.trip?.title ?? "Viaje"}</p>
                 {a.trip && (
-                  <p className="text-sm text-on-surface-variant mt-1">
+                  <p className="mt-1 text-sm text-white/65">
                     {a.trip.location ? `${a.trip.location} · ` : ""}
                     {formatDate(a.trip.start_date)}
                     {a.trip.end_date !== a.trip.start_date && ` — ${formatDate(a.trip.end_date)}`}
@@ -134,11 +149,13 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
       )}
 
       <section>
-        <h2 className="text-lg font-medium text-primary-fixed-dim mb-3">Mis solicitudes</h2>
-        <div className="glass-card rounded-2xl overflow-x-auto">
+        <h2 className="mb-3 font-display text-lg font-bold text-primary-container">
+          Mis solicitudes
+        </h2>
+        <div className={`overflow-x-auto ${panel}`}>
           <table className="w-full min-w-[34rem] text-sm">
             <thead>
-              <tr className="border-b border-outline-variant text-left text-on-surface-variant">
+              <tr className={`border-b text-left text-white/55 ${panelDivider}`}>
                 <th className="px-4 py-3 font-medium">Viaje</th>
                 <th className="px-4 py-3 font-medium">Paso siguiente</th>
                 <th className="px-4 py-3 font-medium">Fecha</th>
@@ -149,18 +166,18 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
               {applications.map((a) => (
                 <tr
                   key={a.id}
-                  className="border-b border-outline-variant/40 last:border-0"
+                  className={`border-b last:border-0 ${panelDivider}`}
                 >
-                  <td className="px-4 py-3 text-on-surface font-medium">
+                  <td className="px-4 py-3 font-medium text-white">
                     {a.trip?.title ?? "—"}
                   </td>
-                  <td className="px-4 py-3 text-on-surface-variant">
+                  <td className="px-4 py-3 text-white/70">
                     {(() => {
                       const step = pendingStep(a);
                       return step.href ? (
                         <Link
                           href={step.href}
-                          className="text-primary-fixed-dim underline"
+                          className="text-primary-container underline"
                         >
                           {step.label}
                         </Link>
@@ -169,7 +186,7 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
                       );
                     })()}
                   </td>
-                  <td className="px-4 py-3 text-on-surface-variant">
+                  <td className="px-4 py-3 text-white/70">
                     {formatDateTime(a.created_at)}
                   </td>
                   <td className="px-4 py-3">

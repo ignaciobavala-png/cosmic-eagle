@@ -23,11 +23,11 @@ export function AvatarUpload({
         className="relative group cursor-pointer"
         aria-label="Cambiar foto de perfil"
       >
-        <div className="w-24 h-24 rounded-full overflow-hidden bg-surface-container-low border-2 border-primary-fixed-dim/40 flex items-center justify-center">
+        <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 border-primary-container/45 bg-white/[0.06]">
           {avatarUrl ? (
             <img src={avatarUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
           ) : (
-            <span className="font-display text-3xl text-primary-fixed-dim">{fallbackLabel}</span>
+            <span className="font-display text-3xl text-primary-container">{fallbackLabel}</span>
           )}
         </div>
         <div className="absolute inset-0 rounded-full bg-void-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -43,9 +43,9 @@ export function AvatarUpload({
           onChange={() => formRef.current?.requestSubmit()}
         />
       </label>
-      {pending && <p className="text-xs text-on-surface-variant">Subiendo...</p>}
+      {pending && <p className="text-xs text-white/60">Subiendo...</p>}
       {state.error && (
-        <p className="text-error text-xs" role="alert">
+        <p className="text-xs text-[#ffb4a8]" role="alert">
           {state.error}
         </p>
       )}

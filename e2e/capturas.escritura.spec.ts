@@ -320,12 +320,43 @@ test("recorrido de la inscripción, pantalla por pantalla", async ({ page, brows
 
     await page.getByRole("button", { name: /Enviar/i }).click();
     await page.waitForURL(`**${ruta}`, { timeout: 30_000 });
+
+    // ─── 9. El consentimiento informado ──────────────────────────────────────
+    await page.getByRole("link", { name: /firmar el consentimiento/i }).click();
+    await page.waitForURL(`**/viajes/${viaje.id}/consentimiento`);
+    await capturar(
+      page,
+      "Consentimiento informado",
+      "El texto legal completo, el mismo del formulario de Google que usan hoy. Se abre recién después del formulario de salud.",
+      "Viajera"
+    );
+
+    const casillas = page.locator('form input[type="checkbox"]');
+    for (const i of [0, 1, 2, 3]) await casillas.nth(i).check();
+    await page.locator('input[name="signature"]').fill(NOMBRE_DE_PRUEBA);
+    await capturar(
+      page,
+      "La firma",
+      "Las cuatro confirmaciones son obligatorias y la firma es el nombre completo escrito. Queda guardado con la fecha y la versión del texto.",
+      "Viajera"
+    );
+
+    await page.getByRole("button", { name: /Firmar el consentimiento/i }).click();
+    await page.waitForURL(`**${ruta}`, { timeout: 30_000 });
     await expect(page.getByText("Estás dentro de este viaje")).toBeVisible();
     await capturar(
       page,
       "Inscripción completa",
-      "Fin del recorrido: inscripción aprobada, pagada y con el formulario de salud entregado.",
+      "Fin del recorrido: inscripción aprobada, pagada, con el formulario de salud entregado y el consentimiento firmado.",
       "Viajera"
+    );
+
+    await admin.page.goto(`/admin/solicitudes/${solicitud!.id}`);
+    await capturar(
+      admin.page,
+      "Panel: el consentimiento firmado",
+      "Estela ve la firma, la fecha y las cuatro confirmaciones con su texto. Es sólo lectura: un consentimiento firmado no se edita.",
+      "Estela (panel)"
     );
 
     // ─── 9. Su espacio personal ──────────────────────────────────────────────

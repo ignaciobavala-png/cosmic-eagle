@@ -9,23 +9,26 @@ import { BaseLayout, CtaButton, Paragraph, Title } from "./BaseLayout";
  * no vuelve a entrar, la solicitud se queda quieta y nadie se entera hasta que
  * Estela mira el panel.
  *
- * **Divergencia deliberada con el copy de Sofia**: el original dice "necesitamos
- * el formulario de salud y el consentimiento informado completos", y aca se
- * nombra solo el de salud. El consentimiento todavia no existe como pantalla —la
- * tabla `consents` esta desde el schema original y sigue sin UI, y los textos
- * legales son de la clienta. Mandar a alguien a completar algo que no puede
- * completar es peor que pedirle una cosa sola. Cuando exista, vuelve la frase
- * entera.
+ * Hasta el 05/09/2026 nombraba SOLO el formulario de salud, a contramano del
+ * copy de Sofia ("necesitamos el formulario de salud y el consentimiento
+ * informado completos"): el consentimiento no existia como pantalla y mandar a
+ * alguien a completar algo que no puede completar es peor que pedirle una cosa
+ * sola. Ahora existe (`/viajes/[id]/consentimiento`) y el correo nombra lo que
+ * de verdad falta — los dos, o solo el consentimiento cuando el de salud ya
+ * llego o no corresponde.
  */
 export function FormulariosPendientes({
   nombre,
   viaje,
   fechas,
+  falta,
   url,
 }: {
   nombre: string;
   viaje: string;
   fechas: string;
+  /** Que le falta: los dos formularios, o solo la firma. */
+  falta: "ambos" | "consentimiento";
   url: string;
 }) {
   return (
@@ -36,17 +39,31 @@ export function FormulariosPendientes({
 
       <Paragraph>
         Tu cupo en <strong>{viaje}</strong>
-        {fechas ? ` (${fechas})` : ""} está reservado, pero aún no recibimos tu
-        formulario de salud.
+        {fechas ? ` (${fechas})` : ""} está reservado, pero todavía nos falta
+        {falta === "ambos"
+          ? " tu formulario de salud y tu consentimiento informado."
+          : " tu consentimiento informado firmado."}
       </Paragraph>
 
-      <Paragraph>
-        Para poder confirmar tu participación necesitamos que lo completes. Es
-        más largo que el primero y es lo que nos permite preparar la ceremonia y
-        cuidar tu proceso, así que tómate el tiempo de responderlo con calma.
-      </Paragraph>
+      {falta === "ambos" ? (
+        <Paragraph>
+          Para poder confirmar tu participación necesitamos que los completes. El
+          formulario de salud es más largo que el primero y es lo que nos permite
+          preparar la ceremonia y cuidar tu proceso, así que tómate el tiempo de
+          responderlo con calma. El consentimiento se firma después, y explica en
+          qué consiste la experiencia y cómo te acompañamos.
+        </Paragraph>
+      ) : (
+        <Paragraph>
+          Es el documento que explica en qué consiste la experiencia, cuál es el
+          rol del facilitador y cómo cuidamos tu información. Se lee con calma y
+          se firma escribiendo tu nombre completo.
+        </Paragraph>
+      )}
 
-      <CtaButton href={url}>Completar mi formulario</CtaButton>
+      <CtaButton href={url}>
+        {falta === "ambos" ? "Completar mi formulario" : "Leer y firmar"}
+      </CtaButton>
 
       <Paragraph>
         Si tuviste algún problema para completarlo o quieres conversar algo

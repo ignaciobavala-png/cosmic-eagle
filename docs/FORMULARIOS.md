@@ -56,7 +56,8 @@ primerizo/recurrente de la app **coincide 1:1 con el de Estela**.
 | Salud ES | ✅ `HealthForm.tsx` (etapa 2), con los detalles condicionales (`<campo>_detail`). Ya no pide nombre, mail ni teléfono: los dio en el filtro |
 | Viajer@s ES | ✅ `ScreeningForm.tsx` (etapa 1). "Ceremonias previas" admite 0 y "última ceremonia" se sacó: se postula a un viaje concreto |
 | Salud EN / Travelers EN | ❌ la web es monolingüe, el i18n no está hecho |
-| Consentimiento ES y EN | ❌ **no hay UI**; la tabla `consents` existe desde el principio |
+| Consentimiento ES | ✅ desde el 05/09/2026: `/viajes/[id]/consentimiento`. Transcripción literal en `docs/CONSENTIMIENTO.md` |
+| Consentimiento EN | ❌ transcripto en `docs/CONSENTIMIENTO.md`, sin implementar: falta el i18n |
 
 - `HealthForm.tsx` (etapa 2) ↔ *Formulario de Salud*: nombre, edad, estatura, peso, país, email,
   teléfono, ocupación (el nombre, el mail y el teléfono los toma del filtro) + 9 preguntas sí/no con detalle condicional (condición de salud,
@@ -65,10 +66,11 @@ primerizo/recurrente de la app **coincide 1:1 con el de Estela**.
 - `ScreeningForm.tsx` (etapa 1) ↔ *Viajer@s*: nombre, mail, teléfono, tratamiento
   médico o psiquiátrico en curso, estrés/ansiedad, tema específico a abordar, algo más a
   compartir, cantidad de ceremonias previas con Estela.
-- El consentimiento calza con la tabla `consents` tal como está: 5 bloques de texto
-  (La experiencia · Rol del facilitador · Efectos potenciales · Posibles resultados ·
-  Confidencialidad), 4 confirmaciones y el nombre completo como firma → `confirmations`
-  (jsonb) + `digital_signature` + `consent_version`. **No hay que tocar el schema.**
+- El consentimiento calzó con la tabla `consents` tal como estaba: 5 bloques de texto
+  (Viaje · Facilitador · Experiencia · Consideraciones · Confidencialidad), 4
+  confirmaciones y el nombre completo como firma → `confirmations` (jsonb) +
+  `digital_signature` + `consent_version`. **No hizo falta tocar el schema** — sí el
+  permiso, ver `docs/CONSENTIMIENTO.md` §3.
 
 El campo "fecha de la próxima ceremonia" del original **se sacó** al pasar al filtro: en la
 web es redundante, se postula a *un* viaje concreto y la fecha sale de `trips`.
@@ -81,10 +83,10 @@ web es redundante, se postula a *un* viaje concreto y la fecha sale de `trips`.
    **sí/no + párrafo**, igual que en la app. La segunda pasa por un modelo que resume, así
    que no es literal y la primera pesa más. **Hay que abrir el formulario a mano y mirar
    ese campo**; si es multiple choice, pedirle la lista de opciones a Estela.
-2. **El consentimiento es un paso aparte y condicionado.** Una de las 4 confirmaciones es
-   "completé el formulario de salud": el flujo real es solicitud → consentimiento. La tabla
-   ya lo soporta vía `application_first_time_id` / `application_returning_id`, así que lo
-   que falta es una pantalla encadenada después de enviar la solicitud, no un form suelto.
+2. ~~**El consentimiento es un paso aparte y condicionado.**~~ **RESUELTO el 05/09/2026.**
+   Es una pantalla encadenada (`/viajes/[id]/consentimiento`), posterior al formulario de
+   salud justamente porque una de las 4 confirmaciones dice "he rellenado el formulario de
+   salud obligatorio". Ver `docs/CONSENTIMIENTO.md`.
 3. **Bug latente con los recurrentes.** La app elige qué formulario mostrar según el
    historial de aprobaciones *en Supabase*. Toda la gente que ya ceremonió vía Google Forms
    tiene historial cero, así que se le mostraría el formulario de primera vez. Tres salidas
@@ -101,19 +103,14 @@ web es redundante, se postula a *un* viaje concreto y la fecha sale de `trips`.
 
 ## Textos legales del consentimiento
 
-Todavía **no están en el repo**. Lo relevado es un resumen del contenido, no la
-transcripción textual, y los textos legales no se inventan ni se modifican (ver "No hacer"
-en CLAUDE.md). Antes de construir la UI del consentimiento hay que obtener la
-transcripción exacta de las versiones ES y EN — se puede extraer del HTML crudo de los
-formularios, que trae las preguntas literales, o pedírsela a Estela.
+**Ya están en el repo** (05/09/2026): transcripción literal de los dos idiomas en
+`docs/CONSENTIMIENTO.md`, y el español, que es el que se renderiza, en
+`src/lib/consent.ts`. Salieron del HTML crudo de los dos formularios de Google, que trae
+las preguntas textuales.
 
-Lo único literal que quedó capturado hasta ahora, del ES:
+Sigue valiendo la regla: **no se reescriben ni se resumen**. Si la clienta cambia el
+texto, se cambia en `src/lib/consent.ts` y se sube `CONSENT_VERSION`, así las firmas
+viejas siguen diciendo qué se aceptó.
 
-- *Viaje*: "El viaje tiene como objetivo acompañar al participante en una experiencia de
-  expansión de conciencia a través de una sesión de hongos psilocybe con acompañamiento de
-  los facilitadores."
-- *Confidencialidad*: "Toda la información compartida durante las sesiones es estrictamente
-  confidencial y será manejada conforme a las leyes vigentes de protección de datos
-  personales."
-
-El resto de los bloques (Facilitador, Experiencia, Consideraciones) sigue sin transcribir.
+Lo que falta es que Estela y Sofía **confirmen que ese es el texto vigente**: se extrajo
+del formulario publicado, no de un documento que ellas hayan mandado.

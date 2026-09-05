@@ -7,6 +7,7 @@ import {
   inputClass,
   labelClass,
 } from "@/components/forms/fields";
+import { panel, panelTitle, submitButton } from "@/components/forms/styles";
 import { submitHealthForm, type HealthFormState } from "./actions";
 
 export function HealthForm({
@@ -24,11 +25,9 @@ export function HealthForm({
   return (
     <form
       action={formAction}
-      className="glass-card rounded-2xl p-6 md:p-8 flex flex-col gap-2 max-w-2xl"
+      className={`flex max-w-2xl flex-col gap-2 p-6 md:p-8 ${panel}`}
     >
-      <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
-        Tus datos
-      </h2>
+      <h2 className={`mb-2 ${panelTitle}`}>Tus datos</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
         <div className="flex flex-col gap-1.5">
@@ -53,10 +52,8 @@ export function HealthForm({
         </div>
       </div>
 
-      <h2 className="font-display text-xl text-primary-fixed-dim mt-4 mb-1">
-        Salud y contención
-      </h2>
-      <p className="text-xs text-on-surface-variant mb-2">
+      <h2 className={`mb-1 mt-4 ${panelTitle}`}>Salud y contención</h2>
+      <p className="mb-2 text-xs text-white/55">
         Esta información es confidencial y sólo la revisa el equipo médico y de
         contención. Sirve para preparar la ceremonia y acompañarte mejor.
       </p>
@@ -106,7 +103,7 @@ export function HealthForm({
       </div>
 
       {state.error && (
-        <p className="text-error text-sm" role="alert">
+        <p className="text-sm text-[#ffb4a8]" role="alert">
           {state.error}
         </p>
       )}
@@ -114,7 +111,7 @@ export function HealthForm({
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-fixed transition-colors disabled:opacity-60"
+        className={`mt-4 ${submitButton}`}
       >
         {pending ? "Enviando..." : "Enviar formulario"}
       </button>

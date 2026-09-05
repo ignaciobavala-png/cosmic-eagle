@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { fieldInput, fieldLabel, panelDivider } from "./styles";
 
 /**
  * Los controles que comparten el filtro corto (etapa 1) y el formulario de
@@ -10,10 +11,13 @@ import { useState } from "react";
  * era la misma para los dos formularios.
  */
 
-export const inputClass =
-  "bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-fixed-dim transition-colors";
+// Desde el 05/09 son los mismos campos de la pantalla de acceso: el embudo
+// entero pasó al azul de Julia y los tokens de superficie del sistema (pensados
+// para el fondo oscuro general) quedaban invisibles encima. Ver
+// `@/components/forms/styles`.
+export const inputClass = fieldInput;
 
-export const labelClass = "text-sm text-on-surface-variant tracking-[0.02em]";
+export const labelClass = fieldLabel;
 
 /**
  * Un número que se escribe, sin las flechitas de `type="number"`.
@@ -82,15 +86,17 @@ export function YesNoQuestion({
   const [answer, setAnswer] = useState<"si" | "no" | null>(null);
 
   return (
-    <fieldset className="flex flex-col gap-2 py-4 border-b border-outline-variant/40 last:border-0">
-      <legend className="text-on-surface">{label}</legend>
-      {hint && <p className="text-xs text-on-surface-variant">{hint}</p>}
+    <fieldset
+      className={`flex flex-col gap-2 border-b py-4 last:border-0 ${panelDivider}`}
+    >
+      <legend className="text-white">{label}</legend>
+      {hint && <p className="text-xs text-white/55">{hint}</p>}
 
       <div className="flex gap-6 pt-1">
         {(["si", "no"] as const).map((value) => (
           <label
             key={value}
-            className="flex items-center gap-2 text-on-surface cursor-pointer"
+            className="flex cursor-pointer items-center gap-2 text-white"
           >
             <input
               type="radio"
@@ -99,7 +105,7 @@ export function YesNoQuestion({
               required
               checked={answer === value}
               onChange={() => setAnswer(value)}
-              className="w-4 h-4 accent-primary-fixed-dim"
+              className="h-4 w-4 accent-[#f9d78f]"
             />
             {value === "si" ? "Sí" : "No"}
           </label>

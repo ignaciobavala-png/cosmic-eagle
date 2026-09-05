@@ -27,6 +27,8 @@ Consecuencias directas, porque contradicen cómo está armada la web hoy:
   manual y sigue siendo el gate real de acceso.
 - **El consentimiento va después del formulario extenso**, no antes ni en el medio. Encaja
   con que una de sus 4 confirmaciones sea "completé el formulario de salud".
+  **Implementado el 05/09/2026** en `/viajes/[id]/consentimiento`, con el texto literal de
+  su formulario de Google: ver `docs/CONSENTIMIENTO.md`.
 
 ### Lo que este orden bloquea
 
@@ -170,9 +172,10 @@ en este primer paso. Hoy es opcional.
 2. ~~**Ella pide dos filtros de salud, la web tiene uno.**~~ **RESUELTO el 2026-08-19**:
    son las dos etapas, y el encuadre de adicciones / bipolaridad / depresión severa se
    muestra arriba de las tres preguntas, antes de que la persona conteste nada.
-3. **Después de aprobar, la web no acompaña.** Los pasos 6, 7 y 9 —preparación,
-   consentimiento, logística, integración— son hoy cero código. Es el mismo hueco que
-   marca `docs/FLUJO_USUARIO.md`: ser viajero aprobado casi no cambia nada.
+3. **Después de aprobar, la web acompaña a medias.** De los pasos 6, 7 y 9, ya están el
+   **consentimiento** (05/09/2026) y la **logística** (el bloque "Para tu llegada" de la
+   pantalla de estado, más el correo [7], desde el 03/09). Siguen en cero la
+   **preparación** —falta `/preparacion`— y la **integración**.
 
 ## Lo que ella no menciona y la web sí tiene
 

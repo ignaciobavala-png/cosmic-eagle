@@ -12,7 +12,7 @@ import {
  * El embudo de inscripción entero, contra la base real:
  *
  *   registro → filtro corto → aprobación → datos de pago → comprobante
- *            → pago registrado → formulario de salud
+ *            → pago registrado → formulario de salud → consentimiento firmado
  *
  * Es lo que venía anotado sesión tras sesión como "sin verificar end-to-end
  * (requiere sesión, la hace Ignacio)". Son siete pantallas y cuatro de ellas
@@ -206,7 +206,6 @@ test("el embudo completo: del registro al formulario de salud", async ({ page, b
     await page.getByRole("button", { name: /Enviar/i }).click();
 
     await page.waitForURL(`**${ruta}`, { timeout: 30_000 });
-    await expect(page.getByText("Estás dentro de este viaje")).toBeVisible();
 
     const { data: salud } = await adminClient()
       .from("health_form_first_time")
@@ -215,6 +214,46 @@ test("el embudo completo: del registro al formulario de salud", async ({ page, b
       .single();
     expect(salud?.first_time_plants).toBe(true);
     expect(salud?.plants_detail).toBe(DETALLE_DE_PRUEBA);
+
+    // ─── 8. El consentimiento informado ──────────────────────────────────────
+    // Recién ahora aparece: la pantalla lo pide DESPUÉS del formulario de salud,
+    // porque una de sus cuatro confirmaciones dice que ese formulario está
+    // completo (docs/CONSENTIMIENTO.md).
+    await page.getByRole("link", { name: /firmar el consentimiento/i }).click();
+    await page.waitForURL(`**/viajes/${viaje.id}/consentimiento`);
+    await expect(
+      page.getByRole("heading", { name: "Confidencialidad" })
+    ).toBeVisible();
+
+    // Con tres de las cuatro marcadas el botón sigue deshabilitado: no es un
+    // consentimiento informado a medias.
+    const casillas = page.locator('form input[type="checkbox"]');
+    await expect(casillas).toHaveCount(4);
+    const firmar = page.getByRole("button", { name: /Firmar el consentimiento/i });
+    for (const i of [0, 1, 2]) await casillas.nth(i).check();
+    await expect(firmar).toBeDisabled();
+
+    await casillas.nth(3).check();
+    await page.locator('input[name="signature"]').fill(NOMBRE_DE_PRUEBA);
+    await expect(firmar).toBeEnabled();
+    await firmar.click();
+
+    await page.waitForURL(`**${ruta}`, { timeout: 30_000 });
+    await expect(page.getByText("Estás dentro de este viaje")).toBeVisible();
+
+    const { data: consentimiento } = await adminClient()
+      .from("consents")
+      .select("digital_signature, confirmations, consent_version, user_id, trip_id, date")
+      .eq("application_id", solicitud!.id)
+      .single();
+    expect(consentimiento?.digital_signature).toBe(NOMBRE_DE_PRUEBA);
+    // Las cuatro etiquetas se guardan enteras: es lo que hace que la firma diga
+    // QUÉ se aceptó aunque el texto cambie después.
+    expect(Array.isArray(consentimiento?.confirmations)).toBe(true);
+    expect((consentimiento?.confirmations as unknown[]).length).toBe(4);
+    // `user_id` y `trip_id` los pone el trigger leyendo la solicitud.
+    expect(consentimiento?.trip_id).toBe(viaje.id);
+    expect(consentimiento?.user_id).toBe(userId);
 
     await admin.context.close();
   } finally {

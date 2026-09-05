@@ -7,6 +7,14 @@ import { createClient } from "@/lib/supabase/server";
 import { getActivePaymentMethods } from "@/lib/payments";
 import { formatAmount } from "@/lib/format";
 import { formatTripHours } from "@/lib/trip-fields";
+import {
+  funnelSurface,
+  panel,
+  panelBody,
+  panelStrong,
+  panelTitle,
+  pillButton,
+} from "@/components/forms/styles";
 import { ScreeningForm } from "./ScreeningForm";
 import { PaymentProofUpload } from "./PaymentProofUpload";
 
@@ -24,6 +32,7 @@ function nextStep(
     payment_status: string | null;
     is_first_time: boolean | null;
     health_form_submitted: boolean | null;
+    consent_submitted: boolean | null;
   }
 ): Step {
   if (app.status === "rejected") {
@@ -69,29 +78,48 @@ function nextStep(
     };
   }
 
-  // Reservó con seña: la etapa 2 se abre igual (así lo pide el correo [3A] de
-  // Sofía — los formularios se mandan con la reserva, no con el saldo), pero la
-  // pantalla tiene que seguir mostrando cuánto falta.
-  if (app.payment_status === "deposit_paid" && app.is_first_time && !app.health_form_submitted) {
-    return {
-      title: "Cupo reservado",
-      body: "Recibimos tu seña y tu lugar está guardado. Abajo está el saldo y cómo completarlo, cuando quieras. Mientras tanto podés seguir con el formulario de salud, que es lo que nos permite preparar la ceremonia.",
-      cta: { href: `/viajes/${tripId}/salud`, label: "Completar el formulario de salud" },
-    };
-  }
+  // Los dos formularios que faltan, en orden: primero el de salud y después el
+  // consentimiento, porque una de sus cuatro confirmaciones dice justamente que
+  // el de salud está completo (docs/CONSENTIMIENTO.md).
+  const faltaSalud = !!app.is_first_time && !app.health_form_submitted;
+  const faltaConsentimiento = !app.consent_submitted;
 
+  const formulario = faltaSalud
+    ? {
+        body: "el formulario de salud completo, que es lo que nos permite preparar la ceremonia y cuidar tu proceso",
+        cta: {
+          href: `/viajes/${tripId}/salud`,
+          label: "Completar el formulario de salud",
+        },
+      }
+    : faltaConsentimiento
+      ? {
+          body: "firmar el consentimiento informado, que explica en qué consiste la experiencia y cómo te acompañamos",
+          cta: {
+            href: `/viajes/${tripId}/consentimiento`,
+            label: "Leer y firmar el consentimiento",
+          },
+        }
+      : null;
+
+  // Reservó con seña: los formularios se abren igual (así lo pide el correo
+  // [3A] de Sofía — se mandan con la reserva, no con el saldo), pero la pantalla
+  // tiene que seguir mostrando cuánto falta.
   if (app.payment_status === "deposit_paid") {
     return {
       title: "Cupo reservado",
-      body: "Recibimos tu seña y tu lugar está guardado. Abajo está el saldo y los medios para completarlo cuando quieras.",
+      body: formulario
+        ? `Recibimos tu seña y tu lugar está guardado. Abajo está el saldo y cómo completarlo, cuando quieras. Mientras tanto podés seguir con ${formulario.body}.`
+        : "Recibimos tu seña y tu lugar está guardado. Abajo está el saldo y los medios para completarlo cuando quieras.",
+      cta: formulario?.cta,
     };
   }
 
-  if (app.is_first_time && !app.health_form_submitted) {
+  if (formulario) {
     return {
       title: "Cupo reservado",
-      body: "Queda un paso importante: el formulario de salud completo, que es lo que nos permite preparar la ceremonia y cuidar tu proceso.",
-      cta: { href: `/viajes/${tripId}/salud`, label: "Completar el formulario de salud" },
+      body: `Queda un paso importante: ${formulario.body}.`,
+      cta: formulario.cta,
     };
   }
 
@@ -130,7 +158,7 @@ export default async function SolicitarPage({
   const { data: applications } = await supabase
     .from("my_applications")
     .select(
-      "id, status, payment_status, amount_paid, is_first_time, health_form_submitted, payment_proof_submitted, payment_proof_at"
+      "id, status, payment_status, amount_paid, is_first_time, health_form_submitted, consent_submitted, payment_proof_submitted, payment_proof_at"
     )
     .eq("trip_id", id)
     .order("created_at", { ascending: false });
@@ -180,36 +208,34 @@ export default async function SolicitarPage({
   return (
     <>
       <Header />
-      <main className="pt-18 md:pt-24 min-h-screen">
-        <div className="px-5 max-w-3xl mx-auto py-16 md:py-20">
+      {/* El encabezado sigue el de la pantalla de acceso: volanta dorada,
+          titulo blanco y bajada al 65%. Antes el titulo era dorado sobre el
+          tramo negro del `body`. */}
+      <main className={`pt-18 md:pt-24 ${funnelSurface}`}>
+        <div className="mx-auto max-w-3xl px-5 py-16 md:py-20">
           <div className="mb-10">
-            <span className="text-xs font-medium tracking-[0.05em] uppercase text-secondary block mb-2">
+            <span className="mb-3.5 block text-label-sm font-bold uppercase tracking-[0.21em] text-primary-container">
               Solicitud de participación
             </span>
-            <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary-fixed-dim mb-2">
+            <h1 className="mb-2.5 font-display text-[clamp(1.875rem,3.4vw,2.375rem)] font-bold text-white">
               {trip.title}
             </h1>
-            <p className="text-on-surface-variant">{trip.location}</p>
+            <p className="text-sm text-white/65">{trip.location}</p>
           </div>
 
           {step ? (
-            <div className="glass-card rounded-2xl p-6">
-              <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
-                {step.title}
-              </h2>
-              <p className="text-on-surface-variant">{step.body}</p>
+            <div className={`p-6 md:p-8 ${panel}`}>
+              <h2 className={`mb-2 ${panelTitle}`}>{step.title}</h2>
+              <p className={panelBody}>{step.body}</p>
               {step.cta && (
-                <Link
-                  href={step.cta.href}
-                  className="inline-block mt-5 bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg px-5 py-2.5 hover:bg-primary-fixed transition-colors"
-                >
+                <Link href={step.cta.href} className={`mt-6 ${pillButton}`}>
                   {step.cta.label}
                 </Link>
               )}
             </div>
           ) : trip.status !== "open" ? (
-            <div className="glass-card rounded-2xl p-6">
-              <p className="text-on-surface-variant">
+            <div className={`p-6 md:p-8 ${panel}`}>
+              <p className={panelBody}>
                 Este viaje no está recibiendo solicitudes en este momento.
               </p>
             </div>
@@ -218,24 +244,22 @@ export default async function SolicitarPage({
           )}
 
           {enPago && existing?.id && (
-            <div className="glass-card rounded-2xl p-6 mt-6">
-              <h2 className="font-display text-xl text-primary-fixed-dim mb-4">
-                Cómo pagar
-              </h2>
+            <div className={`mt-6 p-6 md:p-8 ${panel}`}>
+              <h2 className={`mb-4 ${panelTitle}`}>Cómo pagar</h2>
 
               {trip.price > 0 && (
-                <div className="mb-5 text-on-surface-variant">
+                <div className={`mb-5 ${panelBody}`}>
                   {existing.payment_status === "deposit_paid" ? (
                     // Ya reservó: lo único que importa es cuánto falta. El
                     // plazo no se nombra — la pregunta 4 de
                     // docs/consulta-sofia-pagos.txt sigue sin respuesta.
                     <p>
                       Recibimos{" "}
-                      <span className="text-on-surface font-medium">
+                      <span className={`font-medium ${panelStrong}`}>
                         {formatAmount(existing.amount_paid ?? 0)}
                       </span>{" "}
                       de {formatAmount(trip.price)}. Queda un saldo de{" "}
-                      <span className="text-on-surface font-medium">
+                      <span className={`font-medium ${panelStrong}`}>
                         {formatAmount(trip.price - (existing.amount_paid ?? 0))}
                       </span>
                       , que podés completar de una vez o en partes.
@@ -244,11 +268,11 @@ export default async function SolicitarPage({
                     // Las dos opciones, como las pide el correo [2] de Sofía.
                     <p>
                       Podés reservar tu cupo con una seña de{" "}
-                      <span className="text-on-surface font-medium">
+                      <span className={`font-medium ${panelStrong}`}>
                         {formatAmount(trip.deposit_amount)}
                       </span>{" "}
                       o pagar el total de{" "}
-                      <span className="text-on-surface font-medium">
+                      <span className={`font-medium ${panelStrong}`}>
                         {formatAmount(trip.price)}
                       </span>
                       . Si acordaste otro monto con nosotros, vale lo que
@@ -257,7 +281,7 @@ export default async function SolicitarPage({
                   ) : (
                     <p>
                       Aporte de la experiencia:{" "}
-                      <span className="text-on-surface font-medium">
+                      <span className={`font-medium ${panelStrong}`}>
                         {formatAmount(trip.price)}
                       </span>
                       . Si acordaste una seña o un monto distinto con nosotros,
@@ -276,11 +300,11 @@ export default async function SolicitarPage({
                   `noopener noreferrer` no es ceremonia: la pestana nueva podria
                   tocar `window.opener` sin eso. */}
               {trip.payment_url && (
-                <div className="mb-6 rounded-xl border border-primary-fixed-dim/40 bg-primary-container/10 p-5">
-                  <p className="font-medium text-primary-fixed-dim">
+                <div className="mb-6 rounded-xl border border-primary-container/40 bg-primary-container/[0.08] p-5">
+                  <p className="font-medium text-primary-container">
                     Pagar con tarjeta
                   </p>
-                  <p className="mt-0.5 text-sm text-on-surface-variant">
+                  <p className="mt-0.5 text-sm text-white/70">
                     Desde cualquier país, en dólares o pesos chilenos. Lo cobra
                     Encuadrado y puede tener un recargo por comisión.
                   </p>
@@ -288,14 +312,14 @@ export default async function SolicitarPage({
                     href={trip.payment_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-4 inline-block rounded-lg bg-primary-container px-5 py-2.5 text-sm font-medium tracking-[0.05em] text-on-primary transition-colors hover:bg-primary-fixed"
+                    className={`mt-4 ${pillButton}`}
                   >
                     Ir a pagar
                   </a>
                   {/* Encuadrado no nos avisa que el pago entro: no tiene
                       webhooks. Asi que el comprobante se pide igual, y quien
                       confirma sigue siendo Estela. */}
-                  <p className="mt-3 text-sm text-on-surface-variant">
+                  <p className="mt-3 text-sm text-white/70">
                     Cuando termines, subinos el comprobante acá abajo así lo
                     confirmamos.
                   </p>
@@ -306,7 +330,7 @@ export default async function SolicitarPage({
                   avisa. Con link alcanza: el boton de arriba ya es el camino. */}
               {paymentMethods.length === 0 ? (
                 trip.payment_url ? null : (
-                  <p className="text-on-surface-variant">
+                  <p className={panelBody}>
                     Te vamos a escribir con los datos para hacer el pago. Cuando
                     lo hagas, podés enviarnos el comprobante desde acá.
                   </p>
@@ -316,12 +340,12 @@ export default async function SolicitarPage({
                   {paymentMethods.map((method) => (
                     <li
                       key={method.id}
-                      className="rounded-xl border border-outline-variant/50 p-5"
+                      className="rounded-xl border border-white/[0.14] bg-white/[0.04] p-5"
                     >
-                      <p className="font-medium text-primary-fixed-dim">
+                      <p className="font-medium text-primary-container">
                         {method.label}
                         {method.currency && (
-                          <span className="text-on-surface-variant font-normal">
+                          <span className="font-normal text-white/60">
                             {" "}
                             · {method.currency}
                             {/* El aporte del viaje esta fijado en dolares (ver
@@ -335,13 +359,13 @@ export default async function SolicitarPage({
                         )}
                       </p>
                       {method.audience && (
-                        <p className="mt-0.5 text-sm text-on-surface-variant">
+                        <p className="mt-0.5 text-sm text-white/60">
                           {method.audience}
                         </p>
                       )}
                       {/* `whitespace-pre-line`: las instrucciones se cargan como
                           una lista de datos y los saltos de línea son el formato. */}
-                      <p className="mt-3 whitespace-pre-line text-sm text-on-surface">
+                      <p className="mt-3 whitespace-pre-line text-sm text-white">
                         {method.instructions}
                       </p>
                       {method.link_url && (
@@ -349,7 +373,7 @@ export default async function SolicitarPage({
                           href={method.link_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mt-4 inline-block rounded-lg bg-primary-container px-5 py-2.5 text-sm font-medium tracking-[0.05em] text-on-primary transition-colors hover:bg-primary-fixed"
+                          className={`mt-4 ${pillButton}`}
                         >
                           Ir a pagar
                         </a>
@@ -360,7 +384,7 @@ export default async function SolicitarPage({
               )}
 
               {existing.payment_proof_submitted && (
-                <p className="mt-6 rounded-xl border border-primary-fixed-dim/30 bg-primary-container/10 px-5 py-4 text-sm text-on-surface">
+                <p className="mt-6 rounded-xl border border-primary-container/30 bg-primary-container/[0.08] px-5 py-4 text-sm text-white">
                   Recibimos tu comprobante
                   {existing.payment_proof_at
                     ? ` el ${new Date(existing.payment_proof_at).toLocaleDateString("es-CL", { day: "numeric", month: "long" })}`
@@ -379,17 +403,15 @@ export default async function SolicitarPage({
           )}
 
           {logistica.length > 0 && (
-            <div className="glass-card mt-8 rounded-2xl p-6 md:p-8">
-              <h2 className="font-display text-headline-md text-primary-fixed-dim">
-                Para tu llegada
-              </h2>
+            <div className={`mt-8 p-6 md:p-8 ${panel}`}>
+              <h2 className={panelTitle}>Para tu llegada</h2>
               <dl className="mt-5 flex flex-col gap-5">
                 {logistica.map((item) => (
                   <div key={item.label}>
-                    <dt className="text-xs uppercase tracking-widest text-on-surface-variant mb-1.5">
+                    <dt className="mb-1.5 text-xs uppercase tracking-widest text-white/55">
                       {item.label}
                     </dt>
-                    <dd className="whitespace-pre-line text-sm leading-relaxed text-on-surface">
+                    <dd className="whitespace-pre-line text-sm leading-relaxed text-white">
                       {item.value}
                       {item.href && (
                         <>
