@@ -100,9 +100,15 @@ export default async function NosotrosPage() {
             arriba (`nosObserveToggle`). El titulo entra en 1s, la linea crece de
             0 a 64px en 1.2s y los parrafos van de a 14px con 0.15s de escalon.
             La frase itálica del cierre lleva 0.65s, que es el unico retardo que
-            Julia escribe a mano. Padding mobile 35px como el mockup 2/9. */}
+            Julia escribe a mano. Padding mobile 35px como el mockup 2/9.
+
+            El `id` es el destino del desplegable de "Nosotros" del navbar
+            (04/09). Ojo: `#enfoque` ya estaba tomado por la pantalla de las
+            cuatro palabras, que es a donde apunta el hint del hero — por eso
+            esta seccion es `#nuestro-enfoque` y no se renombro la otra. */}
         <Reveal
           as="section"
+          id="nuestro-enfoque"
           amount={0.25}
           once={false}
           stagger={0}

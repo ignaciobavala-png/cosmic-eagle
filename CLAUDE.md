@@ -1988,3 +1988,38 @@ crítico, y la misma llave para mudar el sitio después) y que confirmen que
 `contacto@cosmiceaglejourney.com` existe, porque es el `reply_to` de todo y
 Resend no tiene bandeja de entrada. Recordatorio: el subdominio de envío **no
 puede ser `mail.`**, ya existe como CNAME al sitio viejo.
+
+### Sesión del 2026-09-05 — el desplegable de «Nosotros» y los títulos solos
+
+Dos pedidos de la reunión del 04/09, los dos de navbar.
+
+**1. «Nosotros» también despliega**, con el mismo panel que Experiencias (filete
+dorado, rombo, flechas), y sus hijos son atajos a las sub-secciones de la propia
+página: Nuestro enfoque, Nuestro propósito y Quiénes somos. El cierre (`#vision`)
+queda afuera a propósito: es un llamado a la acción, no una sección de contenido.
+
+- **Ojo con el nombre del ancla**: `#enfoque` ya estaba tomado por la pantalla de
+  las cuatro palabras (Liberar / Recordar / …), que es a donde apunta el hint del
+  hero. Por eso la sección «Nuestro enfoque» estrenó **`#nuestro-enfoque`** en vez
+  de renombrar la otra, que hubiera roto el hint.
+- **El scroll asistido no necesitó código**: `scroll-behavior: smooth` en `html`
+  ya estaba, y el `scroll-padding-top` del 02/09 es el que evita que el navbar
+  opaco tape el arranque. Medido en el browser: los tres anclajes frenan exacto a
+  96px del top, que es el alto de la barra.
+
+**2. El desplegable lleva SOLO títulos.** Se fue la descripción de los dos ítems
+de Experiencias ("Encuentros de un día para ir más profundo" / "Experiencias de
+una semana en portales sagrados"), que venía del mockup aprobado de Julia
+(`.dropdown-desc`). Con los ítems en una línea la caja quedaba vacía: se angostó
+de 22 a 17rem y el ítem pasó a una línea centrada con su flecha.
+
+- **El copy no se borró**: sigue en `TRIP_TYPES.description` (`constants.ts`) con
+  un comentario de que ya no se muestra en el navbar. Es texto de la clienta y el
+  bloque de `/viajes` puede quererlo; si sigue sin uso, se borra.
+- El drawer mobile lo tomó solo: ya dibujaba los hijos indentados bajo el padre,
+  así que Nosotros los lista sin tocar nada.
+
+Verificado: `tsc`, lint (queda el warning previo del `<img>` del avatar), build de
+producción, los **38 tests públicos en verde**, y medición en Chrome real a
+1440×900 y 390×844 — los dos paneles con sus ítems y hrefs, los tres anclajes
+frenando bajo el navbar, y el drawer listando los cinco hijos.

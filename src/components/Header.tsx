@@ -178,15 +178,22 @@ export function Header() {
                           - un filete dorado corona el panel y lo ata al navbar,
                             con el rombo de 4 puntas del sistema centrado
                             encima, bajo el link;
-                          - los dos items se separan con una linea dorada tenue
+                          - los items se separan con una linea dorada tenue
                             en vez de quedar apilados a la misma altura;
                           - cada item tiene su flecha, que entra y avanza en
                             hover: sin ella nada decia que eran links.
 
+                          Desde la reunion del 04/09 el panel lleva SOLO
+                          titulos: la descripcion de cada item ("Encuentros de
+                          un dia para ir mas profundo") salio a pedido de la
+                          clienta. Por eso la caja se angosto de 22 a 17rem y
+                          los items pasaron a una linea centrada — con el ancho
+                          viejo quedaba una caja casi vacia.
+
                           El panel entra ademas subiendo 6px. El desplazamiento
                           va aca adentro y no en el wrapper, que tiene que
                           quedarse pegado al link (ver arriba). */}
-                      <ul className="relative w-[22rem] rounded-[18px] border border-primary-container/25 bg-[linear-gradient(160deg,rgba(0,121,179,0.16)_0%,rgba(5,18,90,0.55)_55%,rgba(2,12,65,0.56)_100%)] p-6 pt-7 shadow-[0_18px_50px_rgba(2,12,65,0.45)] backdrop-blur-2xl backdrop-brightness-[0.38] backdrop-saturate-150 transition-transform duration-200 translate-y-1.5 group-hover:translate-y-0 group-focus-within:translate-y-0">
+                      <ul className="relative w-[17rem] rounded-[18px] border border-primary-container/25 bg-[linear-gradient(160deg,rgba(0,121,179,0.16)_0%,rgba(5,18,90,0.55)_55%,rgba(2,12,65,0.56)_100%)] p-4 pt-5 shadow-[0_18px_50px_rgba(2,12,65,0.45)] backdrop-blur-2xl backdrop-brightness-[0.38] backdrop-saturate-150 transition-transform duration-200 translate-y-1.5 group-hover:translate-y-0 group-focus-within:translate-y-0">
                         {/* El filete y el rombo son decoracion pura: van en
                             elementos vacios para que ningun lector de pantalla
                             los anuncie, igual que los filetes de
@@ -209,20 +216,15 @@ export function Header() {
                           >
                             <Link
                               href={child.href}
-                              className="group/item flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-primary-container/[0.08]"
+                              className="group/item flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-primary-container/[0.08]"
                             >
-                              <span className="min-w-0 flex-1">
-                                <span className="block font-display text-base font-bold tracking-[0.03em] text-primary-container">
-                                  {child.label}
-                                </span>
-                                <span className="mt-1.5 block text-[13px] font-light leading-relaxed text-primary-container/70">
-                                  {child.description}
-                                </span>
+                              <span className="min-w-0 flex-1 font-display text-base font-bold tracking-[0.03em] text-primary-container">
+                                {child.label}
                               </span>
                               <ArrowRight
                                 size={16}
                                 aria-hidden="true"
-                                className="mt-1 shrink-0 text-primary-container/40 transition-[transform,color] duration-200 group-hover/item:translate-x-1 group-hover/item:text-primary-container"
+                                className="shrink-0 text-primary-container/40 transition-[transform,color] duration-200 group-hover/item:translate-x-1 group-hover/item:text-primary-container"
                               />
                             </Link>
                           </li>

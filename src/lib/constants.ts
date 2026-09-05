@@ -70,9 +70,10 @@ export const TRIP_TYPES = [
     label: "Sesiones",
     singular: "Sesión",
     upcoming: "Próximas Sesiones",
-    // El copy del desplegable es el del mockup aprobado de Julia
-    // (`.dropdown-desc`), que teniamos reescrito y sin tilde. Es el unico lugar
-    // donde se usa esta descripcion.
+    // Copy del mockup aprobado de Julia (`.dropdown-desc`). YA NO SE MUESTRA:
+    // desde la reunion del 04/09 el desplegable del navbar lleva solo titulos
+    // (ver NAV_LINKS). Se conserva porque es copy de la clienta y el bloque de
+    // /viajes puede necesitarlo; si en un mes sigue sin usarse, se borra.
     description: "Encuentros de un día para ir más profundo",
   },
   {
@@ -98,12 +99,30 @@ export type NavLink = {
   label: string;
   href: string;
   icon: "Info" | "Sparkles" | "BookOpen" | "User";
-  children?: { label: string; href: string; description: string }[];
+  // Los hijos del desplegable son SOLO titulos: la descripcion salio en la
+  // reunion del 04/09 ("dejemos solo titulos"). El `href` puede ser un ancla a
+  // una seccion de la propia pagina del padre.
+  children?: { label: string; href: string }[];
 };
 
 // "Inicio" no va en el nav: al home se llega tocando el logo (desktop y drawer)
 export const NAV_LINKS: NavLink[] = [
-  { label: "Nosotros", href: "/nosotros", icon: "Info" },
+  {
+    label: "Nosotros",
+    href: "/nosotros",
+    icon: "Info",
+    // Pedido de la reunion del 04/09: "Nosotros" tambien despliega, con scroll
+    // asistido a sus sub-secciones. Son los tres encabezados reales de la
+    // pagina; el cierre queda afuera porque es un llamado a la accion, no una
+    // seccion de contenido. El desplazamiento suave lo da el
+    // `scroll-behavior: smooth` de globals.css, y el `scroll-padding-top` evita
+    // que el navbar opaco tape el arranque de la seccion.
+    children: [
+      { label: "Nuestro enfoque", href: "/nosotros#nuestro-enfoque" },
+      { label: "Nuestro propósito", href: "/nosotros#proposito" },
+      { label: "Quiénes somos", href: "/nosotros#somos" },
+    ],
+  },
   {
     // El mockup del rediseno lo llama "Experiencias", que ademas resuelve el
     // problema de nomenclatura de docs/HOME_REDISENO.md §3.1: para Sofia "Viaje
@@ -122,7 +141,6 @@ export const NAV_LINKS: NavLink[] = [
     children: TRIP_TYPES.map((t) => ({
       label: t.label,
       href: `/viajes#${t.value === "ceremonia" ? "sesiones" : "viajes"}`,
-      description: t.description,
     })),
   },
   { label: "Contenidos", href: "/contenidos", icon: "BookOpen" },
