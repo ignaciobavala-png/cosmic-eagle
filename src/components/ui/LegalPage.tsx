@@ -6,6 +6,7 @@ import { BackToTop } from "@/components/BackToTop";
 import { ArticleBody } from "@/components/ui/ArticleBody";
 import { Reveal } from "@/components/ui/Reveal";
 import { parseArticleBody, formatArticleDate } from "@/lib/article";
+import { CreamSection } from "./CreamSection";
 import { getLegalDocument, legalDocumentMeta, type LegalSlug } from "@/lib/legal";
 
 /**
@@ -43,8 +44,11 @@ export async function LegalPage({ slug }: { slug: LegalSlug }) {
   return (
     <>
       <Header />
-      <main className="pt-16 lg:pt-21">
-        <article className="mx-auto max-w-3xl px-margin-mobile py-16 md:px-gutter md:py-24">
+      {/* Sobre crema, como el resto del texto largo del sitio (05/09/2026). El
+          `pt` es el del navbar opaco; el fondo lo pone la seccion. */}
+      <main className="pt-18 md:pt-24">
+        <CreamSection full={false}>
+        <article className="mx-auto max-w-3xl">
           {/* Se observa sólo el encabezado y no la sección, por lo mismo que
               /faqs: el alto del documento lo decide la clienta, y el ratio de
               intersección máximo alcanzable es alto-de-pantalla / alto-del-
@@ -52,18 +56,15 @@ export async function LegalPage({ slug }: { slug: LegalSlug }) {
               `once`, no aparecería nunca. El cuerpo queda visible desde el
               arranque (ver CLAUDE.md, sesión del 02/09). */}
           <Reveal amount={0.3}>
-            <h1 className="font-display text-headline-lg text-primary-fixed-dim md:text-display-lg">
+            <h1 className="font-display text-headline-lg font-bold text-[#05125a] md:text-display-lg">
               {doc.title}
             </h1>
-            <div
-              aria-hidden="true"
-              className="mt-5 h-px w-16 bg-primary-fixed-dim/70"
-            />
+            <div aria-hidden="true" className="mt-5 h-0.5 w-16 bg-[#f9d78f]" />
           </Reveal>
 
           {doc.isProvisional && (
-            <p className="glass-card mt-8 rounded-2xl border-l-2 border-primary-fixed-dim px-5 py-4 text-body-md leading-relaxed text-on-surface">
-              <strong className="text-primary-container">
+            <p className="mt-8 rounded-2xl border border-[#f9d78f] border-l-2 bg-white/70 px-5 py-4 text-body-md leading-relaxed text-[#333]">
+              <strong className="text-[#05125a]">
                 Versión preliminar.
               </strong>{" "}
               Este texto está en revisión y puede cambiar. Si algo de lo que leés
@@ -72,13 +73,14 @@ export async function LegalPage({ slug }: { slug: LegalSlug }) {
           )}
 
           <div className="mt-10">
-            <ArticleBody blocks={blocks} />
+            <ArticleBody blocks={blocks} tone="light" />
           </div>
 
-          <p className="mt-14 border-t border-primary-fixed-dim/20 pt-6 text-label-sm uppercase tracking-wider text-on-surface/60">
+          <p className="mt-14 border-t border-[#f9d78f] pt-6 text-label-sm uppercase tracking-wider text-on-primary-container">
             Última actualización: {formatArticleDate(doc.updatedAt)}
           </p>
         </article>
+        </CreamSection>
       </main>
       <Footer />
       <BackToTop />

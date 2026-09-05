@@ -20,6 +20,11 @@ export type ArticleCardData = {
  * La portada va en 16:9 y no en 4:3 como la del viaje: acá es una sola imagen,
  * la misma que encabeza el articulo, y no hace falta que sobreviva a dos
  * recortes distintos.
+ *
+ * **Vive sobre crema** (05/09/2026): la tarjeta es blanca con filete dorado,
+ * como las fichas del detalle de una experiencia. Antes era `glass-card`, que
+ * es vidrio dorado pensado para el fondo oscuro del sistema anterior y sobre
+ * crema no se ve.
  */
 export function ArticleCard({ article }: { article: ArticleCardData }) {
   const date = formatArticleDate(article.published_at);
@@ -27,9 +32,9 @@ export function ArticleCard({ article }: { article: ArticleCardData }) {
   return (
     <Link
       href={`/contenidos/${article.slug}`}
-      className="group flex flex-col overflow-hidden rounded-2xl glass-card transition-colors duration-300 hover:border-primary-fixed-dim/35"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-[#f9d78f] bg-white/70 transition-colors duration-300 hover:border-on-primary-container/50"
     >
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-surface-container-lowest">
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#05125a]">
         {article.cover_url ? (
           <Image
             src={article.cover_url}
@@ -44,33 +49,37 @@ export function ArticleCard({ article }: { article: ArticleCardData }) {
           <div className="absolute inset-0 bg-gradient-to-br from-[#0a2a52] to-[#05060a]" />
         )}
         <div className="absolute inset-0 bg-[#05102a]/20" />
-        <span className="absolute left-4 top-4 rounded-full bg-primary-container/90 px-3 py-1 text-label-sm uppercase text-on-primary backdrop-blur-md">
+        {/* La etiqueta va sobre la foto: opaca, no translucida. */}
+        <span className="absolute left-4 top-4 rounded-full bg-[#f9d78f] px-3 py-1 text-label-sm uppercase text-[#05125a]">
           {articleCategoryLabel(article.category)}
         </span>
       </div>
 
       <div className="flex flex-1 flex-col p-5 sm:p-6">
-        <h3 className="font-display text-headline-md text-on-surface">
+        <h3 className="font-display text-headline-md font-bold text-[#05125a]">
           {article.title}
         </h3>
         {article.excerpt && (
-          <p className="mt-3 text-body-md text-on-surface-variant line-clamp-4">
+          <p className="mt-3 line-clamp-4 text-body-md text-[#333]">
             {article.excerpt}
           </p>
         )}
 
-        <div className="mt-6 flex items-end justify-between gap-4 border-t border-primary-fixed-dim/12 pt-4">
+        <div className="mt-6 flex items-end justify-between gap-4 border-t border-[#f9d78f]/70 pt-4">
           <div>
-            <span className="block text-label-sm uppercase text-on-surface-variant/60">
+            {/* El oro de acento no sirve como texto chico sobre fondo claro
+                (2,66:1): va `on-primary-container`, que es el rol del sistema
+                para eso. Regla del 28/08. */}
+            <span className="block text-label-sm uppercase text-on-primary-container">
               Publicado
             </span>
-            <span className="mt-1 block text-body-md text-on-surface">
+            <span className="mt-1 block text-body-md text-[#05125a]">
               {date ?? "—"}
             </span>
           </div>
           <span
             aria-hidden="true"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary-fixed-dim/35 text-primary-fixed-dim transition-colors group-hover:bg-primary-container group-hover:text-on-primary"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-on-primary-container/40 text-on-primary-container transition-colors group-hover:bg-[#f9d78f] group-hover:text-[#05125a]"
           >
             <ArrowUpRight size={18} />
           </span>

@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { PageHero } from "@/components/ui/PageHero";
 import { ArticleCard } from "@/components/ui/ArticleCard";
+import { CreamSection } from "@/components/ui/CreamSection";
 import { Reveal } from "@/components/ui/Reveal";
 import { YouTubeFacade } from "@/components/ui/YouTubeFacade";
 import { createClient } from "@/lib/supabase/server";
@@ -72,21 +73,34 @@ export default async function ContenidosPage({
           overlay={isEnabled(content("contenidos.hero.overlay"))}
         />
 
-        <Reveal className="py-20 md:py-24">
-          <div
-            id="biblioteca"
-            className="mx-auto max-w-narrative px-margin-mobile md:px-margin-desktop scroll-mt-24"
-          >
-            <div className="mb-8 text-center">
-              <span className="text-label-sm uppercase text-on-surface-variant">
+        {/* La biblioteca vive sobre crema, como los bloques narrativos de
+            /viajes y /nosotros. Antes era una seccion sin fondo propio: se
+            apoyaba en el degrade del `body`, que es el chrome del sistema
+            anterior, y con tarjetas de vidrio dorado.
+
+            **El reveal observa solo el encabezado y no la seccion**, igual que
+            /faqs: el ratio de interseccion maximo alcanzable es alto-de-pantalla
+            / alto-del-observado, y aca el alto lo decide la clienta —publica los
+            articulos que quiera—. Con suficientes tarjetas la seccion nunca
+            llegaria al umbral y, siendo reversible, la grilla quedaria invisible
+            para siempre. El encabezado mide lo mismo con dos articulos que con
+            cincuenta. */}
+        <CreamSection id="biblioteca" full={false}>
+          <div className="mx-auto max-w-narrative">
+            <Reveal amount={0.22} once={false} className="text-center">
+              <p className="text-label-sm font-bold uppercase text-on-primary-container">
                 Explora
-              </span>
-              <h2 className="mt-2 font-display text-headline-md sm:text-headline-lg text-on-surface">
+              </p>
+              <h2 className="mt-3 font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
                 {active
                   ? ARTICLE_CATEGORY_LIST.find((c) => c.value === active)!.label
                   : "Biblioteca"}
               </h2>
-            </div>
+              <div
+                aria-hidden="true"
+                className="mx-auto mt-3 mb-10 h-0.5 w-16 bg-[#f9d78f]"
+              />
+            </Reveal>
 
             {active === "testimonios" && (
               <div className="mx-auto mb-12 max-w-3xl">
@@ -107,8 +121,8 @@ export default async function ContenidosPage({
                   aria-current={filter.active ? "page" : undefined}
                   className={`rounded-full border px-5 py-2 text-label-sm uppercase transition-colors ${
                     filter.active
-                      ? "border-primary-fixed-dim bg-primary-container text-on-primary"
-                      : "border-primary-fixed-dim/25 text-on-surface-variant hover:border-primary-fixed-dim/50 hover:text-on-surface"
+                      ? "border-[#f9d78f] bg-[#f9d78f] text-[#05125a]"
+                      : "border-on-primary-container/35 text-on-primary-container hover:border-on-primary-container hover:bg-white/60"
                   }`}
                 >
                   {filter.label}
@@ -117,7 +131,7 @@ export default async function ContenidosPage({
             </div>
 
             {!articles || articles.length === 0 ? (
-              <p className="mx-auto max-w-md text-center text-body-md text-on-surface-variant">
+              <p className="mx-auto max-w-md text-center text-body-md text-[#333]">
                 {active
                   ? "Todavía no hay contenidos publicados en esta categoría."
                   : "Estamos preparando el material. Vuelve a visitarnos pronto."}
@@ -130,7 +144,7 @@ export default async function ContenidosPage({
               </div>
             )}
           </div>
-        </Reveal>
+        </CreamSection>
       </main>
       <Footer />
       <BackToTop />

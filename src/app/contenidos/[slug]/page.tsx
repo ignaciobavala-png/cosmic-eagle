@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { ArticleBody } from "@/components/ui/ArticleBody";
+import { CreamSection } from "@/components/ui/CreamSection";
 import { createClient } from "@/lib/supabase/server";
 import {
   articleCategoryLabel,
@@ -73,45 +74,50 @@ export default async function ContenidoPage({
               className="object-cover"
             />
             <div className="absolute inset-0 bg-[#05102a]/35" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#05060a]/70 via-transparent to-[#05060a]/80" />
+            {/* El pie se funde con la crema de abajo, no con el negro del
+                sistema anterior. */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#05125a]/60 via-transparent to-[#05125a]/45" />
           </div>
         )}
 
-        <article className="mx-auto max-w-3xl px-margin-mobile md:px-margin-desktop py-16 md:py-20">
-          <Link
-            href="/contenidos"
-            className="inline-flex items-center gap-2 text-label-sm uppercase text-on-surface-variant transition-colors hover:text-primary-fixed-dim"
-          >
-            <ArrowLeft size={15} />
-            Contenidos
-          </Link>
+        {/* El artículo se lee sobre crema, como el resto de los bloques de
+            texto largo del sitio. El fondo oscuro del `body` era el chrome del
+            sistema anterior y acá, con una lectura de varios minutos, es
+            justamente donde peor se sostiene. */}
+        <CreamSection full={false}>
+          <article className="mx-auto max-w-3xl">
+            <Link
+              href="/contenidos"
+              className="inline-flex items-center gap-2 text-label-sm uppercase text-on-primary-container transition-colors hover:text-[#05125a]"
+            >
+              <ArrowLeft size={15} />
+              Contenidos
+            </Link>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span className="rounded-full border border-primary-fixed-dim/40 px-3 py-1 text-label-sm uppercase text-primary-fixed-dim">
-              {articleCategoryLabel(article.category)}
-            </span>
-            {date && (
-              <span className="text-label-sm uppercase text-on-surface-variant">
-                {date}
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <span className="rounded-full border border-on-primary-container/40 px-3 py-1 text-label-sm uppercase text-on-primary-container">
+                {articleCategoryLabel(article.category)}
               </span>
+              {date && (
+                <span className="text-label-sm uppercase text-on-primary-container">
+                  {date}
+                </span>
+              )}
+            </div>
+
+            <h1 className="mt-5 font-display text-display-mobile font-bold text-[#05125a] text-balance md:text-display-lg">
+              {article.title}
+            </h1>
+
+            {article.excerpt && (
+              <p className="mt-5 text-body-lg text-[#333]">{article.excerpt}</p>
             )}
-          </div>
 
-          <h1 className="mt-5 font-display text-display-mobile md:text-display-lg text-primary-fixed-dim text-balance">
-            {article.title}
-          </h1>
-
-          {article.excerpt && (
-            <p className="mt-5 text-body-lg text-on-surface-variant">
-              {article.excerpt}
-            </p>
-          )}
-
-          <div className="mt-10 border-t border-primary-fixed-dim/12 pt-10">
-            <ArticleBody blocks={blocks} />
-          </div>
-
-        </article>
+            <div className="mt-10 border-t border-[#f9d78f] pt-10">
+              <ArticleBody blocks={blocks} tone="light" />
+            </div>
+          </article>
+        </CreamSection>
       </main>
       <Footer />
       <BackToTop />

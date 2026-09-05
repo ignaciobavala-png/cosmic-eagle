@@ -2173,3 +2173,32 @@ Verificado: `tsc`, lint, build, los 38 tests públicos, y medición en Chrome re
 a 1440×900 y 390×844 — cero errores de página, la banda de cierre revela con el
 umbral 0.25 (su ratio máximo alcanzable es 1.43 y 1.26, así que dispara sobrado)
 y el resto del reveal se comporta como el de `/viajes`: reversible.
+
+#### 5. `/contenidos`, el artículo y las páginas legales
+
+Las últimas tres del sistema anterior. Con esto **no queda ninguna ruta pública
+sobre el chrome viejo** (el degradé del `body`, que va del azul al negro).
+
+- **La biblioteca va sobre `CreamSection`** y `ArticleCard` pasó a tarjeta blanca
+  con filete dorado, como las fichas del detalle. El `glass-card` es vidrio
+  dorado pensado para fondo oscuro y sobre crema no se ve. Los filtros
+  siguen la misma paleta: activo dorado con texto azul, inactivo
+  `on-primary-container` (el oro de acento no sirve como texto chico sobre claro
+  — regla del 28/08).
+- **`ArticleBody` sumó `tone`** (`dark` / `light`), porque la misma plantilla se
+  lee sobre dos fondos. No se partió en dos componentes: es el mismo texto con la
+  misma jerarquía, y duplicarlo garantiza que uno quede atrás en el próximo
+  cambio.
+- **`/privacidad` y `/terminos` también pasaron a crema.** Eran las lecturas más
+  largas del sitio y estaban sobre el fondo oscuro.
+
+**Ojo, la trampa del umbral otra vez** (la de `/faqs`): en la biblioteca **el
+reveal observa sólo el encabezado**, no la sección. El ratio de intersección
+máximo alcanzable es *alto de pantalla / alto del observado*, y acá el alto lo
+decide la clienta —publica los artículos que quiera—. Con suficientes tarjetas la
+sección nunca llegaría al umbral y, siendo reversible, la grilla quedaría
+invisible **para siempre**. Medido: la grilla está en opacidad 1 al cargar y al
+pie, en escritorio y en mobile. El artículo, por lo mismo, no lleva observador.
+
+Verificado: `tsc`, lint, build, los 38 tests públicos y capturas reales de
+`/contenidos`, un artículo, `/privacidad` y `/terminos` a 1440×900 y 390×844.
