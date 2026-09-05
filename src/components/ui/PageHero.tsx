@@ -12,6 +12,7 @@ type Action = { label: string; href: string; variant?: "solid" | "ghost" };
 export function PageHero({
   image,
   imageAlt = "",
+  eyebrow,
   title,
   subtitle,
   actions = [],
@@ -23,6 +24,11 @@ export function PageHero({
 }: {
   image: string;
   imageAlt?: string;
+  /**
+   * Fila de etiquetas arriba del titulo. La usa el detalle de una experiencia
+   * para el tipo y el estado del cupo; el resto de los heros no la pasa.
+   */
+  eyebrow?: React.ReactNode;
   title: React.ReactNode;
   subtitle?: string;
   actions?: Action[];
@@ -93,6 +99,7 @@ export function PageHero({
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-margin-mobile md:px-margin-desktop text-center">
         {overlay && (
           <>
+            {eyebrow && <div className="mb-5">{eyebrow}</div>}
             <h1 className="font-display text-display-mobile md:text-display-lg text-primary text-shadow-glow max-w-3xl text-balance">
               {title}
             </h1>

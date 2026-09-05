@@ -2151,3 +2151,25 @@ contra el que comparar.
 **Siguen con el sistema visual anterior** `/contenidos`, `/contenidos/[slug]` y
 el detalle público de una experiencia (`/viajes/[id]`, el que más arrastra: 35
 usos de tokens viejos). Son las tres páginas que Julia no rediseñó.
+
+#### 4. El detalle de una experiencia, al sistema nuevo
+
+`/viajes/[id]` era la página que más arrastraba del sistema anterior (35 usos de
+tokens viejos). Se recompuso con las primitivas del rediseño, sin inventar nada:
+
+- **Hero P1 a sangre** con la portada del viaje, en vez de la tarjeta redondeada
+  dentro de una columna de 5xl. Todas las rutas públicas del rediseño abren con
+  la imagen a pantalla completa; esta era la única que no.
+- **El cuerpo va sobre `CreamSection`**, como `/viajes` y `/nosotros`: descripción,
+  fichas de datos (tarjeta blanca con filete dorado en vez de `glass-card`, que es
+  vidrio dorado sobre fondo oscuro y sobre crema no se ve), Programa y Qué incluye.
+- **El panel lateral pegajoso se convirtió en banda de cierre** a todo el ancho,
+  con el precio, la seña, las condiciones y el CTA. Es el remate que tienen todas
+  las páginas nuevas. El CTA **no se pierde**: está también arriba, en el hero.
+- `PageHero` sumó `eyebrow` (una fila de etiquetas arriba del título) para el tipo
+  y el estado del cupo. Van **opacas y no translúcidas**: viven sobre una foto.
+
+Verificado: `tsc`, lint, build, los 38 tests públicos, y medición en Chrome real
+a 1440×900 y 390×844 — cero errores de página, la banda de cierre revela con el
+umbral 0.25 (su ratio máximo alcanzable es 1.43 y 1.26, así que dispara sobrado)
+y el resto del reveal se comporta como el de `/viajes`: reversible.
