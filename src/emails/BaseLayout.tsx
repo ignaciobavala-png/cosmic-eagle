@@ -11,7 +11,15 @@ import {
 } from "react-email";
 
 /**
- * Marco comun de todos los mails, con la paleta del sitio (Aetheric Mysticism).
+ * Marco comun de todos los mails, con la paleta del sitio.
+ *
+ * **La paleta se actualizo el 05/09/2026** al azul del rediseno de Julia. Hasta
+ * ese dia los correos seguian en el sistema anterior (fondo casi negro `#05060a`
+ * y tarjeta cafe oscura `#131410`), que es de donde tambien venia el embudo. Un
+ * mail no puede importar Tailwind ni leer los tokens del `@theme` —los clientes
+ * de correo no cargan hojas externas—, asi que la paleta va copiada a mano aca;
+ * por eso cuando cambio el sistema visual, esta copia se quedo atras. **Si el
+ * sitio vuelve a cambiar de paleta, este archivo hay que tocarlo a mano.**
  *
  * Tres reglas que no son cosmeticas y no hay que "limpiar":
  *
@@ -25,15 +33,40 @@ import {
  */
 
 // Paleta, en hex plano: en un mail no se puede confiar en alpha ni en variables.
+//
+// Los dos azules y el oro son los mismos de la pantalla de acceso y del embudo
+// (`src/components/forms/styles.ts`). Los dos grises NO son hexes inventados:
+// son el blanco translucido que usa el sitio, aplanado sobre el azul de la
+// tarjeta, que es lo unico que un mail entiende.
 export const c = {
-  page: "#05060a", // el remate oscuro del degrade del sitio
-  card: "#131410", // --color-surface
-  border: "#4d4639", // --color-outline-variant
-  gold: "#e3c37d", // --color-primary-fixed-dim: titulos y acentos
-  goldSolid: "#f9d78f", // --color-primary-container: fondo del CTA
-  onGold: "#131410", // texto sobre el CTA
-  text: "#e5e2db", // --color-on-surface
-  muted: "#a89f90", // texto secundario
+  page: "#05125a", // el azul profundo del navbar y del embudo
+  card: "#0a1f6e", // el segundo azul del degrade, para separar la tarjeta
+  border: "#2c3e82", // el borde blanco al 14% del panel, aplanado sobre `card`
+  // Sobre azul el oro va `primary-container` y no `primary-fixed-dim`: es la
+  // regla del 28/08 (el #e3c37d de antes daba ~4:1 sobre estos fondos).
+  gold: "#f9d78f", // --color-primary-container: titulos, links y acentos
+  goldSolid: "#f9d78f", // fondo del CTA
+  onGold: "#05125a", // texto sobre el CTA, igual que la pildora del sitio
+  text: "#fff6eb", // --color-primary: el blanco calido del sistema
+  muted: "#a9abbf", // el texto al 65%, aplanado sobre `card`
+} as const;
+
+/**
+ * Las dos familias del sitio, con su cascada de respaldo.
+ *
+ * Se nombran igual que en la web aunque casi ningun cliente de correo las
+ * tenga: el que las tenga instaladas las usa, y el resto cae en la fuente de
+ * sistema de la misma familia. **No se pueden cargar por `@import` ni por
+ * `<link>`** — es la regla 3 de arriba, nada de `<style>` en el head.
+ *
+ * Hasta el 05/09/2026 los mails eran Georgia de punta a punta, incluido el
+ * cuerpo. En el sitio el cuerpo es Montserrat desde el 02/09; el serif quedo
+ * donde corresponde, en los titulos.
+ */
+export const font = {
+
+  display: "Domine, Georgia, 'Times New Roman', serif",
+  body: "Montserrat, 'Helvetica Neue', Helvetica, Arial, sans-serif",
 } as const;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://cosmic-eagle.vercel.app";
@@ -111,7 +144,7 @@ export function BaseLayout({
                         fontSize: "12px",
                         lineHeight: "18px",
                         textAlign: "center",
-                        fontFamily: "Georgia, 'Times New Roman', serif",
+                        fontFamily: font.body,
                       }}
                     >
                       Cosmic Eagle Journey ·{" "}
@@ -139,7 +172,8 @@ export function Title({ children }: { children: React.ReactNode }) {
         color: c.gold,
         fontSize: "24px",
         lineHeight: "32px",
-        fontFamily: "Georgia, 'Times New Roman', serif",
+        fontWeight: 700,
+        fontFamily: font.display,
       }}
     >
       {children}
@@ -148,7 +182,22 @@ export function Title({ children }: { children: React.ReactNode }) {
 }
 
 /** Parrafo. Uno por parrafo: un solo `<Text>` con saltos los colapsa. */
-export function Paragraph({ children }: { children: React.ReactNode }) {
+export function Paragraph({
+  children,
+  /**
+   * Conserva los saltos de linea del contenido.
+   *
+   * Va en todo lo que la clienta carga como lista en un campo de texto (que
+   * llevar, llegadas y salidas, los datos de una cuenta bancaria): sin esto el
+   * HTML colapsa los saltos y "Ropa comoda / Una manta / Botella de agua" sale
+   * como un renglon corrido. Gmail y Outlook respetan `pre-line`; el peor caso
+   * es volver a ese renglon, no perder un dato.
+   */
+  preLine = false,
+}: {
+  children: React.ReactNode;
+  preLine?: boolean;
+}) {
   return (
     <Text
       style={{
@@ -156,7 +205,8 @@ export function Paragraph({ children }: { children: React.ReactNode }) {
         color: c.text,
         fontSize: "16px",
         lineHeight: "26px",
-        fontFamily: "Georgia, 'Times New Roman', serif",
+        fontFamily: font.body,
+        ...(preLine ? { whiteSpace: "pre-line" as const } : {}),
       }}
     >
       {children}
@@ -180,26 +230,33 @@ export function CtaButton({ href, children }: { href: string; children: React.Re
       cellPadding={0}
       cellSpacing={0}
       bgcolor={c.goldSolid}
-      style={{ margin: "8px 0 4px", backgroundColor: c.goldSolid, borderRadius: "6px" }}
+      style={{ margin: "8px 0 20px", backgroundColor: c.goldSolid, borderRadius: "999px" }}
     >
       <tbody>
         <tr>
           <td
             align="center"
-            style={{ backgroundColor: c.goldSolid, borderRadius: "6px" }}
+            style={{ backgroundColor: c.goldSolid, borderRadius: "999px" }}
           >
             <Link
               href={href}
               style={{
                 display: "inline-block",
-                padding: "12px 28px",
+                // La pildora del sitio: redondeo completo, mayusculas y
+                // tracking (`CtaLink variant="pill"`). El degrade dorado NO se
+                // porta: Outlook descarta `linear-gradient` y el boton se
+                // quedaria sin fondo, que es justo lo que las tres capas de
+                // `bgcolor` estan evitando.
+                padding: "14px 32px",
                 color: c.onGold,
                 backgroundColor: c.goldSolid,
-                borderRadius: "6px",
-                fontSize: "15px",
-                fontWeight: 600,
+                borderRadius: "999px",
+                fontSize: "14px",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                textTransform: "uppercase",
                 textDecoration: "none",
-                fontFamily: "Georgia, 'Times New Roman', serif",
+                fontFamily: font.display,
               }}
             >
               {children}
@@ -225,7 +282,7 @@ function Signature() {
         color: c.muted,
         fontSize: "15px",
         lineHeight: "24px",
-        fontFamily: "Georgia, 'Times New Roman', serif",
+        fontFamily: font.body,
       }}
     >
       Con cariño,

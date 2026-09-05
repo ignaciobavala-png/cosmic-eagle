@@ -143,7 +143,42 @@ Todas salen de bugs ya pagados en otro proyecto (skills `react-email-resend` y
   en CSS, y sale con fondo blanco en varios clientes móviles.
 - **Nada importante vive dentro de una imagen.** Gmail bloquea imágenes de
   remitentes nuevos por defecto; el logo es decorativo y el mail se lee sin él.
-- **Estilos inline**, nunca `<style>` en el head.
+- **Estilos inline**, nunca `<style>` en el head. Corolario: **las fuentes del
+  sitio no se pueden cargar** (no hay `@import` ni `<link>`), así que las dos
+  familias van nombradas con su cascada de respaldo — el cliente que tenga
+  Domine o Montserrat instaladas las usa, el resto cae en la serif o la sans del
+  sistema.
+- **Los saltos de línea de un campo cargado por la clienta necesitan
+  `whiteSpace: "pre-line"`** (`<Paragraph preLine>`). Sin eso, "qué llevar" o los
+  datos de una cuenta bancaria salen en un renglón corrido: el HTML colapsa los
+  saltos. Se detectó mirando el correo [7] renderizado.
+
+### La paleta (actualizada el 05/09/2026)
+
+Los correos estuvieron hasta ese día en el sistema visual **anterior** —fondo
+casi negro `#05060a`, tarjeta café oscura `#131410`, oro `#e3c37d`— mientras el
+sitio ya era el azul de Julia. No fue un olvido puntual sino algo estructural: un
+mail **no puede importar Tailwind ni leer los tokens del `@theme`**, así que la
+paleta está copiada a mano en `BaseLayout.tsx`. Cuando cambió el sistema visual,
+esa copia se quedó atrás.
+
+**Si el sitio vuelve a cambiar de paleta, hay que tocar ese archivo a mano.** No
+hay forma de que se entere solo.
+
+Hoy son los mismos colores del embudo y de la pantalla de acceso: `#05125a` de
+fondo, `#0a1f6e` la tarjeta, el oro `#f9d78f` (sobre azul va `primary-container`
+y no `primary-fixed-dim`, que da ~4:1) y el CTA es la píldora dorada con texto
+azul. Los dos grises **no son hexes inventados**: son el blanco translúcido del
+sitio aplanado sobre el azul de la tarjeta, que es lo único que un mail entiende.
+
+**El degradé dorado del botón NO se porta**: Outlook descarta `linear-gradient` y
+el botón se quedaría sin fondo, que es justo lo que las tres capas de `bgcolor`
+están evitando. Va dorado plano.
+
+### Cómo mirar un correo sin mandarlo
+
+`/api/preview-email?t=aprobada|formularios|datos`, con `pnpm dev`. Renderiza el
+template con datos de mentira. **En producción devuelve 404.**
 
 ## Cuota, cuando llegue el momento de mandar en volumen
 

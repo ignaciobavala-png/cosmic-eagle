@@ -2105,3 +2105,49 @@ corrigiendo el viaje equivocado y la fecha, update del admin bloqueado, `anon`
 sin grants, el índice único), filas de prueba borradas, y **el embudo completo
 corrido de punta a punta** con el consentimiento adentro (los dos specs de
 escritura en verde). Las capturas del recorrido pasaron de 19 a 22.
+
+#### 3. Los correos, al azul nuevo
+
+Pregunta de Ignacio: si los mails tenían la paleta nueva. No — estaban en la
+vieja **entera**, los mismos hexes que acabábamos de sacar del embudo (fondo
+`#05060a`, tarjeta `#131410`, oro `#e3c37d`).
+
+**No fue un olvido puntual, es estructural**: un correo no puede importar
+Tailwind ni leer los tokens del `@theme` —los clientes de correo no cargan hojas
+externas—, así que la paleta está **copiada a mano** en `src/emails/BaseLayout.tsx`.
+Cuando cambió el sistema visual, esa copia se quedó atrás. Queda anotado en
+`docs/EMAIL.md`: si el sitio vuelve a cambiar de paleta, ese archivo hay que
+tocarlo a mano, no se entera solo.
+
+Ahora son los colores del embudo y de la pantalla de acceso. Detalles que no son
+cosméticos:
+
+- **Los dos grises no son hexes inventados**: son el blanco translúcido del
+  sitio (14% del borde, 65% del texto secundario) **aplanado sobre el azul de la
+  tarjeta**. En un mail no se puede confiar en alpha.
+- **El degradé dorado del botón NO se porta.** Outlook descarta
+  `linear-gradient` y el botón se quedaría sin fondo, que es justo lo que las
+  tres capas de `bgcolor` evitan. Va dorado plano, con la forma de píldora y las
+  mayúsculas del sitio.
+- **El cuerpo pasó a la sans.** Los mails eran Georgia de punta a punta; en el
+  sitio el cuerpo es Montserrat desde el 02/09. Las dos familias van nombradas
+  con su cascada de respaldo: **no se pueden cargar** (nada de `<style>` en el
+  head, es una de las tres reglas de `docs/EMAIL.md`).
+
+**Un bug de contenido que apareció al mirarlos renderizados**: el correo [7]
+imprimía "Qué llevar: Ropa cómoda Una manta Botella de agua" en un renglón
+corrido — el HTML colapsa los saltos de línea de un campo que la clienta carga
+como lista. `Paragraph` tiene ahora `preLine`, que es lo que ya hacía a mano el
+bloque de datos bancarios del correo de aprobación.
+
+**`/api/preview-email?t=aprobada|formularios|datos`** abre un correo en el
+browser con datos de mentira, para no tener que mandarlo. **En producción
+devuelve 404** (verificado sobre el build).
+
+Es el mejor momento para este cambio: todavía no salió ni un correo real (falta
+verificar el dominio en Resend), así que nadie tiene uno viejo en la bandeja
+contra el que comparar.
+
+**Siguen con el sistema visual anterior** `/contenidos`, `/contenidos/[slug]` y
+el detalle público de una experiencia (`/viajes/[id]`, el que más arrastra: 35
+usos de tokens viejos). Son las tres páginas que Julia no rediseñó.

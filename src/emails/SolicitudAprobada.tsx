@@ -1,5 +1,5 @@
 import { Text } from "react-email";
-import { BaseLayout, CtaButton, Paragraph, Title, c } from "./BaseLayout";
+import { BaseLayout, CtaButton, Paragraph, Title, c, font } from "./BaseLayout";
 import { formatAmount } from "@/lib/format";
 
 export type MedioDePago = {
@@ -107,7 +107,8 @@ export function SolicitudAprobada({
                         color: c.gold,
                         fontSize: "16px",
                         lineHeight: "22px",
-                        fontFamily: "Georgia, 'Times New Roman', serif",
+                        fontWeight: 700,
+                        fontFamily: font.display,
                       }}
                     >
                       {medio.label}
@@ -120,7 +121,7 @@ export function SolicitudAprobada({
                           color: c.muted,
                           fontSize: "14px",
                           lineHeight: "20px",
-                          fontFamily: "Georgia, 'Times New Roman', serif",
+                          fontFamily: font.body,
                         }}
                       >
                         {medio.audience}
@@ -137,7 +138,7 @@ export function SolicitudAprobada({
                         fontSize: "14px",
                         lineHeight: "22px",
                         whiteSpace: "pre-line",
-                        fontFamily: "Georgia, 'Times New Roman', serif",
+                        fontFamily: font.body,
                       }}
                     >
                       {medio.instructions}
@@ -148,7 +149,7 @@ export function SolicitudAprobada({
                           margin: "10px 0 0",
                           fontSize: "14px",
                           lineHeight: "22px",
-                          fontFamily: "Georgia, 'Times New Roman', serif",
+                          fontFamily: font.body,
                         }}
                       >
                         <a href={medio.link_url} style={{ color: c.gold }}>

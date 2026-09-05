@@ -51,15 +51,19 @@ export function DatosFinales({
         <strong>Cuándo:</strong> {cuando}
       </Paragraph>
 
+      {/* Los dos van con `preLine`: se cargan como lista desde el panel y sin
+          eso salen en un renglón corrido. */}
       {llegadas && (
-        <Paragraph>
+        <Paragraph preLine>
           <strong>Llegadas y salidas:</strong> {llegadas}
         </Paragraph>
       )}
 
       {queLlevar && (
-        <Paragraph>
-          <strong>Qué llevar:</strong> {queLlevar}
+        <Paragraph preLine>
+          <strong>Qué llevar:</strong>
+          {"\n"}
+          {queLlevar}
         </Paragraph>
       )}
 
