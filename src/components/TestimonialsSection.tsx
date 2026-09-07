@@ -1,33 +1,40 @@
 "use client";
 
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
-import { useRef } from "react";
+import { useEffect, useState } from "react";
 import { HOME_COPY } from "@/lib/constants";
 import type { Testimonial } from "@/lib/testimonials";
 import { SectionHeading } from "./ui/SectionHeading";
 
+/** Cada cuánto pasa al siguiente testimonio. */
+const INTERVALO_MS = 7000;
+
 /**
- * "Voces de Luz" — los testimonios de la home, reescritos sobre el diseño de
- * Julia (`.testimonios` del mockup + la corrección del 02/09, que marcaba que
- * esta sección era la única que no se había respetado).
+ * "Testimonios" — los testimonios de la home, sobre el fondo azul del diseño de
+ * Julia (`.testimonios` del mockup + la corrección del 02/09).
  *
- * Tres cosas que la separan de la versión anterior, que era una grilla de tres
- * tarjetas de vidrio:
+ * **Es UN solo contenedor centrado que va pasando los testimonios**, no el
+ * carrusel arrastrable de nueve tarjetas que había antes (pedido de Sofía del
+ * 07/09, junto con el cambio de título: era "Voces de Luz"). El carrusel obliga
+ * a arrastrar para descubrir que hay más; acá se leen solos, de a uno, con el
+ * texto en grande y centrado en la pantalla.
  *
- * - **Es un carrusel horizontal arrastrable**, no una grilla. El diseño prevé
- *   nueve testimonios y una grilla de nueve tarjetas ocuparía tres pantallas.
- * - **El fondo es el degradé azul** (`#0079b3` → `#05125a` al 45%) y no una
- *   foto: la foto pasó a ser una franja al pie que se funde con ese azul.
- * - **La franja del pie es editable** (`home.voces.image`), como el resto de las
- *   imágenes de la home.
+ * Tres cosas que no hay que "simplificar":
  *
- * El arrastre con el mouse es explícito porque un `overflow-x` sólo se arrastra
- * con el dedo: en escritorio hay que empujar la barra o usar shift+rueda, y el
- * diseño pide poder tomar las tarjetas. En touch no se toca nada — lo maneja el
- * scroll nativo, que es mejor que cualquier emulación.
+ * - **La caja es de alto fijo.** Los testimonios miden distinto y una caja que
+ *   se adapta al texto haría saltar la sección entera en cada pase — con el
+ *   bloque centrado en pantalla, el salto se ve en las dos direcciones.
+ * - **El pase automático se frena con el puntero encima o el foco adentro**, y
+ *   se reinicia con cada avance manual: si alguien está leyendo, el contenido no
+ *   se le va solo. Mismo criterio que `PortalsSection`.
+ * - **Con `prefers-reduced-motion` no rota solo ni funde**: quedan los puntos
+ *   para pasar a mano. Un cambio de contenido cada 7s es movimiento aunque no
+ *   haya transición.
  *
- * **No tiene animación de entrada, a propósito**: en el código aprobado de Julia
- * este bloque es el único sin IntersectionObserver.
+ * La franja de imagen del pie es editable (slot `home.voces.image`) — la key NO
+ * se renombra aunque la sección haya cambiado de nombre, o lo que la clienta ya
+ * subió queda huérfano.
  */
 export function TestimonialsSection({
   id,
@@ -39,29 +46,26 @@ export function TestimonialsSection({
   /** La franja de imagen del pie (slot `home.voces.image`). */
   image: string;
 }) {
-  const track = useRef<HTMLDivElement>(null);
-  const drag = useRef<{ x: number; left: number } | null>(null);
+  const reduced = useReducedMotion();
+  const [activo, setActivo] = useState(0);
+  const [pausado, setPausado] = useState(false);
 
-  if (testimonials.length === 0) return null;
+  const total = testimonials.length;
 
-  function onPointerDown(e: React.PointerEvent) {
-    // Sólo mouse: en touch el scroll nativo ya arrastra, y secuestrarlo rompe
-    // el desplazamiento con inercia.
-    if (e.pointerType !== "mouse" || !track.current) return;
-    drag.current = { x: e.clientX, left: track.current.scrollLeft };
-    track.current.setPointerCapture(e.pointerId);
-  }
+  useEffect(() => {
+    if (reduced || pausado || total < 2) return;
+    const t = setTimeout(
+      () => setActivo((i) => (i + 1) % total),
+      INTERVALO_MS,
+    );
+    return () => clearTimeout(t);
+    // `activo` en las dependencias es lo que reinicia la espera cuando alguien
+    // pasa de testimonio a mano.
+  }, [activo, pausado, reduced, total]);
 
-  function onPointerMove(e: React.PointerEvent) {
-    if (!drag.current || !track.current) return;
-    track.current.scrollLeft = drag.current.left - (e.clientX - drag.current.x);
-  }
+  if (total === 0) return null;
 
-  function endDrag(e: React.PointerEvent) {
-    if (!drag.current || !track.current) return;
-    drag.current = null;
-    track.current.releasePointerCapture(e.pointerId);
-  }
+  const t = testimonials[Math.min(activo, total - 1)];
 
   return (
     <section
@@ -85,43 +89,57 @@ export function TestimonialsSection({
           lineClassName="max-w-[180px]"
         />
 
-        {/* La máscara del borde derecho avisa que la fila sigue. La izquierda
-            queda a filo: el carrusel arranca ahí y un desvanecido en el
-            arranque se lee como un error de recorte. */}
         <div
-          ref={track}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
-          className="mx-auto mt-9 flex max-w-[1000px] cursor-grab gap-5 overflow-x-auto px-2.5 pb-3.5 select-none active:cursor-grabbing [mask-image:linear-gradient(to_right,#000_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,#000_92%,transparent_100%)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="mx-auto mt-9 flex max-w-[760px] flex-col items-center"
+          onPointerEnter={() => setPausado(true)}
+          onPointerLeave={() => setPausado(false)}
+          // El foco cae en los puntos, no en el contenedor: va la variante que
+          // captura el foco de los hijos.
+          onFocusCapture={() => setPausado(true)}
+          onBlurCapture={() => setPausado(false)}
         >
-          {testimonials.map((t) => (
-            /* La tarjeta es RECTANGULAR y de alto fijo (300×225 del mockup):
-               más ancha que alta. El alto no puede depender del texto — con
-               nueve testimonios de largo distinto la fila quedaba dispareja y
-               la sección se pasaba de una pantalla. El panel limita el
-               testimonio a 250 caracteres justamente para que entre; el
-               `line-clamp` es la red por si alguno viejo es más largo.
+          <div
+            className="flex h-[300px] w-full items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/[0.08] px-7 py-8 sm:h-[260px] sm:px-12"
+            aria-live="polite"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.figure
+                key={t.id}
+                initial={reduced ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduced ? { opacity: 1 } : { opacity: 0, y: -12 }}
+                transition={{ duration: reduced ? 0 : 0.45 }}
+                className="w-full"
+              >
+                <blockquote className="line-clamp-6 text-[15px] italic leading-relaxed text-primary sm:line-clamp-5 sm:text-[17px]">
+                  &ldquo;{t.quote}&rdquo;
+                </blockquote>
+                <figcaption className="mt-4 text-[12px] font-bold tracking-normal text-primary-container sm:text-[13px]">
+                  {t.author_name}
+                  {t.author_location && ` — ${t.author_location}`}
+                </figcaption>
+              </motion.figure>
+            </AnimatePresence>
+          </div>
 
-               La tarjeta es más ancha que los 300px del mockup (que se dibujó
-               con placeholders de una línea): con 250 caracteres reales, 300px
-               de ancho no alcanzan para las seis líneas que entran en 225px de
-               alto. Más ancha entra el texto y queda más rectangular, que es
-               justo lo que pide la corrección. */
-            <figure
-              key={t.id}
-              className="flex h-[225px] w-[320px] shrink-0 flex-col justify-center overflow-hidden rounded-xl border border-white/20 bg-white/[0.08] p-7 text-left sm:w-[360px]"
-            >
-              <blockquote className="line-clamp-6 text-[13px] sm:text-[14px] italic leading-relaxed text-primary">
-                &ldquo;{t.quote}&rdquo;
-              </blockquote>
-              <figcaption className="mt-3 shrink-0 text-[12px] font-bold tracking-normal text-primary-container">
-                {t.author_name}
-                {t.author_location && ` — ${t.author_location}`}
-              </figcaption>
-            </figure>
-          ))}
+          {total > 1 && (
+            <div className="mt-5 flex items-center justify-center gap-2.5">
+              {testimonials.map((otro, i) => (
+                <button
+                  key={otro.id}
+                  type="button"
+                  onClick={() => setActivo(i)}
+                  aria-label={`Ver el testimonio de ${otro.author_name}`}
+                  aria-current={i === activo}
+                  className={`h-2 w-2 rounded-full transition-[background-color,transform] duration-200 ${
+                    i === activo
+                      ? "scale-125 bg-primary-container"
+                      : "bg-white/30 hover:bg-white/60"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

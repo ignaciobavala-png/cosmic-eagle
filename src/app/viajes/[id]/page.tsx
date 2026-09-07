@@ -150,7 +150,7 @@ export default async function ViajePage({ params }: Props) {
   return (
     <>
       <Header />
-      <main className="pt-18 md:pt-24">
+      <main className="pt-[var(--navbar-h)]">
         {/* El hero es el mismo P1 del resto del sitio, con la portada del viaje
             como imagen. Antes la portada era una tarjeta redondeada adentro de
             una columna de 5xl, que es como se veian las paginas del sistema

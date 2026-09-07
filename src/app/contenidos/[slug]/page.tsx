@@ -62,7 +62,7 @@ export default async function ContenidoPage({
   return (
     <>
       <Header />
-      <main className="pt-18 md:pt-24">
+      <main className="pt-[var(--navbar-h)]">
         {article.cover_url && (
           <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9] md:aspect-[21/9]">
             <Image

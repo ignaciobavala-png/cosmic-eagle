@@ -44,7 +44,7 @@ export function AuthScreen({
   return (
     // El alto descuenta el navbar: el `main` ya empuja la pagina hacia abajo con
     // su `pt`, asi que un `100svh` pelado aca desbordaria justo esa altura.
-    <section className="flex min-h-[calc(100svh-4rem)] w-full overflow-hidden bg-[linear-gradient(135deg,#05125a_0%,#0a1f6e_55%,#0079b3_100%)] lg:min-h-[calc(100svh-5.25rem)]">
+    <section className="flex min-h-[calc(100svh-var(--navbar-h))] w-full overflow-hidden bg-[linear-gradient(135deg,#05125a_0%,#0a1f6e_55%,#0079b3_100%)]">
       <div className="relative z-[2] -mr-7 mb-10 ml-10 mt-9 hidden flex-1 basis-1/2 overflow-hidden rounded-[20px] bg-[linear-gradient(160deg,#0079b3,#05125a_75%)] shadow-[0_30px_70px_rgba(0,0,0,0.5),0_10px_24px_rgba(0,0,0,0.35)] md:block">
         {/* Dos copias de la misma imagen: ver `kb-zoom` en globals.css. La
             segunda es puramente decorativa y no vuelve a describir la foto. */}

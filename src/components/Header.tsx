@@ -94,7 +94,7 @@ export function Header() {
 
           Ojo: el navbar paso a ser OPACO. Antes era vidrio y el hero le pasaba
           por debajo; en el mockup es una banda solida y el contenido arranca
-          abajo. Por eso cada `main` compensa con `pt-18 md:pt-24`. */}
+          abajo. Por eso cada `main` compensa con `pt-[var(--navbar-h)]`. */}
       <header className="fixed top-0 w-full z-50 bg-[linear-gradient(to_right,#05125a_0%,#0079b3_100%)]">
         {/* La barra horizontal se muestra desde `md`. Ojo, el comentario que
             estuvo aca decia "arranca en lg" y el codigo nunca lo cumplio: entre
@@ -116,7 +116,7 @@ export function Header() {
             Los tracks laterales van `minmax(max-content,1fr)` y no `1fr` pelado:
             cuando el contenido no entra (ver abajo), un `1fr` se comprime por
             debajo del ancho del logo y lo aplasta a cero. */}
-        <nav className="grid grid-cols-[auto_1fr] md:grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center gap-4 px-margin-mobile md:px-margin-desktop h-18 md:h-24 w-full">
+        <nav className="grid grid-cols-[auto_1fr] md:grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center gap-4 px-margin-mobile md:px-margin-desktop h-14 md:h-16 w-full">
           <Link href="/" className="shrink-0 justify-self-start">
             <Image
               src={IMAGES.logo}
@@ -125,7 +125,7 @@ export function Header() {
               height={267}
               priority
               sizes="(min-width: 1024px) 280px, 220px"
-              className="h-10 md:h-16 w-auto object-contain"
+              className="h-9 md:h-11 w-auto object-contain"
             />
           </Link>
 

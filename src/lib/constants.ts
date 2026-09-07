@@ -231,7 +231,7 @@ export const HOME_COPY = {
     "Contribuye a la evolución colectiva",
   ] as const,
   voces: {
-    title: "Voces de Luz",
+    title: "Testimonios",
     label: "Lo que dicen nuestros viajeros",
   },
 } as const;

@@ -55,7 +55,7 @@ export default async function NosotrosPage() {
   return (
     <>
       <Header />
-      <main className="pt-18 md:pt-24">
+      <main className="pt-[var(--navbar-h)]">
         <PageHero
           image={content("nosotros.hero.image")}
           imageAlt="Siluetas de almas en partículas de luz"

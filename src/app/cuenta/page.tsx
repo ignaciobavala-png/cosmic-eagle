@@ -146,7 +146,7 @@ export default async function CuentaPage({
       <Header />
       {/* Con sesión la página pinta el azul del embudo; sin sesión el fondo lo
           pone `AuthScreen`, que trae su propio degradé. */}
-      <main className={`pt-18 md:pt-24 ${user ? funnelSurface : ""}`}>
+      <main className={`pt-[var(--navbar-h)] ${user ? funnelSurface : ""}`}>
         {user ? (
           <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-5 py-16">
             <AvatarUpload

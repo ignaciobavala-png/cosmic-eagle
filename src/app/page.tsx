@@ -12,7 +12,6 @@ import { TripCarousel } from "@/components/ui/TripCarousel";
 import { Collapsible } from "@/components/ui/Collapsible";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
-import { ScrollIndicator } from "@/components/ui/ScrollIndicator";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { createPublicClient } from "@/lib/supabase/public";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
@@ -68,7 +67,7 @@ export default async function Home() {
   return (
     <>
       <Header />
-      <main className="pt-18 md:pt-24">
+      <main className="pt-[var(--navbar-h)]">
         <ImmersiveHero
           image={content("home.hero.image")}
           imageAlt="Figura de partículas mirando hacia el cosmos"
@@ -125,7 +124,6 @@ export default async function Home() {
           ]}
           keywords={["conciencia", "potencial", "dimensión", "evolución"]}
           cta={{ label: "Explorar experiencias", href: "#calendario" }}
-          next="atmosferica"
         />
 
         {/* La cartelera en la home. Va sobre el mismo azul con el que termina el
@@ -221,17 +219,17 @@ export default async function Home() {
               </CtaLink>
             </RevealItem>
           </div>
-
-          <ScrollIndicator
-            label="Nuestras experiencias"
-            target="#experiencias"
-          />
         </Reveal>
 
-        {/* Panel doble: arriba Sesiones (azul) y abajo Viajes (dorado), APILADOS
-            en vertical — Julia lo pidió así y lo revirtió cuando se probó lado a
-            lado (spec del 1/9, `.sesiones-viajes`). Cada mitad 50vh en desktop,
-            alto auto en mobile.
+        {/* Panel doble: Sesiones (azul) y Viajes (dorado), LADO A LADO en
+            escritorio y apilados en mobile, con el contenido centrado. Pedido de
+            Sofía (07/09): apilados en dos bandas horizontales y con el texto
+            pegado a la izquierda le quedaba desbalanceado.
+
+            **OJO, esto revierte una decisión de Julia**: su spec del 1/9
+            (`.sesiones-viajes`) los apila a propósito, y el lado a lado ya se
+            había probado y descartado. Si vuelve a pedir lo apilado, se saca el
+            `md:grid-cols-2` del `Reveal` y se devuelve el texto a la izquierda.
 
             **Un solo observador para los dos paneles** (umbral 0.25), no uno por
             panel: en el mockup las dos cascadas arrancan juntas. Por eso el
@@ -246,16 +244,16 @@ export default async function Home() {
           id="experiencias"
           amount={0.25}
           stagger={0}
-          className="w-full"
+          className="grid w-full md:grid-cols-2"
         >
-          <div className="flex w-full items-center bg-[linear-gradient(135deg,#0079b3,#05125a)] px-6 py-[50px] text-primary-container md:min-h-[50svh] md:p-20">
+          <div className="flex w-full items-center justify-center bg-[linear-gradient(135deg,#0079b3,#05125a)] px-6 py-[60px] text-center text-primary-container md:min-h-[60svh] md:px-12 md:py-20">
             <div className="max-w-[460px]">
               <RevealItem duration={0.8}>
                 <h2 className="mb-3 font-display text-[34px] leading-tight">
                   Sesiones Cósmicas
                 </h2>
               </RevealItem>
-              <RevealLine className="mb-[18px] h-0.5 w-14 bg-primary-container" />
+              <RevealLine className="mx-auto mb-[18px] h-0.5 w-14 bg-primary-container" />
               <RevealItem duration={0.8} delay={0.15}>
                 <p className="mb-[18px] text-[15px] opacity-85">
                   Un espacio para ir más profundo
@@ -280,14 +278,14 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="flex w-full items-center bg-[linear-gradient(to_bottom_right,#6b551f_0%,#b3964b_22%,#f9d78f_50%,#b3964b_78%,#6b551f_100%)] px-6 py-[50px] text-[#05125a] md:min-h-[50svh] md:p-20">
+          <div className="flex w-full items-center justify-center bg-[linear-gradient(to_bottom_right,#6b551f_0%,#b3964b_22%,#f9d78f_50%,#b3964b_78%,#6b551f_100%)] px-6 py-[60px] text-center text-[#05125a] md:min-h-[60svh] md:px-12 md:py-20">
             <div className="max-w-[460px]">
               <RevealItem duration={0.8}>
                 <h2 className="mb-3 font-display text-[34px] leading-tight">
                   Viajes Cósmicos
                 </h2>
               </RevealItem>
-              <RevealLine className="mb-[18px] h-0.5 w-14 bg-[#05125a]" />
+              <RevealLine className="mx-auto mb-[18px] h-0.5 w-14 bg-[#05125a]" />
               <RevealItem duration={0.8} delay={0.15}>
                 <p className="mb-[18px] text-[15px] opacity-85">
                   Un espacio para ir más profundo

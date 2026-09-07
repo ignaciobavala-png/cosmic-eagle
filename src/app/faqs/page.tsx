@@ -41,7 +41,7 @@ export default async function FaqsPage() {
   return (
     <>
       <Header />
-      <main className="pt-18 md:pt-24">
+      <main className="pt-[var(--navbar-h)]">
         <PageHero
           image={content("faqs.hero.image")}
           imageAlt="Partículas de luz sobre un cielo estrellado"

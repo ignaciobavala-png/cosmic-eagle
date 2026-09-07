@@ -72,7 +72,7 @@ export default async function ConsentimientoPage({
   return (
     <>
       <Header />
-      <main className={`pt-18 md:pt-24 ${funnelSurface}`}>
+      <main className={`pt-[var(--navbar-h)] ${funnelSurface}`}>
         <div className="mx-auto max-w-3xl px-5 py-16 md:py-20">
           <div className="mb-10">
             <span className="mb-3.5 block text-label-sm font-bold uppercase tracking-[0.21em] text-primary-container">

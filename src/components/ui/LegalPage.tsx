@@ -46,7 +46,7 @@ export async function LegalPage({ slug }: { slug: LegalSlug }) {
       <Header />
       {/* Sobre crema, como el resto del texto largo del sitio (05/09/2026). El
           `pt` es el del navbar opaco; el fondo lo pone la seccion. */}
-      <main className="pt-18 md:pt-24">
+      <main className="pt-[var(--navbar-h)]">
         <CreamSection full={false}>
         <article className="mx-auto max-w-3xl">
           {/* Se observa sólo el encabezado y no la sección, por lo mismo que
