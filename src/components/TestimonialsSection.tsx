@@ -8,7 +8,7 @@ import type { Testimonial } from "@/lib/testimonials";
 import { SectionHeading } from "./ui/SectionHeading";
 
 /** Cada cuánto pasa al siguiente testimonio. */
-const INTERVALO_MS = 7000;
+const INTERVALO_MS = 3000;
 
 /**
  * "Testimonios" — los testimonios de la home, sobre el fondo azul del diseño de
@@ -29,7 +29,7 @@ const INTERVALO_MS = 7000;
  *   se reinicia con cada avance manual: si alguien está leyendo, el contenido no
  *   se le va solo. Mismo criterio que `PortalsSection`.
  * - **Con `prefers-reduced-motion` no rota solo ni funde**: quedan los puntos
- *   para pasar a mano. Un cambio de contenido cada 7s es movimiento aunque no
+ *   para pasar a mano. Un cambio de contenido cada 3s es movimiento aunque no
  *   haya transición.
  *
  * La franja de imagen del pie es editable (slot `home.voces.image`) — la key NO

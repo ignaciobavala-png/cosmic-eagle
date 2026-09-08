@@ -118,9 +118,9 @@ export const NAV_LINKS: NavLink[] = [
     // `scroll-behavior: smooth` de globals.css, y el `scroll-padding-top` evita
     // que el navbar opaco tape el arranque de la seccion.
     children: [
-      { label: "Nuestro enfoque", href: "/nosotros#nuestro-enfoque" },
-      { label: "Nuestro propósito", href: "/nosotros#proposito" },
       { label: "Quiénes somos", href: "/nosotros#somos" },
+      { label: "Nuestro propósito", href: "/nosotros#proposito" },
+      { label: "Nuestro enfoque", href: "/nosotros#nuestro-enfoque" },
     ],
   },
   {

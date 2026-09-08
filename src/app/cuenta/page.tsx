@@ -178,13 +178,11 @@ export default async function CuentaPage({
         ) : (
           <AuthScreen
             image={content("cuenta.acceso.image")}
-            eyebrow={isSignup ? "Crear cuenta" : "Iniciar sesión"}
+            // Sin rotulo arriba del titulo, y el subtitulo reducido a la
+            // accion: pedido de Julia del 08/09. Las otras dos pantallas de
+            // acceso (recuperar y nueva-clave) conservan el suyo.
             title={isSignup ? "Bienvenido" : "Hola de nuevo"}
-            subtitle={
-              isSignup
-                ? "Crea tu cuenta para postularte a un viaje."
-                : "Ingresa tu email y contraseña para continuar tu camino."
-            }
+            subtitle={isSignup ? "Regístrate" : "Inicia sesión"}
             notice={
               error && ERROR_MESSAGES[error] ? (
                 <Notice text={ERROR_MESSAGES[error]} tone="error" />

@@ -115,14 +115,25 @@ export default async function Home() {
           </div>
         </Reveal>
 
+        {/* El texto y las cuatro frases son los de la entrega del 04/09, que es
+            la version definitiva de esta pantalla. Las frases resaltadas son
+            FRASES y no palabras sueltas ("potencial evolutivo", no
+            "potencial"): cada una viaja entera al centro, y sueltas no
+            significan nada en la lista final. */}
         <ScrollStory
           id="relato"
+          image={content("home.about.image")}
           paragraphs={[
-            "A medida que expandimos nuestra conciencia, comenzamos a descubrir que somos mucho más que nuestra historia personal, nuestra mente o la realidad que percibimos a través de los sentidos.",
+            "Los seres humanos estamos en constante evolución. A medida que expandimos nuestra conciencia, comenzamos a descubrir que somos mucho más que nuestra historia personal, nuestra mente o la realidad que percibimos a través de los sentidos.",
             "Nuestro trabajo explora este potencial evolutivo y la naturaleza multidimensional de la experiencia humana: nuestra capacidad de transformarnos, de acceder a niveles más profundos de inteligencia y de reconectar con la dimensión del alma.",
             "Desde esta perspectiva, la evolución humana pasa a ser parte de un campo de conciencia mucho más amplio, abriendo un camino hacia un conocimiento más profundo, la sabiduría cósmica y una comprensión expandida de quiénes y qué somos.",
           ]}
-          keywords={["conciencia", "potencial", "dimensión", "evolución"]}
+          keywords={[
+            { text: "conciencia", label: "Conciencia" },
+            { text: "potencial evolutivo", label: "Potencial Evolutivo" },
+            { text: "dimensión del alma", label: "Dimensión del Alma" },
+            { text: "sabiduría cósmica", label: "Sabiduría Cósmica" },
+          ]}
           cta={{ label: "Explorar experiencias", href: "#calendario" }}
         />
 
@@ -269,10 +280,9 @@ export default async function Home() {
               <RevealItem duration={0.8} delay={0.45}>
                 <Link
                   href="/viajes#sesiones"
-                  className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,rgba(0,121,179,0.35),rgba(5,18,90,0.35))] px-7 py-[11px] font-display text-[13px] uppercase tracking-[0.038em] text-primary-container transition-[filter,box-shadow,transform] duration-[250ms] hover:scale-[1.06] hover:brightness-110 hover:shadow-[0_0_20px_rgba(0,121,179,0.55)]"
+                  className="inline-flex items-center rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,rgba(0,121,179,0.35),rgba(5,18,90,0.35))] px-7 py-[11px] font-display text-[13px] uppercase tracking-[0.038em] text-primary-container transition-[filter,box-shadow,transform] duration-[250ms] hover:scale-[1.06] hover:brightness-110 hover:shadow-[0_0_20px_rgba(0,121,179,0.55)]"
                 >
                   Explorar próximas sesiones
-                  <span aria-hidden="true">→</span>
                 </Link>
               </RevealItem>
             </div>
@@ -300,10 +310,9 @@ export default async function Home() {
               <RevealItem duration={0.8} delay={0.45}>
                 <Link
                   href="/viajes#viajes"
-                  className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#05125a] bg-[linear-gradient(135deg,rgba(249,215,143,0.4),rgba(179,150,75,0.2))] px-7 py-[11px] font-display text-[13px] uppercase tracking-[0.038em] text-[#05125a] transition-[filter,box-shadow,transform] duration-[250ms] hover:scale-[1.1] hover:brightness-110 hover:shadow-[0_0_34px_rgba(249,215,143,0.9)]"
+                  className="inline-flex items-center rounded-full border-[1.5px] border-[#05125a] bg-[linear-gradient(135deg,rgba(249,215,143,0.4),rgba(179,150,75,0.2))] px-7 py-[11px] font-display text-[13px] uppercase tracking-[0.038em] text-[#05125a] transition-[filter,box-shadow,transform] duration-[250ms] hover:scale-[1.1] hover:brightness-110 hover:shadow-[0_0_34px_rgba(249,215,143,0.9)]"
                 >
                   Ir más allá
-                  <span aria-hidden="true">→</span>
                 </Link>
               </RevealItem>
             </div>

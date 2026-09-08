@@ -1,12 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useTransform, useReducedMotion, type MotionValue } from "framer-motion";
 import { useSectionProgress } from "@/lib/use-section-progress";
+import { BackgroundMedia } from "./BackgroundMedia";
 import { COLLAPSIBLE_TOGGLE } from "./Collapsible";
 
 type Cta = { label: string; href: string };
+
+/**
+ * Una frase resaltada. `text` es como aparece DENTRO del parrafo (en minuscula,
+ * tal cual la escribio la clienta) y `label` como se lee en la lista final, que
+ * va en capitular. Son dos strings y no uno con `capitalize`: la regla de CSS
+ * pondria "Dimension Del Alma", con el articulo en mayuscula.
+ */
+export type StoryKeyword = { text: string; label: string };
 
 /**
  * El "scroll story" de la home: un tramo largo de scroll durante el cual el
@@ -15,10 +24,12 @@ type Cta = { label: string; href: string };
  * desde su lugar en el párrafo hasta el centro y se agrandan— y al final entra
  * el botón.
  *
- * Las cuatro fases, los umbrales y los offsets de salida de cada palabra salen
- * literales del mockup aprobado de Julia (`homepage_correccion.html`, motor
- * "SCROLL STORY"; ver `docs/entregas/2026-09-02-julia/`). No son valores
- * elegidos acá: si hay que moverlos, se mueven contra ese archivo.
+ * Las cuatro fases y sus umbrales salen literales del mockup aprobado de Julia
+ * (`homepage_correccion.html`, motor "SCROLL STORY"), con la correccion del
+ * 04/09 (`docs/entregas/2026-09-04-julia-about/`), que es la version definitiva
+ * de esta pantalla: fondo de imagen a pantalla completa sin velo, posiciones de
+ * salida MEDIDAS en vivo y degrade de tres colores en la lista final. No son
+ * valores elegidos aca: si hay que moverlos, se mueven contra esos archivos.
  *
  * Criterios que no hay que "simplificar":
  *
@@ -46,32 +57,135 @@ const SEGMENT_FADE = 0.1;
 /** Lo que queda encendido de un tramo apagado: no se va a cero del todo. */
 const SEGMENT_FLOOR = 0.08;
 
+type Offset = { x: number; y: number };
+
 /**
- * De dónde sale cada palabra, en px respecto del centro. Son las posiciones
- * aproximadas que ocupa dentro del párrafo, para que el viaje se lea como que
- * la palabra se despega del texto y no como que aparece de la nada.
+ * De donde sale cada palabra: la distancia entre el lugar que ocupa dentro del
+ * parrafo y el lugar donde la espera la lista final. **Se mide en vivo y no es
+ * una constante** — era lo que estaba mal y por eso las cuatro parecian salir
+ * del mismo lugar (correccion de Julia del 04/09).
+ *
+ * Tres cosas que no hay que "simplificar":
+ *
+ * - **Se remide en cada frame de scroll mientras la fase 3 todavia no arranco.**
+ *   El contenido vive dentro de un `sticky`, y un sticky recien esta en su
+ *   posicion final cuando el scroll lo pego al techo: medir una sola vez al
+ *   montar da coordenadas de cuando la seccion estaba abajo de la pantalla. Es
+ *   primo del bug de `useScroll`/`ViewTimeline` del 28/08 — compila igual y se
+ *   ve mal.
+ * - **El destino se calcula con `offsetLeft`/`offsetTop`, no con
+ *   `getBoundingClientRect`.** El rect de la palabra de la lista ya viene movido
+ *   por el transform de la medicion anterior, asi que medirlo con rect se
+ *   realimenta; los offsets de layout son la posicion natural, ajena al
+ *   transform del propio elemento. Su contenedor si va con rect: es quien
+ *   aporta la posicion en pantalla.
+ * - **Se mide contra el destino real, no contra el centro de la pantalla.** El
+ *   mockup usa el centro porque ahi la lista es un bloque suelto; aca cada
+ *   palabra aterriza en su renglon, y restar el centro la haria salir corrida
+ *   medio bloque. El principio que pide la entrega es que cada frase se despegue
+ *   de su lugar en el parrafo, y esto lo cumple exacto.
  */
-const KEYWORD_START_OFFSETS = [
-  { x: 120, y: -180 },
-  { x: 100, y: -40 },
-  { x: -90, y: 60 },
-  { x: 110, y: 190 },
-] as const;
+function measureOffsets(
+  sources: (HTMLElement | null)[],
+  targets: (HTMLElement | null)[],
+  frame: HTMLElement | null,
+  previous: Offset[]
+): Offset[] {
+  if (!frame) return previous;
+  const box = frame.getBoundingClientRect();
+
+  return sources.map((source, i) => {
+    const target = targets[i];
+    if (!source || !target) return previous[i] ?? { x: 0, y: 0 };
+
+    const from = source.getBoundingClientRect();
+    return {
+      x:
+        from.left +
+        from.width / 2 -
+        (box.left + target.offsetLeft + target.offsetWidth / 2),
+      y:
+        from.top +
+        from.height / 2 -
+        (box.top + target.offsetTop + target.offsetHeight / 2),
+    };
+  });
+}
 
 export function ScrollStory({
   paragraphs,
   keywords,
   cta,
   id,
+  image,
 }: {
   paragraphs: readonly string[];
-  keywords: readonly string[];
+  keywords: readonly StoryKeyword[];
   cta: Cta;
   id?: string;
+  /** Fondo a pantalla completa (slot `home.about.image`). */
+  image: string;
 }) {
   const reduced = useReducedMotion();
   const { ref, progress } = useSectionProgress(!reduced);
   const story = useMemo(() => splitStory(paragraphs, keywords), [paragraphs, keywords]);
+
+  // De donde sale cada palabra y a donde llega: los tres refs que alimentan la
+  // medicion (ver `measureOffsets`).
+  const sources = useRef<(HTMLElement | null)[]>([]);
+  const targets = useRef<(HTMLElement | null)[]>([]);
+  const frame = useRef<HTMLDivElement>(null);
+  const offsets = useRef<Offset[]>([]);
+
+  const measure = useCallback(() => {
+    offsets.current = measureOffsets(
+      sources.current,
+      targets.current,
+      frame.current,
+      offsets.current
+    );
+  }, []);
+
+  /**
+   * Los tres momentos en que hay que medir, y los tres hacen falta:
+   *
+   * 1. **Despues de `load` + doble rAF**, para no medir contra la fuente de
+   *    respaldo mientras Domine y Montserrat todavia no asentaron el layout.
+   *    Es la misma espera que arma el observador de `Reveal`.
+   * 2. **En cada `resize`**, con 150ms de gracia: una frase que ocupa un renglon
+   *    en escritorio ocupa dos en mobile, y su lugar en el parrafo cambia.
+   * 3. **En cada frame de scroll mientras la fase 3 no arranco** — el motivo
+   *    esta en `measureOffsets`.
+   */
+  useEffect(() => {
+    if (reduced) return;
+
+    let alive = true;
+    const run = () =>
+      requestAnimationFrame(() => requestAnimationFrame(() => alive && measure()));
+
+    if (document.readyState === "complete") run();
+    else window.addEventListener("load", run, { once: true });
+
+    let timer: ReturnType<typeof setTimeout>;
+    const onResize = () => {
+      clearTimeout(timer);
+      timer = setTimeout(measure, 150);
+    };
+    window.addEventListener("resize", onResize);
+
+    const stop = progress.on("change", (v) => {
+      if (v < PHASE2_END) measure();
+    });
+
+    return () => {
+      alive = false;
+      window.removeEventListener("load", run);
+      window.removeEventListener("resize", onResize);
+      clearTimeout(timer);
+      stop();
+    };
+  }, [measure, progress, reduced]);
 
   // Fase 3: el bloque de texto se apaga entero mientras las palabras viajan.
   const textOpacity = useTransform(progress, [PHASE2_END, PHASE3_END], [1, 0]);
@@ -85,9 +199,11 @@ export function ScrollStory({
     return (
       <section
         id={id}
-        className="w-full bg-[linear-gradient(to_bottom,#011360_0%,#020c41_100%)] px-margin-mobile py-24 md:px-margin-desktop"
+        className="relative w-full overflow-hidden bg-[linear-gradient(to_bottom,#011360_0%,#020c41_100%)] px-margin-mobile py-24 md:px-margin-desktop"
       >
-        <div className="mx-auto max-w-[760px] space-y-6">
+        <BackgroundMedia src={image} className="object-cover" />
+        <div aria-hidden="true" className="absolute inset-0 bg-[#020c41]/40" />
+        <div className="relative z-10 mx-auto max-w-[820px] space-y-6">
           {story.paragraphs.map((pieces, i) => (
             <p key={i} className={PARAGRAPH_CLASS}>
               {pieces.map((piece, j) =>
@@ -118,9 +234,33 @@ export function ScrollStory({
       {/* El `pt` compensa el navbar: el sticky se pega al techo de la pantalla,
           que es justo donde está la banda opaca. */}
       <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden pt-[var(--navbar-h)]">
+        {/* El fondo ocupa la pantalla entera, tambien la franja del navbar: va
+            fuera del `pt`, que solo baja al texto.
+
+            Los z-index arrancan en 0 y no en negativo: el degrade del `body` se
+            pinta DESPUES de los descendientes de z negativo, asi que un -z-10
+            aca dejaria la imagen tapada (docs/HOME_REDISENO.md).
+
+            **El velo es una desviacion consciente de la entrega**, que pide la
+            imagen sin velo. Medido en el browser sobre la foto que hay cargada,
+            barriendo 72 celdas del area que ocupa el texto: sin velo, 28 de
+            esas 72 dejan al texto blanco abajo de 4,5:1 (la peor, 1,57 sobre el
+            nucleo de la llama) y 23 dejan al dorado abajo de 3:1. Con el 40%
+            del azul del sistema no queda ninguna celda dorada abajo de 3 y las
+            blancas bajan a 4, con 3,89 de piso.
+            El texto blanco del parrafo mide 22px, o sea que no es "texto
+            grande" y le corresponde 4,5; las frases doradas si lo son (Domine
+            bold 22px y la lista de 32px) y les alcanza con 3.
+            Cuanto mas oscura sea la imagen que se cargue, menos falta hace este
+            velo — es un `div`, se baja o se saca. */}
+        <div className="absolute inset-0 z-0">
+          <BackgroundMedia src={image} className="object-cover" />
+          <div aria-hidden="true" className="absolute inset-0 bg-[#020c41]/40" />
+        </div>
+
         <motion.div
           style={{ opacity: textOpacity }}
-          className="relative z-[3] mx-auto max-w-[760px] px-[6vw]"
+          className="relative z-[3] mx-auto max-w-[820px] px-[6vw]"
         >
           {story.paragraphs.map((pieces, i) => (
             <StoryParagraph
@@ -131,7 +271,13 @@ export function ScrollStory({
             >
               {pieces.map((piece, j) =>
                 piece.keyword ? (
-                  <span key={j} className={KEYWORD_CLASS}>
+                  <span
+                    key={j}
+                    ref={(el) => {
+                      sources.current[piece.index] = el;
+                    }}
+                    className={KEYWORD_CLASS}
+                  >
                     {piece.text}
                   </span>
                 ) : (
@@ -150,32 +296,55 @@ export function ScrollStory({
         </motion.div>
 
         {/* Las palabras y el botón se apilan sobre el texto en la misma
-            pantalla: el texto ya está apagándose cuando entran. */}
-        <motion.div
-          aria-hidden="true"
-          style={{ opacity: wordsOpacity }}
-          className="pointer-events-none absolute inset-x-0 top-1/2 z-[3] -translate-y-1/2 text-center"
-        >
-          {keywords.map((word, i) => (
-            <TravellingKeyword key={word} travel={travel} index={i}>
-              {word}
-            </TravellingKeyword>
-          ))}
-        </motion.div>
+            pantalla: el texto ya está apagándose cuando entran.
 
-        <motion.div
-          initial={false}
-          animate={
-            ctaVisible
-              ? { opacity: 1, y: 0, scale: 1 }
-              : { opacity: 0, y: 20, scale: 0.85 }
-          }
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="absolute inset-x-0 top-[calc(50%+250px)] z-[4] text-center"
-          style={{ pointerEvents: ctaVisible ? "auto" : "none" }}
-        >
-          <StoryCta {...cta} />
-        </motion.div>
+            Los dos viven en UN solo bloque centrado (el `.story-outcome` de la
+            spec) y no cada uno con su posicion: asi el conjunto lista + botón
+            queda con el mismo aire arriba y abajo una vez que el botón entra.
+            Si la lista se centrara sola, al aparecer el botón el conjunto
+            quedaria pesado abajo. El botón ocupa su lugar desde el arranque
+            —solo cambia de opacidad—, por eso el bloque no se mueve. */}
+        <div className="pointer-events-none absolute inset-0 z-[3] flex flex-col items-center justify-center gap-[59px] px-[6vw] md:gap-10">
+          {/* `relative` no es decoracion: `offsetLeft`/`offsetTop` se miden
+              contra el ancestro POSICIONADO mas cercano, y sin esto ese
+              ancestro era el contenedor de inset-0 — la posicion del bloque
+              dentro de el se sumaba dos veces y las palabras salian de un punto
+              que no existe. Medido: 558px a la izquierda y 308 arriba. */}
+          <motion.div
+            ref={frame}
+            aria-hidden="true"
+            style={{ opacity: wordsOpacity }}
+            className="relative text-center"
+          >
+            {keywords.map((word, i) => (
+              <TravellingKeyword
+                key={word.text}
+                travel={travel}
+                offsets={offsets}
+                index={i}
+                register={(el) => {
+                  targets.current[i] = el;
+                }}
+              >
+                {word.label}
+              </TravellingKeyword>
+            ))}
+          </motion.div>
+
+          <motion.div
+            initial={false}
+            animate={
+              ctaVisible
+                ? { opacity: 1, y: 0, scale: 1 }
+                : { opacity: 0, y: 20, scale: 0.85 }
+            }
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="text-center"
+            style={{ pointerEvents: ctaVisible ? "auto" : "none" }}
+          >
+            <StoryCta {...cta} />
+          </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -183,7 +352,13 @@ export function ScrollStory({
 
 const PARAGRAPH_CLASS =
   "mb-[22px] text-[clamp(0.95rem,1.9vw,1.375rem)] leading-relaxed text-primary";
-const KEYWORD_CLASS = "font-display font-semibold text-primary-container";
+/**
+ * La frase resaltada DENTRO del parrafo: Domine bold, dorado claro SOLIDO.
+ * No lleva degrade — el degrade es exclusivo de la lista final. Comparten
+ * tipografia y color de arranque y por eso se confunden, pero son dos
+ * tratamientos distintos y la entrega del 04/09 pide no fusionarlos.
+ */
+const KEYWORD_CLASS = "font-display font-bold text-primary-container";
 
 /**
  * Fase 4. El botón no hace scrubbing: cruza el umbral y entra con su propia
@@ -319,25 +494,42 @@ function StorySegment({
   return <motion.span style={{ opacity }}>{children}</motion.span>;
 }
 
-/** Fase 3: la palabra viaja desde su lugar en el párrafo al centro, creciendo. */
+/**
+ * Fase 3: la palabra viaja desde su lugar en el párrafo hasta su renglón de la
+ * lista, creciendo de 0,6 a 1.
+ *
+ * **El offset se lee del ref dentro de la funcion de transformacion**, no se
+ * cierra sobre un valor: asi cada frame usa la ultima medicion en vez de la que
+ * habia cuando se monto el componente, que es justo el bug que corrige esta
+ * entrega. Mientras `travel` vale 0 la palabra esta en opacidad 0, asi que no
+ * importa que el valor no se recalcule hasta que el viaje arranca.
+ *
+ * El degrade de tres colores va por renglon (cada palabra es su propio bloque),
+ * asi que corre de punta a punta de ESA linea. Es intencional: la lista entera
+ * con un solo degrade continuo se ve distinto.
+ */
 function TravellingKeyword({
   children,
   travel,
+  offsets,
   index,
+  register,
 }: {
   children: React.ReactNode;
   travel: MotionValue<number>;
+  offsets: React.RefObject<Offset[]>;
   index: number;
+  register: (el: HTMLElement | null) => void;
 }) {
-  const from = KEYWORD_START_OFFSETS[index] ?? { x: 0, y: 0 };
-  const x = useTransform(travel, [0, 1], [from.x, 0]);
-  const y = useTransform(travel, [0, 1], [from.y, 0]);
+  const x = useTransform(travel, (t) => (offsets.current[index]?.x ?? 0) * (1 - t));
+  const y = useTransform(travel, (t) => (offsets.current[index]?.y ?? 0) * (1 - t));
   const scale = useTransform(travel, [0, 1], [0.6, 1]);
 
   return (
     <motion.span
+      ref={register}
       style={{ x, y, scale }}
-      className="block font-display text-[clamp(1.5rem,5vw,3.625rem)] font-semibold leading-[1.35] text-primary-container"
+      className="block bg-[linear-gradient(90deg,#f9d78f,#b3964b,#f9d78f)] bg-clip-text font-display text-[32px] font-semibold leading-[47px] text-transparent"
     >
       {children}
     </motion.span>
@@ -345,7 +537,7 @@ function TravellingKeyword({
 }
 
 type Piece =
-  | { keyword: true; text: string }
+  | { keyword: true; text: string; index: number }
   | { keyword: false; text: string; segment: number };
 
 /**
@@ -359,8 +551,11 @@ type Piece =
  * - Los tramos vecinos se fusionan, así el orden de apagado es el del mockup
  *   (siete tramos, no uno por trozo del split).
  */
-function splitStory(paragraphs: readonly string[], keywords: readonly string[]) {
-  const pattern = new RegExp(`(${keywords.map(escapeRegExp).join("|")})`, "gi");
+function splitStory(paragraphs: readonly string[], keywords: readonly StoryKeyword[]) {
+  // Las frases largas primero: si "conciencia" se probara antes que una frase
+  // que la contenga, la alternancia cortaria por la corta.
+  const ordered = [...keywords].map((k) => k.text).sort((a, b) => b.length - a.length);
+  const pattern = new RegExp(`(${ordered.map(escapeRegExp).join("|")})`, "gi");
   const seen = new Set<string>();
   let segment = 0;
 
@@ -371,11 +566,16 @@ function splitStory(paragraphs: readonly string[], keywords: readonly string[]) 
       if (!part) continue;
 
       const key = part.toLowerCase();
-      const isKeyword = keywords.some((k) => k.toLowerCase() === key) && !seen.has(key);
+      const isKeyword =
+        keywords.some((k) => k.text.toLowerCase() === key) && !seen.has(key);
 
       if (isKeyword) {
         seen.add(key);
-        pieces.push({ keyword: true, text: part });
+        pieces.push({
+          keyword: true,
+          text: part,
+          index: keywords.findIndex((k) => k.text.toLowerCase() === key),
+        });
         continue;
       }
 

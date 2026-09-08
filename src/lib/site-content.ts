@@ -122,6 +122,27 @@ export const SITE_GROUPS = [
         type: "boolean",
         fallback: "true",
       },
+      // Fondo de la pantalla del relato que se destila (la segunda de #about).
+      // La key es la de "Sobre Cosmic Eagle", la seccion que el rediseno del
+      // 20/08 elimino: se reusa —en vez de estrenar una— porque es la misma
+      // seccion #about y asi la foto que la clienta ya subio vuelve a la
+      // pagina en vez de seguir huerfana. Es la regla del registro de slots:
+      // las keys no se renombran aunque cambie la seccion.
+      //
+      // Julia la pidio sin velo (entrega del 04/09). Con la foto que hay
+      // cargada el texto quedaba ilegible en buena parte de la pantalla, asi
+      // que la seccion le pone un velo del 40%. Las mediciones estan en
+      // `ScrollStory`. Cuanto mas oscura la imagen, menos falta hace.
+      {
+        key: "home.about.image",
+        label: "Imagen de fondo del relato",
+        help: "La foto a pantalla completa detrás del texto que se va destilando (“Los seres humanos estamos en constante evolución…”). El texto se lee directamente encima, así que conviene una imagen oscura y sin mucho detalle en el centro.",
+        type: "image",
+        fallback: IMAGES.almas,
+        ratio: "16/9",
+        maxPx: 1920,
+        video: true,
+      },
       {
         key: "home.voces.image",
         label: "Imagen del pie de “Voces de Luz”",

@@ -129,11 +129,10 @@ export function GateModal({
               ¿Quieres seguir explorando?
             </h2>
 
-            <p className="mx-auto mt-[22px] max-w-[21.25rem] text-body-md text-primary-container/85">
-              Para explorar los detalles de esta experiencia cósmica,
-              necesitamos conocerte primero.
-            </p>
-
+            {/* El parrafo "Para explorar los detalles de esta experiencia
+                cosmica..." salio a pedido de Julia (08/09): el titulo y los dos
+                botones ya dicen todo lo que hay que hacer. Por eso los botones
+                suben su margen, que antes lo daba el parrafo. */}
             <div className="mt-9 flex flex-col gap-4">
               <Link
                 href={`/cuenta?${query.slice(1)}`}
@@ -151,19 +150,29 @@ export function GateModal({
               </Link>
             </div>
 
-            {/* "Contacta soporte" queda SIN link: en el mockup apunta a `#` y el
-                destino real (¿mail?, ¿página de contacto?) todavía no está
-                definido. Mismo criterio que los links apagados del footer:
-                antes que mandar a ningún lado, no linkear. */}
-            <p className="mt-7 text-[13px] normal-case tracking-normal text-primary/75">
-              ¿Necesitas ayuda? Contacta soporte
-            </p>
+            {/* Julia (08/09): se va "Contacta soporte" y queda "¿Necesitas
+                ayuda?" como el boton de contacto, subrayado sutil. El destino
+                lo confirmo Ignacio el mismo dia: la casilla
+                bookings@cosmiceaglejourney.com. Es un `mailto:` y no un
+                `next/link` — no es una ruta del sitio. */}
+            <a
+              href={`mailto:${SOPORTE_EMAIL}`}
+              className="mt-7 inline-block text-[13px] normal-case tracking-normal text-primary/75 underline decoration-primary/30 underline-offset-4 transition-colors duration-300 hover:text-primary hover:decoration-primary/70"
+            >
+              ¿Necesitas ayuda?
+            </a>
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
+
+/**
+ * La casilla de contacto de la clienta (confirmada el 08/09). Es la unica del
+ * sitio que se le ofrece a alguien sin sesion.
+ */
+const SOPORTE_EMAIL = "bookings@cosmiceaglejourney.com";
 
 const GATE_BTN =
   "block rounded-full bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-5 py-4 font-display text-base font-bold text-[#05125a] transition-[box-shadow,transform,filter] duration-300 hover:-translate-y-px hover:brightness-[1.08] hover:shadow-[0_0_22px_rgba(249,215,143,0.75),0_0_44px_rgba(249,215,143,0.4)] active:-translate-y-px active:brightness-[1.08] active:shadow-[0_0_22px_rgba(249,215,143,0.75),0_0_44px_rgba(249,215,143,0.4)]";

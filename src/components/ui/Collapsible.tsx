@@ -112,15 +112,9 @@ export function Collapsible({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls={panelId}
-        className={`inline-flex items-center gap-2.5 rounded-full border-[1.5px] px-8 py-3.5 font-display text-body-md font-bold transition-colors duration-300 ${toneClasses}`}
+        className={`inline-flex items-center rounded-full border-[1.5px] px-8 py-3.5 font-display text-body-md font-bold transition-colors duration-300 ${toneClasses}`}
       >
         {label}
-        <span
-          aria-hidden="true"
-          className={`inline-block transition-transform duration-300 ${open ? "rotate-90" : ""}`}
-        >
-          →
-        </span>
       </button>
       )}
 

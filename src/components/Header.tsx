@@ -13,7 +13,6 @@ import {
   BookOpen,
   User,
   CircleUser,
-  ArrowRight,
   ChevronDown,
 } from "lucide-react";
 import Image from "next/image";
@@ -136,18 +135,36 @@ export function Header() {
                 <li key={link.href} className="relative group">
                   <Link
                     href={link.href}
-                    className={`flex items-center gap-1.5 whitespace-nowrap px-[1.75rem] py-2 font-display text-[13px] uppercase tracking-[0.115em] transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary-fixed-dim"
-                        : "text-on-surface-variant hover:text-on-surface"
-                    }`}
+                    className="flex items-center gap-1.5 whitespace-nowrap px-[1.75rem] py-2 font-display text-[13px] uppercase tracking-[0.115em]"
                   >
-                    {link.label}
+                    {/* El dorado va en DEGRADE (#f9d78f -> #b3964b, pedido de
+                        Julia del 08/09), y un degrade solo se puede pintar
+                        sobre el fondo: de ahi el `bg-clip-text` con el texto
+                        transparente.
+
+                        Por eso el degrade va en un `span` propio y NO en el
+                        Link: con el texto transparente heredado, el chevron
+                        —que es un SVG con `currentColor`— se volveria
+                        invisible. El icono se pinta aparte.
+
+                        La seccion activa se distingue con el dorado claro
+                        entero (`primary-container`, que es el extremo brillante
+                        del mismo degrade) en vez de con otro color: asi el
+                        estado activo no se sale de lo que pidio. */}
+                    <span
+                      className={`transition-[filter] duration-200 group-hover:brightness-110 ${
+                        isActive
+                          ? "text-primary-container"
+                          : "bg-[linear-gradient(90deg,#f9d78f,#b3964b)] bg-clip-text text-transparent"
+                      }`}
+                    >
+                      {link.label}
+                    </span>
                     {link.children && (
                       <ChevronDown
                         size={13}
                         aria-hidden="true"
-                        className="transition-transform duration-200 group-hover:rotate-180"
+                        className="text-primary-fixed-dim transition-transform duration-200 group-hover:rotate-180"
                       />
                     )}
                   </Link>
@@ -197,8 +214,11 @@ export function Header() {
                             encima, bajo el link;
                           - los items se separan con una linea dorada tenue
                             en vez de quedar apilados a la misma altura;
-                          - cada item tiene su flecha, que entra y avanza en
-                            hover: sin ella nada decia que eran links.
+                          - los items ya NO llevan flecha: la regla de Julia
+                            del 08/09 es que ningun boton lleve flechas
+                            adentro, y aplica tambien aca. Lo que dice que son
+                            links es el subrayado del hover y el fondo dorado
+                            tenue.
 
                           Desde la reunion del 04/09 el panel lleva SOLO
                           titulos: la descripcion de cada item ("Encuentros de
@@ -238,11 +258,6 @@ export function Header() {
                               <span className="min-w-0 flex-1 font-display text-base font-bold tracking-[0.03em] text-primary-container">
                                 {child.label}
                               </span>
-                              <ArrowRight
-                                size={16}
-                                aria-hidden="true"
-                                className="shrink-0 text-primary-container/40 transition-[transform,color] duration-200 group-hover/item:translate-x-1 group-hover/item:text-primary-container"
-                              />
                             </Link>
                           </li>
                         ))}
@@ -283,7 +298,6 @@ export function Header() {
                   className="whitespace-nowrap px-6 py-3"
                 >
                   Unirme al círculo
-                  <ArrowRight size={14} />
                 </CtaLink>
               </div>
             )}
@@ -389,7 +403,6 @@ export function Header() {
                     className="w-full py-4"
                   >
                     Unirme al círculo
-                    <ArrowRight size={14} />
                   </CtaLink>
                 </div>
               )}

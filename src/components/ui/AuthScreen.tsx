@@ -31,7 +31,9 @@ export function AuthScreen({
 }: {
   image: string;
   /** Volanta en mayusculas y dorado, arriba del titulo. */
-  eyebrow: string;
+  /** Rotulo chico sobre el titulo. Opcional: login y registro van sin el
+   * (pedido de Julia del 08/09); recuperar y nueva-clave lo conservan. */
+  eyebrow?: string;
   title: string;
   subtitle: string;
   /** El formulario. */
@@ -69,9 +71,11 @@ export function AuthScreen({
 
       <div className="relative z-[1] flex flex-1 basis-1/2 items-center justify-center px-6 pb-15 pt-11 md:px-12 md:pt-9">
         <div className="animate-auth-card w-full max-w-[420px]">
-          <p className="mb-3.5 text-label-sm font-bold uppercase tracking-[0.21em] text-primary-container">
-            {eyebrow}
-          </p>
+          {eyebrow && (
+            <p className="mb-3.5 text-label-sm font-bold uppercase tracking-[0.21em] text-primary-container">
+              {eyebrow}
+            </p>
+          )}
           <h1 className="mb-2.5 font-display text-[clamp(1.875rem,3.4vw,2.375rem)] font-bold text-white">
             {title}
           </h1>
