@@ -82,7 +82,15 @@ export function StickyStory({
   );
 }
 
-/** Cada párrafo tiene su propio tramo dentro del 75% inicial del recorrido. */
+/**
+ * Cada párrafo tiene su propio tramo dentro del 75% inicial del recorrido.
+ *
+ * El PRIMERO arranca visible (su tramo termina en 0), así que los que se revelan
+ * con el scroll son `total - 1`. Es lo que evita que la sección se estrene en
+ * blanco: mide 260vh y el desplegable de "Nosotros" ancla justo a su arranque,
+ * o sea con el progreso en 0 — con el primer párrafo también apagado, llegar
+ * acá desde el navbar dejaba una pantalla azul vacía hasta scrollear.
+ */
 function StoryParagraph({
   children,
   progress,
@@ -95,8 +103,11 @@ function StoryParagraph({
   total: number;
 }) {
   const REVEAL_END = 0.75;
-  const start = (REVEAL_END / total) * index;
-  const end = (REVEAL_END / total) * (index + 1);
+  const pasos = Math.max(total - 1, 1);
+  // El tramo del primero termina en 0: `useTransform` recorta fuera del rango,
+  // así que queda en opacidad 1 desde el arranque de la sección.
+  const start = (REVEAL_END / pasos) * (index - 1);
+  const end = (REVEAL_END / pasos) * index;
 
   const opacity = useTransform(progress, [start, end], [0, 1]);
   const y = useTransform(progress, [start, end], [30, 0]);
