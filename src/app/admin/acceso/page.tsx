@@ -21,7 +21,9 @@ export default async function AdminAccesoPage() {
       .order("created_at", { ascending: false }),
     supabase
       .from("content_grants")
-      .select("id, user_id, level, note, granted_at, expires_at, access_code_id")
+      .select(
+        "id, user_id, level, note, granted_at, expires_at, access_code_id, application_id"
+      )
       .is("revoked_at", null)
       .order("granted_at", { ascending: false }),
     supabase
@@ -56,10 +58,11 @@ export default async function AdminAccesoPage() {
         Acceso a contenidos
       </h1>
       <p className="mb-10 max-w-2xl text-sm text-on-surface-variant">
-        Quién puede leer los contenidos del programa. Se habilita de dos formas y
-        las dos terminan en lo mismo: un permiso pegado a la cuenta de la
-        persona, que se puede quitar cuando quieras. Qué nivel pide cada texto se
-        elige en{" "}
+        Quién puede leer los contenidos del programa. <strong>No hay que
+        habilitar a nadie a mano</strong>: al aprobar una solicitud, esa persona
+        queda habilitada sola. Los códigos de acá son para quien no pasó por la
+        plataforma —las que ya ceremoniaron con ustedes antes de la web—. Qué
+        nivel pide cada texto se elige en{" "}
         <Link
           href="/admin/contenidos"
           className="text-secondary hover:underline"
@@ -133,8 +136,9 @@ export default async function AdminAccesoPage() {
           Personas habilitadas
         </h2>
         <p className="mb-4 max-w-2xl text-sm text-on-surface-variant">
-          Las que entraron con un código y las que habilitaste a mano desde su
-          solicitud. Para habilitar a alguien nuevo, entrá a su solicitud en{" "}
+          Las que quedaron habilitadas al aprobarles la solicitud, las que
+          entraron con un código y las que habilitaste a mano. Para quitarle el
+          acceso a alguien, el botón está acá o en su solicitud, en{" "}
           <Link
             href="/admin/solicitudes"
             className="text-secondary hover:underline"
@@ -146,8 +150,9 @@ export default async function AdminAccesoPage() {
 
         {(grants?.length ?? 0) === 0 ? (
           <p className="glass-card rounded-2xl px-5 py-4 text-sm text-on-surface-variant">
-            Todavía no hay nadie habilitado. Cualquier persona con cuenta ve los
-            contenidos marcados como «Con cuenta»; los del programa, no.
+            Todavía no hay nadie habilitado — no hay ninguna solicitud aprobada.
+            Cualquier persona con cuenta ve los contenidos marcados como «Con
+            cuenta»; los del programa, no.
           </p>
         ) : (
           <ul className="space-y-3">

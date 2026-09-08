@@ -320,6 +320,7 @@ export type Database = {
       content_grants: {
         Row: {
           access_code_id: string | null
+          application_id: string | null
           expires_at: string | null
           granted_at: string
           granted_by: string | null
@@ -331,6 +332,7 @@ export type Database = {
         }
         Insert: {
           access_code_id?: string | null
+          application_id?: string | null
           expires_at?: string | null
           granted_at?: string
           granted_by?: string | null
@@ -342,6 +344,7 @@ export type Database = {
         }
         Update: {
           access_code_id?: string | null
+          application_id?: string | null
           expires_at?: string | null
           granted_at?: string
           granted_by?: string | null
@@ -357,6 +360,20 @@ export type Database = {
             columns: ["access_code_id"]
             isOneToOne: false
             referencedRelation: "access_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_grants_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: true
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_grants_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: true
+            referencedRelation: "my_applications"
             referencedColumns: ["id"]
           },
         ]

@@ -2231,11 +2231,16 @@ producción.
   un 404 sacaría del buscador una ficha que sí es pública.
 - **Ojo, otra vez**: una vista definer también *escribe* como su dueño. Sólo se
   le otorgó SELECT.
-- **`content_grants` es la habilitación**, siempre a mano (decisión de Ignacio) y
-  con botón en `/admin/solicitudes/[id]`, que es donde se toma la decisión. Se
-  revoca marcando `revoked_at`, no borrando. Es **independiente de la solicitud**:
-  la persona la conserva después del viaje, y se le puede dar a alguien que
-  ceremonió por Google Forms.
+- **`content_grants` es la habilitación, y sale sola de la aprobación**
+  (migración `20260908190000`, corrección del mismo día: el formulario que había
+  primero —elegir nivel, escribir una nota— **no se iba a llenar**, y repetía una
+  decisión ya tomada). Lo que sigue siendo a mano es *aprobar*. Se revoca
+  marcando `revoked_at`, no borrando, y **`on conflict do nothing`**: si la
+  quitaron a mano, volver a pasar por «aprobada» no la resucita. Es
+  **independiente de la solicitud**: la persona la conserva después del viaje, y
+  el botón queda para las dos excepciones (quitarla, o darla sin solicitud
+  aprobada). **El umbral es la aprobación y no el pago**: el material de
+  preparación se necesita antes de viajar.
 - **`access_codes`: uno por viaje o tanda, no por persona** (decisión de
   Ignacio). Lo escribe ella —tiene que ser decible por WhatsApp— con tope de usos
   y vencimiento. **Canjearlo NO es una forma de entrar**: exige sesión y sólo
@@ -2254,9 +2259,12 @@ el §6 del doc), y el muro servido por `next start`. Filas de prueba borradas. L
 dos advisors nuevos (`lint 0010` por la vista y `lint 0029` por la función de
 canje) son a propósito.
 
-**Sin verificar end-to-end** (requiere sesión de admin, la hace Ignacio): crear
-un código desde `/admin/acceso` y canjearlo con otra cuenta, y habilitar a
-alguien desde su solicitud.
+**Sin verificar end-to-end** (requiere sesión de admin, la hace Ignacio):
+aprobar una solicitud y ver a esa persona habilitada, y crear un código desde
+`/admin/acceso` y canjearlo con otra cuenta. **Los tests del panel no se
+pudieron correr**: el puerto 3000 lo tenía un `next dev` con trabajo en curso, y
+Playwright corrió contra eso. La geometría de `/cuenta` en producción se midió
+igual y está bien.
 
 **Lo que NO entró**: el rediseño de `/contenidos` que muestra el video de Julia
 (acordeón de tres niveles, navegación tipo Netflix) sigue sin implementarse — el

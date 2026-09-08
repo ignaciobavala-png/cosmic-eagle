@@ -65,7 +65,7 @@ export default async function SolicitudDetallePage({
   // pasado por la plataforma (los recurrentes de Google Forms).
   const { data: grant } = await supabase
     .from("content_grants")
-    .select("id, level, granted_at")
+    .select("id, granted_at, note")
     .eq("user_id", application.user_id)
     .is("revoked_at", null)
     .order("granted_at", { ascending: false })
@@ -166,13 +166,15 @@ export default async function SolicitudDetallePage({
           Acceso a contenidos
         </h2>
         <p className="mb-4 text-sm text-on-surface-variant">
-          Habilita a esta persona a leer los contenidos del programa. Es
-          independiente de la solicitud: una vez habilitada, los sigue viendo
-          después del viaje, hasta que le quites el acceso.
+          Se habilita sola al aprobar la solicitud. Una vez habilitada, la
+          persona sigue leyendo los contenidos después del viaje, hasta que le
+          quites el acceso.
         </p>
         <GrantAccessPanel
+          applicationId={id}
           userId={application.user_id}
           fullName={application.full_name}
+          approved={application.status === "approved"}
           grant={grant ?? null}
         />
       </div>

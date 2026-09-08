@@ -69,18 +69,41 @@ pública.
 
 ## 4. Las habilitaciones (`content_grants`)
 
-Una fila por habilitación: a quién, qué nivel, quién la dio, cuándo, hasta
-cuándo. Se revoca marcando `revoked_at`, **no borrando**: quién habilitó a quién
-es justamente lo que hay que poder mirar después. Por eso tampoco es una columna
-en `profiles`.
+**Salen solas de la aprobación.** Migración
+`20260908190000_content_access_on_approval.sql`: un trigger sobre `applications`
+escribe la habilitación cuando el estado pasa a `approved`. Estela no hace un
+segundo paso — la decisión ya la tomó al aprobar, y el dato ya está en el panel.
 
-**Siempre a mano, nunca automática** (decisión de Ignacio, 08/09). El botón vive
-en `/admin/solicitudes/[id]`, que es donde se toma la decisión —ya se aprobó y se
-registró el pago—, y el listado completo en `/admin/acceso`.
+La primera versión de esta sección pedía elegir nivel y escribir una nota en un
+formulario. **Eso se sacó el mismo día**: ese formulario no se iba a llenar, y
+repetía una decisión ya tomada.
+
+Sigue habiendo una fila por habilitación —a quién, qué nivel, de qué solicitud
+salió, quién la dio, cuándo, hasta cuándo— porque es lo que permite quitarla y
+lo que deja el rastro.
+
+Detalles que sostienen esto:
+
+- **El umbral es la aprobación, no el pago.** Quien fue aceptada necesita el
+  material de preparación *antes* de viajar: es lo que promete el correo [6].
+  Moverlo al pago es cambiar el `if` del trigger.
+- **`content_grants.application_id` con índice único parcial** es lo que hace
+  idempotente al trigger: sin él, cada ida y vuelta de estado agregaría una fila.
+- **`on conflict do nothing`, no `do update`.** Si la habilitación se revocó a
+  mano, esa decisión gana: volver a pasar por «aprobada» no la resucita.
+  Verificado.
+- **El trigger es `security definer`** para que funcione por cualquier camino
+  —el panel, un SQL a mano, el backfill— sin depender de quién corre el update.
+- La migración **hace backfill** de las solicitudes ya aprobadas. En producción
+  no había ninguna.
+
+El botón del panel quedó para las dos excepciones: **quitarle** el acceso a
+alguien, y **dárselo** a alguien cuya solicitud todavía no está aprobada o que
+ceremonió por fuera de la plataforma. No pide nivel ni nota: los dos los sabe el
+sistema.
 
 La habilitación **es independiente de la solicitud**: la persona la conserva
-después del viaje, y se le puede dar a alguien que ceremonió por fuera de la
-plataforma (los recurrentes de Google Forms) sin inventarle una solicitud.
+después del viaje, hasta que se la quiten.
 
 Nadie se auto-habilita: `authenticated` no tiene INSERT sobre `content_grants`
 más que por la policy de admin. Verificado con `set role`.
@@ -140,9 +163,9 @@ Los dos advisors nuevos (`lint 0010` por la vista definer y `lint 0029` por
 
 ## 7. Lo que falta
 
-1. **Verificación end-to-end con sesión de admin** (la hace Ignacio): crear un
-   código desde `/admin/acceso`, canjearlo con otra cuenta y ver la biblioteca
-   abrirse; y habilitar a alguien desde su solicitud.
+1. **Verificación end-to-end con sesión de admin** (la hace Ignacio): aprobar
+   una solicitud y ver a esa persona aparecer habilitada; y crear un código
+   desde `/admin/acceso`, canjearlo con otra cuenta y ver la biblioteca abrirse.
 2. **El diseño del muro y del modal es nuestro, no de Julia.** Ella dibujó el
    modal dorado en el video de `/contenidos` mobile, pero ese rediseño entero
    —acordeón de tres niveles, navegación tipo Netflix— **no está implementado**:

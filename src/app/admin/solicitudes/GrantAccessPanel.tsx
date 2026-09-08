@@ -1,44 +1,47 @@
 "use client";
 
-import { useActionState } from "react";
-import { GRANTABLE_LEVELS } from "@/lib/content-access";
 import {
-  grantContentAccess,
+  grantProgramAccess,
   revokeContentGrant,
-  type AccessFormState,
 } from "@/app/admin/acceso/actions";
 
 /**
- * Habilitar a esta persona a leer los contenidos del programa. Va acá, en la
- * solicitud, porque es el momento en que se decide: ya se aprobó y se registró
- * el pago (decision de Ignacio, 08/09 — siempre a mano, nunca automático).
+ * Estado del acceso a contenidos de esta persona. **No es un formulario**: al
+ * aprobar la solicitud queda habilitada sola (trigger
+ * `private.grant_content_on_approval`), asi que lo normal es que este panel solo
+ * informe. Los botones son para las dos excepciones: quitarle el acceso, o
+ * darselo a alguien cuya solicitud todavia no esta aprobada.
  */
 export function GrantAccessPanel({
+  applicationId,
   userId,
   fullName,
+  approved,
   grant,
 }: {
+  applicationId: string;
   userId: string;
   fullName: string;
-  grant: { id: string; level: string; granted_at: string } | null;
+  approved: boolean;
+  grant: { id: string; granted_at: string; note: string | null } | null;
 }) {
-  const [state, formAction, pending] = useActionState<AccessFormState, FormData>(
-    grantContentAccess,
-    { error: null }
-  );
-
   if (grant) {
     return (
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-on-surface-variant">
           Habilitada desde el{" "}
-          {new Date(grant.granted_at).toLocaleDateString("es-CL")}. Ve todos los
-          contenidos del programa.
+          {new Date(grant.granted_at).toLocaleDateString("es-CL")}
+          {grant.note && ` · ${grant.note}`}. Lee todos los contenidos del
+          programa.
         </p>
         <form
           action={revokeContentGrant.bind(null, grant.id)}
           onSubmit={(event) => {
-            if (!confirm(`¿Quitarle el acceso a ${fullName}?`)) {
+            if (
+              !confirm(
+                `¿Quitarle el acceso a ${fullName}? No se le vuelve a dar solo, ni siquiera si aprobás otra solicitud suya.`
+              )
+            ) {
               event.preventDefault();
             }
           }}
@@ -52,57 +55,20 @@ export function GrantAccessPanel({
   }
 
   return (
-    <form action={formAction} className="flex flex-wrap items-end gap-3">
-      <input type="hidden" name="user_id" value={userId} />
-
-      <div className="flex flex-col gap-1.5">
-        <label
-          htmlFor="grant_level"
-          className="text-sm tracking-[0.02em] text-on-surface-variant"
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <p className="text-sm text-on-surface-variant">
+        {approved
+          ? "No tiene acceso: se lo quitaron a mano."
+          : "Todavía no. Se habilita sola en cuanto apruebes la solicitud."}
+      </p>
+      <form action={grantProgramAccess.bind(null, userId, applicationId)}>
+        <button
+          type="submit"
+          className="rounded-lg bg-primary-container px-6 py-2.5 text-sm font-medium tracking-[0.05em] text-on-primary transition-colors hover:bg-primary-fixed"
         >
-          Nivel
-        </label>
-        <select
-          id="grant_level"
-          name="level"
-          defaultValue="programa"
-          className="rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2.5 text-on-surface transition-colors focus:border-primary-fixed-dim focus:outline-none"
-        >
-          {GRANTABLE_LEVELS.map((level) => (
-            <option key={level.value} value={level.value}>
-              {level.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="flex min-w-48 flex-1 flex-col gap-1.5">
-        <label
-          htmlFor="grant_note"
-          className="text-sm tracking-[0.02em] text-on-surface-variant"
-        >
-          Nota (opcional)
-        </label>
-        <input
-          id="grant_note"
-          name="note"
-          type="text"
-          placeholder="Ya ceremonió con nosotras"
-          className="rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2.5 text-on-surface transition-colors focus:border-primary-fixed-dim focus:outline-none"
-        />
-      </div>
-
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-lg bg-primary-container px-6 py-2.5 text-sm font-medium tracking-[0.05em] text-on-primary transition-colors hover:bg-primary-fixed disabled:opacity-40"
-      >
-        {pending ? "Habilitando…" : "Habilitar contenidos"}
-      </button>
-
-      {state.error && (
-        <p className="w-full text-sm text-error">{state.error}</p>
-      )}
-    </form>
+          Habilitar igual
+        </button>
+      </form>
+    </div>
   );
 }

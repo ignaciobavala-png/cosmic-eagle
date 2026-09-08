@@ -85,35 +85,53 @@ export async function setAccessCodeActive(id: string, isActive: boolean) {
   revalidateAccessPaths();
 }
 
-/** Habilitación a mano, desde la solicitud o desde esta sección. */
-export async function grantContentAccess(
-  _state: AccessFormState,
-  formData: FormData
-): Promise<AccessFormState> {
-  const userId = formData.get("user_id");
-  const level = formData.get("level");
-  const note = formData.get("note");
-
-  if (typeof userId !== "string" || !userId) {
-    return { error: "Falta la persona a habilitar." };
-  }
-
-  if (!isContentAccessLevel(level) || level === "publico") {
-    return { error: "Elegí el nivel." };
-  }
-
+/**
+ * Habilitar a mano. Es la **excepcion**, no el camino normal: lo normal es que
+ * la aprobacion de la solicitud habilite sola (trigger
+ * `private.grant_content_on_approval`). Existe para dos casos — alguien que
+ * ceremonio por fuera de la plataforma, y alguien a quien le sacaron el acceso
+ * y se lo quieren devolver.
+ *
+ * No pide nivel ni nota: los dos los sabe el sistema. El nivel es `programa`,
+ * que es el unico que se habilita, y de que solicitud sale queda en
+ * `application_id`.
+ */
+export async function grantProgramAccess(
+  userId: string,
+  applicationId: string | null
+) {
   const supabase = await createClient();
-  const { error } = await supabase.from("content_grants").insert({
+
+  // Si ya hay una fila para esta solicitud (revocada), se reactiva en vez de
+  // insertar otra: el indice unico parcial no deja dos.
+  if (applicationId) {
+    const { data: existing } = await supabase
+      .from("content_grants")
+      .select("id")
+      .eq("application_id", applicationId)
+      .maybeSingle();
+
+    if (existing) {
+      await supabase
+        .from("content_grants")
+        .update({ revoked_at: null })
+        .eq("id", existing.id);
+
+      revalidateAccessPaths();
+      revalidatePath("/admin/solicitudes", "layout");
+      return;
+    }
+  }
+
+  await supabase.from("content_grants").insert({
     user_id: userId,
-    level,
-    note: typeof note === "string" && note.trim() ? note.trim() : null,
+    level: "programa",
+    application_id: applicationId,
+    note: applicationId ? "Habilitada a mano" : "Habilitada a mano, sin solicitud",
   });
 
-  if (error) return { error: `No se pudo habilitar: ${error.message}` };
-
   revalidateAccessPaths();
-  revalidatePath("/admin/solicitudes");
-  return { error: null, ok: "Habilitada." };
+  revalidatePath("/admin/solicitudes", "layout");
 }
 
 /**
@@ -128,5 +146,5 @@ export async function revokeContentGrant(id: string) {
     .eq("id", id);
 
   revalidateAccessPaths();
-  revalidatePath("/admin/solicitudes");
+  revalidatePath("/admin/solicitudes", "layout");
 }
