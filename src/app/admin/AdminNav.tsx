@@ -22,6 +22,7 @@ const LINKS = [
   { href: "/admin/pagos", label: "Pagos" },
   { href: "/admin/multimedia", label: "Multimedia" },
   { href: "/admin/contenidos", label: "Contenidos" },
+  { href: "/admin/acceso", label: "Acceso a contenidos" },
   { href: "/admin/testimonios", label: "Testimonios" },
   { href: "/admin/faqs", label: "Preguntas frecuentes" },
   { href: "/admin/legales", label: "Privacidad y Términos" },

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Lock } from "lucide-react";
 import { articleCategoryLabel, formatArticleDate } from "@/lib/article";
 
 export type ArticleCardData = {
@@ -25,8 +25,18 @@ export type ArticleCardData = {
  * como las fichas del detalle de una experiencia. Antes era `glass-card`, que
  * es vidrio dorado pensado para el fondo oscuro del sistema anterior y sobre
  * crema no se ve.
+ *
+ * `locked` dibuja el candado. La tarjeta **sigue siendo un link**: la pagina del
+ * articulo existe igual y muestra el muro con el copy de la clienta y el canje
+ * del codigo. Cortar la navegacion aca dejaria a la persona sin saber que hacer.
  */
-export function ArticleCard({ article }: { article: ArticleCardData }) {
+export function ArticleCard({
+  article,
+  locked = false,
+}: {
+  article: ArticleCardData;
+  locked?: boolean;
+}) {
   const date = formatArticleDate(article.published_at);
 
   return (
@@ -53,6 +63,12 @@ export function ArticleCard({ article }: { article: ArticleCardData }) {
         <span className="absolute left-4 top-4 rounded-full bg-[#f9d78f] px-3 py-1 text-label-sm uppercase text-[#05125a]">
           {articleCategoryLabel(article.category)}
         </span>
+        {locked && (
+          <span className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-[#05125a]/85 px-3 py-1 text-label-sm uppercase text-[#f9d78f]">
+            <Lock size={12} aria-hidden="true" />
+            Del programa
+          </span>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-5 sm:p-6">
@@ -71,10 +87,10 @@ export function ArticleCard({ article }: { article: ArticleCardData }) {
                 (2,66:1): va `on-primary-container`, que es el rol del sistema
                 para eso. Regla del 28/08. */}
             <span className="block text-label-sm uppercase text-on-primary-container">
-              Publicado
+              {locked ? "Contenido" : "Publicado"}
             </span>
             <span className="mt-1 block text-body-md text-[#05125a]">
-              {date ?? "—"}
+              {locked ? "Requiere acceso" : (date ?? "—")}
             </span>
           </div>
           <span

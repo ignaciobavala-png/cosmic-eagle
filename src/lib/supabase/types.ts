@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          label: string | null
+          level: Database["public"]["Enums"]["content_access_level"]
+          max_uses: number | null
+          trip_id: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          level?: Database["public"]["Enums"]["content_access_level"]
+          max_uses?: number | null
+          trip_id?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          level?: Database["public"]["Enums"]["content_access_level"]
+          max_uses?: number | null
+          trip_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_codes_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_notifications: {
         Row: {
           application_id: string | null
@@ -166,6 +213,7 @@ export type Database = {
       }
       articles: {
         Row: {
+          access_level: Database["public"]["Enums"]["content_access_level"]
           body: string
           category: Database["public"]["Enums"]["article_category"]
           cover_url: string | null
@@ -180,6 +228,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          access_level?: Database["public"]["Enums"]["content_access_level"]
           body: string
           category?: Database["public"]["Enums"]["article_category"]
           cover_url?: string | null
@@ -194,6 +243,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          access_level?: Database["public"]["Enums"]["content_access_level"]
           body?: string
           category?: Database["public"]["Enums"]["article_category"]
           cover_url?: string | null
@@ -263,6 +313,50 @@ export type Database = {
             columns: ["trip_id"]
             isOneToOne: false
             referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_grants: {
+        Row: {
+          access_code_id: string | null
+          expires_at: string | null
+          granted_at: string
+          granted_by: string | null
+          id: string
+          level: Database["public"]["Enums"]["content_access_level"]
+          note: string | null
+          revoked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_code_id?: string | null
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          level?: Database["public"]["Enums"]["content_access_level"]
+          note?: string | null
+          revoked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_code_id?: string | null
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          level?: Database["public"]["Enums"]["content_access_level"]
+          note?: string | null
+          revoked_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_grants_access_code_id_fkey"
+            columns: ["access_code_id"]
+            isOneToOne: false
+            referencedRelation: "access_codes"
             referencedColumns: ["id"]
           },
         ]
@@ -758,6 +852,19 @@ export type Database = {
       }
     }
     Views: {
+      articles_public: {
+        Row: {
+          access_level: Database["public"]["Enums"]["content_access_level"] | null
+          category: Database["public"]["Enums"]["article_category"] | null
+          cover_url: string | null
+          excerpt: string | null
+          id: string | null
+          published_at: string | null
+          slug: string | null
+          title: string | null
+        }
+        Relationships: []
+      }
       my_applications: {
         Row: {
           amount_paid: number | null
@@ -813,7 +920,7 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      redeem_access_code: { Args: { p_code: string }; Returns: string }
     }
     Enums: {
       admin_notification_kind:
@@ -834,6 +941,7 @@ export type Database = {
         | "tecnologia"
         | "testimonios"
       article_status: "draft" | "published"
+      content_access_level: "publico" | "miembros" | "programa"
       faq_placement: "general" | "sesiones" | "viajes"
       payment_status: "pending" | "deposit_paid" | "paid" | "waived"
       scheduled_email_kind:
@@ -995,6 +1103,7 @@ export const Constants = {
         "testimonios",
       ],
       article_status: ["draft", "published"],
+      content_access_level: ["publico", "miembros", "programa"],
       faq_placement: ["general", "sesiones", "viajes"],
       payment_status: ["pending", "deposit_paid", "paid", "waived"],
       scheduled_email_kind: [

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ReviewButtons } from "../ReviewButtons";
 import { PaymentControls } from "../PaymentControls";
 import { PaymentProofList } from "../PaymentProofList";
+import { GrantAccessPanel } from "../GrantAccessPanel";
 import { AnswerList } from "../../AnswerList";
 import {
   SCREENING_FIELDS,
@@ -58,6 +59,18 @@ export default async function SolicitudDetallePage({
   if (!application) notFound();
 
   const isOwnApplication = application.user_id === user?.id;
+
+  // La habilitacion a los contenidos vive en `content_grants` y no en la
+  // solicitud: una persona la conserva entre viajes, y puede tenerla sin haber
+  // pasado por la plataforma (los recurrentes de Google Forms).
+  const { data: grant } = await supabase
+    .from("content_grants")
+    .select("id, level, granted_at")
+    .eq("user_id", application.user_id)
+    .is("revoked_at", null)
+    .order("granted_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
   // La relación es uno a uno, pero PostgREST la devuelve como array salvo que
   // el tipo generado diga lo contrario.
   const health = Array.isArray(application.health_form_first_time)
@@ -145,6 +158,22 @@ export default async function SolicitudDetallePage({
           amountPaid={application.amount_paid}
           price={application.trips?.price ?? 0}
           depositAmount={application.trips?.deposit_amount ?? null}
+        />
+      </div>
+
+      <div className="glass-card rounded-2xl p-6 md:p-8 mb-6">
+        <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
+          Acceso a contenidos
+        </h2>
+        <p className="mb-4 text-sm text-on-surface-variant">
+          Habilita a esta persona a leer los contenidos del programa. Es
+          independiente de la solicitud: una vez habilitada, los sigue viendo
+          después del viaje, hasta que le quites el acceso.
+        </p>
+        <GrantAccessPanel
+          userId={application.user_id}
+          fullName={application.full_name}
+          grant={grant ?? null}
         />
       </div>
 

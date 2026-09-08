@@ -101,7 +101,7 @@ el acceso respete los niveles, y registro de envios con opcion de baja.
 | Textos tipo ensayo con listas y citas | El parser solo entiende parrafo y `## ` → hay que ampliarlo |
 | Navegacion Netflix | No existe: hoy es filtro + grilla |
 | Plantilla unica de lectura | `/contenidos/[slug]` existe pero **no fue rediseñada por Julia** |
-| Niveles de acceso | **No existe nada.** `articles` es publico-o-borrador |
+| Niveles de acceso | **Hecho el 08/09**, ver `docs/ACCESO_CONTENIDOS.md` |
 | Manual Evolutivo | No existe |
 | Marca de agua | No existe |
 | Newsletter | Hay `newsletter_subscribers` y alta desde el footer. **No hay envio** |
@@ -123,7 +123,12 @@ Es el punto que hay que resolver antes de escribir el gate.
 Coinciden en el resto: sus tres etapas (Foundations / Evolution / Advanced) son
 exactamente el acordeon de tres niveles del video.
 
-**Recomendacion: por cuenta, sin codigo.** Postularse ya exige sesion, asi que
+**RESUELTO el 08/09/2026 — ver `docs/ACCESO_CONTENIDOS.md`.** Entraron las dos
+cosas y no se contradicen: el codigo existe, pero **canjearlo no es una forma de
+entrar**, sino un permiso que se le pega a la cuenta de quien lo escribe. El
+modal dorado de Julia se conserva; el control queda donde lo pide Sofia.
+
+Recomendacion original, que sigue siendo el criterio: **por cuenta.** Postularse ya exige sesion, asi que
 el nivel de cada persona se puede derivar de lo que la plataforma ya sabe
 (solicitudes aprobadas, viajes completados) mas una habilitacion manual del
 equipo para el Manual. Un codigo suelto se comparte por WhatsApp y anula el

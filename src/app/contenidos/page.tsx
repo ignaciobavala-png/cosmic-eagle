@@ -11,6 +11,9 @@ import { YouTubeFacade } from "@/components/ui/YouTubeFacade";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { ARTICLE_CATEGORY_LIST, isArticleCategory } from "@/lib/article";
+import { canRead, CONTENT_WALL_COPY } from "@/lib/content-access";
+import { viewerContentLevel } from "@/lib/content-access-server";
+import { AccessCodeForm } from "@/components/ui/AccessCodeForm";
 
 export const metadata: Metadata = {
   title: "Contenidos | Cosmic Eagle",
@@ -40,16 +43,27 @@ export default async function ContenidosPage({
   const content = await getSiteContent();
 
   const supabase = await createClient();
+
+  // **Se lee la vista `articles_public`, no la tabla.** La vista trae los
+  // metadatos de TODO lo publicado, incluido lo que esta persona no puede leer:
+  // §1.4 del documento de Sofia pide que quien no tiene acceso vea igual las
+  // categorias y las portadas, y el mockup de Julia muestra candados, no
+  // ausencia. El cuerpo del texto no esta en la vista, y la tabla (que si lo
+  // tiene) sigue filtrando por RLS.
   let query = supabase
-    .from("articles")
-    .select("slug, title, excerpt, cover_url, category, published_at");
+    .from("articles_public")
+    .select("slug, title, excerpt, cover_url, category, published_at, access_level");
 
   if (active) query = query.eq("category", active);
 
-  const { data: articles } = await query.order("published_at", {
-    ascending: false,
-    nullsFirst: false,
-  });
+  const [{ data: articles }, viewerLevel] = await Promise.all([
+    query.order("published_at", { ascending: false, nullsFirst: false }),
+    viewerContentLevel(supabase),
+  ]);
+
+  const locked = (articles ?? []).filter(
+    (article) => !canRead(article.access_level ?? "miembros", viewerLevel)
+  ).length;
 
   const filters = [
     { label: "Todos", href: "/contenidos", active: !active },
@@ -137,11 +151,35 @@ export default async function ContenidosPage({
                   : "Estamos preparando el material. Vuelve a visitarnos pronto."}
               </p>
             ) : (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {articles.map((article) => (
-                  <ArticleCard key={article.slug} article={article} />
-                ))}
-              </div>
+              <>
+                {locked > 0 && (
+                  <div className="mx-auto mb-12 max-w-2xl rounded-2xl border border-[#f9d78f] bg-white/70 px-6 py-6 text-center">
+                    <p className="text-body-md text-[#333]">
+                      {CONTENT_WALL_COPY}
+                    </p>
+                    <AccessCodeForm tone="light" />
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {articles.map((article) => (
+                    <ArticleCard
+                      key={article.slug}
+                      article={{
+                        slug: article.slug!,
+                        title: article.title!,
+                        excerpt: article.excerpt,
+                        cover_url: article.cover_url,
+                        category: article.category!,
+                        published_at: article.published_at,
+                      }}
+                      locked={
+                        !canRead(article.access_level ?? "miembros", viewerLevel)
+                      }
+                    />
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </CreamSection>

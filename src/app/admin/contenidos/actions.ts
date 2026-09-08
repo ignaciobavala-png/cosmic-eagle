@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isArticleCategory, slugify } from "@/lib/article";
+import { isContentAccessLevel } from "@/lib/content-access";
 import type { ArticleStatus } from "@/lib/article";
 
 export type ArticleFormState = { error: string | null };
@@ -35,6 +36,7 @@ function parseArticleForm(formData: FormData) {
   const excerpt = formData.get("excerpt");
   const category = formData.get("category");
   const status = formData.get("status");
+  const accessLevel = formData.get("access_level");
   const slugField = formData.get("slug");
 
   if (
@@ -43,7 +45,8 @@ function parseArticleForm(formData: FormData) {
     typeof body !== "string" ||
     !body.trim() ||
     !isArticleCategory(category) ||
-    !isStatus(status)
+    !isStatus(status) ||
+    !isContentAccessLevel(accessLevel)
   ) {
     return { error: "Completa el título y el texto.", data: null } as const;
   }
@@ -65,6 +68,7 @@ function parseArticleForm(formData: FormData) {
         typeof excerpt === "string" && excerpt.trim() ? excerpt.trim() : null,
       category,
       status,
+      access_level: accessLevel,
     },
   } as const;
 }

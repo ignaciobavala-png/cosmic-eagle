@@ -2202,3 +2202,64 @@ pie, en escritorio y en mobile. El artículo, por lo mismo, no lleva observador.
 
 Verificado: `tsc`, lint, build, los 38 tests públicos y capturas reales de
 `/contenidos`, un artículo, `/privacidad` y `/terminos` a 1440×900 y 390×844.
+
+### Sesión del 2026-09-08 — la biblioteca con niveles, habilitaciones y códigos
+
+Pedido de la organización: habilitar desde el panel a los inscriptos a un viaje a
+leer los contenidos, que exista un código, y poder elegir qué ve un visitante sin
+sesión. Es lo que faltaba de `docs/BIBLIOTECA.md` §1.4 y **cierra el conflicto de
+§3** (código de Julia vs. cuenta de Sofía), abierto desde el 15/08. Detalle
+completo en **`docs/ACCESO_CONTENIDOS.md`**. Migración
+`20260908160000_content_access_levels.sql`, aplicada y verificada contra
+producción.
+
+- **Escala de tres niveles** (`publico < miembros < programa`), y el **orden de
+  declaración del enum es el orden de comparación**: las policies escriben
+  `access_level <= private.content_level()`. Si se suma un nivel, va en su lugar
+  de la escala, no al final.
+- **Cada artículo declara qué nivel pide** (desplegable «Quién puede leerlo» en
+  `/admin/contenidos`). El default de uno nuevo es `miembros` y no `publico`:
+  equivocarse hacia adentro se corrige con un click, hacia afuera es contenido
+  del programa publicado sin querer. **Avisarle esto a la clienta.**
+- **El gate va en la RLS**, como los borradores desde el 18/08. Verificado
+  sirviendo el sitio de verdad: el cuerpo de un artículo cerrado no aparece en el
+  HTML.
+- **Pero las portadas de lo cerrado son públicas**, porque §1.4 y el mockup de
+  Julia piden candados y no ausencia. Eso no lo puede hacer una sola policy —o la
+  fila sale o no sale—, y de ahí la vista **`articles_public`** (metadatos sin
+  `body`). La página del artículo cerrado **existe igual** y muestra el muro:
+  un 404 sacaría del buscador una ficha que sí es pública.
+- **Ojo, otra vez**: una vista definer también *escribe* como su dueño. Sólo se
+  le otorgó SELECT.
+- **`content_grants` es la habilitación**, siempre a mano (decisión de Ignacio) y
+  con botón en `/admin/solicitudes/[id]`, que es donde se toma la decisión. Se
+  revoca marcando `revoked_at`, no borrando. Es **independiente de la solicitud**:
+  la persona la conserva después del viaje, y se le puede dar a alguien que
+  ceremonió por Google Forms.
+- **`access_codes`: uno por viaje o tanda, no por persona** (decisión de
+  Ignacio). Lo escribe ella —tiene que ser decible por WhatsApp— con tope de usos
+  y vencimiento. **Canjearlo NO es una forma de entrar**: exige sesión y sólo
+  escribe una fila en `content_grants` para esa cuenta. Así conviven el modal
+  dorado de Julia y la recomendación de Sofía.
+- **Nadie que no sea admin puede leer `access_codes`**: listarla es poder canjear
+  cualquier código. El canje lo resuelve `public.redeem_access_code`, definer.
+  Un código apagado responde igual que uno inexistente, para no confirmarle a
+  quien prueba códigos que acertó uno.
+- Sección nueva **`/admin/acceso`**: los códigos y la lista de personas
+  habilitadas. `content_grants.user_id` apunta a `auth.users` y no a `profiles`,
+  así que **PostgREST no puede embeber el perfil**: se cruza en la página.
+
+Verificado: `tsc`, lint, build, la RLS entera con `set role` (nueve casos, ver
+el §6 del doc), y el muro servido por `next start`. Filas de prueba borradas. Los
+dos advisors nuevos (`lint 0010` por la vista y `lint 0029` por la función de
+canje) son a propósito.
+
+**Sin verificar end-to-end** (requiere sesión de admin, la hace Ignacio): crear
+un código desde `/admin/acceso` y canjearlo con otra cuenta, y habilitar a
+alguien desde su solicitud.
+
+**Lo que NO entró**: el rediseño de `/contenidos` que muestra el video de Julia
+(acordeón de tres niveles, navegación tipo Netflix) sigue sin implementarse — el
+muro se compuso con las primitivas que ya existen. Y el **Manual Evolutivo**
+sigue sin existir: sus tres etapas no son tres niveles de acceso sino tres
+cuerpos de contenido, y entregarlas por etapa pide otra definición de Sofía.

@@ -8,6 +8,7 @@ import {
   ARTICLE_COVER_MAX_PX,
   slugify,
 } from "@/lib/article";
+import { CONTENT_ACCESS_LEVELS } from "@/lib/content-access";
 import type { Tables } from "@/lib/supabase/types";
 import type { ArticleFormState } from "./actions";
 
@@ -208,6 +209,28 @@ export function ArticleForm({
             ))}
           </select>
         </div>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="access_level" className={labelClass}>
+          Quién puede leerlo
+        </label>
+        <select
+          id="access_level"
+          name="access_level"
+          defaultValue={article?.access_level ?? "miembros"}
+          className={inputClass}
+        >
+          {CONTENT_ACCESS_LEVELS.map((level) => (
+            <option key={level.value} value={level.value}>
+              {level.label} — {level.hint}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-on-surface-variant">
+          Quien no alcanza el nivel igual ve la tarjeta y la portada en la
+          biblioteca, con un candado: lo que se guarda es el texto.
+        </p>
       </div>
 
       <div className="flex flex-col gap-1.5">
