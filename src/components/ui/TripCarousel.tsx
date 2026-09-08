@@ -1,3 +1,4 @@
+import { groupTripsByPlace } from "@/lib/trip-groups";
 import { ExperienceGate } from "./ExperienceGate";
 import { TripCard, type TripCardData } from "./TripCard";
 
@@ -32,6 +33,11 @@ export function TripCarousel({
   trips: TripCardData[];
   emptyLabel: string;
 }) {
+  // Las experiencias que solo cambian de fecha van en UNA tarjeta con las
+  // fechas adentro: dos tarjetas identicas seguidas se leian como un error de
+  // carga. El detalle esta en `groupTripsByPlace`.
+  const groups = groupTripsByPlace(trips);
+
   return (
     <div className="rounded-[20px] bg-[linear-gradient(135deg,#7a6329_0%,#f9d78f_30%,#fbe9c0_50%,#b3964b_75%,#6b551f_100%)] px-5 py-11">
       <p className="text-center text-[12px] uppercase tracking-[0.167em] text-[#05125a]/70">
@@ -60,19 +66,19 @@ export function TripCarousel({
               en cada vuelta. Con el margen adentro de cada item el ancho es
               exactamente `2n * (tarjeta + separador)` y `-50%` cierra justo. */}
           <div className="animate-marquee flex w-max">
-            {trips.map((trip) => (
-              <div key={trip.id} className="mr-[22px] w-[17rem] shrink-0 sm:w-[20rem]">
-                <TripCard trip={trip} tone="light" />
+            {groups.map((group) => (
+              <div key={group.key} className="mr-[22px] w-[17rem] shrink-0 sm:w-[20rem]">
+                <TripCard trip={group.trip} tone="light" dates={group.dates} />
               </div>
             ))}
-            {trips.map((trip) => (
+            {groups.map((group) => (
               <div
-                key={`copia-${trip.id}`}
+                key={`copia-${group.key}`}
                 aria-hidden="true"
                 tabIndex={-1}
                 className="mr-[22px] hidden w-[17rem] shrink-0 sm:w-[20rem] md:block"
               >
-                <TripCard trip={trip} tone="light" />
+                <TripCard trip={group.trip} tone="light" dates={group.dates} />
               </div>
             ))}
           </div>

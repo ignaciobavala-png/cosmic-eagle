@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { formatDateRangeCompact } from "@/lib/format";
 import { isTripType, tripTypeLabel } from "@/lib/trip-type";
+import type { TripDate } from "@/lib/trip-groups";
 import { TripCover } from "./TripCover";
 
 export type TripCardData = {
@@ -34,8 +35,17 @@ const STATUS_LABEL: Record<string, string> = {
 export function TripCard({
   trip,
   tone = "dark",
+  dates,
 }: {
   trip: TripCardData;
+  /**
+   * Las fechas de la experiencia cuando hay mas de una en el mismo lugar (ver
+   * `groupTripsByPlace`). Con una sola, o sin la prop, la tarjeta es la de
+   * siempre. Con varias, el pie pasa a ser una fila de fechas y **la tarjeta
+   * deja de ser un link**: cada fecha lleva a su propia experiencia, y un
+   * `<a>` no puede contener otros `<a>`.
+   */
+  dates?: TripDate[];
   /**
    * `dark` es la tarjeta de vidrio de siempre, sobre el fondo azul del sitio.
    * `light` es la del rediseño: fondo blanco, para la cartelera dorada de
@@ -45,16 +55,14 @@ export function TripCard({
   tone?: "dark" | "light";
 }) {
   const light = tone === "light";
+  const many = (dates?.length ?? 0) > 1;
 
-  return (
-    <Link
-      href={`/viajes/${trip.id}`}
-      className={
-        light
-          ? "group flex h-full flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.15)] transition-[transform,box-shadow] duration-300 hover:-translate-y-2 hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)]"
-          : "group flex flex-col overflow-hidden rounded-2xl glass-card transition-colors duration-300 hover:border-primary-fixed-dim/35"
-      }
-    >
+  const className = light
+    ? "group flex h-full flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.15)] transition-[transform,box-shadow] duration-300 hover:-translate-y-2 hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)]"
+    : "group flex flex-col overflow-hidden rounded-2xl glass-card transition-colors duration-300 hover:border-primary-fixed-dim/35";
+
+  const content = (
+    <>
       {light ? (
         /* La tarjeta de la cartelera, segun `calendariodeviajes_design.png`
            (correccion del 02/09): la portada es una franja apaisada y limpia, y
@@ -95,25 +103,41 @@ export function TripCard({
               </p>
             )}
 
-            <div className="mt-4 flex items-end justify-between gap-4 border-t border-[#e0e0e0] pt-4">
-              <div>
-                {/* El label va en `on-primary-container` y no en el `#b3964b`
-                    del mockup: ese oro sobre blanco da 3,4:1 en un texto de
-                    10px (ver la sesion del 28/08). Mismo rol de la paleta, un
-                    tono mas oscuro. */}
-                <span className="block font-display text-[10px] font-semibold uppercase tracking-[0.12em] text-on-primary-container">
-                  Fecha
-                </span>
-                <span className="mt-1 block font-display text-[13px] font-bold uppercase tracking-[0.04em] text-[#05125a]">
-                  {formatDateRangeCompact(trip.start_date, trip.end_date)}
-                </span>
-              </div>
-              <span
-                aria-hidden="true"
-                className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[10px] border-2 border-[#05125a] text-lg text-[#05125a] transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#05125a] group-hover:text-white"
-              >
-                <ArrowUpRight size={16} />
+            <div className="mt-4 border-t border-[#e0e0e0] pt-4">
+              {/* El label va en `on-primary-container` y no en el `#b3964b`
+                  del mockup: ese oro sobre blanco da 3,4:1 en un texto de
+                  10px (ver la sesion del 28/08). Mismo rol de la paleta, un
+                  tono mas oscuro. */}
+              <span className="block font-display text-[10px] font-semibold uppercase tracking-[0.12em] text-on-primary-container">
+                {many ? "Fechas" : "Fecha"}
               </span>
+
+              {many ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {dates!.map((date) => (
+                    <Link
+                      key={date.id}
+                      href={`/viajes/${date.id}`}
+                      aria-label={`${trip.title}, ${formatDateRangeCompact(date.start_date, date.end_date)}`}
+                      className="rounded-full border-2 border-[#05125a] px-3.5 py-1.5 font-display text-[12px] font-bold uppercase tracking-[0.04em] text-[#05125a] transition-colors duration-300 hover:bg-[#05125a] hover:text-white"
+                    >
+                      {formatDateRangeCompact(date.start_date, date.end_date)}
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-end justify-between gap-4">
+                  <span className="mt-1 block font-display text-[13px] font-bold uppercase tracking-[0.04em] text-[#05125a]">
+                    {formatDateRangeCompact(trip.start_date, trip.end_date)}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[10px] border-2 border-[#05125a] text-lg text-[#05125a] transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#05125a] group-hover:text-white"
+                  >
+                    <ArrowUpRight size={16} />
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </>
@@ -150,25 +174,51 @@ export function TripCard({
             </p>
           )}
 
-          <div className="mt-6 flex items-end justify-between gap-4 border-t border-primary-fixed-dim/12 pt-4">
-            <div>
-              <span className="block text-label-sm uppercase text-on-surface-variant/60">
-                Fecha
-              </span>
-              <span className="mt-1 block text-body-md text-on-surface">
-                {formatDateRangeCompact(trip.start_date, trip.end_date)}
-              </span>
-            </div>
-            <span
-              aria-hidden="true"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary-fixed-dim/35 text-primary-fixed-dim transition-colors group-hover:bg-primary-container group-hover:text-on-primary"
-            >
-              <ArrowUpRight size={18} />
+          <div className="mt-6 border-t border-primary-fixed-dim/12 pt-4">
+            <span className="block text-label-sm uppercase text-on-surface-variant/60">
+              {many ? "Fechas" : "Fecha"}
             </span>
+
+            {many ? (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {dates!.map((date) => (
+                  <Link
+                    key={date.id}
+                    href={`/viajes/${date.id}`}
+                    aria-label={`${trip.title}, ${formatDateRangeCompact(date.start_date, date.end_date)}`}
+                    className="rounded-full border border-primary-container/55 px-3.5 py-1.5 text-label-sm uppercase text-primary-container transition-colors duration-300 hover:bg-primary-container hover:text-on-primary"
+                  >
+                    {formatDateRangeCompact(date.start_date, date.end_date)}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-end justify-between gap-4">
+                <span className="mt-1 block text-body-md text-on-surface">
+                  {formatDateRangeCompact(trip.start_date, trip.end_date)}
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary-fixed-dim/35 text-primary-fixed-dim transition-colors group-hover:bg-primary-container group-hover:text-on-primary"
+                >
+                  <ArrowUpRight size={18} />
+                </span>
+              </div>
+            )}
           </div>
         </div>
         </>
       )}
+    </>
+  );
+
+  // Con varias fechas la tarjeta no puede ser un link: los links son las
+  // fechas, y un `<a>` no puede contener otros `<a>`.
+  return many ? (
+    <div className={className}>{content}</div>
+  ) : (
+    <Link href={`/viajes/${trip.id}`} className={className}>
+      {content}
     </Link>
   );
 }
