@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useTransform, useReducedMotion, type MotionValue } from "framer-motion";
 import { useSectionProgress } from "@/lib/use-section-progress";
-import { BackgroundMedia } from "./BackgroundMedia";
 import { COLLAPSIBLE_TOGGLE } from "./Collapsible";
 
 type Cta = { label: string; href: string };
@@ -26,10 +25,15 @@ export type StoryKeyword = { text: string; label: string };
  *
  * Las cuatro fases y sus umbrales salen literales del mockup aprobado de Julia
  * (`homepage_correccion.html`, motor "SCROLL STORY"), con la correccion del
- * 04/09 (`docs/entregas/2026-09-04-julia-about/`), que es la version definitiva
- * de esta pantalla: fondo de imagen a pantalla completa sin velo, posiciones de
- * salida MEDIDAS en vivo y degrade de tres colores en la lista final. No son
- * valores elegidos aca: si hay que moverlos, se mueven contra esos archivos.
+ * 04/09 (`docs/entregas/2026-09-04-julia-about/`): posiciones de salida MEDIDAS
+ * en vivo y degrade de tres colores en la lista final. No son valores elegidos
+ * aca: si hay que moverlos, se mueven contra esos archivos.
+ *
+ * **El fondo se queda en el degrade azul y NO lleva imagen**, que es lo unico de
+ * esa entrega que no entro: se probo con la foto a pantalla completa y quedaba
+ * mejor sin (decision de Ignacio, 08/09). De paso se evita el problema que traia:
+ * sobre las zonas claras de una foto el texto blanco caia a 1,57:1 y habia que
+ * taparla con un velo del 40%, o sea casi volver al fondo plano.
  *
  * Criterios que no hay que "simplificar":
  *
@@ -117,14 +121,11 @@ export function ScrollStory({
   keywords,
   cta,
   id,
-  image,
 }: {
   paragraphs: readonly string[];
   keywords: readonly StoryKeyword[];
   cta: Cta;
   id?: string;
-  /** Fondo a pantalla completa (slot `home.about.image`). */
-  image: string;
 }) {
   const reduced = useReducedMotion();
   const { ref, progress } = useSectionProgress(!reduced);
@@ -199,11 +200,9 @@ export function ScrollStory({
     return (
       <section
         id={id}
-        className="relative w-full overflow-hidden bg-[linear-gradient(to_bottom,#011360_0%,#020c41_100%)] px-margin-mobile py-24 md:px-margin-desktop"
+        className="w-full bg-[linear-gradient(to_bottom,#011360_0%,#020c41_100%)] px-margin-mobile py-24 md:px-margin-desktop"
       >
-        <BackgroundMedia src={image} className="object-cover" />
-        <div aria-hidden="true" className="absolute inset-0 bg-[#020c41]/40" />
-        <div className="relative z-10 mx-auto max-w-[820px] space-y-6">
+        <div className="mx-auto max-w-[820px] space-y-6">
           {story.paragraphs.map((pieces, i) => (
             <p key={i} className={PARAGRAPH_CLASS}>
               {pieces.map((piece, j) =>
@@ -234,30 +233,6 @@ export function ScrollStory({
       {/* El `pt` compensa el navbar: el sticky se pega al techo de la pantalla,
           que es justo donde está la banda opaca. */}
       <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden pt-[var(--navbar-h)]">
-        {/* El fondo ocupa la pantalla entera, tambien la franja del navbar: va
-            fuera del `pt`, que solo baja al texto.
-
-            Los z-index arrancan en 0 y no en negativo: el degrade del `body` se
-            pinta DESPUES de los descendientes de z negativo, asi que un -z-10
-            aca dejaria la imagen tapada (docs/HOME_REDISENO.md).
-
-            **El velo es una desviacion consciente de la entrega**, que pide la
-            imagen sin velo. Medido en el browser sobre la foto que hay cargada,
-            barriendo 72 celdas del area que ocupa el texto: sin velo, 28 de
-            esas 72 dejan al texto blanco abajo de 4,5:1 (la peor, 1,57 sobre el
-            nucleo de la llama) y 23 dejan al dorado abajo de 3:1. Con el 40%
-            del azul del sistema no queda ninguna celda dorada abajo de 3 y las
-            blancas bajan a 4, con 3,89 de piso.
-            El texto blanco del parrafo mide 22px, o sea que no es "texto
-            grande" y le corresponde 4,5; las frases doradas si lo son (Domine
-            bold 22px y la lista de 32px) y les alcanza con 3.
-            Cuanto mas oscura sea la imagen que se cargue, menos falta hace este
-            velo — es un `div`, se baja o se saca. */}
-        <div className="absolute inset-0 z-0">
-          <BackgroundMedia src={image} className="object-cover" />
-          <div aria-hidden="true" className="absolute inset-0 bg-[#020c41]/40" />
-        </div>
-
         <motion.div
           style={{ opacity: textOpacity }}
           className="relative z-[3] mx-auto max-w-[820px] px-[6vw]"

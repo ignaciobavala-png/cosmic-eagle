@@ -122,7 +122,6 @@ export default async function Home() {
             significan nada en la lista final. */}
         <ScrollStory
           id="relato"
-          image={content("home.about.image")}
           paragraphs={[
             "Los seres humanos estamos en constante evolución. A medida que expandimos nuestra conciencia, comenzamos a descubrir que somos mucho más que nuestra historia personal, nuestra mente o la realidad que percibimos a través de los sentidos.",
             "Nuestro trabajo explora este potencial evolutivo y la naturaleza multidimensional de la experiencia humana: nuestra capacidad de transformarnos, de acceder a niveles más profundos de inteligencia y de reconectar con la dimensión del alma.",
