@@ -55,16 +55,22 @@ test("el desplegable de secciones lista todas y navega", async ({ page }) => {
   // eso no aparecen como `link`. Es correcto para un menu, pero hay que
   // buscarlos por ese rol.
   const items = page.getByRole("menuitem");
-  // Las 12 secciones de `LINKS` en AdminNav. Avisos no esta ahi: se llega por
-  // la campanita. El numero es a proposito: si una seccion se cae del menu, el
+  // Las 13 secciones de AdminNav. Avisos no esta ahi: se llega por la
+  // campanita. El numero es a proposito: si una seccion se cae del menu, el
   // panel la esconde sin avisar y nadie se entera.
-  await expect(items).toHaveCount(12);
+  await expect(items).toHaveCount(13);
   for (const label of [
-    "Dashboard", "Sesiones", "Viajes", "Solicitudes", "Pagos",
+    "Dashboard", "Solicitudes", "Pagos", "CRM", "Sesiones", "Viajes",
     "Multimedia", "Contenidos", "Testimonios", "Preguntas frecuentes",
-    "Privacidad y Términos", "CRM", "Suscriptores",
+    "Legales", "Niveles de acceso", "Suscriptores",
   ]) {
     await expect(items.filter({ hasText: label })).toHaveCount(1);
+  }
+
+  // Los cuatro grupos del 08/09. Van como `role="group"`, asi que si alguien
+  // vuelve a aplanar la lista este assert lo avisa.
+  for (const grupo of ["Inscripciones", "Experiencias", "El sitio", "Personas"]) {
+    await expect(page.getByRole("group", { name: grupo })).toHaveCount(1);
   }
 
   await items.filter({ hasText: "Multimedia" }).click();

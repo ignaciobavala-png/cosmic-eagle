@@ -383,13 +383,10 @@ function useThreshold(progress: MotionValue<number>, at: number, enabled: boolea
  */
 function StoryCta({ label, href }: Cta) {
   const className =
-    "inline-flex items-center gap-2 rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-10 py-4 font-display text-[14px] font-bold uppercase tracking-[0.071em] text-[#05125a] transition-[filter] duration-300 hover:brightness-110";
-  const content = (
-    <>
-      {label}
-      <span aria-hidden="true">↗</span>
-    </>
-  );
+    "inline-flex items-center rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-10 py-4 font-display text-[14px] font-bold uppercase tracking-[0.071em] text-[#05125a] transition-[filter] duration-300 hover:brightness-110";
+  // Sin flecha adentro: la regla de Julia del 08/09 es que ningun boton la
+  // lleve, solo su texto.
+  const content = <>{label}</>;
 
   return href.startsWith("#") ? (
     <a

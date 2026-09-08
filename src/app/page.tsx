@@ -225,7 +225,6 @@ export default async function Home() {
                 className="mt-[50px] px-7 py-3.5 text-[14px] tracking-[0.071em] md:mt-20 md:px-10 md:py-4"
               >
                 Ir más profundo
-                <span aria-hidden="true">↗</span>
               </CtaLink>
             </RevealItem>
           </div>
@@ -381,7 +380,6 @@ export default async function Home() {
                   className="mt-10 px-7 py-3.5 text-[14px] tracking-[0.071em]"
                 >
                   Ir más profundo
-                  <span aria-hidden="true">↗</span>
                 </CtaLink>
               </RevealItem>
             </div>

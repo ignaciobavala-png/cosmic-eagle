@@ -14,21 +14,63 @@ import {
 } from "lucide-react";
 import { logout } from "@/app/cuenta/actions";
 
-const LINKS = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/sesiones", label: "Sesiones" },
-  { href: "/admin/viajes", label: "Viajes" },
-  { href: "/admin/solicitudes", label: "Solicitudes" },
-  { href: "/admin/pagos", label: "Pagos" },
-  { href: "/admin/multimedia", label: "Multimedia" },
-  { href: "/admin/contenidos", label: "Contenidos" },
-  { href: "/admin/acceso", label: "Acceso a contenidos" },
-  { href: "/admin/testimonios", label: "Testimonios" },
-  { href: "/admin/faqs", label: "Preguntas frecuentes" },
-  { href: "/admin/legales", label: "Privacidad y Términos" },
-  { href: "/admin/crm", label: "CRM" },
-  { href: "/admin/suscriptores", label: "Suscriptores" },
+/**
+ * Las secciones, agrupadas por TAREA y no por orden de construccion, que es
+ * como habian quedado: trece renglones planos en los que habia que leer todo
+ * para encontrar uno. Los grupos van de lo que se toca todos los dias a lo que
+ * se toca casi nunca.
+ *
+ * Dos renombres que salen de esto:
+ *
+ * - "Acceso a contenidos" -> **"Niveles de acceso"**. Se confundia con
+ *   "Contenidos", que esta al lado y es otra cosa: aca no se carga contenido,
+ *   se habilita gente.
+ * - "Privacidad y Terminos" -> **"Legales"**. Era la etiqueta mas larga de la
+ *   lista y la que menos se usa.
+ *
+ * Las RUTAS no cambian: son solo etiquetas.
+ */
+type NavLink = { href: string; label: string };
+
+const GROUPS: { title: string; links: NavLink[] }[] = [
+  {
+    title: "Inscripciones",
+    links: [
+      { href: "/admin/solicitudes", label: "Solicitudes" },
+      { href: "/admin/pagos", label: "Pagos" },
+      { href: "/admin/crm", label: "CRM" },
+    ],
+  },
+  {
+    title: "Experiencias",
+    links: [
+      { href: "/admin/sesiones", label: "Sesiones" },
+      { href: "/admin/viajes", label: "Viajes" },
+    ],
+  },
+  {
+    title: "El sitio",
+    links: [
+      { href: "/admin/multimedia", label: "Multimedia" },
+      { href: "/admin/contenidos", label: "Contenidos" },
+      { href: "/admin/testimonios", label: "Testimonios" },
+      { href: "/admin/faqs", label: "Preguntas frecuentes" },
+      { href: "/admin/legales", label: "Legales" },
+    ],
+  },
+  {
+    title: "Personas",
+    links: [
+      { href: "/admin/acceso", label: "Niveles de acceso" },
+      { href: "/admin/suscriptores", label: "Suscriptores" },
+    ],
+  },
 ];
+
+/** El Dashboard no es un grupo: es la portada, y va suelto arriba de todo. */
+const HOME: NavLink = { href: "/admin", label: "Dashboard" };
+
+const LINKS = [HOME, ...GROUPS.flatMap((group) => group.links)];
 
 /**
  * Barra del panel. Las secciones van en **un desplegable y no en una fila**: con
@@ -41,6 +83,29 @@ const LINKS = [
  * refresca cuando revalida el layout — por eso los actions de notificaciones
  * llaman `revalidatePath("/admin", "layout")` y no solo la pagina.
  */
+function MenuLink({
+  link,
+  active,
+}: {
+  link: NavLink;
+  active: boolean;
+}) {
+  return (
+    <Link
+      href={link.href}
+      role="menuitem"
+      className={`flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
+        active
+          ? "bg-primary-container/10 text-primary-fixed-dim"
+          : "text-on-surface-variant hover:bg-primary-container/5 hover:text-on-surface"
+      }`}
+    >
+      {link.label}
+      {active && <Check size={14} className="shrink-0" />}
+    </Link>
+  );
+}
+
 export function AdminNav({ unread = 0 }: { unread?: number }) {
   const pathname = usePathname();
   // Se guarda EN QUE ruta se abrio el menu, no un booleano: asi navegar lo
@@ -113,30 +178,43 @@ export function AdminNav({ unread = 0 }: { unread?: number }) {
             </button>
 
             {open && (
-              <ul
+              /* Dos columnas y no una lista: con trece secciones apiladas el
+                 menu medía media pantalla y habia que leerlo entero. En dos
+                 columnas los cuatro grupos entran de un vistazo.
+                 En telefono el panel NO cuelga del boton: se ancla al viewport
+                 (`fixed inset-x-4`) y cae a una columna. Colgado del boton se
+                 salia por la derecha —medido: el borde caia en 469px con una
+                 pantalla de 390—, porque el disparador ya arranca corrido por
+                 el logo y el ancho del menu crecio. */
+              <div
                 role="menu"
-                className="absolute left-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-outline-variant/60 bg-surface-container-low p-1 shadow-xl shadow-black/40"
+                aria-label="Secciones del panel"
+                className="fixed inset-x-4 top-[4.5rem] z-50 rounded-xl border border-outline-variant/60 bg-surface-container-low p-2 shadow-xl shadow-black/40 sm:absolute sm:inset-x-auto sm:left-0 sm:top-full sm:mt-2 sm:w-[min(32rem,calc(100vw-2.5rem))]"
               >
-                {LINKS.map((link) => {
-                  const active = isActive(link.href);
-                  return (
-                    <li key={link.href} role="none">
-                      <Link
-                        href={link.href}
-                        role="menuitem"
-                        className={`flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
-                          active
-                            ? "bg-primary-container/10 text-primary-fixed-dim"
-                            : "text-on-surface-variant hover:bg-primary-container/5 hover:text-on-surface"
-                        }`}
+                <MenuLink link={HOME} active={isActive(HOME.href)} />
+
+                <div className="mt-1 grid gap-x-2 gap-y-3 sm:grid-cols-2">
+                  {GROUPS.map((group) => (
+                    <div key={group.title} role="group" aria-label={group.title}>
+                      {/* El titulo del grupo no es un item del menu: no se
+                          navega ni recibe foco. */}
+                      <p
+                        aria-hidden="true"
+                        className="px-3 pb-1 pt-2 font-display text-[11px] uppercase tracking-[0.12em] text-on-surface-variant/60"
                       >
-                        {link.label}
-                        {active && <Check size={14} className="shrink-0" />}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
+                        {group.title}
+                      </p>
+                      {group.links.map((link) => (
+                        <MenuLink
+                          key={link.href}
+                          link={link}
+                          active={isActive(link.href)}
+                        />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>
