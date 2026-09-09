@@ -22,8 +22,16 @@ export const metadata: Metadata = {
  * /nosotros según el rediseño de Julia (`NOSOTROS.html`, ver
  * docs/REDISENO_JULIA_HTML.md §4).
  *
- * Recorrido: hero → cuatro palabras sobre crema + símbolo 1 → Nuestro enfoque +
- * símbolo 2 → Nuestro propósito → frase sobre imagen → relato sticky → cierre.
+ * Recorrido: hero → cuatro palabras sobre crema + símbolo 1 → Quiénes somos
+ * (relato sticky) → Nuestro propósito + símbolo 2 → frase sobre imagen →
+ * Nuestro enfoque → cierre.
+ *
+ * **El orden es de Ignacio (09/09) y NO es el del mockup**, donde el enfoque
+ * abre y "Quiénes somos" cierra: la página se presenta primero y deja el
+ * enfoque para el final. Ojo, ya se revirtió una vez por error — el 08/09 el
+ * desplegable del navbar tenía este orden y se lo "corrigió" para que siguiera
+ * al de la página, tomándolo por un descuido. El menú y la página van juntos y
+ * los manda este orden.
  *
  * Las dos filas de símbolos decorativos (arte final entregado el 2/9 junto con
  * este mockup) replican `.nos-symbol-row`/`nosCenterSymbol()` del original: el
@@ -40,9 +48,10 @@ export const metadata: Metadata = {
  *    y `nosotros.metodologia.image`) se reusan acá con la misma key, así lo que
  *    la clienta ya subió desde /admin/multimedia sigue apareciendo. Renombrarlas
  *    hubiera dejado las filas huérfanas y la página con los assets del repo.
- * 3. **Los botones de scroll internos del mockup** (IR MÁS PROFUNDO → video,
- *    SOBRE NOSOTROS → relato, CONTINUAR → cierre) se portan como anclas, con el
- *    mismo lenguaje visual que el hint del hero.
+ * 3. **Los botones de scroll internos del mockup** se portan como anclas, con el
+ *    mismo lenguaje visual que el hint del hero. Encadenan el recorrido de
+ *    arriba, así que al mover un bloque hay que revisarlos: hoy van relato →
+ *    propósito → video → enfoque → cierre.
  *
  * El copy es de la clienta y está literal del mockup. El texto viejo de
  * metodología (hongos, dosis, seres de luz) que esta versión deja afuera quedó
@@ -87,7 +96,12 @@ export default async function NosotrosPage() {
             variant={1}
             id="nos-symbol-row-1"
             aboveId="nos-words-seq"
-            belowId="nos-enfoque-title"
+            // **`belowId` es la SECCION siguiente, no un texto.** Con el orden
+            // del 09/09 ya no hay dos pantallas crema seguidas: abajo empieza el
+            // relato, que es azul. Anclarlo a un texto de ahi dejaria el simbolo
+            // dorado a caballo del borde; contra el `top` de la seccion queda
+            // centrado en el aire que sobra de SU pantalla, que es donde se ve.
+            belowId="somos"
             minGap={95}
             maxGap={95}
             amount={0.4}
@@ -95,7 +109,111 @@ export default async function NosotrosPage() {
           />
         </section>
 
-        {/* Pantalla 2 — "Nuestro enfoque". Umbral 0.25 y REVERSIBLE: en
+        <StickyStory
+          id="somos"
+          paragraphs={[
+            "Somos investigadores y exploradores apasionados de la conciencia, la transformación humana y la naturaleza de la realidad. Nuestro trabajo se nutre de la exploración de la metafísica, las civilizaciones antiguas, las filosofías espirituales, las tradiciones de sanación, las prácticas de bienestar, los estudios de la conciencia y el conocimiento cósmico.",
+            "Existimos para quienes sienten el llamado de ir más allá de la transformación personal, hacia un proceso evolutivo más profundo: expandir la conciencia, liberar patrones humanos limitantes, fortalecer la conexión con el alma y explorar las capacidades que pueden emerger a medida que esa conexión se profundiza.",
+            <span key="cierre" className="font-semibold text-primary-container">
+              A través de nuestro cuerpo de conocimiento en evolución, nuestras
+              prácticas y tecnologías cósmicas, ofrecemos un camino hacia el
+              recuerdo y la encarnación de la luz, la inteligencia y el potencial
+              que existen dentro de nosotros.
+            </span>,
+          ]}
+          scrollHint={{ label: "Nuestro propósito", target: "#proposito" }}
+        />
+
+        {/* Pantalla 3 — "Nuestro propósito", mismo estilo que "Nuestro enfoque".
+            En mobile min-height 81vh y padding 35px (mockup 2/9): el contenido
+            es corto y ese recorte es lo que deja el hueco del símbolo parejo. */}
+        <Reveal
+          as="section"
+          id="proposito"
+          amount={0.25}
+          once={false}
+          stagger={0}
+          className="relative flex w-full flex-col items-center justify-center bg-[#fff6eb] px-margin-mobile py-[35px] text-[#05125a] min-h-[81svh] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
+        >
+          <div className="mx-auto max-w-3xl">
+            <RevealItem y={0} duration={1} id="nos-proposito-title">
+              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                Nuestro propósito
+              </h2>
+            </RevealItem>
+            <RevealLine className="mt-3 mb-6 h-0.5 w-16 bg-[#f9d78f]" />
+            {/* **Los resaltados NO cambian de tipografía**, sólo de color y
+                peso: llevaban `font-display` y con Sorts Mill Goudy —que tiene
+                la altura de x mucho más baja que Montserrat— quedaban
+                visiblemente más chicos que el renglón donde viven, como si
+                estuvieran en minúscula (reporte de Ignacio del 09/09). Es la
+                misma regla que la palabra clave del relato de la home. */}
+            <div className="space-y-6 text-body-md leading-relaxed text-[#333] text-justify [&_strong]:font-semibold [&_strong]:text-[#05125a]">
+              <RevealItem y={14} duration={0.8} delay={0.15}>
+              <p>
+                Creamos espacios donde las personas puedan{" "}
+                <strong>trascender</strong> patrones limitantes,{" "}
+                <strong>reconectar</strong> con su naturaleza más profunda y
+                acceder a la luz, la sabiduría y el poder interior que ya habitan
+                en ellas.
+              </p>
+              </RevealItem>
+              <RevealItem y={14} duration={0.8} delay={0.3} id="nos-proposito-close">
+              <p>
+                <strong>
+                  Nuestro trabajo acompaña a personas en distintas etapas de este
+                  camino:
+                </strong>{" "}
+                desde quienes comienzan un proceso profundo de transformación,
+                hasta sanadores, guías y practicantes experimentados que entran
+                en nuevas etapas de evolución, desarrollo y servicio.
+              </p>
+              </RevealItem>
+            </div>
+          </div>
+          {/* Símbolo 2: cierra "Nuestro propósito", contra el borde del bloque de
+              imagen que sigue. Usa su propio observer (umbral 0.6) y no el de la
+              pantalla. Mismo criterio que el símbolo 1 con el `belowId`. */}
+          <SymbolRow
+            variant={2}
+            id="nos-symbol-row-2"
+            aboveId="nos-proposito-close"
+            belowId="video"
+            minGap={32}
+            maxGap={121}
+            amount={0.6}
+            delay={0.3}
+          />
+          <ScrollHintButton
+            label="Ir más profundo"
+            target="#video"
+            tone="dark"
+            className="bottom-3 md:bottom-6"
+          />
+        </Reveal>
+
+        {/* Julia pidió video acá; va la imagen hasta que llegue. La key del slot
+            es la del bloque "Evolución Consciente" que el rediseño elimina, para
+            no perder la foto que la clienta ya subió. */}
+        {/* Fade simple: umbral 0.4, 1.2s y SIN transform ni retardo — es el
+            unico bloque del sitio que solo cambia de opacidad. Velo al 0.3 como
+            en el mockup. */}
+        <MediaStatement
+          id="video"
+          image={content("nosotros.proposito.image")}
+          imageAlt="Círculo de ceremonia iluminado"
+          text={content("nosotros.frase")}
+          amount={0.4}
+          once={false}
+          y={0}
+          duration={1.2}
+          veil={0.3}
+          overlay={isEnabled(content("nosotros.proposito.overlay"))}
+          scrollHint={{ label: "Nuestro enfoque", target: "#nuestro-enfoque" }}
+        />
+
+        {/* Pantalla 5 — "Nuestro enfoque", la última de contenido antes del
+            cierre. Umbral 0.25 y REVERSIBLE: en
             /nosotros y /viajes las animaciones se deshacen al volver hacia
             arriba (`nosObserveToggle`). El titulo entra en 1s, la linea crece de
             0 a 64px en 1.2s y los parrafos van de a 14px con 0.15s de escalon.
@@ -159,104 +277,13 @@ export default async function NosotrosPage() {
               </p>
             </RevealItem>
           </div>
-          {/* Símbolo 2: vive al límite entre esta pantalla y la de propósito, por
-              eso usa su propio observer (umbral 0.6) y no el de ninguna de las
-              dos. */}
-          <SymbolRow
-            variant={2}
-            id="nos-symbol-row-2"
-            aboveId="nos-enfoque-close"
-            belowId="nos-proposito-title"
-            minGap={32}
-            maxGap={121}
-            amount={0.6}
-            delay={0.3}
-          />
-        </Reveal>
-
-        {/* Pantalla 3 — "Nuestro propósito", mismo estilo que la pantalla 2.
-            En mobile min-height 81vh y padding 35px (mockup 2/9): el contenido
-            es corto y ese recorte es lo que deja el hueco del símbolo parejo. */}
-        <Reveal
-          as="section"
-          id="proposito"
-          amount={0.25}
-          once={false}
-          stagger={0}
-          className="relative flex w-full flex-col items-center justify-center bg-[#fff6eb] px-margin-mobile py-[35px] text-[#05125a] min-h-[81svh] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
-        >
-          <div className="mx-auto max-w-3xl">
-            <RevealItem y={0} duration={1} id="nos-proposito-title">
-              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                Nuestro propósito
-              </h2>
-            </RevealItem>
-            <RevealLine className="mt-3 mb-6 h-0.5 w-16 bg-[#f9d78f]" />
-            <div className="space-y-6 text-body-md leading-relaxed text-[#333] text-justify [&_strong]:font-display [&_strong]:font-bold [&_strong]:text-[#05125a]">
-              <RevealItem y={14} duration={0.8} delay={0.15}>
-              <p>
-                Creamos espacios donde las personas puedan{" "}
-                <strong>trascender</strong> patrones limitantes,{" "}
-                <strong>reconectar</strong> con su naturaleza más profunda y
-                acceder a la luz, la sabiduría y el poder interior que ya habitan
-                en ellas.
-              </p>
-              </RevealItem>
-              <RevealItem y={14} duration={0.8} delay={0.3}>
-              <p>
-                <strong>
-                  Nuestro trabajo acompaña a personas en distintas etapas de este
-                  camino:
-                </strong>{" "}
-                desde quienes comienzan un proceso profundo de transformación,
-                hasta sanadores, guías y practicantes experimentados que entran
-                en nuevas etapas de evolución, desarrollo y servicio.
-              </p>
-              </RevealItem>
-            </div>
-          </div>
           <ScrollHintButton
-            label="Ir más profundo"
-            target="#video"
+            label="Continuar"
+            target="#vision"
             tone="dark"
             className="bottom-3 md:bottom-6"
           />
         </Reveal>
-
-        {/* Julia pidió video acá; va la imagen hasta que llegue. La key del slot
-            es la del bloque "Evolución Consciente" que el rediseño elimina, para
-            no perder la foto que la clienta ya subió. */}
-        {/* Fade simple: umbral 0.4, 1.2s y SIN transform ni retardo — es el
-            unico bloque del sitio que solo cambia de opacidad. Velo al 0.3 como
-            en el mockup. */}
-        <MediaStatement
-          id="video"
-          image={content("nosotros.proposito.image")}
-          imageAlt="Círculo de ceremonia iluminado"
-          text={content("nosotros.frase")}
-          amount={0.4}
-          once={false}
-          y={0}
-          duration={1.2}
-          veil={0.3}
-          overlay={isEnabled(content("nosotros.proposito.overlay"))}
-          scrollHint={{ label: "Sobre nosotros", target: "#somos" }}
-        />
-
-        <StickyStory
-          id="somos"
-          paragraphs={[
-            "Somos investigadores y exploradores apasionados de la conciencia, la transformación humana y la naturaleza de la realidad. Nuestro trabajo se nutre de la exploración de la metafísica, las civilizaciones antiguas, las filosofías espirituales, las tradiciones de sanación, las prácticas de bienestar, los estudios de la conciencia y el conocimiento cósmico.",
-            "Existimos para quienes sienten el llamado de ir más allá de la transformación personal, hacia un proceso evolutivo más profundo: expandir la conciencia, liberar patrones humanos limitantes, fortalecer la conexión con el alma y explorar las capacidades que pueden emerger a medida que esa conexión se profundiza.",
-            <span key="cierre" className="font-semibold text-primary-container">
-              A través de nuestro cuerpo de conocimiento en evolución, nuestras
-              prácticas y tecnologías cósmicas, ofrecemos un camino hacia el
-              recuerdo y la encarnación de la luz, la inteligencia y el potencial
-              que existen dentro de nosotros.
-            </span>,
-          ]}
-          scrollHint={{ label: "Continuar", target: "#vision" }}
-        />
 
         <ClosingHero
           id="vision"

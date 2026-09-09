@@ -17,17 +17,32 @@ import { Reveal } from "./Reveal";
  * que es como aparecen las pantallas de /nosotros en el mockup. En /viajes los
  * bloques son mas largos que una pantalla y llevan una banda de ancho completo
  * adentro, asi que van sin centrar: ahi se pasa `full={false}`.
+ *
+ * `flushBottom` saca el padding de abajo, para cuando el ultimo hijo es una
+ * banda de ancho completo con fondo propio: sin esto queda una franja crema
+ * colgando debajo de ella.
+ *
+ * **Ojo, esto NO se puede hacer con `className="pb-0"`.** Se intento asi y no
+ * funcionaba: `py-24` emite `padding-block` y `pb-0` emite `padding-bottom`, y
+ * entre dos utilidades de la misma especificidad decide el ORDEN DE LA HOJA
+ * generada, no el orden en que se escriben las clases — ahi gana `py`. Quedaron
+ * 96px de franja crema en las dos bandas de /viajes hasta que Ignacio la
+ * reporto el 09/09. Es la misma trampa que documenta `CtaLink` con el
+ * `display`. Por eso el padding se arma aca y nunca se pisa desde afuera.
  */
 export function CreamSection({
   children,
   id,
   full = true,
+  flushBottom = false,
   className = "",
   reveal,
 }: {
   children: React.ReactNode;
   id?: string;
   full?: boolean;
+  /** Sin padding abajo: el ultimo hijo es una banda con su propio fondo. */
+  flushBottom?: boolean;
   className?: string;
   /**
    * Convierte la seccion en el elemento OBSERVADO del scroll reveal.
@@ -45,7 +60,8 @@ export function CreamSection({
     delay?: number;
   };
 }) {
-  const classes = `w-full bg-[#fff6eb] px-margin-mobile py-20 text-[#05125a] md:px-margin-desktop md:py-24 ${
+  const padY = flushBottom ? "pt-20 md:pt-24" : "py-20 md:py-24";
+  const classes = `w-full bg-[#fff6eb] px-margin-mobile ${padY} text-[#05125a] md:px-margin-desktop ${
     full ? "flex min-h-[100svh] items-center justify-center" : "block"
   } ${className}`;
 

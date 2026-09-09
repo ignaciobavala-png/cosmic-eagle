@@ -88,7 +88,13 @@ export default async function ViajesPage() {
           duration={0.9}
           overlay={isEnabled(content("viajes.about.overlay"))}
         >
-          <div className="space-y-6 text-body-md leading-relaxed text-primary text-justify md:text-body-lg [&_strong]:font-display [&_strong]:font-bold [&_strong]:text-primary-container">
+          {/* **Los resaltados NO cambian de tipografía**, sólo de color y
+              peso: llevaban `font-display` y con Sorts Mill Goudy —que tiene
+              la altura de x mucho más baja que Montserrat— quedaban
+              visiblemente más chicos que el renglón donde viven, como si
+              estuvieran en minúscula (reporte de Ignacio del 09/09). Es la
+              misma regla que la palabra clave del relato de la home. */}
+          <div className="space-y-6 text-body-md leading-relaxed text-primary text-justify md:text-body-lg [&_strong]:font-semibold [&_strong]:text-primary-container">
             <p>
               Nuestras experiencias cósmicas son{" "}
               <strong>viajes de exploración interior</strong> diseñados para
@@ -116,7 +122,7 @@ export default async function ViajesPage() {
         <CreamSection
           id="sesiones"
           full={false}
-          className="pb-0"
+          flushBottom
           reveal={{ amount: 0.22, once: false, stagger: 0 }}
         >
           {/* Estandar de Experiencias: umbral 0.22 sobre la SECCION (lo pone
@@ -197,7 +203,7 @@ export default async function ViajesPage() {
         <CreamSection
           id="viajes"
           full={false}
-          className="pb-0"
+          flushBottom
           reveal={{ amount: 0.22, once: false, stagger: 0 }}
         >
           {/* Estandar de Experiencias: umbral 0.22 sobre la SECCION (lo pone

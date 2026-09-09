@@ -371,12 +371,21 @@ export function ScrollStory({
 const PARAGRAPH_CLASS =
   "mb-[clamp(12px,2.4vh,22px)] text-[clamp(0.95rem,min(1.9vw,3.1vh),1.375rem)] leading-relaxed text-primary";
 /**
- * La frase resaltada DENTRO del parrafo: Domine bold, dorado claro SOLIDO.
- * No lleva degrade — el degrade es exclusivo de la lista final. Comparten
- * tipografia y color de arranque y por eso se confunden, pero son dos
+ * La frase resaltada DENTRO del parrafo: **la misma tipografia y el mismo cuerpo
+ * que el texto que la rodea, y lo unico que cambia es el color**. Es lo que dice
+ * el mockup (`.keyword{color:var(--dorado-claro);font-weight:600}`, sin
+ * `font-family`) y lo que pidio Ignacio el 09/09.
+ *
+ * **Ojo, no volver a ponerle `font-display`.** Lo tuvo hasta el 09/09 y con
+ * Domine casi no se notaba, pero al pasar la display a Sorts Mill Goudy —que
+ * tiene la altura de x mucho mas baja que Montserrat— la frase quedaba
+ * visiblemente mas chica que el renglon en el que vive, como si estuviera en
+ * otro cuerpo.
+ *
+ * Tampoco lleva degrade: el degrade es exclusivo de la lista final. Son dos
  * tratamientos distintos y la entrega del 04/09 pide no fusionarlos.
  */
-const KEYWORD_CLASS = "font-display font-bold text-primary-container";
+const KEYWORD_CLASS = "font-semibold text-primary-container";
 
 /**
  * Fase 4. El botón no hace scrubbing: cruza el umbral y entra con su propia

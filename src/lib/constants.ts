@@ -117,12 +117,14 @@ export const NAV_LINKS: NavLink[] = [
     // seccion de contenido. El desplazamiento suave lo da el
     // `scroll-behavior: smooth` de globals.css, y el `scroll-padding-top` evita
     // que el navbar opaco tape el arranque de la seccion.
-    // El orden es el de la propia pagina (enfoque -> proposito -> quienes
-    // somos), no al reves: el desplegable se lee como un indice de /nosotros.
+    // El orden lo decidio Ignacio (quienes somos -> proposito -> enfoque) y la
+    // PAGINA se reordeno para seguirlo, asi que el desplegable vuelve a leerse
+    // como su indice. **No invertirlo de nuevo**: el 08/09 se hizo justamente
+    // eso, tomando este orden por un descuido, y era una decision.
     children: [
-      { label: "Nuestro enfoque", href: "/nosotros#nuestro-enfoque" },
-      { label: "Nuestro propósito", href: "/nosotros#proposito" },
       { label: "Quiénes somos", href: "/nosotros#somos" },
+      { label: "Nuestro propósito", href: "/nosotros#proposito" },
+      { label: "Nuestro enfoque", href: "/nosotros#nuestro-enfoque" },
     ],
   },
   {

@@ -5,7 +5,7 @@
    (#e3c37d, acentos/bordes/headings) y primary-container (#f9d78f, CTA solido).
    `primary` (#fff6eb) queda para el realce mas brillante. */
 @theme {
-  --font-display: var(--font-display, "Domine", serif);
+  --font-display: var(--font-display, "Sorts Mill Goudy", Georgia, serif);
   --font-body: var(--font-body, "Montserrat", "Helvetica Neue", Arial, sans-serif);
 
   --color-background: #131410;
@@ -363,6 +363,25 @@ html {
    del documento, y el remate oscuro del pie nunca se veria. */
 html {
   background-color: #05060a;
+}
+
+/* Sorts Mill Goudy (la display del manual de marca) existe SOLO en peso 400: el
+   bold de Goudy Old Style era una fuente aparte y no se digitalizo. Sin esto, el
+   browser fabrica el bold engordando el trazo, y un faux bold sobre una serif de
+   estilo antiguo se ve embarrado — justo lo contrario del trazo fino que pide la
+   marca.
+
+   Con `font-synthesis-weight: none` los `font-bold` que ya estan escritos sobre
+   `font-display` (son 49 en el sitio) rinden en regular en vez de engordarse, y
+   no hay que tocarlos uno por uno. Es ademas como el manual muestra los
+   titulares: en regular.
+
+   Ojo: `-weight` y no `font-synthesis: none` a secas, que apagaria tambien la
+   italica sintetica. Sorts Mill Goudy trae italica de verdad, pero la regla la
+   heredarian los hijos con otra familia. */
+.font-display,
+[class*="font-display"] {
+  font-synthesis-weight: none;
 }
 
 /* Midnight Celestial: el fondo nunca es plano. Degrade vertical de documento

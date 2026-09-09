@@ -1,36 +1,26 @@
-"use client";
-
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { HOME_COPY } from "@/lib/constants";
 import type { Testimonial } from "@/lib/testimonials";
 import { SectionHeading } from "./ui/SectionHeading";
-
-/** Cada cuánto pasa al siguiente testimonio. */
-const INTERVALO_MS = 3000;
+import { TestimonialViewer } from "./ui/TestimonialViewer";
 
 /**
  * "Testimonios" — los testimonios de la home, sobre el fondo azul del diseño de
  * Julia (`.testimonios` del mockup + la corrección del 02/09).
  *
- * **Es UN solo contenedor centrado que va pasando los testimonios**, no el
- * carrusel arrastrable de nueve tarjetas que había antes (pedido de Sofía del
- * 07/09, junto con el cambio de título: era "Voces de Luz"). El carrusel obliga
- * a arrastrar para descubrir que hay más; acá se leen solos, de a uno, con el
- * texto en grande y centrado en la pantalla.
+ * **Es UN solo testimonio centrado que va pasando**, no el carrusel arrastrable
+ * de nueve tarjetas que había antes (pedido de Sofía del 07/09, junto con el
+ * cambio de título: era "Voces de Luz"). El carrusel obliga a arrastrar para
+ * descubrir que hay más; acá se leen solos, de a uno, con el texto en grande y
+ * centrado en la pantalla.
  *
- * Tres cosas que no hay que "simplificar":
+ * El visor es `TestimonialViewer`, compartido con las dos bandas de
+ * Experiencias: ahí están las reglas del pase, las flechas y por qué no lleva
+ * caja. Esta sección sólo pone el marco — el fondo, la cabecera y la franja de
+ * imagen del pie.
  *
- * - **La caja es de alto fijo.** Los testimonios miden distinto y una caja que
- *   se adapta al texto haría saltar la sección entera en cada pase — con el
- *   bloque centrado en pantalla, el salto se ve en las dos direcciones.
- * - **El pase automático se frena con el puntero encima o el foco adentro**, y
- *   se reinicia con cada avance manual: si alguien está leyendo, el contenido no
- *   se le va solo. Mismo criterio que `PortalsSection`.
- * - **Con `prefers-reduced-motion` no rota solo ni funde**: quedan los puntos
- *   para pasar a mano. Un cambio de contenido cada 3s es movimiento aunque no
- *   haya transición.
+ * Ya no necesita `"use client"`: todo lo que tenía estado se fue al visor, y
+ * esto volvió a ser un Server Component.
  *
  * La franja de imagen del pie es editable (slot `home.voces.image`) — la key NO
  * se renombra aunque la sección haya cambiado de nombre, o lo que la clienta ya
@@ -46,26 +36,7 @@ export function TestimonialsSection({
   /** La franja de imagen del pie (slot `home.voces.image`). */
   image: string;
 }) {
-  const reduced = useReducedMotion();
-  const [activo, setActivo] = useState(0);
-  const [pausado, setPausado] = useState(false);
-
-  const total = testimonials.length;
-
-  useEffect(() => {
-    if (reduced || pausado || total < 2) return;
-    const t = setTimeout(
-      () => setActivo((i) => (i + 1) % total),
-      INTERVALO_MS,
-    );
-    return () => clearTimeout(t);
-    // `activo` en las dependencias es lo que reinicia la espera cuando alguien
-    // pasa de testimonio a mano.
-  }, [activo, pausado, reduced, total]);
-
-  if (total === 0) return null;
-
-  const t = testimonials[Math.min(activo, total - 1)];
+  if (testimonials.length === 0) return null;
 
   return (
     <section
@@ -95,58 +66,7 @@ export function TestimonialsSection({
           lineClassName="max-w-[180px]"
         />
 
-        <div
-          className="mx-auto mt-9 flex max-w-[760px] flex-col items-center"
-          onPointerEnter={() => setPausado(true)}
-          onPointerLeave={() => setPausado(false)}
-          // El foco cae en los puntos, no en el contenedor: va la variante que
-          // captura el foco de los hijos.
-          onFocusCapture={() => setPausado(true)}
-          onBlurCapture={() => setPausado(false)}
-        >
-          <div
-            className="flex h-[300px] w-full items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/[0.08] px-7 py-8 sm:h-[260px] sm:px-12"
-            aria-live="polite"
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.figure
-                key={t.id}
-                initial={reduced ? false : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduced ? { opacity: 1 } : { opacity: 0, y: -12 }}
-                transition={{ duration: reduced ? 0 : 0.45 }}
-                className="w-full"
-              >
-                <blockquote className="line-clamp-6 text-[15px] italic leading-relaxed text-primary sm:line-clamp-5 sm:text-[17px]">
-                  &ldquo;{t.quote}&rdquo;
-                </blockquote>
-                <figcaption className="mt-4 text-[12px] font-bold tracking-normal text-primary-container sm:text-[13px]">
-                  {t.author_name}
-                  {t.author_location && ` — ${t.author_location}`}
-                </figcaption>
-              </motion.figure>
-            </AnimatePresence>
-          </div>
-
-          {total > 1 && (
-            <div className="mt-5 flex items-center justify-center gap-2.5">
-              {testimonials.map((otro, i) => (
-                <button
-                  key={otro.id}
-                  type="button"
-                  onClick={() => setActivo(i)}
-                  aria-label={`Ver el testimonio de ${otro.author_name}`}
-                  aria-current={i === activo}
-                  className={`h-2 w-2 rounded-full transition-[background-color,transform] duration-200 ${
-                    i === activo
-                      ? "scale-125 bg-primary-container"
-                      : "bg-white/30 hover:bg-white/60"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        <TestimonialViewer testimonials={testimonials} className="mt-9" />
       </div>
 
       {/* La franja del pie ocupa TODO el alto que sobra y termina con la

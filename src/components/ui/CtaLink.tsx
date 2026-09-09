@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-type Variant = "solid" | "ghost" | "pill" | "glass";
+type Variant = "solid" | "ghost" | "pill" | "glass" | "outline";
 
 const VARIANTS: Record<Variant, string> = {
   // CTA solido: oro champagne con texto oscuro (primary-container / on-primary)
@@ -26,6 +26,17 @@ const VARIANTS: Record<Variant, string> = {
   // El brillo de arriba (`inset`) es lo que le da el canto de vidrio.
   glass:
     "rounded-full border-[1.5px] border-primary-container/50 bg-[linear-gradient(135deg,rgba(0,121,179,0.5),rgba(5,18,90,0.5))] font-display font-bold tracking-[0.08em] text-primary-container shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-[10px] hover:brightness-125",
+  // El boton de contorno, **el que eligio Sofia** (09/09): es el que estaba
+  // escrito a mano en los dos paneles de la home (`.sv-btn` del mockup de
+  // Julia). Contorno fino del color del texto, relleno apenas translucido y
+  // nada de degrade dorado — el que menos peso agrega a la composicion, que es
+  // justo el reclamo de "demasiados rectangulos y tres botones distintos".
+  //
+  // El color lo pone quien lo usa con `className` (`text-*` y `border-*`): el
+  // mismo boton vive sobre el panel azul y sobre el dorado, y el contorno
+  // siempre sigue al texto. Por eso aca va `border-current` y no un color fijo.
+  outline:
+    "rounded-full border-[1.5px] border-current font-display tracking-[0.038em] transition-[filter,box-shadow,transform] duration-[250ms] hover:scale-[1.04] hover:brightness-110",
 };
 
 /**
@@ -52,7 +63,7 @@ export function CtaLink({
   return (
     <Link
       href={href}
-      className={`inline-flex items-center justify-center gap-2 px-7 py-3 text-label-sm uppercase transition-all duration-300 ${variant === "pill" || variant === "glass" ? "" : "rounded-lg"} ${VARIANTS[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 px-7 py-3 text-label-sm uppercase transition-all duration-300 ${variant === "pill" || variant === "glass" || variant === "outline" ? "" : "rounded-lg"} ${VARIANTS[variant]} ${className}`}
     >
       {children}
     </Link>

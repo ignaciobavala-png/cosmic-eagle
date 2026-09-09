@@ -2398,3 +2398,133 @@ Verificado: `tsc`, lint, build de producción, medición sobre el build servido 
 1440×900 y 390×844 (cero tramos vacíos, un solo cruce en el relevo, cero errores
 de página), capturas de antes/después del punto exacto del recorrido, y los tests
 públicos.
+
+### Sesión del 2026-09-09 (bis) — la tipografía del manual de marca
+
+Sofía mandó el **manual de marca** (`MANUAL DE MARCA/`, copiado el mismo día a
+`entregas-sofia/2026-09-09-manual-de-marca/`) y dijo que Julia no había aplicado
+bien las tipografías. Tenía razón: **no coincidía ninguna de las dos.**
+
+| rol | manual | sitio (hasta hoy) |
+|---|---|---|
+| titulares | **LTC Goudy Old Style** | Domine |
+| texto | **Dolly Pro** | Montserrat |
+
+**Las dos del manual son de pago y los archivos que llegaron son piratas** — leído
+en los metadatos de los OTF: Goudy es de **P22/Lanston**, con licencia de
+escritorio de 5 equipos y *embedding* sólo "Print and Preview"; Dolly es de
+**Underware** y los archivos son builds de Adobe Typekit con su EULA adentro
+(*"requires a purchased Underware End User License Agreement"*). Los cinco se
+llaman `fonnts.com-...`, que es un sitio de descargas pirata. Una licencia de
+escritorio **no cubre webfont**, y un `@font-face` publica el archivo para que lo
+baje cualquiera. **No se pueden servir.**
+
+Se aplicó la salida libre, que Ignacio aprobó:
+
+- **Display → `Sorts Mill Goudy`** (Google Fonts), digitalización del mismo
+  original de ATF. En el cotejo lado a lado es casi indistinguible del specimen
+  del manual.
+- **El cuerpo sigue en Montserrat.** Montserrat **no está respaldada por el
+  manual** (la carpeta `Tipografías/Montserrat` viene vacía y la sans con la que
+  está maquetado el documento no es Montserrat ni Poppins — comparado), pero
+  cambiar el cuerpo a serif toca el sitio entero y **Julia cerró Montserrat
+  explícitamente el 02/09**. Es un desacuerdo entre el manual y la diseñadora, y
+  lo resuelven ellas.
+- **`manual_de_marca_cosmic_eagle_3.pdf` (enero 2026) está TRUNCADO**: pesa
+  exactamente 4 MiB, una descarga cortada. Hay que pedirlo — es la versión más
+  nueva y podría cambiar esto.
+
+**Sorts Mill Goudy sólo existe en peso 400** (el bold de Goudy Old Style era una
+fuente aparte y no se digitalizó) y el sitio tiene **49 titulares con
+`font-bold`**. En vez de tocarlos uno por uno va **`font-synthesis-weight: none`**
+sobre la familia display en `globals.css`: sin eso el browser fabrica el bold
+engordando el trazo, y un faux bold sobre una serif de estilo antiguo se ve
+embarrado. Con la regla rinden en regular, que es como el manual muestra los
+titulares.
+
+#### El bug que destapó el cambio: los resaltados se veían "en minúscula"
+
+Reportado por Ignacio en tres lugares. **Sorts Mill Goudy tiene la altura de x
+mucho más baja que Montserrat**, así que cualquier texto en `font-display`
+metido DENTRO de un renglón de Montserrat queda visiblemente más chico, como si
+estuviera en otro cuerpo. Pasaba en:
+
+- la palabra clave del relato de la home (`KEYWORD_CLASS` de `ScrollStory`),
+- los `<strong>` de "Nuestro propósito" en /nosotros,
+- los `<strong>` del bloque de Experiencias.
+
+**La regla que sale de esto: un resaltado dentro de un párrafo no cambia de
+tipografía, sólo de color y peso.** Es además lo que dice el mockup de Julia
+(`.keyword{color:var(--dorado-claro);font-weight:600}`, sin `font-family`), o sea
+que el `font-display` era una desviación nuestra que con Domine casi no se
+notaba. Medido después: resaltado y párrafo en Montserrat, mismo `font-size`, y
+lo único distinto es el peso (600) y el color. **No vuelvan a ponerle
+`font-display` a un resaltado en línea**; sí lo llevan las frases sueltas que
+ocupan su propio renglón (la lista que viaja al centro, las citas), donde el
+cambio de familia es el efecto.
+
+#### Un solo botón, y los testimonios sin caja
+
+De la captura `cuadrados.png`: "demasiados rectángulos y tres botones distintos".
+
+- **`CtaLink` sumó la variante `outline`**, que es el botón que eligió Sofía (el
+  "Explorar próximas sesiones" del panel de la home, `.sv-btn` del mockup):
+  contorno fino del color del texto y nada de degradé dorado. Va con
+  `border-current` porque el mismo botón vive sobre el panel azul y sobre el
+  dorado. Los tres botones de ese sector quedaron iguales — se fueron la píldora
+  dorada de "Ir más profundo" y el contorno distinto de "Ir más allá".
+- **Los testimonios perdieron la caja** y ganaron dos flechas de trazo 1px.
+  `TestimonialViewer` es nuevo y lo comparten los **tres** juegos: "Testimonios"
+  de la home, "Nuestros Sanadores" y "Nuestros Viajeros". En Experiencias eso
+  **reemplaza al carrusel horizontal de tarjetas**: no alcanzaba con sacarle el
+  borde, porque ahí la caja era lo único que separaba un testimonio del
+  siguiente. `TestimonialsSection` se quedó sin estado y **volvió a ser Server
+  Component**.
+
+#### La franja crema, y una trampa de Tailwind que ya nos costó dos veces
+
+Debajo de cada banda de testimonios de /viajes colgaba una franja crema de 96px.
+`CreamSection` la recibía con `className="pb-0"` y **eso nunca funcionó**:
+`py-24` emite `padding-block` y `pb-0` emite `padding-bottom`, y entre dos
+utilidades de la misma especificidad decide el **orden de la hoja generada**, no
+el orden en que se escriben las clases — ahí gana `py`. Medido: `padding-bottom`
+computado en 96px teniendo `pb-0` puesto.
+
+Ahora el padding se arma dentro del componente con la prop **`flushBottom`** y no
+se pisa desde afuera. **Es la misma trampa que ya documenta `CtaLink` con el
+`display`**: en este proyecto, pasar por `className` una utilidad que compite con
+una que el componente ya trae no funciona — hay que resolverlo adentro.
+
+#### /nosotros volvió al orden acordado
+
+El recorrido pasó a **cuatro palabras → Quiénes somos → Nuestro propósito →
+frase sobre imagen → Nuestro enfoque → cierre**, y el menú lo sigue.
+
+**Ojo, esto ya se revirtió una vez por error.** El 08/09 el desplegable tenía
+este orden y una sesión lo "corrigió" (commit `570040e`) para que siguiera al de
+la página, tomándolo por un descuido cuando era una decisión de Ignacio. Queda
+advertido en `constants.ts` y en el encabezado de la página: **el menú y la
+página van juntos, y los manda este orden.**
+
+Dos cosas que el reordenamiento rompió y hubo que arreglar:
+
+- **Los botones de "continuar" encadenan el recorrido** y apuntaban al orden
+  viejo. Ahora van relato → propósito → frase → enfoque → cierre, y "Nuestro
+  enfoque", que pasó a ser la última pantalla de contenido, estrenó el suyo.
+- **Los símbolos dorados se centran en runtime entre dos textos que nombran por
+  `id`**, y esos textos cambiaron de lugar: el símbolo 1 se calculaba contra el
+  título de "Nuestro enfoque", que quedó 4000px más abajo, así que terminó
+  flotando en medio del relato azul (medido: top 3785, dentro de `#somos`). Se
+  reanclaron al **borde de la sección siguiente** en vez de a un texto. Con el
+  orden nuevo **ya no hay dos pantallas crema seguidas**, así que el símbolo dejó
+  de ser separador entre dos y pasó a rematar la suya.
+
+Verificado: `tsc`, lint, build de producción, y medición en Chrome real a
+1440×900 — el orden y las posiciones de las seis secciones, los símbolos dentro
+de su pantalla (1534 y 5012), las tres anclas frenando bajo el navbar, la franja
+en 0px, y resaltado y párrafo con la misma familia y el mismo cuerpo en /viajes
+y /nosotros. Más los tests públicos.
+
+**Pendiente de decidir con ellas**: si el cuerpo pasa a la serif que pide el
+manual, el PDF truncado, y que los cuatro testimonios de "Nuestros Sanadores"
+publicados en producción son **Lorem ipsum** — datos de prueba, no texto real.

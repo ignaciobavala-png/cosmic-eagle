@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
@@ -221,8 +220,8 @@ export default async function Home() {
             <RevealItem y={30} duration={0.9} delay={0.75}>
               <CtaLink
                 href="/nosotros"
-                variant="pill"
-                className="mt-[50px] px-7 py-3.5 text-[14px] tracking-[0.071em] md:mt-20 md:px-10 md:py-4"
+                variant="outline"
+                className="mt-[50px] px-7 py-3.5 text-[14px] text-primary-container md:mt-20 md:px-10 md:py-4"
               >
                 Ir más profundo
               </CtaLink>
@@ -276,12 +275,13 @@ export default async function Home() {
                 </p>
               </RevealItem>
               <RevealItem duration={0.8} delay={0.45}>
-                <Link
+                <CtaLink
                   href="/viajes#sesiones"
-                  className="inline-flex items-center rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,rgba(0,121,179,0.35),rgba(5,18,90,0.35))] px-7 py-[11px] font-display text-[13px] uppercase tracking-[0.038em] text-primary-container transition-[filter,box-shadow,transform] duration-[250ms] hover:scale-[1.06] hover:brightness-110 hover:shadow-[0_0_20px_rgba(0,121,179,0.55)]"
+                  variant="outline"
+                  className="px-7 py-[11px] text-[13px] text-primary-container hover:shadow-[0_0_20px_rgba(0,121,179,0.55)]"
                 >
                   Explorar próximas sesiones
-                </Link>
+                </CtaLink>
               </RevealItem>
             </div>
           </div>
@@ -306,12 +306,13 @@ export default async function Home() {
                 </p>
               </RevealItem>
               <RevealItem duration={0.8} delay={0.45}>
-                <Link
+                <CtaLink
                   href="/viajes#viajes"
-                  className="inline-flex items-center rounded-full border-[1.5px] border-[#05125a] bg-[linear-gradient(135deg,rgba(249,215,143,0.4),rgba(179,150,75,0.2))] px-7 py-[11px] font-display text-[13px] uppercase tracking-[0.038em] text-[#05125a] transition-[filter,box-shadow,transform] duration-[250ms] hover:scale-[1.1] hover:brightness-110 hover:shadow-[0_0_34px_rgba(249,215,143,0.9)]"
+                  variant="outline"
+                  className="px-7 py-[11px] text-[13px] text-[#05125a] hover:shadow-[0_0_34px_rgba(249,215,143,0.9)]"
                 >
                   Ir más allá
-                </Link>
+                </CtaLink>
               </RevealItem>
             </div>
           </div>

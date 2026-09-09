@@ -1,5 +1,6 @@
 import type { Testimonial } from "@/lib/testimonials";
 import { Reveal } from "./Reveal";
+import { TestimonialViewer } from "./TestimonialViewer";
 
 /**
  * Banda de testimonios de ancho completo, del rediseño de /viajes: cada tipo de
@@ -13,6 +14,12 @@ import { Reveal } from "./Reveal";
  * las tres secciones llevan textos distintos). **Si la sección no tiene ninguno
  * cargado, la banda no se dibuja**: es preferible a un bloque vacío o a repetir
  * los de otra sección.
+ *
+ * El contenido lo pone `TestimonialViewer`, el mismo visor de la home: uno por
+ * vez, sin caja y con las dos flechas finas (pedido de Sofía del 09/09). **Antes
+ * era un carrusel horizontal de tarjetas con recuadro** — no alcanzaba con
+ * sacarle el borde, porque era lo único que separaba un testimonio del
+ * siguiente.
  */
 export function TestimonialsBand({
   title,
@@ -35,22 +42,12 @@ export function TestimonialsBand({
           {label}
         </p>
 
-        <div className="flex snap-x gap-5 overflow-x-auto pb-3 text-left [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {testimonials.map((t) => (
-            <figure
-              key={t.id}
-              className="flex w-[18rem] shrink-0 snap-start flex-col justify-center rounded-xl border border-white/20 bg-white/[0.08] p-8"
-            >
-              <blockquote className="text-body-md italic text-primary">
-                &ldquo;{t.quote}&rdquo;
-              </blockquote>
-              <figcaption className="mt-4 text-label-sm font-bold text-primary-container">
-                {t.author_name}
-                {t.author_location ? ` — ${t.author_location}` : ""}
-              </figcaption>
-            </figure>
-          ))}
-        </div>
+        {/* Mas bajo que en la home: alla el bloque es el protagonista de una
+            pantalla entera y aca cierra una seccion que ya viene larga. */}
+        <TestimonialViewer
+          testimonials={testimonials}
+          alturaClassName="h-[240px] sm:h-[200px]"
+        />
       </Reveal>
     </div>
   );
