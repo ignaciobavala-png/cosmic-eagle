@@ -70,7 +70,13 @@ export function TestimonialsSection({
   return (
     <section
       id={id}
-      className="relative flex h-[100svh] w-full flex-col overflow-hidden bg-[linear-gradient(180deg,#0079b3_0%,#05125a_45%)]"
+      // `min-h` y no `h`: con alto fijo, una pantalla baja no achicaba nada
+      // —la cabecera es `shrink-0` y la franja tiene `min-h`— sino que se
+      // comía 127px por abajo, y lo que se perdía era la franja de imagen
+      // entera (medido a 1346x578 y 1280x600). Con `min-h` la sección crece
+      // sólo en esos casos; a 900 y a 844 sigue midiendo exactamente una
+      // pantalla, que es como se verificó el 03/09.
+      className="relative flex min-h-[100svh] w-full flex-col overflow-hidden bg-[linear-gradient(180deg,#0079b3_0%,#05125a_45%)]"
     >
       {/* El `pt` de mobile suma la altura del navbar: la sección mide una
           pantalla justa y la banda opaca le tapaba el título. En escritorio los

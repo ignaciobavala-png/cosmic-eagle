@@ -56,6 +56,28 @@ const PHASE2_END = 0.55; // termina el apagado de los tramos de texto
 const PHASE3_END = 0.78; // las palabras llegan al centro
 const CTA_TRIGGER = 0.8; // umbral del botón (no es scrubbing: entra y sale entero)
 
+/**
+ * El relevo entre la frase del párrafo y su copia que viaja: lo que tarda la
+ * lista en encenderse, y lo que tarda la original en apagarse. Es el mismo
+ * tramo para las dos, así que en cualquier punto se lee UNA sola vez.
+ *
+ * **Que la original se apague acá es la correccion del 09/09** y es lo unico
+ * que se aparta del motor del mockup, donde `.keyword` sigue encendida hasta
+ * que el bloque entero se desvanece en 0,78. Ahi no molestaba porque las copias
+ * salian de cuatro offsets inventados, lejos de su original; desde que los
+ * offsets se miden en vivo (correccion del 04/09) cada copia arranca ENCIMA de
+ * su gemela y la frase se leia dos veces, con dos tamaños y corrida.
+ *
+ * Medido en produccion a 1440x900 antes del arreglo: las dos versiones legibles
+ * (opacidad > 0,25 las dos) durante 378px de scroll, desde 5-11px de distancia
+ * al arrancar hasta 184px. Ver las fotos de la sesion del 09/09.
+ *
+ * El resto del parrafo NO se toca: sigue apagandose lento hasta 0,78, que es lo
+ * que pide el mockup. Lo que se adelanta es solo la frase que tiene un doble en
+ * pantalla.
+ */
+const KEYWORD_HANDOFF = 0.06;
+
 /** Cuánto dura, en progreso, el apagado de cada tramo de texto. */
 const SEGMENT_FADE = 0.1;
 /** Lo que queda encendido de un tramo apagado: no se va a cero del todo. */
@@ -190,8 +212,13 @@ export function ScrollStory({
 
   // Fase 3: el bloque de texto se apaga entero mientras las palabras viajan.
   const textOpacity = useTransform(progress, [PHASE2_END, PHASE3_END], [1, 0]);
-  // Las palabras entran rápido apenas arranca la fase, y ya no se apagan.
-  const wordsOpacity = useTransform(progress, [PHASE2_END, PHASE2_END + 0.06], [0, 1]);
+  // Las palabras entran rápido apenas arranca la fase, y ya no se apagan. Es el
+  // mismo tramo en que se apaga su gemela del párrafo (ver `KEYWORD_HANDOFF`).
+  const wordsOpacity = useTransform(
+    progress,
+    [PHASE2_END, PHASE2_END + KEYWORD_HANDOFF],
+    [0, 1]
+  );
   const travel = useTransform(progress, [PHASE2_END, PHASE3_END], [0, 1]);
 
   const ctaVisible = useThreshold(progress, CTA_TRIGGER, !reduced);
@@ -246,15 +273,15 @@ export function ScrollStory({
             >
               {pieces.map((piece, j) =>
                 piece.keyword ? (
-                  <span
+                  <StoryKeywordSource
                     key={j}
-                    ref={(el) => {
+                    progress={progress}
+                    register={(el) => {
                       sources.current[piece.index] = el;
                     }}
-                    className={KEYWORD_CLASS}
                   >
                     {piece.text}
-                  </span>
+                  </StoryKeywordSource>
                 ) : (
                   <StorySegment
                     key={j}
@@ -325,8 +352,24 @@ export function ScrollStory({
   );
 }
 
+/**
+ * **La medida del texto sigue al ALTO de la pantalla, no sólo al ancho.** El
+ * bloque vive dentro de un sticky de `100svh` con `overflow-hidden` y centrado
+ * en flex: si el texto no entra, no hay scroll que valga — se recorta arriba y
+ * abajo, y no hay forma de leer lo que quedó afuera.
+ *
+ * Medido antes del arreglo (1440px de ancho): con la pantalla en 660px de alto
+ * el bloque ya no entraba, y en 578px se comian dos lineas arriba — el parrafo
+ * arrancaba en "comenzamos a descubrir que". Pasa con la ventana a media
+ * pantalla, con el zoom del browser arriba del 125% y en un portatil bajo.
+ *
+ * De ahi el `min(1.9vw, 3.1vh)`: en una pantalla normal manda el ancho y el
+ * tamaño es exactamente el de antes (el tope de 1.375rem se alcanza igual), y
+ * sólo cuando la pantalla es baja toma el mando el alto. El margen entre
+ * párrafos sigue la misma regla.
+ */
 const PARAGRAPH_CLASS =
-  "mb-[22px] text-[clamp(0.95rem,1.9vw,1.375rem)] leading-relaxed text-primary";
+  "mb-[clamp(12px,2.4vh,22px)] text-[clamp(0.95rem,min(1.9vw,3.1vh),1.375rem)] leading-relaxed text-primary";
 /**
  * La frase resaltada DENTRO del parrafo: Domine bold, dorado claro SOLIDO.
  * No lleva degrade — el degrade es exclusivo de la lista final. Comparten
@@ -422,7 +465,25 @@ function StoryCta({ label, href }: Cta) {
   );
 }
 
-/** Fase 1: cada párrafo tiene su propia ventana de scroll, sólo opacidad. */
+/**
+ * Fase 1: cada párrafo tiene su propia ventana de scroll, sólo opacidad.
+ *
+ * **El primero está visible desde el arranque** y los demás se reparten el
+ * tramo. Es la única desviación del motor aprobado, y arregla un agujero que el
+ * mockup tambien tiene: el progreso vale 0 hasta que la sección llega al techo
+ * de la pantalla, así que con los tres párrafos en opacidad 0 quedaba **media
+ * pantalla en blanco** entre la frase manifiesto —que ya se fue por arriba— y
+ * el primer párrafo, que no empieza a encenderse hasta estar 250px adentro.
+ *
+ * Medido antes del arreglo, barriendo el documento de a 100px: 500px de scroll
+ * sin un solo texto legible a 1440x900, 400px a 1885x810 y 500px a 390x844. El
+ * mismo barrido sobre `homepage_correccion.html` da el mismo tramo vacío, o sea
+ * que no era nuestro: viene del motor de Julia. **Avisarle.**
+ *
+ * Con el primer párrafo encendido, la sección entra desde abajo con el texto ya
+ * puesto y el vacío desaparece. La destilación no se pierde: siguen entrando
+ * dos párrafos con el scroll, y la fase 2 no se toca.
+ */
 function StoryParagraph({
   children,
   progress,
@@ -434,8 +495,13 @@ function StoryParagraph({
   index: number;
   total: number;
 }) {
-  const window_ = PHASE1_END / total;
-  const opacity = useTransform(progress, [window_ * index, window_ * (index + 1)], [0, 1]);
+  const window_ = PHASE1_END / Math.max(1, total - 1);
+  const start = window_ * (index - 1);
+  const opacity = useTransform(
+    progress,
+    index === 0 ? [0, 1] : [start, start + window_],
+    index === 0 ? [1, 1] : [0, 1]
+  );
 
   return (
     <motion.p style={{ opacity }} className={PARAGRAPH_CLASS}>
@@ -464,6 +530,37 @@ function StorySegment({
   );
 
   return <motion.span style={{ opacity }}>{children}</motion.span>;
+}
+
+/**
+ * La frase resaltada DENTRO del parrafo. Se apaga en el relevo, cuando su copia
+ * entra encima (ver `KEYWORD_HANDOFF`): la frase se despega del texto y deja su
+ * lugar, en vez de quedar duplicada.
+ *
+ * **Apagarla no estropea la medicion**: `opacity` no toca el layout, y ademas
+ * `measure()` sólo corre mientras el progreso no llegó a `PHASE2_END`, o sea
+ * antes de que esto empiece a bajar.
+ */
+function StoryKeywordSource({
+  children,
+  progress,
+  register,
+}: {
+  children: React.ReactNode;
+  progress: MotionValue<number>;
+  register: (el: HTMLElement | null) => void;
+}) {
+  const opacity = useTransform(
+    progress,
+    [PHASE2_END, PHASE2_END + KEYWORD_HANDOFF],
+    [1, 0]
+  );
+
+  return (
+    <motion.span ref={register} style={{ opacity }} className={KEYWORD_CLASS}>
+      {children}
+    </motion.span>
+  );
 }
 
 /**

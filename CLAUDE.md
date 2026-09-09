@@ -2271,3 +2271,130 @@ igual y está bien.
 muro se compuso con las primitivas que ya existen. Y el **Manual Evolutivo**
 sigue sin existir: sus tres etapas no son tres niveles de acceso sino tres
 cuerpos de contenido, y entregarlas por etapa pide otra definición de Sofía.
+
+### Sesión del 2026-09-08 (bis) — auditoría de la home: la pantalla en blanco y el texto recortado
+
+Reporte de Ignacio, con captura: en el relato de la home «sólo se ve desde
+*descubrir que*, el resto no se ve». Auditado en Chrome real midiendo el DOM a
+seis tamaños, no a ojo. Eran **dos defectos distintos**, y ninguno era nuestro:
+los dos están también en el motor aprobado de Julia.
+
+**1. El texto del relato se recorta en pantallas bajas.** El bloque vive en un
+sticky de `100svh` con `overflow-hidden` y centrado en flex: cuando no entra, se
+come líneas arriba y abajo y **no hay scroll que lo recupere**. Medido a 1440 de
+ancho: a 660px de alto ya no entra, y a 578px se comía dos líneas arriba — el
+párrafo arrancaba exactamente en «comenzamos a descubrir que», que es el síntoma
+que reportó. Se dispara con la ventana a media pantalla, con el zoom del browser
+arriba del 125% o en un portátil bajo.
+
+- Arreglado haciendo que la medida del texto siga **también al alto**:
+  `min(1.9vw, 3.1vh)` y el margen entre párrafos con la misma regla. En una
+  pantalla normal manda el ancho y el tamaño es exactamente el de antes (22px a
+  1440 y a 1885, 15,2px en mobile); sólo cuando la pantalla es baja toma el
+  mando el alto. Verificado: recorte cero a 1885×810, 1440×900, 1346×578,
+  1280×600, 390×844 y 360×640.
+- **Es el modo de falla a chequear en cualquier sección de `100svh` con
+  `overflow-hidden`**: compila igual, se ve bien en el monitor del que la
+  escribió, y recorta sin avisar en el del que la mira.
+
+**2. Media pantalla en blanco entre la frase manifiesto y el relato.** El
+progreso del scroll-story vale 0 hasta que la sección llega al techo de la
+pantalla, y con los tres párrafos arrancando en opacidad 0 quedaba un tramo sin
+un solo texto legible: **500px a 1440×900, 400px a 1885×810 y 500px a 390×844**,
+medidos barriendo el documento de a 100px. La captura que mandó Ignacio era justo
+ese tramo.
+
+- El mismo barrido sobre `homepage_correccion.html` da el mismo vacío, o sea que
+  **viene del motor de Julia. Avisarle.**
+- Arreglado dejando el **primer párrafo visible desde el arranque**; los otros dos
+  se reparten el tramo de la fase 1. Así la sección entra desde abajo con el
+  texto ya puesto. Es la única desviación del motor aprobado, y la destilación no
+  se pierde: siguen entrando dos párrafos con el scroll y **las fases 2, 3 y 4 no
+  se tocaron** — verificado que los 7 tramos siguen dando los mismos valores que
+  el mockup en cada punto del recorrido.
+
+**3. «Voces de Luz» se recortaba a sí misma.** Con `h-[100svh]` fijo, una
+pantalla baja no achicaba nada —la cabecera es `shrink-0` y la franja de imagen
+tiene `min-h`— sino que se comía 127px por abajo, y lo que se perdía era la
+franja entera (medido a 1346×578 y 1280×600). Pasó a `min-h-[100svh]`: crece sólo
+en esos casos y a 900 y a 844 sigue midiendo exactamente una pantalla, que es
+como se verificó el 03/09.
+
+Verificado: `tsc`, lint (los 2 errores de `multimedia/SlotEditor.tsx` y los
+warnings de `<img>` son previos), build de producción, y en Chrome real a seis
+tamaños — cero recortes, cero tramos en blanco, cero errores de consola, sin
+scroll horizontal y el viaje de las cuatro palabras aterrizando alineado en los
+tres anchos.
+
+**Lo que queda anotado y no se tocó**: en mobile angosto (360px) el
+`line-clamp-6` de la tarjeta de testimonio corta unas dos líneas de un testimonio
+real. El alto de esa tarjeta es spec de Julia y el tope de 250 caracteres ya es
+una concesión, así que **es decisión de ella**, no un arreglo nuestro.
+
+### Sesión del 2026-09-09 — la frase que se leía dos veces
+
+Ignacio mandó tres capturas de **producción** con lo que se rompe en la home,
+marcado en rojo. Auditado en Chrome real midiendo el DOM a 1440×900 y 390×844,
+no a ojo. Eran tres cosas distintas y **ninguna era un bug nuestro**.
+
+**1. Los 400px de pantalla vacía ya estaban arreglados, pero sin pushear.** El
+fix del 08/09 (primer párrafo encendido desde el arranque) vivía en el working
+tree. Medido con un barrido del documento de a 50px, contando sólo texto dentro
+del `<main>` con opacidad efectiva > 0,15: producción tenía **400px sin un solo
+texto legible** a 1440×900 (y 1450→1800) y **350px** a 390×844; con el fix,
+**cero** en los dos tamaños. Entró en este commit.
+
+**2. La frase resaltada se leía DOS VECES, y es el hallazgo de la sesión.** La
+copia dorada que viaja al centro entraba encima de su gemela del párrafo:
+
+| progreso | opac. párrafo | opac. lista | distancia original↔copia |
+|---|---|---|---|
+| 0,56 | 0,96 | 0,17 | **5–11px** ← la copia aparece pisada |
+| 0,60 | 0,78 | 0,83 | 24–54px, las dos legibles |
+| 0,72 | 0,26 | 1 | 83–184px, las dos legibles |
+| 0,78 | 0 | 1 | 112–248px (fin del viaje) |
+
+**378px de scroll con las dos versiones legibles a la vez.** El motivo es que
+la lista sube de 0 a 1 en 0,06 de progreso mientras el párrafo tarda 0,23 en
+apagarse — eso es literal del mockup —, pero ahí no molestaba: las copias salían
+de **cuatro offsets inventados**, lejos de su original. Desde que los offsets se
+**miden en vivo** (corrección de Julia del 04/09), cada copia arranca justo
+encima de su gemela. O sea que lo destapó un arreglo anterior, no una desviación.
+
+Arreglado con `KEYWORD_HANDOFF`: la frase del párrafo se apaga **en el mismo
+tramo corto (0,06) en que entra su copia**. Se lee como que la frase se despega
+del texto y deja su hueco. Medido después: original 1 → 0 y copia 0 → 1 en el
+mismo tramo, y queda **un solo punto de cruce** (54px de scroll, las dos al 50%),
+que es un fundido cruzado normal y no lectura doble.
+
+- **El resto del párrafo NO se tocó**: sigue apagándose lento hasta 0,78, que es
+  lo que pide el mockup. Lo que se adelanta es sólo la frase que tiene un doble
+  en pantalla.
+- **Apagar la fuente no estropea la medición**: `opacity` no toca el layout, y
+  además `measure()` sólo corre mientras el progreso no llegó a `PHASE2_END`.
+- **De paso quedó a la vista que el viaje es cortísimo**: 112px para "Potencial
+  Evolutivo" y 248px para "Sabiduría Cósmica". Los offsets inventados de Julia
+  eran de ~180-190px verticales; al medirlos de verdad resultó que las frases ya
+  estaban casi donde aterrizan. **Es diseño, no bug** — si se quiere más viaje,
+  lo decide ella.
+
+**3. El aire arriba de la frase manifiesto NO se tocó** (decisión de Ignacio). Es
+fiel al mockup (`.about-statement`: `min-height:100vh` + `align-items:center`),
+pero medido son **384px de aire arriba y 384px abajo para 132px de texto** a
+1440×900 (341/341 sobre 161px en mobile): el 85% de esa pantalla es vacío. Se
+nota porque arriba tiene un hero a pantalla completa y abajo otro bloque
+centrado. **Es decisión de diseño de Julia y hay que consultárselo con estos
+números**, no arreglarlo por nuestra cuenta.
+
+**Anotado y sin arreglar — la home tira un error de hidratación con «reducir
+movimiento» activo** (React #418, verificado que **ya está en producción**, es
+previo). `ScrollStory` devuelve un árbol distinto cuando `reduced`, y
+`useReducedMotion` no puede saber la preferencia en el servidor. Acá no deja nada
+invisible —React regenera el subárbol y se ve bien, medido: cero elementos por
+debajo de 0,15— así que no es el bug del 03/09 en `Reveal`, pero es la misma
+grieta: la cura es que el árbol sea el mismo y sólo cambien las transiciones.
+
+Verificado: `tsc`, lint, build de producción, medición sobre el build servido a
+1440×900 y 390×844 (cero tramos vacíos, un solo cruce en el relevo, cero errores
+de página), capturas de antes/después del punto exacto del recorrido, y los tests
+públicos.
