@@ -324,7 +324,7 @@ export function Header() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[60] bg-void-black/60 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-[60] bg-[#02071f]/70 backdrop-blur-sm md:hidden"
               onClick={() => setDrawerOpen(false)}
             />
             <motion.div
@@ -332,9 +332,16 @@ export function Header() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 z-[60] w-80 max-w-[85vw] bg-surface-container-low/95 backdrop-blur-2xl border-r border-parchment/10 shadow-2xl flex flex-col py-6 md:hidden"
+              // El drawer usa el MISMO degrade que la barra de escritorio
+              // (#05125a -> #0079b3, horizontal), no el `surface-container-low`
+              // de la paleta base, que es un marron y no tenia nada que ver con
+              // el navbar (reporte de Ignacio, 10/09). Va horizontal y no
+              // vertical para que el panel se lea como una tajada de la misma
+              // banda: vertical dejaria el celeste al pie, donde el dorado de
+              // los links pierde contraste.
+              className="fixed inset-y-0 left-0 z-[60] w-80 max-w-[85vw] bg-[linear-gradient(to_right,#05125a_0%,#0079b3_100%)] border-r border-primary-fixed-dim/25 shadow-2xl flex flex-col py-6 md:hidden"
             >
-              <div className="px-6 py-4 border-b border-parchment/5 flex justify-between items-center">
+              <div className="px-6 py-4 border-b border-primary-fixed-dim/20 flex justify-between items-center">
                 <Link href="/" onClick={() => setDrawerOpen(false)}>
                   <Image
                     src={IMAGES.logo}
@@ -347,7 +354,7 @@ export function Header() {
                 </Link>
                 <button
                   onClick={() => setDrawerOpen(false)}
-                  className="text-on-surface-variant"
+                  className="text-primary-fixed-dim transition-colors hover:text-primary-container"
                   aria-label="Cerrar menú"
                 >
                   <X size={24} />
@@ -362,14 +369,30 @@ export function Header() {
                       <Link
                         href={link.href}
                         onClick={() => setDrawerOpen(false)}
-                        className={`mx-2 flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 ${
-                          isActive
-                            ? "bg-primary-container text-on-primary"
-                            : "text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30"
-                        }`}
+                        className="group mx-2 flex items-center gap-4 px-4 py-3 transition-transform duration-200 active:scale-[0.98]"
                       >
-                        <Icon size={20} />
-                        <span className="font-display tracking-[0.1em] font-semibold text-sm uppercase">
+                        {/* Mismo criterio que la barra de escritorio: el dorado
+                            va en DEGRADE sobre el texto (`bg-clip-text`) y por
+                            eso el icono se pinta aparte — con el color
+                            transparente heredado, un SVG con `currentColor`
+                            desaparece. La seccion activa se distingue con el
+                            dorado claro entero, que es el extremo brillante del
+                            mismo degrade. */}
+                        <Icon
+                          size={20}
+                          className={
+                            isActive
+                              ? "text-primary-container"
+                              : "text-primary-fixed-dim"
+                          }
+                        />
+                        <span
+                          className={`font-display tracking-[0.1em] font-semibold text-sm uppercase transition-[filter] duration-200 group-hover:brightness-110 ${
+                            isActive
+                              ? "text-primary-container"
+                              : "bg-[linear-gradient(90deg,#f9d78f,#b3964b)] bg-clip-text text-transparent"
+                          }`}
+                        >
                           {link.label}
                         </span>
                       </Link>
@@ -377,13 +400,13 @@ export function Header() {
                       {/* En el drawer no hay hover: los hijos se muestran
                           siempre, indentados bajo el padre. */}
                       {link.children && (
-                        <ul className="mb-1 ml-[3.25rem] mr-2 flex flex-col border-l border-primary-fixed-dim/20 pl-3">
+                        <ul className="mb-1 ml-[3.25rem] mr-2 flex flex-col border-l border-primary-fixed-dim/30 pl-3">
                           {link.children.map((child) => (
                             <li key={child.href}>
                               <Link
                                 href={child.href}
                                 onClick={() => setDrawerOpen(false)}
-                                className="block rounded-lg px-3 py-2 font-display text-sm tracking-[0.05em] text-on-surface-variant uppercase transition-colors hover:bg-surface-variant/30 hover:text-on-surface"
+                                className="block px-3 py-2 font-display text-sm tracking-[0.05em] text-primary-container uppercase transition-colors hover:text-primary"
                               >
                                 {child.label}
                               </Link>
