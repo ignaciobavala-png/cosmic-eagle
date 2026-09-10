@@ -154,7 +154,7 @@ export default async function ContenidoPage({
 
             <div className="mt-10 border-t border-[#f9d78f] pt-10">
               {locked ? (
-                <div className="rounded-2xl border border-[#f9d78f] bg-white/70 px-6 py-8 text-center sm:px-10">
+                <div className="rounded-2xl border border-[#f9d78f] bg-[#fff6eb] px-6 py-8 text-center sm:px-10">
                   <Lock
                     size={22}
                     aria-hidden="true"

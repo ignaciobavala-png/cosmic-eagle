@@ -136,7 +136,7 @@ export default async function ContenidosPage({
                   className={`rounded-full border px-5 py-2 text-label-sm uppercase transition-colors ${
                     filter.active
                       ? "border-[#f9d78f] bg-[#f9d78f] text-[#05125a]"
-                      : "border-on-primary-container/35 text-on-primary-container hover:border-on-primary-container hover:bg-white/60"
+                      : "border-on-primary-container/35 text-on-primary-container hover:border-on-primary-container hover:bg-[#fff6eb]"
                   }`}
                 >
                   {filter.label}
@@ -153,7 +153,7 @@ export default async function ContenidosPage({
             ) : (
               <>
                 {locked > 0 && (
-                  <div className="mx-auto mb-12 max-w-2xl rounded-2xl border border-[#f9d78f] bg-white/70 px-6 py-6 text-center">
+                  <div className="mx-auto mb-12 max-w-2xl rounded-2xl border border-[#f9d78f] bg-[#fff6eb] px-6 py-6 text-center">
                     <p className="text-body-md text-[#333]">
                       {CONTENT_WALL_COPY}
                     </p>

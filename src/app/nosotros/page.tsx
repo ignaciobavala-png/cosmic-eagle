@@ -82,7 +82,7 @@ export default async function NosotrosPage() {
             se centra verticalmente y el simbolo viaja absoluto medido. */}
         <section
           id="enfoque"
-          className="relative flex w-full flex-col items-center justify-start bg-[#fff7ea] px-margin-mobile pt-[110px] text-[#05125a] md:min-h-[100svh] md:justify-center md:px-margin-desktop md:py-24"
+          className="relative flex w-full flex-col items-center justify-start bg-[#fcedcd] px-margin-mobile pt-[110px] text-[#05125a] md:min-h-[100svh] md:justify-center md:px-margin-desktop md:py-24"
         >
           <div id="nos-words-seq">
             <WordSequence
@@ -133,7 +133,7 @@ export default async function NosotrosPage() {
           amount={0.25}
           once={false}
           stagger={0}
-          className="relative flex w-full flex-col items-center justify-center bg-[#fff6eb] px-margin-mobile py-[35px] text-[#05125a] min-h-[81svh] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
+          className="relative flex w-full flex-col items-center justify-center bg-[#fcedcd] px-margin-mobile py-[35px] text-[#05125a] min-h-[81svh] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
         >
           <div className="mx-auto max-w-3xl">
             <RevealItem y={0} duration={1} id="nos-proposito-title">
@@ -228,7 +228,7 @@ export default async function NosotrosPage() {
           amount={0.25}
           once={false}
           stagger={0}
-          className="relative flex w-full flex-col items-center justify-center bg-[#fff6eb] px-margin-mobile py-[35px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
+          className="relative flex w-full flex-col items-center justify-center bg-[#fcedcd] px-margin-mobile py-[35px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
         >
           <div className="mx-auto max-w-3xl">
             <RevealItem y={0} duration={1} id="nos-enfoque-title">

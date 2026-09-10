@@ -1,18 +1,37 @@
 import { Reveal } from "./Reveal";
 
 /**
- * El crema de la paleta de Julia (`--crema-claro`, el token `primary`).
+ * El crema de las franjas claras: `#f9d78f` —el oro del manual de marca— al 45%
+ * sobre blanco. No es un hex inventado, sale de la paleta de la pagina 6.
+ *
+ * Reemplazo al `#fff6eb` de Julia el 10/09, despues de probarlo en /faqs: el
+ * crema anterior "tiraba mucha luz" en pantalla grande. Contraste medido sobre
+ * el nuevo: 14,62:1 con el azul de los titulos y 10,91:1 con el gris del
+ * cuerpo, los dos muy arriba del 4,5:1 de AA.
  *
  * Van como clase completa y no como interpolacion de un hex: Tailwind escanea
  * el codigo fuente buscando literales, asi que `bg-[${hex}]` no genera regla.
  */
-export const CREAM = "bg-[#fff6eb]";
+export const CREAM = "bg-[#fcedcd]";
 
 /**
- * Crema profunda: `#f9d78f` (el oro claro del manual de marca) al 45% sobre
- * blanco. No es un hex inventado — sale de la paleta de la pagina 6.
+ * Alias historico del crema profundo, que desde el 10/09 es el crema del
+ * sistema: la prueba en /faqs se aprobo ("mucha luz" en el resto del sitio) y
+ * el valor se mudo a `CREAM`. Se conserva el nombre para no romper imports.
  */
-export const CREAM_DEEP = "bg-[#fcedcd]";
+export const CREAM_DEEP = CREAM;
+
+/**
+ * El crema claro de Julia (`#fff6eb`, el token `primary`), que hasta el 10/09
+ * era el fondo de las franjas.
+ *
+ * Pasó a ser el color de las SUPERFICIES que se apoyan sobre la franja —las
+ * tarjetas y las fichas, que antes eran blancas—: con el fondo mas cargado, una
+ * tarjeta blanca es el punto mas luminoso de la pagina y vuelve el
+ * deslumbramiento por la ventana chica. Asi la tarjeta sigue siendo un escalon
+ * mas clara que su fondo, sin blanco puro en ningun lado.
+ */
+export const CREAM_SURFACE = "bg-[#fff6eb]";
 
 /**
  * Franja de fondo crema, a contramano del azul del resto del sitio.
@@ -64,12 +83,9 @@ export function CreamSection({
   /** Sin padding abajo: el ultimo hijo es una banda con su propio fondo. */
   flushBottom?: boolean;
   /**
-   * Color de la franja. El default es el crema de Julia.
-   *
-   * `/faqs` va con `CREAM_DEEP` a modo de prueba en produccion (10/09): es el
-   * mismo oro del manual con el doble de carga. Si Ignacio lo aprueba, se
-   * cambia el valor de `CREAM` y lo hereda el sitio entero; si no, se le saca
-   * la prop a esa pagina y no queda rastro en ningun otro lado.
+   * Color de la franja. El default es el crema del sistema y hoy no lo pisa
+   * ninguna pagina: la prueba de /faqs se aprobo y el valor se mudo a `CREAM`.
+   * La prop se conserva por si alguna franja necesita otro tono.
    */
   background?: string;
   className?: string;

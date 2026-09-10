@@ -312,7 +312,12 @@
       panel colgaba de la zona celeste y arrancaba en el extremo opuesto del
       degrade: ese salto era el "choque" que marco la clienta (10/09).
    2. Encima va un oscurecido vertical, para que el texto siga leyendose cuando
-      el panel ya se despego de la barra.
+      el panel ya se despego de la barra. Ese oscurecido es el AZUL OSCURO de la
+      paleta (#05125a) y no un negro azulado: con negro el panel se iba a un
+      tono que no existe en la barra y volvia a chocar con el celeste
+      (pedido del 10/09). Por lo mismo el `brightness` subio de 0.5 a 0.62 —
+      cuanto menos se oscurece, mas se parece al navbar; el piso lo pone el
+      contraste del dorado, que se mide sobre la franja crema.
    3. El `backdrop-filter` pinta SIEMPRE su rectangulo completo, asi que sin la
       mascara vuelve a aparecer la caja aunque el fondo este en degrade. La
       mascara lo disuelve por los cuatro lados. Ojo: los tramos opacos tienen
@@ -329,15 +334,15 @@
   background-image:
     linear-gradient(
       180deg,
-      rgba(2, 8, 34, 0) 0%,
-      rgba(2, 8, 34, 0.34) 62%,
-      rgba(2, 8, 34, 0.5) 100%
+      rgba(5, 18, 90, 0) 0%,
+      rgba(5, 18, 90, 0.34) 62%,
+      rgba(5, 18, 90, 0.55) 100%
     ),
     linear-gradient(to right, #05125a 0%, #0079b3 100%);
   background-attachment: local, fixed;
   background-size: auto, 100vw 100%;
-  backdrop-filter: blur(10px) brightness(0.5);
-  -webkit-backdrop-filter: blur(10px) brightness(0.5);
+  backdrop-filter: blur(10px) brightness(0.62);
+  -webkit-backdrop-filter: blur(10px) brightness(0.62);
   -webkit-mask-image:
     linear-gradient(180deg, #000 38%, transparent 100%),
     linear-gradient(90deg, transparent, #000 34%, #000 66%, transparent);

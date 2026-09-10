@@ -63,7 +63,7 @@ export async function LegalPage({ slug }: { slug: LegalSlug }) {
           </Reveal>
 
           {doc.isProvisional && (
-            <p className="mt-8 rounded-2xl border border-[#f9d78f] border-l-2 bg-white/70 px-5 py-4 text-body-md leading-relaxed text-[#333]">
+            <p className="mt-8 rounded-2xl border border-[#f9d78f] border-l-2 bg-[#fff6eb] px-5 py-4 text-body-md leading-relaxed text-[#333]">
               <strong className="text-[#05125a]">
                 Versión preliminar.
               </strong>{" "}

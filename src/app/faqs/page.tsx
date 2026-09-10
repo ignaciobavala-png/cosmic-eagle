@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { PageHero } from "@/components/ui/PageHero";
-import { CreamSection, CREAM_DEEP } from "@/components/ui/CreamSection";
+import { CreamSection } from "@/components/ui/CreamSection";
 import { Reveal } from "@/components/ui/Reveal";
 import { FaqList } from "@/components/ui/FaqList";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
@@ -61,11 +61,7 @@ export default async function FaqsPage() {
             quiera— asi que no puede haber un umbral atado a él. Se revela solo
             el encabezado, que mide lo mismo siempre, y la lista queda visible
             desde el arranque. */}
-        {/* Fondo mas cargado que el crema del resto del sitio: es el oro
-            `#f9d78f` del manual de marca al 45% sobre blanco. Va SOLO acá a
-            proposito, para mirarlo en produccion antes de decidir si el sitio
-            entero cambia de crema (10/09). */}
-        <CreamSection id="preguntas" full={false} background={CREAM_DEEP}>
+        <CreamSection id="preguntas" full={false}>
           <div className="mx-auto max-w-3xl">
             {blocks.length === 0 ? (
               // Al salir a produccion la tabla esta vacia a proposito: el texto

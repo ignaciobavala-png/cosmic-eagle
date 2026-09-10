@@ -42,7 +42,7 @@ export function ArticleCard({
   return (
     <Link
       href={`/contenidos/${article.slug}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-[#f9d78f] bg-white/70 transition-colors duration-300 hover:border-on-primary-container/50"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-[#f9d78f] bg-[#fff6eb] transition-colors duration-300 hover:border-on-primary-container/50"
     >
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#05125a]">
         {article.cover_url ? (

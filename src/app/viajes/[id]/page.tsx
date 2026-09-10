@@ -233,7 +233,7 @@ export default async function ViajePage({ params }: Props) {
                 {details.map(({ icon: Icon, label, value }) => (
                   <div
                     key={label}
-                    className="rounded-2xl border border-[#f9d78f] bg-white/70 p-4"
+                    className="rounded-2xl border border-[#f9d78f] bg-[#fff6eb] p-4"
                   >
                     <dt className="mb-1.5 flex items-center gap-2 text-xs uppercase tracking-widest text-on-primary-container">
                       <Icon size={14} />
@@ -267,7 +267,7 @@ export default async function ViajePage({ params }: Props) {
                             </span>
                           </h4>
                         )}
-                        <ol className="rounded-2xl border border-[#f9d78f] bg-white/70 px-5 py-2 sm:px-6">
+                        <ol className="rounded-2xl border border-[#f9d78f] bg-[#fff6eb] px-5 py-2 sm:px-6">
                           {group.items.map((item, i) => (
                             <li
                               key={`${item.time}-${i}`}

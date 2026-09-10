@@ -176,12 +176,25 @@ export function Header() {
                       desplazamiento de entrada lo hace el panel de adentro y no
                       este wrapper: moverlo a el abriria ese hueco.
 
-                      Va CENTRADO bajo el link (`left-1/2 -translate-x-1/2`),
-                      que es lo que dice el CSS de Julia (`left:50%`) y no lo
-                      que teniamos: pegado al borde izquierdo, el panel colgaba
-                      de una esquina y se leia como una caja suelta. */}
+                      Va CENTRADO bajo el link (`left:50%` en el CSS de Julia)
+                      y no pegado al borde izquierdo, que hacia que el panel
+                      colgara de una esquina y se leyera como una caja suelta.
+
+                      **El centrado va con margen negativo y NO con
+                      `-translate-x-1/2`, y la entrada con `margin-top` y no con
+                      `translate-y`**: un `transform` en cualquier ancestro
+                      convierte a ese ancestro en el bloque contenedor de un
+                      `background-attachment: fixed`, y el velo del panel
+                      depende justamente de que ese fondo se resuelva contra la
+                      PANTALLA para empalmar con el degrade del navbar. Con el
+                      transform puesto, el degrade arrancaba en el borde
+                      izquierdo del panel y el menu quedaba varios tonos mas
+                      oscuro que la barra de la que cuelga (medido el 10/09:
+                      el navbar en (2,69,134) contra el panel en (5,30,101)).
+                      Por eso el ancho `w-[21rem]` y el `-ml-[10.5rem]` van
+                      juntos: si cambia uno, cambia el otro. */}
                   {link.children && (
-                    <div className="invisible absolute left-1/2 top-full z-50 -translate-x-1/2 pt-2 opacity-0 transition-opacity duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                    <div className="invisible absolute left-1/2 top-full z-50 -ml-[10.5rem] pt-2 opacity-0 transition-opacity duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
                       {/* El panel dejo de ser una caja (pedido de la clienta,
                           10/09: "seguimos viendo un cuadrado"). Ya no lleva
                           borde, ni radio, ni sombra, ni fondo propio: lo que lo
@@ -209,7 +222,7 @@ export function Header() {
                           El panel entra ademas subiendo 6px. El desplazamiento
                           va aca adentro y no en el wrapper, que tiene que
                           quedarse pegado al link (ver arriba). */}
-                      <ul className="relative isolate w-[21rem] px-[18px] pb-[54px] pt-[22px] transition-transform duration-200 translate-y-1.5 group-hover:translate-y-0 group-focus-within:translate-y-0">
+                      <ul className="relative isolate mt-1.5 w-[21rem] px-[18px] pb-[54px] pt-[22px] transition-[margin] duration-200 group-hover:mt-0 group-focus-within:mt-0">
                         {/* El velo va como elemento propio y no como fondo del
                             `ul` porque necesita salirse de su caja (`-bottom-10`)
                             y quedar DETRAS del texto. El `isolate` del padre lo
