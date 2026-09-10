@@ -1,6 +1,20 @@
 import { Reveal } from "./Reveal";
 
 /**
+ * El crema de la paleta de Julia (`--crema-claro`, el token `primary`).
+ *
+ * Van como clase completa y no como interpolacion de un hex: Tailwind escanea
+ * el codigo fuente buscando literales, asi que `bg-[${hex}]` no genera regla.
+ */
+export const CREAM = "bg-[#fff6eb]";
+
+/**
+ * Crema profunda: `#f9d78f` (el oro claro del manual de marca) al 45% sobre
+ * blanco. No es un hex inventado — sale de la paleta de la pagina 6.
+ */
+export const CREAM_DEEP = "bg-[#fcedcd]";
+
+/**
  * Franja de fondo crema, a contramano del azul del resto del sitio.
  *
  * Sale del rediseño de Julia para /nosotros (`NOSOTROS.html`, `.nos-enfoque-*`):
@@ -22,6 +36,11 @@ import { Reveal } from "./Reveal";
  * banda de ancho completo con fondo propio: sin esto queda una franja crema
  * colgando debajo de ella.
  *
+ * `background` cambia el color de la franja. Va como prop y NO como
+ * `className` por lo mismo que el padding: dos utilidades de fondo de la misma
+ * especificidad las resuelve el orden de la hoja generada, no el orden en que
+ * se escriben las clases.
+ *
  * **Ojo, esto NO se puede hacer con `className="pb-0"`.** Se intento asi y no
  * funcionaba: `py-24` emite `padding-block` y `pb-0` emite `padding-bottom`, y
  * entre dos utilidades de la misma especificidad decide el ORDEN DE LA HOJA
@@ -35,6 +54,7 @@ export function CreamSection({
   id,
   full = true,
   flushBottom = false,
+  background = CREAM,
   className = "",
   reveal,
 }: {
@@ -43,6 +63,15 @@ export function CreamSection({
   full?: boolean;
   /** Sin padding abajo: el ultimo hijo es una banda con su propio fondo. */
   flushBottom?: boolean;
+  /**
+   * Color de la franja. El default es el crema de Julia.
+   *
+   * `/faqs` va con `CREAM_DEEP` a modo de prueba en produccion (10/09): es el
+   * mismo oro del manual con el doble de carga. Si Ignacio lo aprueba, se
+   * cambia el valor de `CREAM` y lo hereda el sitio entero; si no, se le saca
+   * la prop a esa pagina y no queda rastro en ningun otro lado.
+   */
+  background?: string;
   className?: string;
   /**
    * Convierte la seccion en el elemento OBSERVADO del scroll reveal.
@@ -61,7 +90,7 @@ export function CreamSection({
   };
 }) {
   const padY = flushBottom ? "pt-20 md:pt-24" : "py-20 md:py-24";
-  const classes = `w-full bg-[#fff6eb] px-margin-mobile ${padY} text-[#05125a] md:px-margin-desktop ${
+  const classes = `w-full ${background} px-margin-mobile ${padY} text-[#05125a] md:px-margin-desktop ${
     full ? "flex min-h-[100svh] items-center justify-center" : "block"
   } ${className}`;
 
