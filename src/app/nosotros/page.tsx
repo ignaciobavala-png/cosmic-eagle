@@ -184,12 +184,10 @@ export default async function NosotrosPage() {
             amount={0.6}
             delay={0.3}
           />
-          <ScrollHintButton
-            label="Ir más profundo"
-            target="#video"
-            tone="dark"
-            className="bottom-3 md:bottom-6"
-          />
+          {/* Esta pantalla NO lleva boton de continuar, a diferencia del resto
+              del recorrido: el `SymbolRow` de arriba se ancla al pie del bloque
+              y el boton le caia encima. Pedido de la clienta, 10/09 — se saca
+              el boton, no el simbolo. El paso a `#video` queda solo por scroll. */}
         </Reveal>
 
         {/* Julia pidió video acá; va la imagen hasta que llegue. La key del slot

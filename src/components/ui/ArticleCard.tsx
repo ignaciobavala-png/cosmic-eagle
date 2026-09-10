@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { articleCategoryLabel, formatArticleDate } from "@/lib/article";
 
 export type ArticleCardData = {
@@ -81,23 +81,18 @@ export function ArticleCard({
           </p>
         )}
 
-        <div className="mt-6 flex items-end justify-between gap-4 border-t border-[#f9d78f]/70 pt-4">
-          <div>
-            {/* El oro de acento no sirve como texto chico sobre fondo claro
-                (2,66:1): va `on-primary-container`, que es el rol del sistema
-                para eso. Regla del 28/08. */}
-            <span className="block text-label-sm uppercase text-on-primary-container">
-              {locked ? "Contenido" : "Publicado"}
-            </span>
-            <span className="mt-1 block text-body-md text-[#05125a]">
-              {locked ? "Requiere acceso" : (date ?? "—")}
-            </span>
-          </div>
-          <span
-            aria-hidden="true"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-on-primary-container/40 text-on-primary-container transition-colors group-hover:bg-[#f9d78f] group-hover:text-[#05125a]"
-          >
-            <ArrowUpRight size={18} />
+        {/* Sin flecha: la tarjeta entera es el link y el icono no agregaba
+            ninguna informacion (iba `aria-hidden`, o sea que para un lector de
+            pantalla nunca existio). Pedido de la clienta, 10/09. */}
+        <div className="mt-6 border-t border-[#f9d78f]/70 pt-4">
+          {/* El oro de acento no sirve como texto chico sobre fondo claro
+              (2,66:1): va `on-primary-container`, que es el rol del sistema
+              para eso. Regla del 28/08. */}
+          <span className="block text-label-sm uppercase text-on-primary-container">
+            {locked ? "Contenido" : "Publicado"}
+          </span>
+          <span className="mt-1 block text-body-md text-[#05125a]">
+            {locked ? "Requiere acceso" : (date ?? "—")}
           </span>
         </div>
       </div>
