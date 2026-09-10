@@ -182,83 +182,74 @@ export function Header() {
                       de una esquina y se leia como una caja suelta. */}
                   {link.children && (
                     <div className="invisible absolute left-1/2 top-full z-50 -translate-x-1/2 pt-2 opacity-0 transition-opacity duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                      {/* La caja sale del mockup (`.dropdown-experiences`) y
-                          conserva su ADN: azul de la paleta, borde dorado,
-                          titulo en Domine dorado y descripcion en Montserrat al
-                          70%. Lo que cambia es lo que la hacia leerse "medio
-                          cuadrada" (Sofia, 03/09), sin salirse de la paleta:
+                      {/* El panel dejo de ser una caja (pedido de la clienta,
+                          10/09: "seguimos viendo un cuadrado"). Ya no lleva
+                          borde, ni radio, ni sombra, ni fondo propio: lo que lo
+                          sostiene es el filete dorado del que cuelga y un velo
+                          que se desvanece por los cuatro lados
+                          (`nav-dropdown-veil`, ver globals.css, que explica por
+                          que el fondo continua el degrade del navbar y por que
+                          la mascara es imprescindible).
 
-                          - el fondo deja de ser un plano: degrade de la misma
-                            familia que el navbar y el footer (el celeste
-                            #0079b3 apenas insinuado arriba sobre el azul
-                            oscuro), que es como esta pintado el resto del sitio.
-                            Las opacidades son las que eligio Julia (03/09): un
-                            30% menos que la primera version, "para darle menos
-                            peso al contenedor", y bajadas otra vez en la
-                            segunda vuelta del mismo dia ("un poco mas de
-                            transparencia, que no parezca una caja solida").
-                            Lo que sostiene esa
-                            transparencia es el filtro del fondo, y el
-                            `backdrop-brightness` **no es decorativo**: el
-                            navbar es fijo, asi que el panel se abre sobre lo
-                            que haya debajo, y con la franja crema de
-                            "Tecnologia del Alma" atras el panel se aclaraba
-                            entero y la descripcion dorada al 70% dejaba de
-                            leerse. Oscurecer lo de ATRAS (en vez de subir la
-                            opacidad del panel) mantiene el contenedor liviano,
-                            que es justo lo que pidio. Si se saca el filtro hay
-                            que devolver la opacidad;
-                          - radio de 12 a 18px, y mas aire adentro;
-                          - un filete dorado corona el panel y lo ata al navbar,
-                            con el rombo de 4 puntas del sistema centrado
-                            encima, bajo el link;
-                          - los items se separan con una linea dorada tenue
-                            en vez de quedar apilados a la misma altura;
-                          - los items ya NO llevan flecha: la regla de Julia
-                            del 08/09 es que ningun boton lleve flechas
-                            adentro, y aplica tambien aca. Lo que dice que son
-                            links es el subrayado del hover y el fondo dorado
-                            tenue.
+                          De ahi el ancho de 21rem para dos palabras: el ancho
+                          de mas NO sobra, es el margen que se usa para
+                          disolver los cantos. Angostarlo devuelve la arista.
+
+                          Lo que se conserva del mockup de Julia: el azul de la
+                          paleta, el filete dorado coronando el panel con el
+                          rombo de 4 puntas centrado bajo el link, el titulo en
+                          Domine dorado y los items separados por una linea
+                          tenue — que ahora se apaga en las puntas en vez de
+                          cruzar de lado a lado.
 
                           Desde la reunion del 04/09 el panel lleva SOLO
-                          titulos: la descripcion de cada item ("Encuentros de
-                          un dia para ir mas profundo") salio a pedido de la
-                          clienta. Por eso la caja se angosto de 22 a 17rem y
-                          los items pasaron a una linea centrada — con el ancho
-                          viejo quedaba una caja casi vacia.
+                          titulos: la descripcion de cada item salio a pedido de
+                          la clienta.
 
                           El panel entra ademas subiendo 6px. El desplazamiento
                           va aca adentro y no en el wrapper, que tiene que
                           quedarse pegado al link (ver arriba). */}
-                      <ul className="relative w-[17rem] rounded-[18px] border border-primary-container/25 bg-[linear-gradient(160deg,rgba(0,121,179,0.16)_0%,rgba(5,18,90,0.55)_55%,rgba(2,12,65,0.56)_100%)] p-4 pt-5 shadow-[0_18px_50px_rgba(2,12,65,0.45)] backdrop-blur-2xl backdrop-brightness-[0.38] backdrop-saturate-150 transition-transform duration-200 translate-y-1.5 group-hover:translate-y-0 group-focus-within:translate-y-0">
+                      <ul className="relative isolate w-[21rem] px-[18px] pb-[54px] pt-[22px] transition-transform duration-200 translate-y-1.5 group-hover:translate-y-0 group-focus-within:translate-y-0">
+                        {/* El velo va como elemento propio y no como fondo del
+                            `ul` porque necesita salirse de su caja (`-bottom-10`)
+                            y quedar DETRAS del texto. El `isolate` del padre lo
+                            encierra: sin el, un z negativo se escapa del panel y
+                            lo tapa el fondo de la pagina. */}
+                        <span aria-hidden="true" className="nav-dropdown-veil" />
                         {/* El filete y el rombo son decoracion pura: van en
                             elementos vacios para que ningun lector de pantalla
                             los anuncie, igual que los filetes de
                             `SectionHeading`. */}
-                        {/* El filete no llega a las esquinas (`inset-x-8`):
-                            con el radio de 18px, una linea de borde a borde se
-                            escapa de la curva y deja dos puntas sueltas. */}
+                        {/* El filete cruza todo el ancho pero solo esta opaco
+                            en el tercio central: es la linea de la que cuelga el
+                            menu, no el borde de una caja. */}
                         <span
                           aria-hidden="true"
-                          className="absolute inset-x-8 top-0 h-px bg-[linear-gradient(to_right,transparent,#f9d78f,transparent)]"
+                          className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(to_right,transparent,#f9d78f_38%,#f9d78f_62%,transparent)]"
                         />
                         <span
                           aria-hidden="true"
                           className="absolute left-1/2 top-0 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-primary-container shadow-[0_0_10px_rgba(249,215,143,0.55)]"
                         />
-                        {link.children.map((child) => (
-                          <li
-                            key={child.href}
-                            className="[&:not(:last-child)]:mb-1 [&:not(:last-child)]:border-b [&:not(:last-child)]:border-primary-container/12 [&:not(:last-child)]:pb-1"
-                          >
+                        {link.children.map((child, i, todos) => (
+                          <li key={child.href} className="relative">
+                            {/* La linea entre opciones se apaga en las puntas:
+                                una que cruzara entera volveria a dibujar filas
+                                dentro de un rectangulo. El hover ya no pinta un
+                                fondo (eso era, otra vez, una cajita): cambia el
+                                dorado por la crema. */}
                             <Link
                               href={child.href}
-                              className="group/item flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-primary-container/[0.08]"
+                              className="nav-dropdown-item block px-1 py-[13px] text-center font-display text-base font-bold tracking-[0.03em] text-primary-container transition-colors hover:text-primary"
                             >
-                              <span className="min-w-0 flex-1 font-display text-base font-bold tracking-[0.03em] text-primary-container">
-                                {child.label}
-                              </span>
+                              {child.label}
                             </Link>
+                            {i < todos.length - 1 && (
+                              <span
+                                aria-hidden="true"
+                                className="absolute inset-x-[26%] bottom-0 h-px bg-[linear-gradient(to_right,transparent,rgba(249,215,143,0.35),transparent)]"
+                              />
+                            )}
                           </li>
                         ))}
                       </ul>

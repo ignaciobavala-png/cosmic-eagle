@@ -172,11 +172,15 @@ async function cargarArticulos(supabase) {
       body: stripComments(body),
       category: meta.category ?? "preparacion",
       status: meta.status ?? "draft",
+      // Sin `access_level` en el frontmatter mandan las policies: la columna
+      // sale `miembros`, que es equivocarse hacia adentro (ver
+      // docs/ACCESO_CONTENIDOS.md). Abrir un articulo es explicito.
+      access_level: meta.access_level ?? "miembros",
       ...(cover ? { cover_url: cover } : {}),
     };
 
     console.log(
-      `  ${row.title} · ${row.category} · ${row.status} · ${row.body.length} caracteres`
+      `  ${row.title} · ${row.category} · ${row.status} · ${row.access_level} · ${row.body.length} caracteres`
     );
     if (cover) console.log(`  portada: ${cover}`);
 

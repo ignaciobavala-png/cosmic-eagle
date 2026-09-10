@@ -300,6 +300,62 @@
   animation: nos-symbol-spin 30s linear infinite;
 }
 
+/* Velo del desplegable del navbar.
+   -----------------------------------------------------------------------------
+   Es lo que le saca al menu la forma de caja sin perder la lectura. Tres cosas
+   que no son decorativas:
+
+   1. El fondo es EL MISMO degrade del navbar (`to right, #05125a -> #0079b3`)
+      con `background-attachment: fixed`. Al estar anclado a la PANTALLA y no al
+      panel, el color con el que arranca el menu es exactamente el que tiene la
+      barra justo encima, en cualquier ancho de viewport. Con un azul propio el
+      panel colgaba de la zona celeste y arrancaba en el extremo opuesto del
+      degrade: ese salto era el "choque" que marco la clienta (10/09).
+   2. Encima va un oscurecido vertical, para que el texto siga leyendose cuando
+      el panel ya se despego de la barra.
+   3. El `backdrop-filter` pinta SIEMPRE su rectangulo completo, asi que sin la
+      mascara vuelve a aparecer la caja aunque el fondo este en degrade. La
+      mascara lo disuelve por los cuatro lados. Ojo: los tramos opacos tienen
+      que terminar antes del canto (aca 34%-66% a lo ancho), o el degrade se
+      corta a mitad de camino y reaparece la arista recta.
+
+   Por eso el panel es mas ancho que su texto: el ancho de mas es el que se usa
+   para desvanecer. */
+@utility nav-dropdown-veil {
+  position: absolute;
+  inset: 0 0 -10px;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(2, 8, 34, 0) 0%,
+      rgba(2, 8, 34, 0.34) 62%,
+      rgba(2, 8, 34, 0.5) 100%
+    ),
+    linear-gradient(to right, #05125a 0%, #0079b3 100%);
+  background-attachment: local, fixed;
+  background-size: auto, 100vw 100%;
+  backdrop-filter: blur(10px) brightness(0.5);
+  -webkit-backdrop-filter: blur(10px) brightness(0.5);
+  -webkit-mask-image:
+    linear-gradient(180deg, #000 38%, transparent 100%),
+    linear-gradient(90deg, transparent, #000 34%, #000 66%, transparent);
+  mask-image:
+    linear-gradient(180deg, #000 38%, transparent 100%),
+    linear-gradient(90deg, transparent, #000 34%, #000 66%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* Sobre fondo claro el velo se desvanece y el dorado se queda sin contraste.
+   La sombra no se ve sobre el azul y sostiene la lectura sobre la crema. */
+@utility nav-dropdown-item {
+  text-shadow:
+    0 1px 14px rgba(3, 10, 40, 0.85),
+    0 0 26px rgba(3, 10, 40, 0.6);
+}
+
 /* Las reglas sin `@layer` le ganan a las utilidades de Tailwind, que si estan
    en capa. Por eso este bloque apaga las animaciones aunque se escriba antes. */
 @media (prefers-reduced-motion: reduce) {

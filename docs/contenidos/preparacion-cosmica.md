@@ -3,8 +3,8 @@ slug: preparacion-cosmica
 title: Preparación para el viaje cósmico
 excerpt: Cómo preparar mente, cuerpo y energía los días previos para que tu sistema interno llegue abierto y disponible.
 category: preparacion
-access: publico
 status: published
+access_level: publico
 cover: preparacion-cosmica.webp
 source: Preparación Cósmica.pdf (Canva, 11pp)
 ---

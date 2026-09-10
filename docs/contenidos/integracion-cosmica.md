@@ -3,8 +3,8 @@ slug: integracion-cosmica
 title: Integración después del viaje
 excerpt: Cómo optimizar tu experiencia y potenciar sus beneficios en los días y semanas posteriores.
 category: preparacion
-access: publico
 status: published
+access_level: publico
 cover: integracion-cosmica.webp
 source: Integración Cósmica.pdf (Canva, 15pp)
 ---
