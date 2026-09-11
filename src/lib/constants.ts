@@ -112,12 +112,13 @@ export const NAV_LINKS: NavLink[] = [
     href: "/nosotros",
     icon: "Info",
     // Pedido de la reunion del 04/09: "Nosotros" tambien despliega, con scroll
-    // asistido a sus sub-secciones. Son los tres encabezados reales de la
+    // asistido a sus sub-secciones. Son los cuatro encabezados reales de la
     // pagina; el cierre queda afuera porque es un llamado a la accion, no una
     // seccion de contenido. El desplazamiento suave lo da el
     // `scroll-behavior: smooth` de globals.css, y el `scroll-padding-top` evita
     // que el navbar opaco tape el arranque de la seccion.
-    // El orden lo decidio Ignacio (quienes somos -> proposito -> enfoque) y la
+    // El orden lo decidio Ignacio (quienes somos -> proposito -> enfoque ->
+    // Estela, que se sumo el 11/09 como ultima pantalla de contenido) y la
     // PAGINA se reordeno para seguirlo, asi que el desplegable vuelve a leerse
     // como su indice. **No invertirlo de nuevo**: el 08/09 se hizo justamente
     // eso, tomando este orden por un descuido, y era una decision.
@@ -125,6 +126,7 @@ export const NAV_LINKS: NavLink[] = [
       { label: "Quiénes somos", href: "/nosotros#somos" },
       { label: "Nuestro propósito", href: "/nosotros#proposito" },
       { label: "Nuestro enfoque", href: "/nosotros#nuestro-enfoque" },
+      { label: "Estela, fundadora", href: "/nosotros#estela" },
     ],
   },
   {

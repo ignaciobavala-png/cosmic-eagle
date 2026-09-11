@@ -24,7 +24,7 @@ export const metadata: Metadata = {
  *
  * Recorrido: hero → cuatro palabras sobre crema + símbolo 1 → Quiénes somos
  * (relato sticky) → Nuestro propósito + símbolo 2 → frase sobre imagen →
- * Nuestro enfoque → cierre.
+ * Nuestro enfoque → Estela, fundadora → cierre.
  *
  * **El orden es de Ignacio (09/09) y NO es el del mockup**, donde el enfoque
  * abre y "Quiénes somos" cierra: la página se presenta primero y deja el
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
  * 3. **Los botones de scroll internos del mockup** se portan como anclas, con el
  *    mismo lenguaje visual que el hint del hero. Encadenan el recorrido de
  *    arriba, así que al mover un bloque hay que revisarlos: hoy van relato →
- *    propósito → video → enfoque → cierre.
+ *    propósito → video → enfoque → Estela → cierre.
  *
  * El copy es de la clienta y está literal del mockup. El texto viejo de
  * metodología (hongos, dosis, seres de luz) que esta versión deja afuera quedó
@@ -272,6 +272,96 @@ export default async function NosotrosPage() {
                 Nuestro rol no es definir lo que alguien debe experimentar o en
                 qué debe convertirse, sino crear las condiciones para que su
                 propio proceso se despliegue.
+              </p>
+            </RevealItem>
+          </div>
+          <ScrollHintButton
+            label="Estela"
+            target="#estela"
+            tone="dark"
+            className="bottom-3 md:bottom-6"
+          />
+        </Reveal>
+
+        {/* Pantalla 6 — "Estela, fundadora", la ultima de contenido. Copy de la
+            clienta (11/09), literal: no se reescribe ni se le inventan
+            resaltados. Es el mismo bloque que "Nuestro enfoque" y "Nuestro
+            proposito" (crema profunda, titulo en la display, filete dorado,
+            cuerpo en Montserrat justificado y cierre en italica sobre el
+            filete), asi las tres pantallas de texto del recorrido se leen como
+            una sola serie.
+
+            La frase final va en el cierre italico y no como un parrafo mas: es
+            la unica que sintetiza, igual que la de "Nuestro enfoque".
+
+            NO lleva foto: no hay retrato entregado. Cuando llegue, va como slot
+            de site_content (grupo "Nosotros") y el bloque pasa a dos columnas.
+
+            `#estela` es tambien el destino del desplegable de "Nosotros" del
+            navbar. */}
+        <Reveal
+          as="section"
+          id="estela"
+          amount={0.25}
+          once={false}
+          stagger={0}
+          className="relative flex w-full flex-col items-center justify-center bg-[#fcedcd] px-margin-mobile py-[35px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
+        >
+          <div className="mx-auto max-w-3xl">
+            <RevealItem y={0} duration={1} id="nos-estela-title">
+              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                Estela, fundadora
+              </h2>
+            </RevealItem>
+            <RevealLine className="mt-3 mb-6 h-px w-16 bg-[#f9d78f]" />
+            <div className="space-y-6 text-body-md leading-relaxed text-[#333] text-justify">
+              <RevealItem y={14} duration={0.8} delay={0.15}>
+                <p>
+                  Estela lleva más de 25 años explorando la conciencia, la mente,
+                  el alma y el potencial humano. Su camino ha sido principalmente
+                  experiencial: una búsqueda constante por comprender quiénes
+                  somos, cómo funcionamos y hasta dónde podemos evolucionar.
+                </p>
+              </RevealItem>
+              <RevealItem y={14} duration={0.8} delay={0.3}>
+                <p>
+                  A lo largo de estos años ha estudiado y experimentado con
+                  distintas corrientes y herramientas, desde la psicología, la
+                  metafísica y las filosofías espirituales hasta el yoga, la
+                  meditación, la energía Kundalini, la nutrición consciente, las
+                  prácticas energéticas, el chamanismo, las plantas de poder y los
+                  estados expandidos de conciencia.
+                </p>
+              </RevealItem>
+              <RevealItem y={14} duration={0.8} delay={0.45}>
+                <p>
+                  Con el tiempo, todo este recorrido fue convergiendo en una
+                  práctica propia para acompañar procesos de transformación y
+                  evolución. Su enfoque integra conocimiento ancestral,
+                  herramientas contemporáneas, prácticas energéticas y lo que ella
+                  llama conocimiento cósmico: información y tecnologías que ha ido
+                  recibiendo y explorando a través de estados expandidos de
+                  conciencia y de su conexión con otras dimensiones e
+                  inteligencias superiores.
+                </p>
+              </RevealItem>
+              <RevealItem y={14} duration={0.8} delay={0.6}>
+                <p>
+                  Hoy acompaña a personas de distintas partes del mundo en
+                  procesos de liberación de patrones y memorias, reconexión con el
+                  alma, expansión de conciencia, despertar espiritual y desarrollo
+                  de capacidades intuitivas y energéticas. También enseña y
+                  acompaña a hombres y mujeres medicina, terapeutas y guías a
+                  profundizar en sus propias herramientas, expandir sus
+                  capacidades y llevar su práctica a un nuevo nivel.
+                </p>
+              </RevealItem>
+            </div>
+            <RevealItem y={14} duration={0.8} delay={0.8} id="nos-estela-close">
+              <p className="mt-8 border-t border-[#05125a]/15 pt-6 font-display text-xl italic leading-relaxed text-[#05125a]">
+                En el centro de todo está la evolución: liberarnos de aquello que
+                nos limita, recordar quiénes somos y abrir espacio para desarrollar
+                el potencial que cada ser humano lleva dentro.
               </p>
             </RevealItem>
           </div>
