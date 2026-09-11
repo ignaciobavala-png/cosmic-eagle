@@ -333,8 +333,25 @@ export default async function Home() {
         {/* En mobile la sección tiene que entrar en UNA pantalla, con el texto
             centrado en vertical (fix v3 de Julia, docs/entregas/2026-09-03-julia).
             En escritorio no cambia nada: sigue siendo el par texto/imagen. */}
+        {/* El fondo de ESTA franja no es el crema del sitio: es la banda
+            dorada, el mismo degrade `#f9d78f → #b3964b` de la pildora y del
+            cierre de la home. Lo eligio Sofia el 11/09 sobre un comparador de
+            ocho fondos ("el crema no, que vaya mas hacia el golden"). Va por la
+            prop `background` y NO por `className`: dos utilidades de fondo de la
+            misma especificidad las resuelve el orden de la hoja generada.
+
+            **Es la unica franja clara del sitio con este fondo.** El resto
+            (/nosotros, /viajes, el detalle, /contenidos, /faqs y las legales)
+            sigue con el crema — cambiarlo aca fue un pedido puntual, no un
+            cambio de sistema.
+
+            Sobre el dorado hay dos piezas que dejan de verse y por eso cambian
+            con el: el filete pasa al oro oscuro (el claro da 1,00:1 sobre este
+            fondo, o sea invisible) y el boton pasa a la pildora azul, porque la
+            dorada se funde. */}
         <CreamSection
           id="tecnologia"
+          background="bg-[linear-gradient(135deg,#f9d78f,#b3964b)]"
           full={false}
           className="max-md:flex max-md:min-h-[100svh] max-md:items-center"
           reveal={{ amount: 0.25, stagger: 0 }}
@@ -349,10 +366,17 @@ export default async function Home() {
                   Ciencia del Alma
                 </h2>
               </RevealItem>
-              <RevealLine className="mb-5 h-0.5 w-20 bg-[#f9d78f] md:mb-6 md:w-16" />
-              {/* El cuerpo va negro puro en mobile y gris en escritorio: es un
-                  cambio de spec explícito de Julia, no un descuido. */}
-              <div className="space-y-5 text-[clamp(13px,3.6vw,15px)] leading-[1.8] text-black md:max-w-[480px] md:space-y-6 md:text-[16px] md:text-[#333]">
+              {/* Oro oscuro y no el claro: sobre el fondo dorado el filete
+                  claro da 1,00:1 y no se ve. */}
+              <RevealLine className="mb-5 h-px w-20 bg-[#b3964b] md:mb-6 md:w-16" />
+              {/* El cuerpo va AZUL, no negro. Hasta el 11/09 era negro puro en
+                  mobile y gris #333 en escritorio, que era spec explícita de
+                  Julia (fix v3 del 03/09); lo cambió Sofía, que lo veía negro.
+                  Sobre la banda dorada el azul mide 5,95:1 en el punto más
+                  oscuro del degradé contra los 4,44:1 del gris, que estaba
+                  abajo del mínimo legible. **Es sólo acá**: el resto del sitio
+                  sigue con el gris. Conviene avisarle a Julia. */}
+              <div className="space-y-5 text-[clamp(13px,3.6vw,15px)] leading-[1.8] text-[#05125a] md:max-w-[480px] md:space-y-6 md:text-[16px]">
                 <RevealItem duration={0.8} delay={0.15}>
                   <p>
                     A medida que expandimos nuestra conciencia, emergen nuevas
@@ -377,7 +401,7 @@ export default async function Home() {
               <RevealItem duration={0.8} delay={0.6}>
                 <CtaLink
                   href="/contenidos"
-                  variant="pill"
+                  variant="blue"
                   className="mt-10 px-7 py-3.5 text-[14px] tracking-[0.071em]"
                 >
                   Ir más profundo
