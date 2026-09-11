@@ -2528,3 +2528,63 @@ y /nosotros. Más los tests públicos.
 **Pendiente de decidir con ellas**: si el cuerpo pasa a la serif que pide el
 manual, el PDF truncado, y que los cuatro testimonios de "Nuestros Sanadores"
 publicados en producción son **Lorem ipsum** — datos de prueba, no texto real.
+
+### Sesión del 2026-09-11 (bis) — pedidos de Sofía y los indicadores que pisaban el texto
+
+Cuatro cosas chicas, las cuatro medidas en Chrome real a 1440×900 y 390×844.
+
+1. **El desplegable de «Nosotros» dice «Equipo»** (antes «Fundadora»). Cambia
+   sólo la etiqueta: el ancla sigue siendo `/nosotros#estela` y el título de la
+   pantalla sigue siendo "Estela, fundadora". Si esa sección suma gente, el
+   título también tendría que cambiar.
+2. **La frase del banner atmosférico de la home va en dorado**
+   (`primary-container`), pedido de Sofía.
+3. **Los testimonios de Experiencias funcionan como los de la home**: sin pase
+   automático y sin puntos, o sea que sólo avanzan con las flechas. Se pidió
+   para "Nuestros Viajeros" y se aplicó también a "Nuestros Sanadores" — son la
+   misma banda en la misma página y que una pasara sola y la otra no se leería
+   como una falla. Pasó a ser el **default** de `TestimonialViewer`; el pase
+   automático sigue existiendo como prop, apagado en los tres juegos del sitio.
+4. **Los indicadores de scroll de /nosotros caían encima del texto en mobile.**
+
+**Ojo con buscar un texto que no está en el repo.** La frase del punto 2 la
+carga la clienta desde `/admin/multimedia` (slot `home.atmos.text`) y vive en
+`site_content`, no en el código: un `grep` del sitio no la encuentra, y lo que
+sí aparece es una frase casi igual dentro del relato de la home, que es otra
+cosa. Se resaltó la equivocada, y la pista que lo resolvió fue una captura.
+**Antes de tocar un texto que el grep no encuentra, buscarlo en `site_content`.**
+
+#### Los indicadores de scroll (punto 4)
+
+Reporte de Ignacio: "los botones al pie de cada sección se aplastan con el texto
+en mobile". Auditadas `/`, `/nosotros`, `/viajes`, `/faqs` y `/contenidos` a
+390×844 y 360×640, con y sin `reduce`, buscando solapes de rectángulos.
+
+Aparecieron **dos, los dos en /nosotros**: los indicadores «Estela» y
+«Continuar» se metían **23px dentro del cierre en itálica** de "Nuestro enfoque"
+y de "Estela, fundadora".
+
+- **`ScrollHintButton` es `absolute`, o sea que no ocupa lugar**, y la sección
+  tiene que reservarle el hueco con su propio padding. En escritorio no se veía
+  porque esas secciones miden `100svh` y sobra aire; en mobile no tienen alto
+  mínimo —las llena el texto— y quedaban 35px de padding para un elemento de 58.
+  Ahora llevan `pb-[76px]` (12 del `bottom` + 46 que mide + 18 de aire) y el
+  texto respira 19px en los dos anchos. Queda anotado en el componente.
+- **Y salió la trampa de Tailwind por cuarta vez**: las dos secciones le pasaban
+  `className="bottom-3 md:bottom-6"` al indicador y **nunca tuvo efecto** —el
+  `bottom-8` del componente gana por orden de la hoja generada, no por orden de
+  las clases—, así que el hueco real era de 78px y no de 58. Ahora va por prop
+  (`bottomClassName`), como ya se había resuelto en `CtaLink` y `CreamSection`.
+  Lo mismo hizo falta en `MediaStatement` para el color de la frase
+  (`textColorClassName`), que competía con su `text-primary`.
+
+En `/`, `/viajes`, `/faqs` y `/contenidos` no hay ningún solape. El único que
+marcó la herramienta en la home es falso positivo: el botón "Explorar
+experiencias" se apila sobre el párrafo del relato, pero cuando entra ese texto
+ya está en opacidad 0.
+
+Verificado: `tsc`, lint (los 2 errores de `multimedia/SlotEditor.tsx` son
+previos), build de producción, y en Chrome real el color y el cuerpo de la frase
+del banner, el aire bajo los dos indicadores a 390 y 360 de ancho, y las bandas
+de testimonios (cero puntos, mismo testimonio después de 7s quietos —el
+intervalo viejo era de 3— y avanzando al click).

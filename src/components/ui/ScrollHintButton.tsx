@@ -8,17 +8,31 @@ import { ChevronDown } from "lucide-react";
  * Es el mismo lenguaje visual que el hint del hero de `PageHero`. Tono claro
  * para fondos oscuros (video, sticky, cierre) y oscuro para los fondos crema
  * de /nosotros.
+ *
+ * **Es `absolute`, o sea que no ocupa lugar**: la seccion que lo lleva tiene
+ * que reservarle el hueco con su propio padding inferior, o en mobile —donde el
+ * texto llega hasta el pie— le cae encima al ultimo parrafo. Mide 46px de alto
+ * mas lo que diga `bottomClassName`.
  */
 export function ScrollHintButton({
   label,
   target,
   tone = "dark",
+  bottomClassName = "bottom-8",
   className = "",
 }: {
   label: string;
   /** Ancla de destino (`#nosVideo`, `#somos`, ...). */
   target: string;
   tone?: "dark" | "light";
+  /**
+   * A que altura del pie se pega. **Va por esta prop y no por `className`**: el
+   * `bottom` base y el del className compiten por la misma propiedad, y entre
+   * dos utilidades de la misma especificidad decide el orden de la hoja
+   * generada, no el orden en que se escriben — gana el del componente. Es la
+   * misma trampa que ya documentan `CtaLink` y `CreamSection`.
+   */
+  bottomClassName?: string;
   className?: string;
 }) {
   const color =
@@ -29,7 +43,7 @@ export function ScrollHintButton({
   return (
     <a
       href={target}
-      className={`absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 transition-colors ${color} ${className}`}
+      className={`absolute left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 transition-colors ${bottomClassName} ${color} ${className}`}
     >
       <span className="font-display text-[13px] font-normal uppercase tracking-[0.23em]">
         {label}

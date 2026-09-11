@@ -177,6 +177,12 @@ export default async function Home() {
           overlay={isEnabled(content("home.promesas.overlay"))}
           height={900}
           textClassName="text-[22px] md:text-[28px]"
+          // La frase va DORADA y no en el blanco cálido (pedido de Sofía,
+          // 11/09). Es el token `primary-container`, el mismo oro que el resto
+          // del sitio usa sobre fondo azul — no el `primary-fixed-dim` de
+          // acento (regla del 28/08). El texto en sí lo carga ella desde
+          // /admin/multimedia (slot `home.atmos.text`), acá sólo va el color.
+          textColorClassName="text-primary-container"
           scrollIndicator={{
             label: "Nuestro propósito",
             target: "#proposito",

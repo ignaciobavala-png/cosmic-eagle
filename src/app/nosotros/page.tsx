@@ -228,7 +228,7 @@ export default async function NosotrosPage() {
           amount={0.25}
           once={false}
           stagger={0}
-          className="relative flex w-full flex-col items-center justify-center bg-[#fcedcd] px-margin-mobile py-[35px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
+          className="relative flex w-full flex-col items-center justify-center bg-[#fcedcd] px-margin-mobile pt-[35px] pb-[76px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
         >
           <div className="mx-auto max-w-3xl">
             <RevealItem y={0} duration={1} id="nos-enfoque-title">
@@ -275,11 +275,17 @@ export default async function NosotrosPage() {
               </p>
             </RevealItem>
           </div>
+          {/* El indicador es `absolute`, asi que no ocupa lugar: el `pb-[76px]`
+              de la seccion es el hueco que le reserva. En mobile esta seccion
+              no tiene alto minimo —la llena el texto— y con el padding de 35px
+              el indicador caia ENCIMA del cierre en italica (reporte de
+              Ignacio del 11/09, medido a 390x844: se metia 23px adentro).
+              76px = 12 del `bottom-3` + 46 que mide + 18 de aire. */}
           <ScrollHintButton
             label="Estela"
             target="#estela"
             tone="dark"
-            className="bottom-3 md:bottom-6"
+            bottomClassName="bottom-3 md:bottom-6"
           />
         </Reveal>
 
@@ -305,7 +311,7 @@ export default async function NosotrosPage() {
           amount={0.25}
           once={false}
           stagger={0}
-          className="relative flex w-full flex-col items-center justify-center bg-[#fcedcd] px-margin-mobile py-[35px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
+          className="relative flex w-full flex-col items-center justify-center bg-[#fcedcd] px-margin-mobile pt-[35px] pb-[76px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
         >
           <div className="mx-auto max-w-3xl">
             <RevealItem y={0} duration={1} id="nos-estela-title">
@@ -365,11 +371,12 @@ export default async function NosotrosPage() {
               </p>
             </RevealItem>
           </div>
+          {/* Mismo hueco reservado que en "Nuestro enfoque" (ver alla). */}
           <ScrollHintButton
             label="Continuar"
             target="#vision"
             tone="dark"
-            className="bottom-3 md:bottom-6"
+            bottomClassName="bottom-3 md:bottom-6"
           />
         </Reveal>
 

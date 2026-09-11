@@ -10,7 +10,7 @@ const INTERVALO_MS = 3000;
 
 /**
  * El visor de testimonios del sitio: **uno por vez, centrado y SIN caja**, con
- * dos flechas finas para pasar a mano y los puntos abajo.
+ * dos flechas finas como único control.
  *
  * Lo comparten los tres juegos —"Testimonios" de la home, "Nuestros Sanadores" y
  * "Nuestros Viajeros" de Experiencias— desde el pedido de Sofía del 09/09: el
@@ -26,15 +26,16 @@ const INTERVALO_MS = 3000;
  * - **El bloque tiene alto fijo aunque no haya caja.** Los testimonios miden
  *   distinto y un alto que sigue al texto haría saltar todo lo que tiene debajo
  *   en cada pase.
- * - **El pase automático se frena con el puntero encima o el foco adentro**, y
- *   se reinicia con cada avance manual: si alguien está leyendo, el contenido no
- *   se le va solo. Mismo criterio que `PortalsSection`. En la home ese pase está
- *   apagado del todo (`auto={false}`, pedido de Sofía del 11/09): ahí el
- *   testimonio se mueve sólo si tocan una flecha. Las dos bandas de Experiencias
- *   siguen pasando solas — si se quiere lo mismo, es pasarles la prop.
- * - **Con `prefers-reduced-motion` no rota solo ni funde**: quedan las flechas y
- *   los puntos. Un cambio de contenido cada 3s es movimiento aunque no haya
- *   transición.
+ * - **Por defecto NO pasa solo y NO lleva puntos** (pedido de Sofía del 11/09,
+ *   primero para la home y después para las dos bandas de Experiencias): el
+ *   testimonio se mueve sólo si tocan una flecha, y con los puntos fuera las
+ *   flechas quedan como único control, que es lo que ella quiere que se vea.
+ *   Hoy los tres juegos del sitio van así; el pase automático sigue existiendo
+ *   como `auto`, y cuando está encendido se frena con el puntero encima o el
+ *   foco adentro y se reinicia con cada avance manual — si alguien está
+ *   leyendo, el contenido no se le va solo. Mismo criterio que `PortalsSection`.
+ * - **Con `prefers-reduced-motion` no rota solo ni funde**: quedan las flechas.
+ *   Un cambio de contenido cada 3s es movimiento aunque no haya transición.
  * - **Las flechas van FUERA del texto, no encima**, así no tapan nada ni
  *   necesitan un fondo propio para despegarse del testimonio.
  */
@@ -44,14 +45,17 @@ export function TestimonialViewer({
   /** Alto del bloque de texto. Se fija para que la sección no salte al pasar. */
   alturaClassName = "h-[300px] sm:h-[260px]",
   quoteClassName = "text-[15px] sm:text-[17px]",
-  auto = true,
-  dots = true,
+  auto = false,
+  dots = false,
 }: {
   testimonials: Testimonial[];
   className?: string;
   alturaClassName?: string;
   quoteClassName?: string;
-  /** Pase automático cada 3s. Apagado, sólo avanzan las flechas. */
+  /**
+   * Pase automático cada 3s. **Apagado en todo el sitio** (ver arriba): sólo
+   * avanzan las flechas. Queda como prop por si algún juego lo quiere.
+   */
   auto?: boolean;
   /** Los puntos de abajo. Sin ellos, las flechas son el único control. */
   dots?: boolean;

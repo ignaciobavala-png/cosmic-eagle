@@ -20,6 +20,12 @@ import { TestimonialViewer } from "./TestimonialViewer";
  * era un carrusel horizontal de tarjetas con recuadro** — no alcanzaba con
  * sacarle el borde, porque era lo único que separaba un testimonio del
  * siguiente.
+ *
+ * **Funciona igual que la home**: sin pase automático y sin puntos, o sea que
+ * el testimonio se mueve sólo si tocan una flecha (pedido de Sofía del 11/09
+ * sobre "Nuestros Viajeros", aplicado también a "Nuestros Sanadores" — son la
+ * misma banda en la misma página y que una pasara sola y la otra no se leería
+ * como una falla). Es el default del visor, no hace falta pedirlo.
  */
 export function TestimonialsBand({
   title,

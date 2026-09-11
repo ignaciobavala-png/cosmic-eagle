@@ -126,9 +126,10 @@ export const NAV_LINKS: NavLink[] = [
       { label: "Quiénes somos", href: "/nosotros#somos" },
       { label: "Nuestro propósito", href: "/nosotros#proposito" },
       { label: "Nuestro enfoque", href: "/nosotros#nuestro-enfoque" },
-      // Solo "Fundadora" (pedido de Ignacio, 11/09): el titulo de la
-      // pantalla sigue siendo "Estela, fundadora".
-      { label: "Fundadora", href: "/nosotros#estela" },
+      // "Equipo" (pedido de Sofia, 11/09; antes "Fundadora"). El titulo de la
+      // pantalla sigue siendo "Estela, fundadora": la etiqueta del menu nombra
+      // la seccion, no la pantalla, y deja lugar a que despues sume mas gente.
+      { label: "Equipo", href: "/nosotros#estela" },
     ],
   },
   {

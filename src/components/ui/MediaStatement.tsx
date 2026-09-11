@@ -28,6 +28,7 @@ export function MediaStatement({
   scrollIndicator,
   height,
   textClassName,
+  textColorClassName = "text-primary",
   width = "narrow",
   amount = 0.4,
   once = true,
@@ -68,6 +69,16 @@ export function MediaStatement({
   height?: number;
   /** Tamaño de la frase cuando el mockup fija un px (28px en Atmosférica, 32px en el Cierre). */
   textClassName?: string;
+  /**
+   * Color de la frase. Por defecto el blanco cálido del sistema.
+   *
+   * **Va por esta prop y no dentro de `textClassName`**: las dos utilidades de
+   * color compiten por la misma propiedad y entre dos de la misma
+   * especificidad decide el orden de la hoja generada, no el orden en que se
+   * escriben — o sea que el `text-primary` de acá le ganaría. Es la misma
+   * trampa que ya documentan `CtaLink`, `CreamSection` y `ScrollHintButton`.
+   */
+  textColorClassName?: string;
   width?: "narrow" | "prose";
   /**
    * Los valores por defecto son los de la frase atmosferica de la home (umbral
@@ -106,7 +117,7 @@ export function MediaStatement({
           >
             {text && (
               <p
-                className={`font-display text-primary text-balance ${
+                className={`font-display text-balance ${textColorClassName} ${
                   textClassName ?? "text-headline-md md:text-headline-lg"
                 }`}
               >

@@ -73,16 +73,10 @@ export function TestimonialsSection({
         />
 
         {/* Sin pase automatico y sin puntos (pedido de Sofia del 11/09): el
-            testimonio se mueve SOLO si tocan una flecha. Con los puntos fuera,
-            las flechas quedan como unico control, que es justamente lo que ella
-            quiere que se vea. Las dos bandas de Experiencias conservan el pase
-            automatico. */}
-        <TestimonialViewer
-          testimonials={testimonials}
-          className="mt-9"
-          auto={false}
-          dots={false}
-        />
+            testimonio se mueve SOLO si tocan una flecha. Es el comportamiento
+            por defecto del visor desde que las dos bandas de Experiencias
+            pasaron a lo mismo, asi que no hace falta pedirlo aca. */}
+        <TestimonialViewer testimonials={testimonials} className="mt-9" />
       </div>
 
       {/* La franja del pie ocupa TODO el alto que sobra y termina con la
