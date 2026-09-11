@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-type Variant = "solid" | "ghost" | "pill" | "glass" | "outline" | "blue";
+type Variant = "solid" | "ghost" | "pill" | "glass" | "outline";
 
 const VARIANTS: Record<Variant, string> = {
   // CTA solido: oro champagne con texto oscuro (primary-container / on-primary)
@@ -37,13 +37,6 @@ const VARIANTS: Record<Variant, string> = {
   // siempre sigue al texto. Por eso aca va `border-current` y no un color fijo.
   outline:
     "rounded-full border-[1.5px] border-current font-display tracking-[0.038em] transition-[filter,box-shadow,transform] duration-[250ms] hover:scale-[1.04] hover:brightness-110",
-  // La MISMA pildora, invertida: azul solido con texto dorado. Existe porque la
-  // `pill` dorada desaparece sobre un fondo dorado — es el caso de "Tecnologia
-  // del Alma" desde que Sofia eligio la banda dorada de fondo (11/09). Misma
-  // forma, mismo tipo y mismo tracking que la dorada, asi sigue leyendose como
-  // el mismo boton del sistema y no como uno nuevo.
-  blue:
-    "rounded-full border-[1.5px] border-[#05125a] bg-[#05125a] font-display font-bold tracking-[0.08em] text-primary-container transition-[filter,transform] hover:brightness-125",
 };
 
 /**
@@ -70,7 +63,7 @@ export function CtaLink({
   return (
     <Link
       href={href}
-      className={`inline-flex items-center justify-center gap-2 px-7 py-3 text-label-sm uppercase transition-all duration-300 ${variant === "pill" || variant === "glass" || variant === "outline" || variant === "blue" ? "" : "rounded-lg"} ${VARIANTS[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 px-7 py-3 text-label-sm uppercase transition-all duration-300 ${variant === "pill" || variant === "glass" || variant === "outline" ? "" : "rounded-lg"} ${VARIANTS[variant]} ${className}`}
     >
       {children}
     </Link>

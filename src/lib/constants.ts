@@ -126,7 +126,9 @@ export const NAV_LINKS: NavLink[] = [
       { label: "Quiénes somos", href: "/nosotros#somos" },
       { label: "Nuestro propósito", href: "/nosotros#proposito" },
       { label: "Nuestro enfoque", href: "/nosotros#nuestro-enfoque" },
-      { label: "Estela, fundadora", href: "/nosotros#estela" },
+      // Solo "Fundadora" (pedido de Ignacio, 11/09): el titulo de la
+      // pantalla sigue siendo "Estela, fundadora".
+      { label: "Fundadora", href: "/nosotros#estela" },
     ],
   },
   {

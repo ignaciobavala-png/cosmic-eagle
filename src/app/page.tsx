@@ -399,10 +399,18 @@ export default async function Home() {
                 </RevealItem>
               </div>
               <RevealItem duration={0.8} delay={0.6}>
+                {/* El MISMO boton que el "Ir mas profundo" de "Nuestro
+                    proposito" (pedido de Ignacio, 11/09: coherencia de pagina):
+                    la variante `outline` que eligio Sofia el 09/09, con su
+                    mismo padding y cuerpo. Lo unico que cambia es el color, que
+                    en `outline` lo pone quien lo usa y arrastra el contorno
+                    (`border-current`): alla va dorado sobre azul, aca azul
+                    sobre el fondo dorado. Antes era la pildora dorada, que
+                    sobre este fondo se fundia. */}
                 <CtaLink
                   href="/contenidos"
-                  variant="blue"
-                  className="mt-10 px-7 py-3.5 text-[14px] tracking-[0.071em]"
+                  variant="outline"
+                  className="mt-10 px-7 py-3.5 text-[14px] text-[#05125a] md:px-10 md:py-4"
                 >
                   Ir más profundo
                 </CtaLink>
