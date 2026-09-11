@@ -141,7 +141,7 @@ export default async function NosotrosPage() {
                 Nuestro propósito
               </h2>
             </RevealItem>
-            <RevealLine className="mt-3 mb-6 h-0.5 w-16 bg-[#f9d78f]" />
+            <RevealLine className="mt-3 mb-6 h-px w-16 bg-[#f9d78f]" />
             {/* **Los resaltados NO cambian de tipografía**, sólo de color y
                 peso: llevaban `font-display` y con Sorts Mill Goudy —que tiene
                 la altura de x mucho más baja que Montserrat— quedaban
@@ -236,7 +236,7 @@ export default async function NosotrosPage() {
                 Nuestro enfoque
               </h2>
             </RevealItem>
-            <RevealLine className="mt-3 mb-6 h-0.5 w-16 bg-[#f9d78f]" />
+            <RevealLine className="mt-3 mb-6 h-px w-16 bg-[#f9d78f]" />
             <div className="space-y-6 text-body-md leading-relaxed text-[#333] text-justify">
               <RevealItem y={14} duration={0.8} delay={0.15}>
               <p>

@@ -59,7 +59,7 @@ export async function LegalPage({ slug }: { slug: LegalSlug }) {
             <h1 className="font-display text-headline-lg font-bold text-[#05125a] md:text-display-lg">
               {doc.title}
             </h1>
-            <div aria-hidden="true" className="mt-5 h-0.5 w-16 bg-[#f9d78f]" />
+            <div aria-hidden="true" className="mt-5 h-px w-16 bg-[#f9d78f]" />
           </Reveal>
 
           {doc.isProvisional && (

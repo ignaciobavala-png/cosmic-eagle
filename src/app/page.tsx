@@ -203,7 +203,7 @@ export default async function Home() {
             </RevealItem>
             <RevealLine
               duration={1.6}
-              className="mx-auto mt-4 h-0.5 w-[70px] bg-primary-container md:mt-5"
+              className="mx-auto mt-4 h-px w-[70px] bg-primary-container md:mt-5"
             />
             <RevealItem y={30} duration={0.9} delay={0.45}>
             <p className="mx-auto mt-[30px] max-w-[640px] text-[16px] leading-[1.8] tracking-[0.3px] text-[#d0c5b4] md:mt-[50px] md:text-[20px] md:leading-[1.9]">
@@ -261,7 +261,7 @@ export default async function Home() {
                   Sesiones Cósmicas
                 </h2>
               </RevealItem>
-              <RevealLine className="mx-auto mb-[18px] h-0.5 w-14 bg-primary-container" />
+              <RevealLine className="mx-auto mb-[18px] h-px w-14 bg-primary-container" />
               <RevealItem duration={0.8} delay={0.15}>
                 <p className="mb-[18px] text-[15px] opacity-85">
                   Un espacio para ir más profundo
@@ -293,7 +293,7 @@ export default async function Home() {
                   Viajes Cósmicos
                 </h2>
               </RevealItem>
-              <RevealLine className="mx-auto mb-[18px] h-0.5 w-14 bg-[#05125a]" />
+              <RevealLine className="mx-auto mb-[18px] h-px w-14 bg-[#05125a]" />
               <RevealItem duration={0.8} delay={0.15}>
                 <p className="mb-[18px] text-[15px] opacity-85">
                   Un espacio para ir más profundo

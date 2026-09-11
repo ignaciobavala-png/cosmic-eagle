@@ -72,7 +72,7 @@ export default async function FaqsPage() {
                 </h2>
                 <div
                   aria-hidden="true"
-                  className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]"
+                  className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]"
                 />
                 <p className="text-body-md leading-relaxed text-[#333]">
                   Estamos preparando esta sección. Mientras tanto, escribinos y
@@ -92,7 +92,7 @@ export default async function FaqsPage() {
                     </h2>
                     <div
                       aria-hidden="true"
-                      className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]"
+                      className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]"
                     />
                   </Reveal>
 

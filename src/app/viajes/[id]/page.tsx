@@ -205,7 +205,7 @@ export default async function ViajePage({ params }: Props) {
                 Sobre esta experiencia
               </h2>
             </RevealItem>
-            <RevealLine className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]" />
+            <RevealLine className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]" />
 
             <RevealItem y={14} duration={0.8} delay={0.15}>
               {trip.description ? (
@@ -255,7 +255,7 @@ export default async function ViajePage({ params }: Props) {
                   <h3 className="font-display text-headline-md font-bold text-[#05125a]">
                     Programa
                   </h3>
-                  <div className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]" />
+                  <div className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]" />
                   <div className="flex flex-col gap-6">
                     {schedule.map((group) => (
                       <div key={group.day ?? "sin-jornada"}>
@@ -298,7 +298,7 @@ export default async function ViajePage({ params }: Props) {
                   <h3 className="font-display text-headline-md font-bold text-[#05125a]">
                     Qué incluye
                   </h3>
-                  <div className="mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]" />
+                  <div className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]" />
                   <p className="whitespace-pre-line text-body-md leading-relaxed text-[#333]">
                     {trip.includes}
                   </p>
@@ -326,7 +326,7 @@ export default async function ViajePage({ params }: Props) {
                     Postularte a esta experiencia
                   </h2>
                 </RevealItem>
-                <RevealLine className="mx-auto mt-3 mb-7 h-0.5 w-16 bg-[#f9d78f]" />
+                <RevealLine className="mx-auto mt-3 mb-7 h-px w-16 bg-[#f9d78f]" />
 
                 {trip.price > 0 && (
                   <RevealItem y={14} duration={0.8} delay={0.15}>
