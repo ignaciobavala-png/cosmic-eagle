@@ -23,7 +23,15 @@ export function Footer() {
 
         {FOOTER_COLUMNS.map((column) => (
           <nav key={column.title} className="space-y-4">
-            <h2 className="text-label-sm uppercase text-primary-fixed-dim">
+            {/* 18px y no `text-label-sm`: el titulo de columna media 12px y
+                sus propios links 16px, o sea que el encabezado era MAS CHICO
+                que lo que encabeza (reporte de Sofia, 11/09). Los tres valores
+                van explicitos y no por token porque `text-label-sm` ya emite
+                font-size: dos utilidades de la misma propiedad las resuelve el
+                orden de la hoja generada, no el orden en que se escriben. Se
+                conservan la mayuscula, el tracking y el peso de la etiqueta:
+                lo unico que cambia es el cuerpo. */}
+            <h2 className="text-[18px] font-semibold uppercase leading-6 tracking-[0.1em] text-primary-fixed-dim">
               {column.title}
             </h2>
             <ul className="space-y-3">
@@ -52,7 +60,8 @@ export function Footer() {
         ))}
 
         <div className="space-y-4">
-          <h2 className="text-label-sm uppercase text-primary-fixed-dim">
+          {/* Mismo cuerpo que los otros tres titulos de columna, ver arriba. */}
+          <h2 className="text-[18px] font-semibold uppercase leading-6 tracking-[0.1em] text-primary-fixed-dim">
             Sintoniza
           </h2>
           <p className="text-body-md text-on-surface-variant">
