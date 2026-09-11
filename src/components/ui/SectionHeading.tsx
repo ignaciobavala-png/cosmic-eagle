@@ -14,6 +14,7 @@ export function SectionHeading({
   label,
   className = "",
   titleClassName = "text-headline-md md:text-headline-lg",
+  titleColorClassName = "text-primary",
   labelClassName = "text-label-sm text-primary-fixed-dim/85",
   lineClassName = "max-w-[120px]",
 }: {
@@ -22,13 +23,18 @@ export function SectionHeading({
   className?: string;
   /** El mockup fija el px por seccion ("Voces de Luz" va en 42). */
   titleClassName?: string;
+  /** El color del titulo va como prop y NO dentro de `titleClassName`: dos
+      utilidades `text-*` de la misma especificidad las resuelve el orden de la
+      hoja generada, no el orden en que se escriben (la trampa que ya documenta
+      `CtaLink` con el `display`), asi que pisarlo desde afuera no funciona. */
+  titleColorClassName?: string;
   labelClassName?: string;
   /** El largo de los dos filetes. Crecen hasta este tope. */
   lineClassName?: string;
 }) {
   return (
     <div className={`text-center ${className}`}>
-      <h2 className={`font-display text-primary ${titleClassName}`}>
+      <h2 className={`font-display ${titleColorClassName} ${titleClassName}`}>
         {title}
       </h2>
 

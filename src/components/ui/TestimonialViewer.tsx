@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Testimonial } from "@/lib/testimonials";
 
-/** Cada cuánto pasa al siguiente testimonio. */
+/** Cada cuánto pasa al siguiente testimonio, donde el pase automático está. */
 const INTERVALO_MS = 3000;
 
 /**
@@ -28,7 +28,10 @@ const INTERVALO_MS = 3000;
  *   en cada pase.
  * - **El pase automático se frena con el puntero encima o el foco adentro**, y
  *   se reinicia con cada avance manual: si alguien está leyendo, el contenido no
- *   se le va solo. Mismo criterio que `PortalsSection`.
+ *   se le va solo. Mismo criterio que `PortalsSection`. En la home ese pase está
+ *   apagado del todo (`auto={false}`, pedido de Sofía del 11/09): ahí el
+ *   testimonio se mueve sólo si tocan una flecha. Las dos bandas de Experiencias
+ *   siguen pasando solas — si se quiere lo mismo, es pasarles la prop.
  * - **Con `prefers-reduced-motion` no rota solo ni funde**: quedan las flechas y
  *   los puntos. Un cambio de contenido cada 3s es movimiento aunque no haya
  *   transición.
@@ -41,11 +44,17 @@ export function TestimonialViewer({
   /** Alto del bloque de texto. Se fija para que la sección no salte al pasar. */
   alturaClassName = "h-[300px] sm:h-[260px]",
   quoteClassName = "text-[15px] sm:text-[17px]",
+  auto = true,
+  dots = true,
 }: {
   testimonials: Testimonial[];
   className?: string;
   alturaClassName?: string;
   quoteClassName?: string;
+  /** Pase automático cada 3s. Apagado, sólo avanzan las flechas. */
+  auto?: boolean;
+  /** Los puntos de abajo. Sin ellos, las flechas son el único control. */
+  dots?: boolean;
 }) {
   const reduced = useReducedMotion();
   const [activo, setActivo] = useState(0);
@@ -54,12 +63,12 @@ export function TestimonialViewer({
   const total = testimonials.length;
 
   useEffect(() => {
-    if (reduced || pausado || total < 2) return;
+    if (!auto || reduced || pausado || total < 2) return;
     const t = setTimeout(() => setActivo((i) => (i + 1) % total), INTERVALO_MS);
     return () => clearTimeout(t);
     // `activo` en las dependencias es lo que reinicia la espera cuando alguien
     // pasa de testimonio a mano.
-  }, [activo, pausado, reduced, total]);
+  }, [activo, auto, pausado, reduced, total]);
 
   if (total === 0) return null;
 
@@ -117,7 +126,7 @@ export function TestimonialViewer({
         )}
       </div>
 
-      {total > 1 && (
+      {dots && total > 1 && (
         <div className="mt-5 flex items-center justify-center gap-2">
           {testimonials.map((otro, i) => (
             <button

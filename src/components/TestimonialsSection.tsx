@@ -58,15 +58,31 @@ export function TestimonialsSection({
           la pantalla es baja, en vez de empujar la imagen fuera de la vista —
           era lo que la hacía desaparecer en mobile. */}
       <div className="mx-auto w-full min-h-0 max-w-narrative shrink-0 px-margin-mobile pt-[calc(3rem+var(--navbar-h))] pb-6 text-center md:px-margin-desktop md:pt-[7.5rem] md:pb-5">
+        {/* El titulo va dorado y no en el blanco calido del resto de los
+            encabezados (pedido de Sofia del 11/09: "que vaya mas con la
+            pagina"). Es el token `primary-container`, el mismo oro que el
+            filete y el label — sobre azul es el rol que corresponde, no el
+            `primary-fixed-dim` de acento (regla del 28/08). */}
         <SectionHeading
           title={HOME_COPY.voces.title}
           label={HOME_COPY.voces.label}
           titleClassName="text-[32px] font-bold md:text-[42px]"
+          titleColorClassName="text-primary-container"
           labelClassName="text-[13px] tracking-[0.115em] text-[#f9d78f]"
           lineClassName="max-w-[180px]"
         />
 
-        <TestimonialViewer testimonials={testimonials} className="mt-9" />
+        {/* Sin pase automatico y sin puntos (pedido de Sofia del 11/09): el
+            testimonio se mueve SOLO si tocan una flecha. Con los puntos fuera,
+            las flechas quedan como unico control, que es justamente lo que ella
+            quiere que se vea. Las dos bandas de Experiencias conservan el pase
+            automatico. */}
+        <TestimonialViewer
+          testimonials={testimonials}
+          className="mt-9"
+          auto={false}
+          dots={false}
+        />
       </div>
 
       {/* La franja del pie ocupa TODO el alto que sobra y termina con la
