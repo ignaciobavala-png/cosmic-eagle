@@ -207,9 +207,15 @@ export default async function Home() {
                 Nuestro propósito
               </h2>
             </RevealItem>
+            {/* Filete fino que se desvanece en las puntas (pedido de Sofia,
+                12/09): el oro solido de 70px se leia como un subrayado corto.
+                Va mas larga y con degrade a transparente en los dos extremos,
+                asi que el 1px de alto se percibe todavia mas delgado. El oro
+                pleno queda en el centro. `RevealLine` la sigue haciendo crecer
+                desde la izquierda, como todas las lineas del sitio. */}
             <RevealLine
               duration={1.6}
-              className="mx-auto mt-4 h-px w-[70px] bg-primary-container md:mt-5"
+              className="mx-auto mt-4 h-px w-[120px] bg-[linear-gradient(to_right,transparent_0%,var(--color-primary-container)_50%,transparent_100%)] md:mt-5 md:w-[160px]"
             />
             <RevealItem y={30} duration={0.9} delay={0.45}>
             <p className="mx-auto mt-[30px] max-w-[640px] text-[16px] leading-[1.8] tracking-[0.3px] text-[#d0c5b4] md:mt-[50px] md:text-[20px] md:leading-[1.9]">
@@ -267,7 +273,11 @@ export default async function Home() {
                   Sesiones Cósmicas
                 </h2>
               </RevealItem>
-              <RevealLine className="mx-auto mb-[18px] h-px w-14 bg-primary-container" />
+              {/* Mismo filete que "Nuestro propósito" (pedido de Sofía,
+                  12/09): 1px que se desvanece en las puntas, en vez del oro
+                  sólido corto. Más corta que la de esa sección porque el
+                  bloque acá mide 460px de ancho, no 640. */}
+              <RevealLine className="mx-auto mb-[18px] h-px w-[100px] bg-[linear-gradient(to_right,transparent_0%,var(--color-primary-container)_50%,transparent_100%)] md:w-[120px]" />
               <RevealItem duration={0.8} delay={0.15}>
                 <p className="mb-[18px] text-[15px] opacity-85">
                   Un espacio para ir más profundo
@@ -299,7 +309,9 @@ export default async function Home() {
                   Viajes Cósmicos
                 </h2>
               </RevealItem>
-              <RevealLine className="mx-auto mb-[18px] h-px w-14 bg-[#05125a]" />
+              {/* El mismo filete que el panel de Sesiones, en el azul del
+                  panel dorado. */}
+              <RevealLine className="mx-auto mb-[18px] h-px w-[100px] bg-[linear-gradient(to_right,transparent_0%,#05125a_50%,transparent_100%)] md:w-[120px]" />
               <RevealItem duration={0.8} delay={0.15}>
                 <p className="mb-[18px] text-[15px] opacity-85">
                   Un espacio para ir más profundo

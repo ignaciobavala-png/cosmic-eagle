@@ -23,12 +23,12 @@ export const ARTICLE_CATEGORIES = {
   },
   salud: {
     value: "salud",
-    label: "Salud y Bienestar",
+    label: "Salud & Bienestar",
     description: "El cuidado del cuerpo, la medicina y sus resguardos.",
   },
   evolucion: {
     value: "evolucion",
-    label: "Evolución y Conciencia",
+    label: "Evolución & Conciencia",
     description: "El proceso evolutivo y la expansión de la conciencia.",
   },
   tecnologia: {
