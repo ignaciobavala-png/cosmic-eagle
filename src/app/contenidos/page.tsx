@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { PageHero } from "@/components/ui/PageHero";
 import { ArticleCard } from "@/components/ui/ArticleCard";
-import { CreamSection } from "@/components/ui/CreamSection";
+import { CreamSection, CREAM_HEX } from "@/components/ui/CreamSection";
 import { Reveal } from "@/components/ui/Reveal";
 import { YouTubeFacade } from "@/components/ui/YouTubeFacade";
 import { createClient } from "@/lib/supabase/server";
@@ -85,6 +85,7 @@ export default async function ContenidosPage({
           scrollHint="Explorar"
           scrollTo="biblioteca"
           overlay={isEnabled(content("contenidos.hero.overlay"))}
+          fadeTo={CREAM_HEX}
         />
 
         {/* La biblioteca vive sobre crema, como los bloques narrativos de

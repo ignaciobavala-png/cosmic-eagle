@@ -10,6 +10,7 @@ import { ClosingHero } from "@/components/ui/ClosingHero";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
 import { SymbolRow } from "@/components/ui/NosSymbols";
 import { ScrollHintButton } from "@/components/ui/ScrollHintButton";
+import { CREAM_HEX } from "@/components/ui/CreamSection";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 
 export const metadata: Metadata = {
@@ -74,6 +75,7 @@ export default async function NosotrosPage() {
           scrollTo="enfoque"
           height="full"
           overlay={isEnabled(content("nosotros.hero.overlay"))}
+          fadeTo={CREAM_HEX}
         />
 
         {/* Pantalla 1 — las cuatro palabras sobre crema. En mobile el copy queda

@@ -21,6 +21,7 @@ export function PageHero({
   priority = true,
   height = "banner",
   overlay = true,
+  fadeTo,
 }: {
   image: string;
   imageAlt?: string;
@@ -51,6 +52,25 @@ export function PageHero({
    * indicador debajo del pliegue en una pantalla baja.
    */
   height?: "banner" | "full";
+  /**
+   * Color al que se funde el PIE del banner, cuando lo que sigue es una seccion
+   * opaca con fondo propio (en la practica, siempre una `CreamSection`: se pasa
+   * `CREAM_HEX`).
+   *
+   * Existe porque el corte hero -> crema era un borde recto de 15,11:1 medido
+   * (el maximo posible es 21:1, negro sobre blanco), y a la clienta no le
+   * gustan los contrastes marcados. Con esto la foto entra al crema en vez de
+   * chocar contra el.
+   *
+   * **Apaga la mascara del `banner`**, que desvanece el pie a transparente para
+   * dejar ver el degrade del `body`: ese fundido es al azul del chrome, y
+   * cuando abajo hay una franja opaca ese azul no se ve nunca. Los dos juntos
+   * darian dos pasajes encima.
+   *
+   * Va por `style` y no por clase: Tailwind escanea literales en el codigo
+   * fuente, asi que un color interpolado no genera regla.
+   */
+  fadeTo?: string;
 }) {
   const full = height === "full";
   return (
@@ -81,7 +101,7 @@ export function PageHero({
           pagina. Sin la mascara el limite banner/seccion queda como una linea. */}
       <div
         className={
-          full
+          full || fadeTo
             ? "absolute inset-0"
             : "absolute inset-0 [mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)]"
         }
@@ -95,6 +115,28 @@ export function PageHero({
         <div className="absolute inset-0 bg-[#05102a]/35" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#05060a]/45" />
       </div>
+
+      {/* Pasaje al fondo de la seccion siguiente. Las paradas intermedias no
+          son decorativas: un degrade lineal de dos paradas sobre una foto
+          oscura deja una banda gris a mitad de camino, porque el 50% de opacidad
+          cae justo donde mas se nota. Con el arranque suave el crema entra
+          recien en el ultimo cuarto.
+
+          **La altura es corta a proposito** (56/80px): el indicador de scroll
+          vive a 32px del pie, o sea adentro de esta banda, y con un pasaje mas
+          alto quedaria apoyado sobre crema pleno, donde el oro de acento da
+          1,7:1. Medido con esta altura sobre /contenidos: el indicador va de
+          5,63:1 a 11,30:1 contra el fondo que le toca en cada punto. Si algun
+          dia se agranda, hay que volver a mirar ese contraste. */}
+      {fadeTo && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-14 md:h-20"
+          style={{
+            backgroundImage: `linear-gradient(to bottom, transparent 0%, color-mix(in srgb, ${fadeTo} 12%, transparent) 45%, color-mix(in srgb, ${fadeTo} 55%, transparent) 78%, ${fadeTo} 100%)`,
+          }}
+        />
+      )}
 
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-margin-mobile md:px-margin-desktop text-center">
         {overlay && (

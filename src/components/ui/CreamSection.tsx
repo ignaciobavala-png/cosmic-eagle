@@ -15,6 +15,13 @@ import { Reveal } from "./Reveal";
 export const CREAM = "bg-[#fcedcd]";
 
 /**
+ * El mismo crema como hex suelto, para cuando hace falta interpolarlo en un
+ * degrade y no alcanza con la clase (Tailwind no genera reglas a partir de
+ * valores armados en runtime). Lo usa el `fadeTo` de `PageHero`.
+ */
+export const CREAM_HEX = "#fcedcd";
+
+/**
  * Alias historico del crema profundo, que desde el 10/09 es el crema del
  * sistema: la prueba en /faqs se aprobo ("mucha luz" en el resto del sitio) y
  * el valor se mudo a `CREAM`. Se conserva el nombre para no romper imports.
