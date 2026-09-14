@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState, useRef, useState } from "react";
-import { compressImage } from "@/lib/compress-image";
+import { CoverFramer } from "@/components/admin/CoverFramer";
+import { useCoverCrop } from "@/components/admin/use-cover-crop";
 import { TRIP_COVER_ASPECT, TRIP_COVER_MAX_PX } from "@/lib/trip-cover";
 import type { Tables } from "@/lib/supabase/types";
 import type { TripType } from "@/lib/trip-type";
@@ -85,28 +86,14 @@ export function TripForm({
   const [startDate, setStartDate] = useState(trip?.start_date ?? "");
   const isSesion = type === TRIP_TYPES.ceremonia.value;
 
-  // Preview del recorte real, no del archivo original: lo que se ve aca es
-  // exactamente lo que se va a subir.
-  const [preview, setPreview] = useState<string | null>(null);
-  const [cropping, setCropping] = useState(false);
+  // El encuadre manda: lo que queda dentro de la ventana es exactamente lo que
+  // se sube.
   const imageInputRef = useRef<HTMLInputElement>(null);
-
-  async function handleCover(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setCropping(true);
-    const cover = await compressImage(file, TRIP_COVER_MAX_PX, TRIP_COVER_ASPECT);
-    setCropping(false);
-
-    // El input tiene que llevar el archivo recortado, no el original: es el que
-    // se sube cuando el form hace submit.
-    const transfer = new DataTransfer();
-    transfer.items.add(cover);
-    if (imageInputRef.current) imageInputRef.current.files = transfer.files;
-
-    setPreview(URL.createObjectURL(cover));
-  }
+  const { working: cropping, framerProps, pick } = useCoverCrop({
+    aspect: TRIP_COVER_ASPECT,
+    maxPx: TRIP_COVER_MAX_PX,
+    inputRef: imageInputRef,
+  });
 
   return (
     <form
@@ -151,20 +138,27 @@ export function TripForm({
         <label htmlFor="image" className={labelClass}>
           Portada
         </label>
-        {(preview || trip?.image_url) && (
-          <div className="relative aspect-[16/9] w-full max-w-64 overflow-hidden rounded-lg border border-outline-variant">
-            {/* <img> y no next/image: la preview local es un blob: y el
-                optimizador no lo puede resolver (mismo caso que SlotEditor). */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={preview ?? trip!.image_url!}
-              alt={preview ? "Portada nueva, ya recortada" : "Portada actual del viaje"}
-              className="h-full w-full object-cover"
-            />
-            {/* Guia de zona segura: lo que quede fuera del 75% central se pierde
-                en alguno de los dos recortes (tarjeta 4:3 o banner 21:9). */}
-            <div className="pointer-events-none absolute inset-x-[12.5%] inset-y-[12.5%] border border-dashed border-primary-fixed-dim/60" />
-          </div>
+        {framerProps ? (
+          // Con un archivo nuevo elegido, el encuadre REEMPLAZA a la preview:
+          // la ventana ya muestra lo que se va a guardar.
+          <CoverFramer {...framerProps} className="w-full max-w-80" />
+        ) : (
+          trip?.image_url && (
+            <div className="relative aspect-[16/9] w-full max-w-64 overflow-hidden rounded-lg border border-outline-variant">
+              {/* <img> y no next/image: puede ser un blob: y el optimizador no
+                  lo puede resolver (mismo caso que SlotEditor). */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={trip.image_url}
+                alt="Portada actual del viaje"
+                className="h-full w-full object-cover"
+              />
+              {/* Guia de zona segura: lo que quede fuera del 75% central se
+                  pierde en alguno de los dos recortes (tarjeta 4:3 o banner
+                  21:9). */}
+              <div className="pointer-events-none absolute inset-x-[12.5%] inset-y-[12.5%] border border-dashed border-primary-fixed-dim/60" />
+            </div>
+          )
         )}
         <input
           ref={imageInputRef}
@@ -172,13 +166,13 @@ export function TripForm({
           name="image"
           type="file"
           accept="image/*"
-          onChange={handleCover}
+          onChange={pick}
           className={`${inputClass} file:mr-4 file:rounded-md file:border-0 file:bg-primary-container file:px-3 file:py-1 file:text-on-primary`}
         />
         <p className="text-xs text-on-surface-variant/70">
           {cropping
             ? "Recortando…"
-            : "Se recorta sola a 16:9 desde el centro y se convierte a WebP. Deja lo importante dentro del recuadro punteado: es lo que se ve en todos los tamaños. "}
+            : "Se recorta a 16:9 y se convierte a WebP. Deja lo importante dentro del recuadro punteado: es lo que se ve en todos los tamaños. "}
           {!cropping && trip?.image_url && "Si no eliges una, se mantiene la actual. "}
           {!cropping && "Sin portada se usa una imagen genérica."}
         </p>
@@ -554,7 +548,9 @@ export function TripForm({
 
       <button
         type="submit"
-        disabled={pending}
+        // Tambien mientras recorta: el input lleva el archivo YA recortado, asi
+        // que un submit disparado en medio sube el encuadre anterior.
+        disabled={pending || cropping}
         className="mt-2 bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg py-2.5 hover:bg-primary-fixed transition-colors disabled:opacity-60"
       >
         {pending ? "Guardando..." : trip ? "Guardar cambios" : "Crear viaje"}

@@ -42,7 +42,9 @@ recordarse.
 | `src/lib/trip-cover.ts` | **La única que sube.** Proporción, tope de tamaño y subida al bucket, compartidas por las dos pantallas |
 | `src/app/admin/viajes/TripForm.tsx` | Portada como campo del form del viaje |
 | `src/app/admin/multimedia/CoverEditor.tsx` | Portada desde Multimedia, sin entrar a editar el viaje |
-| `src/lib/compress-image.ts` | `compressImage(file, maxPx, aspect)` — el tercer parámetro recorta centrado |
+| `src/lib/compress-image.ts` | `compressImage(file, maxPx, aspect, focus)` — recorta a la proporción, en el punto que se le diga (centro por defecto) |
+| `src/components/admin/CoverFramer.tsx` | El control de encuadre: la foto entera con la ventana del recorte encima |
+| `src/components/admin/use-cover-crop.ts` | Elegir archivo → encuadrar → dejar el recorte en el `<input type="file">`. Lo comparten los tres paneles |
 
 Se sube desde **dos lugares** y por eso la lógica está extraída: dos
 implementaciones se separan en cuanto alguien toca una — que es exactamente lo que
@@ -73,10 +75,26 @@ quedaran distintos — que es exactamente lo que había pasado.
 
 ## Pendiente
 
-- **Punto focal.** Hoy el recorte es siempre centrado. Si aparece una foto cuyo
-  motivo está arriba o a un costado, no hay forma de decírselo al sistema: hay que
-  recortarla a mano antes de subirla. La solución real es guardar un
-  `focal_point` por viaje y traducirlo a `object-position`; no se hizo porque
-  todavía no hay ninguna portada cargada que lo necesite.
+- ~~**Punto focal.**~~ **HECHO el 14/09.** Al subir una foto, el panel muestra la
+  imagen entera con la ventana del recorte encima y se arrastra (o se mueve con
+  las flechas) para elegir qué queda adentro. Está en los tres lugares que
+  recortan: portada de contenido, portada de experiencia y el editor de portadas
+  de Multimedia.
+
+  **Se resolvió encuadrando al subir y no guardando un `focal_point` +
+  `object-position`**, que era la idea anterior. El motivo es el principio de
+  arriba: lo que la clienta ve en el panel es literalmente lo que se guarda. Con
+  `object-position` habría que guardar una posición por imagen **y por uso** —la
+  tarjeta recorta 4:3 y el banner 21:9 desde el mismo archivo— y el panel dejaría
+  de ser WYSIWYG.
+
+  El costo de esa decisión: **una portada ya subida no se puede reencuadrar sin
+  el archivo original**. Es lo mismo que pasaba antes y hay que avisárselo a
+  ella.
+
+  Por qué importaba: una foto vertical pierde el **58%** del alto al pasar a 16:9
+  (el **68%** si es 9:16), repartido mitad arriba y mitad abajo — que es
+  exactamente cómo se le va la cabeza a una persona fotografiada de cuerpo
+  entero.
 - **Ninguno de los 8 viajes tiene portada.** Las páginas usan el placeholder por
   hash del id.

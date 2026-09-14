@@ -16,19 +16,38 @@
 const QUALITY = 0.82;
 
 /**
- * `aspect` (ancho / alto) recorta la imagen a esa proporcion **desde el centro**
- * antes de escalar. Se usa para las portadas de viaje: se guarda una sola imagen
- * en 16:9 y cada lugar del sitio recorta desde ahi (ver docs/PORTADAS.md). Sin
- * `aspect` la imagen conserva su proporcion original, que es lo que quiere el
- * panel de multimedia, donde cada slot tiene la suya.
+ * Punto de la imagen original que queda en el centro del recorte, en fracciones
+ * de 0 a 1. `{x: 0.5, y: 0.5}` es el centro, `{y: 0}` pega el recorte al borde
+ * de arriba.
+ *
+ * Solo tiene efecto el eje que sobra: recortando a 16:9, una foto vertical solo
+ * se puede correr en `y` y una panoramica solo en `x`.
+ */
+export type CropFocus = { x: number; y: number };
+
+export const CENTER_FOCUS: CropFocus = { x: 0.5, y: 0.5 };
+
+/**
+ * `aspect` (ancho / alto) recorta la imagen a esa proporcion antes de escalar.
+ * Se usa para las portadas de viaje: se guarda una sola imagen en 16:9 y cada
+ * lugar del sitio recorta desde ahi (ver docs/PORTADAS.md). Sin `aspect` la
+ * imagen conserva su proporcion original, que es lo que quiere el panel de
+ * multimedia, donde cada slot tiene la suya.
+ *
+ * `focus` mueve ese recorte. El default es el centro, que es como se comporto
+ * desde el 18/08 y sigue siendo lo que sale sin tocar nada. Existe porque una
+ * foto vertical pierde el 58% del alto al pasar a 16:9 (el 68% si es 9:16), y
+ * repartido mitad arriba y mitad abajo eso le corta la cabeza a una persona de
+ * cuerpo entero. Lo elige la clienta con `CoverFramer`.
  */
 export async function compressImage(
   file: File,
   maxPx = 1600,
-  aspect?: number
+  aspect?: number,
+  focus: CropFocus = CENTER_FOCUS
 ): Promise<File> {
   try {
-    return await toWebp(file, maxPx, aspect);
+    return await toWebp(file, maxPx, aspect, focus);
   } catch {
     // Formato raro, canvas sin contexto, imagen corrupta: sube el original.
     // Peor que comprimido, mejor que un error que la clienta no puede resolver.
@@ -36,7 +55,12 @@ export async function compressImage(
   }
 }
 
-function toWebp(file: File, maxPx: number, aspect?: number): Promise<File> {
+function toWebp(
+  file: File,
+  maxPx: number,
+  aspect: number | undefined,
+  focus: CropFocus
+): Promise<File> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -47,21 +71,26 @@ function toWebp(file: File, maxPx: number, aspect?: number): Promise<File> {
       let { width, height } = img;
       if (!width || !height) return reject(new Error("dimensiones vacías"));
 
-      // Recorte centrado a la proporcion pedida. Se calcula sobre la imagen
-      // original (`sx/sy/sw/sh` de drawImage) y no escalando el canvas: escalar
-      // deformaria, que es justo lo que hay que evitar.
+      // Recorte a la proporcion pedida, corrido al punto de foco. Se calcula
+      // sobre la imagen original (`sx/sy/sw/sh` de drawImage) y no escalando el
+      // canvas: escalar deformaria, que es justo lo que hay que evitar.
       let sx = 0;
       let sy = 0;
       let sw = width;
       let sh = height;
 
       if (aspect) {
+        // El foco se acota antes de usarlo: un valor fuera de rango daria un
+        // `sx`/`sy` negativo y `drawImage` devolveria borde transparente.
+        const fx = clamp01(focus.x);
+        const fy = clamp01(focus.y);
+
         if (width / height > aspect) {
           sw = Math.round(height * aspect);
-          sx = Math.round((width - sw) / 2);
+          sx = Math.round((width - sw) * fx);
         } else {
           sh = Math.round(width / aspect);
-          sy = Math.round((height - sh) / 2);
+          sy = Math.round((height - sh) * fy);
         }
         width = sw;
         height = sh;
@@ -106,4 +135,9 @@ function toWebp(file: File, maxPx: number, aspect?: number): Promise<File> {
 
     img.src = url;
   });
+}
+
+function clamp01(value: number) {
+  if (!Number.isFinite(value)) return 0.5;
+  return Math.min(1, Math.max(0, value));
 }
