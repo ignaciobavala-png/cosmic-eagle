@@ -29,6 +29,29 @@ export const CREAM_HEX = "#fcedcd";
 export const CREAM_DEEP = CREAM;
 
 /**
+ * La banda dorada: el degrade `#f9d78f -> #b3964b`, el mismo de la pildora y
+ * del cierre de la home. Lo eligio Sofia el 11/09 sobre un comparador de ocho
+ * fondos ("el crema no, que vaya mas hacia el golden") para la franja de
+ * Tecnologia Humana, y desde el 15/09 se esta probando como fondo de franja en
+ * /contenidos. Va por la prop `background` de `CreamSection`.
+ *
+ * Lo que arrastra un fondo dorado, medido: el cuerpo gris `#333` cae a 4,44:1
+ * contra el punto mas oscuro del degrade —abajo del minimo— y pasa al azul
+ * `#05125a` (5,95:1); el oro claro como filete da 1,00:1 y pasa al oro oscuro;
+ * `on-primary-container` (`#755c21`), que es el color de texto chico sobre
+ * crema, da 2,23:1 y tambien pasa al azul; y una pildora dorada se funde con el
+ * fondo, asi que el boton va azul.
+ */
+export const GOLD = "bg-[linear-gradient(135deg,#f9d78f,#b3964b)]";
+
+/**
+ * El arranque del degrade dorado como hex suelto, para el `fadeTo` del
+ * `PageHero`: el hero se funde con el BORDE SUPERIOR de la franja, que en un
+ * degrade a 135 grados es el color de arriba a la izquierda.
+ */
+export const GOLD_HEX = "#f9d78f";
+
+/**
  * El crema claro de Julia (`#fff6eb`, el token `primary`), que hasta el 10/09
  * era el fondo de las franjas.
  *

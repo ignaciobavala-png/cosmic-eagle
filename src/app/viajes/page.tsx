@@ -171,9 +171,9 @@ export default async function ViajesPage() {
             delay={0.6}
             className="-mx-margin-mobile text-center md:-mx-margin-desktop"
           >
-            <Collapsible label="Explorar próximas sesiones">
+            <Collapsible label="Ver fechas disponibles">
               <TripCarousel
-                caption="Calendario de sesiones"
+                caption="Calendario"
                 title="Próximas Sesiones"
                 trips={ceremonias}
                 emptyLabel="No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto."
@@ -244,9 +244,9 @@ export default async function ViajesPage() {
             delay={0.45}
             className="-mx-margin-mobile text-center md:-mx-margin-desktop"
           >
-            <Collapsible label="Explorar próximos viajes">
+            <Collapsible label="Ver fechas disponibles">
               <TripCarousel
-                caption="Calendario de viajes"
+                caption="Calendario"
                 title="Próximos Viajes"
                 trips={retiros}
                 emptyLabel="No hay viajes publicados por el momento. Vuelve a visitarnos pronto."

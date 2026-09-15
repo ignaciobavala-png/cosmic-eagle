@@ -6,7 +6,7 @@ import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { ImmersiveHero } from "@/components/ui/ImmersiveHero";
 import { ScrollStory } from "@/components/ui/ScrollStory";
 import { MediaStatement } from "@/components/ui/MediaStatement";
-import { CreamSection } from "@/components/ui/CreamSection";
+import { CreamSection, GOLD } from "@/components/ui/CreamSection";
 import { TripCarousel } from "@/components/ui/TripCarousel";
 import { Collapsible } from "@/components/ui/Collapsible";
 import { CtaLink } from "@/components/ui/CtaLink";
@@ -167,7 +167,7 @@ export default async function Home() {
           <Collapsible openOnHash="calendario">
             <div className="w-full py-20">
               <TripCarousel
-                caption="Calendario de viajes"
+                caption="Calendario"
                 title="Próximos Viajes"
                 trips={trips}
                 emptyLabel="No hay experiencias publicadas por el momento. Vuelve a visitarnos pronto."
@@ -193,10 +193,10 @@ export default async function Home() {
           // acento (regla del 28/08). El texto en sí lo carga ella desde
           // /admin/multimedia (slot `home.atmos.text`), acá sólo va el color.
           textColorClassName="text-primary-container"
-          scrollIndicator={{
-            label: "Nuestro propósito",
-            target: "#proposito",
-          }}
+          // Sin indicador de scroll: hasta el 15/09 el pie del banner llevaba
+          // "Nuestro proposito" con su flechita, y Ignacio lo saco — la frase
+          // se queda sola sobre la imagen. La seccion #proposito sigue abajo y
+          // se llega por scroll; el ancla no se borra porque la usa el menu.
         />
 
         <Reveal
@@ -380,16 +380,17 @@ export default async function Home() {
             centrado en vertical (fix v3 de Julia, docs/entregas/2026-09-03-julia).
             En escritorio no cambia nada: sigue siendo el par texto/imagen. */}
         {/* El fondo de ESTA franja no es el crema del sitio: es la banda
-            dorada, el mismo degrade `#f9d78f → #b3964b` de la pildora y del
-            cierre de la home. Lo eligio Sofia el 11/09 sobre un comparador de
-            ocho fondos ("el crema no, que vaya mas hacia el golden"). Va por la
-            prop `background` y NO por `className`: dos utilidades de fondo de la
-            misma especificidad las resuelve el orden de la hoja generada.
+            dorada (`GOLD`), el mismo degrade `#f9d78f → #b3964b` de la pildora y
+            del cierre de la home. Lo eligio Sofia el 11/09 sobre un comparador
+            de ocho fondos ("el crema no, que vaya mas hacia el golden"). Va por
+            la prop `background` y NO por `className`: dos utilidades de fondo de
+            la misma especificidad las resuelve el orden de la hoja generada.
 
-            **Es la unica franja clara del sitio con este fondo.** El resto
-            (/nosotros, /viajes, el detalle, /contenidos, /faqs y las legales)
-            sigue con el crema — cambiarlo aca fue un pedido puntual, no un
-            cambio de sistema.
+            Fue la primera franja con este fondo y desde el 15/09 hay una
+            segunda, la biblioteca de /contenidos, como prueba antes de decidir
+            si el dorado reemplaza al crema en todo el sitio. El resto
+            (/nosotros, /viajes, el detalle, /faqs y las legales) sigue con el
+            crema.
 
             Sobre el dorado hay dos piezas que dejan de verse y por eso cambian
             con el: el filete pasa al oro oscuro (el claro da 1,00:1 sobre este
@@ -397,7 +398,7 @@ export default async function Home() {
             dorada se funde. */}
         <CreamSection
           id="tecnologia"
-          background="bg-[linear-gradient(135deg,#f9d78f,#b3964b)]"
+          background={GOLD}
           full={false}
           className="max-md:flex max-md:min-h-[100svh] max-md:items-center"
           reveal={{ amount: 0.25, stagger: 0 }}

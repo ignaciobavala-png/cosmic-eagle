@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { PageHero } from "@/components/ui/PageHero";
 import { ArticleCard } from "@/components/ui/ArticleCard";
-import { CreamSection, CREAM_HEX } from "@/components/ui/CreamSection";
+import { CreamSection, GOLD } from "@/components/ui/CreamSection";
 import { Reveal } from "@/components/ui/Reveal";
 import { YouTubeFacade } from "@/components/ui/YouTubeFacade";
 import { createClient } from "@/lib/supabase/server";
@@ -82,14 +82,26 @@ export default async function ContenidosPage({
           image={content("contenidos.hero.image")}
           title={content("contenidos.hero.title")}
           subtitle={content("contenidos.hero.subtitle")}
-          scrollHint="Explorar"
+          scrollHint="Ver la biblioteca"
           scrollTo="biblioteca"
           overlay={isEnabled(content("contenidos.hero.overlay"))}
-          fadeTo={CREAM_HEX}
+          hardEdge
         />
 
-        {/* La biblioteca vive sobre crema, como los bloques narrativos de
-            /viajes y /nosotros. Antes era una seccion sin fondo propio: se
+        {/* La biblioteca vive sobre la banda dorada. Hasta el 15/09 era el
+            crema del sistema, como /viajes y /nosotros; el dorado entra aca
+            como PRUEBA —la segunda franja del sitio con este fondo, despues de
+            Tecnologia Humana en la home— para decidir mirandolo si reemplaza al
+            crema en todo el sitio. Si se revierte, vuelve `CREAM` por `GOLD` y
+            el hero vuelve a `fadeTo={CREAM_HEX}` en lugar de `hardEdge`, y con
+            eso alcanza salvo por los colores de adentro que anota cada bloque.
+
+            Lo que arrastro el dorado, medido y no a ojo (los numeros estan en
+            `GOLD`): el filete, los chips, el muro y el texto de vacio cambiaron
+            de color porque sobre este fondo el oro claro y el `#755c21` del
+            crema no llegan al minimo.
+
+            Antes de todo esto era una seccion sin fondo propio: se
             apoyaba en el degrade del `body`, que es el chrome del sistema
             anterior, y con tarjetas de vidrio dorado.
 
@@ -100,10 +112,12 @@ export default async function ContenidosPage({
             llegaria al umbral y, siendo reversible, la grilla quedaria invisible
             para siempre. El encabezado mide lo mismo con dos articulos que con
             cincuenta. */}
-        <CreamSection id="biblioteca" full={false}>
+        <CreamSection id="biblioteca" background={GOLD} full={false}>
           <div className="mx-auto max-w-narrative">
             <Reveal amount={0.22} once={false} className="text-center">
-              <p className="text-label-sm font-bold uppercase text-on-primary-container">
+              {/* Azul y no `on-primary-container`: ese es el color de texto
+                  chico sobre CREMA y sobre el dorado cae a 2,23:1. */}
+              <p className="text-label-sm font-bold uppercase text-[#05125a]">
                 Explora
               </p>
               <h2 className="mt-3 font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
@@ -113,7 +127,7 @@ export default async function ContenidosPage({
               </h2>
               <div
                 aria-hidden="true"
-                className="mx-auto mt-3 mb-10 h-px w-16 bg-[#f9d78f]"
+                className="mx-auto mt-3 mb-10 h-px w-16 bg-[#b3964b]"
               />
             </Reveal>
 
@@ -134,10 +148,14 @@ export default async function ContenidosPage({
                   href={filter.href}
                   scroll={false}
                   aria-current={filter.active ? "page" : undefined}
+                  // El chip activo era una pildora dorada y sobre este fondo
+                  // desaparecia: va la azul, la misma del boton de Tecnologia
+                  // Humana. El inactivo pasa a borde y texto azules por lo
+                  // mismo que el kicker.
                   className={`rounded-full border px-5 py-2 text-label-sm uppercase transition-colors ${
                     filter.active
-                      ? "border-[#f9d78f] bg-[#f9d78f] text-[#05125a]"
-                      : "border-on-primary-container/35 text-on-primary-container hover:border-on-primary-container hover:bg-[#fff6eb]"
+                      ? "border-[#05125a] bg-[#05125a] text-[#fff6eb]"
+                      : "border-[#05125a]/35 text-[#05125a] hover:border-[#05125a] hover:bg-[#fff6eb]"
                   }`}
                 >
                   {filter.label}
@@ -146,7 +164,7 @@ export default async function ContenidosPage({
             </div>
 
             {!articles || articles.length === 0 ? (
-              <p className="mx-auto max-w-md text-center text-body-md text-[#333]">
+              <p className="mx-auto max-w-md text-center text-body-md text-[#05125a]">
                 {active
                   ? "Todavía no hay contenidos publicados en esta categoría."
                   : "Estamos preparando el material. Vuelve a visitarnos pronto."}
@@ -154,8 +172,8 @@ export default async function ContenidosPage({
             ) : (
               <>
                 {locked > 0 && (
-                  <div className="mx-auto mb-12 max-w-2xl rounded-2xl border border-[#f9d78f] bg-[#fff6eb] px-6 py-6 text-center">
-                    <p className="text-body-md text-[#333]">
+                  <div className="mx-auto mb-12 max-w-2xl rounded-2xl border border-[#b3964b] bg-[#fff6eb] px-6 py-6 text-center">
+                    <p className="text-body-md text-[#05125a]">
                       {CONTENT_WALL_COPY}
                     </p>
                     <AccessCodeForm tone="light" />

@@ -2,14 +2,30 @@
 
 import { useEffect, useState } from "react";
 
-import { Reveal, RevealItem } from "./Reveal";
+import { Reveal, RevealItem, RevealLine } from "./Reveal";
 
 /**
- * Secuencia de palabras encadenadas con flechas (`Liberar → Recordar →
- * Reconectar → Encarnar`), del rediseño de /nosotros.
+ * Secuencia de palabras encadenadas (`Liberar · Recordar · Reconectar ·
+ * Encarnar`), del rediseño de /nosotros.
+ *
+ * **El eslabón es un filete que se dibuja, no una flecha.** Hasta el 15/09 eran
+ * tres `→`: a Sofía no le gustaban ("algo más sutil que una flecha"), y en una
+ * página que no tiene ningún otro signo de interfaz la flecha era justamente lo
+ * que desentonaba. El filete se lleva la esencia sin el signo: es el mismo que
+ * va debajo de cada título de /nosotros, y la SECUENCIA no se pierde porque el
+ * filete entra dibujándose de izquierda a derecha — la dirección la da el
+ * movimiento y no una punta.
+ *
+ * Va en `#755c21`, que es el mismo tono que tenía la flecha. Los dos oros más
+ * claros no sirven acá: desde el 15/09 esta pantalla tiene el fondo dorado, y
+ * sobre él `#f9d78f` y `#b3964b` quedan oro sobre oro (1,20:1 y 1,61:1 medidos
+ * en el punto donde cae el filete, o sea que desaparecen). `#755c21` da 3,58:1
+ * ahí y no baja de 2,23:1 ni en el extremo más oscuro del degradé: se ve sin
+ * gritar, que es lo que se pidió. El azul del texto daría 9,55:1 y convertiría
+ * al eslabón en un elemento fuerte.
  *
  * Las palabras entran alternando de abajo y de arriba (±36px), escalonadas. Los
- * siete elementos —cuatro palabras y tres flechas— llevan retardos de 0.1s a
+ * siete elementos —cuatro palabras y tres filetes— llevan retardos de 0.1s a
  * 1.2s, que es lo que Julia escribe a mano por `nth-child`: de ahí salen el
  * `delay` de 0.1 y el escalón de 0.183 del contenedor.
  *
@@ -17,7 +33,10 @@ import { Reveal, RevealItem } from "./Reveal";
  * pares: el escalón de Framer Motion se reparte entre los hijos directos, y
  * anidarlos daría dos tiempos en vez de siete.
  *
- * En mobile la fila pasa a columna y la flecha rota 90°, igual que en el mockup.
+ * En mobile la fila pasa a columna y el filete se pone vertical, igual que
+ * hacía la flecha en el mockup. No rota: se dibuja hacia ABAJO, con `axis="y"`
+ * de `RevealLine`. Una rotación de 90° sobre un filete con `origin-left` lo
+ * haría crecer desde el costado equivocado.
  *
  * **Y ahí la secuencia va más lenta**, que es la corrección del 02/09 de Julia
  * ("en mobile se desarrolla muy rápido, y eso no es bueno para la experiencia").
@@ -54,15 +73,14 @@ export function WordSequence({ words }: { words: readonly string[] }) {
       {words.flatMap((word, i) => [
         ...(i > 0
           ? [
-              <RevealItem
-                key={`arrow-${word}`}
-                as="span"
-                y={0}
+              <RevealLine
+                key={`link-${word}`}
+                axis={narrow ? "y" : "x"}
                 duration={narrow ? 1.1 : 0.9}
-                className="rotate-90 text-2xl text-on-primary-container sm:rotate-0"
-              >
-                <span aria-hidden="true">→</span>
-              </RevealItem>,
+                className={
+                  narrow ? "h-8 w-px bg-[#755c21]" : "h-px w-10 bg-[#755c21]"
+                }
+              />,
             ]
           : []),
         <RevealItem

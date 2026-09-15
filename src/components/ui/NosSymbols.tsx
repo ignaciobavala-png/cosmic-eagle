@@ -47,6 +47,7 @@ const SIDE_CLASS = {
   /** Umbral del observer propio del simbolo y retardo del fade de aparicion. */
   amount = 0.4,
   delay = 0,
+  onGold = false,
 }: {
   variant: 1 | 2;
   id: string;
@@ -58,10 +59,23 @@ const SIDE_CLASS = {
   maxGap?: number;
   amount?: number;
   delay?: number;
+  /**
+   * El simbolo se apoya sobre la banda dorada y no sobre el crema.
+   *
+   * El asset es un trazo DORADO sobre transparente, asi que sobre el degrade
+   * dorado queda oro sobre oro: medido en 1,20:1, o sea que desaparece. No se
+   * puede recolorear —es un PNG, no un SVG— pero si oscurecer el trazo con un
+   * filtro, que es lo que hace este flag.
+   *
+   * Va como prop y no como clase desde afuera porque los tres `img` (el central
+   * y los dos laterales) tienen que llevarlo igual.
+   */
+  onGold?: boolean;
 }) {
   const src = variant === 1 ? IMAGES.nosSymbol1 : IMAGES.nosSymbol2;
   const alt = variant === 1 ? "Simbolo decorativo 1" : "Simbolo decorativo 2";
   const reduced = useReducedMotion();
+  const tone = onGold ? " [filter:brightness(0.58)_saturate(1.2)]" : "";
 
   const rowRef = useRef<HTMLDivElement>(null);
   const inView = useInView(rowRef, { amount, once: false });
@@ -205,13 +219,13 @@ const SIDE_CLASS = {
     >
       {/* El row esta centrado por CSS; el `top`/margenes los fija el hook. El
           central se ve en los dos anchos; los laterales solo en desktop. */}
-      <img src={src} alt="" className={SIDE_CLASS[variant]} />
+      <img src={src} alt="" className={`${SIDE_CLASS[variant]}${tone}`} />
       <img
         src={src}
         alt={alt}
-        className={`block shrink-0 animate-nos-spin ${CENTER_CLASS[variant]}`}
+        className={`block shrink-0 animate-nos-spin ${CENTER_CLASS[variant]}${tone}`}
       />
-      <img src={src} alt="" className={SIDE_CLASS[variant]} />
+      <img src={src} alt="" className={`${SIDE_CLASS[variant]}${tone}`} />
     </motion.div>
   );
 }

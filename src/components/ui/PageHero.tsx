@@ -22,6 +22,7 @@ export function PageHero({
   height = "banner",
   overlay = true,
   fadeTo,
+  hardEdge = false,
 }: {
   image: string;
   imageAlt?: string;
@@ -71,6 +72,22 @@ export function PageHero({
    * fuente, asi que un color interpolado no genera regla.
    */
   fadeTo?: string;
+  /**
+   * El banner corta RECTO contra la seccion de abajo: sin pasaje y sin la
+   * mascara del pie. Es lo contrario de `fadeTo`, y por eso se excluyen.
+   *
+   * No alcanza con no pasar `fadeTo`: sin el vuelve la mascara del `banner`,
+   * que desvanece la foto a transparente. Cuando abajo hay una franja opaca eso
+   * no deja ver el degrade del `body` como un corte limpio, sino un pasaje al
+   * azul del chrome — el fundido que se queria sacar, en otro color. Este flag
+   * apaga las dos cosas.
+   *
+   * Lo pidio Ignacio el 15/09 para la prueba de la franja dorada de
+   * /contenidos. Va contra el criterio de "sin contrastes marcados" con el que
+   * nacio `fadeTo` (el corte mide 15,11:1), asi que si Sofia lo mira y no le
+   * gusta, se vuelve poniendo `fadeTo={GOLD_HEX}` y sacando este flag.
+   */
+  hardEdge?: boolean;
 }) {
   const full = height === "full";
   return (
@@ -101,7 +118,7 @@ export function PageHero({
           pagina. Sin la mascara el limite banner/seccion queda como una linea. */}
       <div
         className={
-          full || fadeTo
+          full || fadeTo || hardEdge
             ? "absolute inset-0"
             : "absolute inset-0 [mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)]"
         }

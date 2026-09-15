@@ -250,21 +250,43 @@ export function RevealLine({
   className = "",
   duration = 1.2,
   delay = 0,
+  axis = "x",
 }: {
   className?: string;
   duration?: number;
   delay?: number;
+  /**
+   * Hacia donde se dibuja el filete. `x` (el default) es el filete que va
+   * debajo de un titulo; `y` es el vertical, que existe para la version en
+   * columna de `WordSequence` en mobile.
+   *
+   * Va como prop y no con una clase `origin-top` desde afuera: el origen y el
+   * eje que se anima tienen que coincidir, y pasar solo uno de los dos deja el
+   * filete creciendo desde el borde equivocado.
+   */
+  axis?: "x" | "y";
 }) {
   const reduced = useReducedMotion();
+  const vertical = axis === "y";
+
+  // Los dos estados fijan SIEMPRE las dos escalas, aunque solo una se mueva.
+  // Animar nada mas que la del eje activo deja pegada la del otro cuando `axis`
+  // cambia despues del primer render — que es justo lo que hace `WordSequence`,
+  // que arranca en horizontal y se corrige a vertical en el efecto de mobile.
+  // Ahi el filete quedaba con el `scaleX: 0` del estado inicial y ninguna
+  // variante volvia a tocarlo: tres eslabones invisibles, medidos en 0px de
+  // ancho. Compila igual y se ve mal; por eso se verifica en el browser.
+  const hidden = vertical ? { scaleX: 1, scaleY: 0 } : { scaleX: 0, scaleY: 1 };
 
   return (
     <motion.div
       aria-hidden="true"
-      className={`origin-left ${className}`}
+      className={`${vertical ? "origin-top" : "origin-left"} ${className}`}
       variants={{
-        hidden: { scaleX: 0 },
+        hidden,
         visible: {
           scaleX: 1,
+          scaleY: 1,
           transition: reduced ? { duration: 0 } : { duration, delay, ease: EASE },
         },
       }}

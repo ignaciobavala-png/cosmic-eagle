@@ -10,7 +10,6 @@ import { ClosingHero } from "@/components/ui/ClosingHero";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
 import { SymbolRow } from "@/components/ui/NosSymbols";
 import { ScrollHintButton } from "@/components/ui/ScrollHintButton";
-import { CREAM_HEX } from "@/components/ui/CreamSection";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 
 export const metadata: Metadata = {
@@ -75,16 +74,22 @@ export default async function NosotrosPage() {
           scrollTo="enfoque"
           height="full"
           overlay={isEnabled(content("nosotros.hero.overlay"))}
-          fadeTo={CREAM_HEX}
+          hardEdge
         />
 
-        {/* Pantalla 1 — las cuatro palabras sobre crema. En mobile el copy queda
-            arriba con aire fijo (mockup 2/9: `justify-start`, padding-top 110px,
-            sin alto minimo) y el simbolo lo sigue en flujo; en desktop la fila
-            se centra verticalmente y el simbolo viaja absoluto medido. */}
+        {/* Pantalla 1 — las cuatro palabras. En mobile el copy queda arriba con
+            aire fijo (mockup 2/9: `justify-start`, padding-top 110px, sin alto
+            minimo) y el simbolo lo sigue en flujo; en desktop la fila se centra
+            verticalmente y el simbolo viaja absoluto medido.
+
+            **El fondo es la banda dorada y no el crema del sitio**, pedido de
+            Sofia del 15/09 sobre la prueba de /contenidos. Es la unica pantalla
+            de /nosotros con este fondo: las otras tres (proposito, enfoque,
+            cierre) siguen en crema. La clase va suelta y no por `GOLD` porque
+            esta seccion no es una `CreamSection`, pero es el mismo degrade. */}
         <section
           id="enfoque"
-          className="relative flex w-full flex-col items-center justify-start bg-[#fcedcd] px-margin-mobile pt-[110px] text-[#05125a] md:min-h-[100svh] md:justify-center md:px-margin-desktop md:py-24"
+          className="relative flex w-full flex-col items-center justify-start bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile pt-[110px] text-[#05125a] md:min-h-[100svh] md:justify-center md:px-margin-desktop md:py-24"
         >
           <div id="nos-words-seq">
             <WordSequence
@@ -108,6 +113,7 @@ export default async function NosotrosPage() {
             maxGap={95}
             amount={0.4}
             delay={2.2}
+            onGold
           />
         </section>
 
@@ -126,16 +132,21 @@ export default async function NosotrosPage() {
           scrollHint={{ label: "Nuestro propósito", target: "#proposito" }}
         />
 
-        {/* Pantalla 3 — "Nuestro propósito", mismo estilo que "Nuestro enfoque".
-            En mobile min-height 81vh y padding 35px (mockup 2/9): el contenido
-            es corto y ese recorte es lo que deja el hueco del símbolo parejo. */}
+        {/* Pantalla 3 — "Nuestro propósito". En mobile min-height 81vh y
+            padding 35px (mockup 2/9): el contenido es corto y ese recorte es lo
+            que deja el hueco del símbolo parejo.
+
+            Fondo dorado desde el 15/09, como la pantalla de las cuatro
+            palabras. Arrastra lo mismo que alla: el filete y el cuerpo cambian
+            de color porque sobre este fondo el oro claro y el gris no llegan, y
+            el simbolo va con `onGold`. */}
         <Reveal
           as="section"
           id="proposito"
           amount={0.25}
           once={false}
           stagger={0}
-          className="relative flex w-full flex-col items-center justify-center bg-[#fcedcd] px-margin-mobile py-[35px] text-[#05125a] min-h-[81svh] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
+          className="relative flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile py-[35px] text-[#05125a] min-h-[81svh] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
         >
           <div className="mx-auto max-w-3xl">
             <RevealItem y={0} duration={1} id="nos-proposito-title">
@@ -143,14 +154,18 @@ export default async function NosotrosPage() {
                 Nuestro propósito
               </h2>
             </RevealItem>
-            <RevealLine className="mt-3 mb-6 h-px w-16 bg-[#f9d78f]" />
+            {/* Oro oscuro: sobre el dorado el `#f9d78f` de los otros filetes
+                da 1,20:1, o sea que no se ve. */}
+            <RevealLine className="mt-3 mb-6 h-px w-16 bg-[#755c21]" />
             {/* **Los resaltados NO cambian de tipografía**, sólo de color y
                 peso: llevaban `font-display` y con Sorts Mill Goudy —que tiene
                 la altura de x mucho más baja que Montserrat— quedaban
                 visiblemente más chicos que el renglón donde viven, como si
                 estuvieran en minúscula (reporte de Ignacio del 09/09). Es la
                 misma regla que la palabra clave del relato de la home. */}
-            <div className="space-y-6 text-body-md leading-relaxed text-[#333] text-justify [&_strong]:font-semibold [&_strong]:text-[#05125a]">
+            {/* Cuerpo azul y no el gris `#333` del resto de la pagina: sobre
+                el dorado ese gris cae a 4,44:1, abajo del minimo. */}
+            <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-justify [&_strong]:font-semibold [&_strong]:text-[#05125a]">
               <RevealItem y={14} duration={0.8} delay={0.15}>
               <p>
                 Creamos espacios donde las personas puedan{" "}
@@ -185,6 +200,7 @@ export default async function NosotrosPage() {
             maxGap={121}
             amount={0.6}
             delay={0.3}
+            onGold
           />
           {/* Esta pantalla NO lleva boton de continuar, a diferencia del resto
               del recorrido: el `SymbolRow` de arriba se ancla al pie del bloque
@@ -209,7 +225,6 @@ export default async function NosotrosPage() {
           duration={1.2}
           veil={0.3}
           overlay={isEnabled(content("nosotros.proposito.overlay"))}
-          scrollHint={{ label: "Nuestro enfoque", target: "#nuestro-enfoque" }}
         />
 
         {/* Pantalla 5 — "Nuestro enfoque", la última de contenido antes del
@@ -291,7 +306,7 @@ export default async function NosotrosPage() {
           />
         </Reveal>
 
-        {/* Pantalla 6 — "Estela, fundadora", la ultima de contenido. Copy de la
+        {/* Pantalla 6 — "Estela, founder", la ultima de contenido. Copy de la
             clienta (11/09), literal: no se reescribe ni se le inventan
             resaltados. Es el mismo bloque que "Nuestro enfoque" y "Nuestro
             proposito" (crema profunda, titulo en la display, filete dorado,
@@ -318,7 +333,7 @@ export default async function NosotrosPage() {
           <div className="mx-auto max-w-3xl">
             <RevealItem y={0} duration={1} id="nos-estela-title">
               <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                Estela, fundadora
+                Estela, founder
               </h2>
             </RevealItem>
             <RevealLine className="mt-3 mb-6 h-px w-16 bg-[#f9d78f]" />
@@ -373,13 +388,11 @@ export default async function NosotrosPage() {
               </p>
             </RevealItem>
           </div>
-          {/* Mismo hueco reservado que en "Nuestro enfoque" (ver alla). */}
-          <ScrollHintButton
-            label="Continuar"
-            target="#vision"
-            tone="dark"
-            bottomClassName="bottom-3 md:bottom-6"
-          />
+          {/* Sin boton de continuar: lo saco Ignacio el 15/09, igual que el
+              de "Nuestro proposito". El paso al cierre queda solo por scroll.
+              El padding de abajo de la seccion se deja como esta: era el hueco
+              que le reservaba al boton, y sin ese aire el texto termina pegado
+              al borde. */}
         </Reveal>
 
         <ClosingHero

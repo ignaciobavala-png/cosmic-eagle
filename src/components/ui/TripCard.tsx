@@ -119,7 +119,7 @@ export function TripCard({
                       key={date.id}
                       href={`/viajes/${date.id}`}
                       aria-label={`${trip.title}, ${formatDateRangeCompact(date.start_date, date.end_date)}`}
-                      className="rounded-full border-2 border-[#05125a] px-3.5 py-1.5 font-display text-[12px] font-bold uppercase tracking-[0.04em] text-[#05125a] transition-colors duration-300 hover:bg-[#05125a] hover:text-white"
+                      className="rounded-full border-2 border-[#05125a] px-3.5 py-1.5 font-display text-[15px] font-bold uppercase tracking-[0.04em] text-[#05125a] transition-colors duration-300 hover:bg-[#05125a] hover:text-white"
                     >
                       {formatDateRangeCompact(date.start_date, date.end_date)}
                     </Link>
@@ -127,7 +127,16 @@ export function TripCard({
                 </div>
               ) : (
                 <div className="flex items-end justify-between gap-4">
-                  <span className="mt-1 block font-display text-[13px] font-bold uppercase tracking-[0.04em] text-[#05125a]">
+                  {/* La fecha es el dato por el que se mira la tarjeta y a
+                      13px quedaba por debajo de la descripcion, que es un
+                      adelanto. Sube de 13px a 21px: queda por encima del
+                      cuerpo y del resto de la ficha, pero todavia por debajo
+                      del titulo, que es `headline-md` (24px) — la jerarquia no
+                      se invierte. Sigue en `uppercase` porque el mes lo da
+                      `toLocaleDateString` con `month: "short"`, o sea "oct" en
+                      minuscula. Pedido de Ignacio del 15/09
+                      (`docs/entregas/2026-09-15-ignacio-ajustes`). */}
+                  <span className="mt-1.5 block font-display text-[21px] font-bold uppercase leading-tight tracking-[0.03em] text-[#05125a]">
                     {formatDateRangeCompact(trip.start_date, trip.end_date)}
                   </span>
                   <span
