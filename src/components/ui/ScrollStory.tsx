@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CTA_TONES } from "./CtaLink";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useTransform, useReducedMotion, type MotionValue } from "framer-motion";
 import { useSectionProgress } from "@/lib/use-section-progress";
@@ -371,21 +372,32 @@ export function ScrollStory({
 const PARAGRAPH_CLASS =
   "mb-[clamp(12px,2.4vh,22px)] text-[clamp(0.95rem,min(1.9vw,3.1vh),1.375rem)] leading-relaxed text-primary";
 /**
- * La frase resaltada DENTRO del parrafo: **la misma tipografia y el mismo cuerpo
- * que el texto que la rodea, y lo unico que cambia es el color**. Es lo que dice
- * el mockup (`.keyword{color:var(--dorado-claro);font-weight:600}`, sin
- * `font-family`) y lo que pidio Ignacio el 09/09.
+ * La frase resaltada DENTRO del parrafo.
  *
- * **Ojo, no volver a ponerle `font-display`.** Lo tuvo hasta el 09/09 y con
- * Domine casi no se notaba, pero al pasar la display a Sorts Mill Goudy —que
- * tiene la altura de x mucho mas baja que Montserrat— la frase quedaba
- * visiblemente mas chica que el renglon en el que vive, como si estuviera en
- * otro cuerpo.
+ * Va en la **serif**, igual que la lista final a la que viaja: Sofia comparo
+ * los dos momentos del relato y eligio ese (15/09). Antes era Montserrat, o
+ * sea que el bloque cambiaba de tipografia a la mitad.
  *
- * Tampoco lleva degrade: el degrade es exclusivo de la lista final. Son dos
+ * **El `text-[1.18em]` no es decorativo y no se saca.** Sorts Mill Goudy tiene
+ * la altura de x un 18% mas baja que Montserrat (medido: 45 contra 53 a 100px
+ * de cuerpo), asi que a igual `font-size` la frase se ve mas chica que el
+ * renglon en el que vive, como si estuviera en otro cuerpo. Ese es exactamente
+ * el bug que hizo que el 09/09 se le sacara la serif — la solucion de entonces
+ * fue volver a Montserrat, la de ahora es compensar el cuerpo. El factor iguala
+ * las MINUSCULAS, que es lo que se ve: las cuatro frases son todas minusculas.
+ *
+ * Va en `em` y no en px para que siga al `clamp` del parrafo, que depende del
+ * ancho Y del alto de la pantalla.
+ *
+ * El `font-semibold` renderiza como regular: la serif solo existe en peso 400 y
+ * `globals.css` corta el faux bold con `font-synthesis-weight`. Queda igual que
+ * la lista final, que declara lo mismo.
+ *
+ * Lo que NO lleva es el degrade: eso es exclusivo de la lista final. Son dos
  * tratamientos distintos y la entrega del 04/09 pide no fusionarlos.
  */
-const KEYWORD_CLASS = "font-semibold text-primary-container";
+const KEYWORD_CLASS =
+  "font-display text-[1.18em] font-semibold text-primary-container";
 
 /**
  * Fase 4. El botón no hace scrubbing: cruza el umbral y entra con su propia
@@ -434,8 +446,13 @@ function useThreshold(progress: MotionValue<number>, at: number, enabled: boolea
  * otra ruta sigue siendo `Link`.
  */
 function StoryCta({ label, href }: Cta) {
+  // EL boton del sistema, el mismo de `CtaLink` (estandarizacion del 15/09).
+  // Aca las clases van copiadas y no el componente porque esto no navega:
+  // intercepta el click para abrir la cartelera, que esta 400vh mas abajo
+  // dentro del sticky de este mismo relato (ver el comentario de arriba).
+  // Se escapo de la primera pasada justamente por no ser un `CtaLink`.
   const className =
-    "inline-flex items-center rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-10 py-4 font-display text-[14px] font-bold uppercase tracking-[0.071em] text-[#05125a] transition-[filter] duration-300 hover:brightness-110";
+    `inline-flex items-center justify-center gap-2 rounded-full border-[1.5px] px-10 py-4 font-display text-[14px] uppercase tracking-[0.071em] transition-[color,background-color,border-color,box-shadow,transform] duration-[250ms] hover:scale-[1.04] ${CTA_TONES.gold}`;
   // Sin flecha adentro: la regla de Julia del 08/09 es que ningun boton la
   // lleve, solo su texto.
   const content = <>{label}</>;
