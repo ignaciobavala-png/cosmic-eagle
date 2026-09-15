@@ -132,6 +132,17 @@ export const SITE_GROUPS = [
         maxPx: 1920,
       },
       {
+        key: "home.viajes.image",
+        label: "Fondo del panel “Viajes Cósmicos”",
+        help: "Opcional. Sin imagen, el panel usa el degradé dorado de la marca (el “Fondo 4” del manual), que es lo que se ve hoy. Si subís una foto, va detrás del texto, así que conviene una imagen clara y sin nada importante en el centro: el título y el botón van encima en azul.",
+        type: "image",
+        // Vacio a proposito: el fondo por defecto es un degrade CSS, no un
+        // archivo. Ver el panel dorado en `app/page.tsx`.
+        fallback: "",
+        ratio: "16/9",
+        maxPx: 1920,
+      },
+      {
         key: "home.tecnologia.image",
         label: "Imagen de “Tecnología del Alma”",
         help: "La foto vertical que acompaña al texto de Tecnología del Alma, sobre el fondo claro.",

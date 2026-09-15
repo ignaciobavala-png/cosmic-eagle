@@ -254,7 +254,15 @@ function ImageField({
         className="w-full shrink-0 overflow-hidden rounded-lg bg-surface-container-lowest sm:w-44"
         style={{ aspectRatio: slot.ratio ?? "16/9" }}
       >
-        {showVideo ? (
+        {!(preview ?? value) ? (
+          /* Un slot de imagen puede salir VACIO a proposito (el fondo del panel
+             dorado de la home usa un degrade de CSS si nadie sube nada). Sin
+             este caso el recuadro renderiza un `<img src="">`, que en el
+             browser es una imagen rota. */
+          <div className="flex h-full w-full items-center justify-center bg-surface-container px-3 text-center text-xs text-on-surface-variant">
+            Sin imagen
+          </div>
+        ) : showVideo ? (
           <video
             src={preview ?? value}
             muted

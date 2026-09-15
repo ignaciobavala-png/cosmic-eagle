@@ -10,6 +10,7 @@ import { CreamSection } from "@/components/ui/CreamSection";
 import { TripCarousel } from "@/components/ui/TripCarousel";
 import { Collapsible } from "@/components/ui/Collapsible";
 import { CtaLink } from "@/components/ui/CtaLink";
+import { BackgroundMedia } from "@/components/ui/BackgroundMedia";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { createPublicClient } from "@/lib/supabase/public";
@@ -48,6 +49,8 @@ export const revalidate = 3600;
  */
 export default async function Home() {
   const content = await getSiteContent();
+  // Vacio = el panel dorado se queda con el degrade del manual de marca.
+  const fondoViajes = content("home.viajes.image").trim();
 
   // Cliente sin cookies a proposito: los viajes publicados son publicos, y leer
   // `cookies()` volveria dinamica la pagina y anularia el ISR de arriba.
@@ -232,8 +235,7 @@ export default async function Home() {
             <RevealItem y={30} duration={0.9} delay={0.75}>
               <CtaLink
                 href="/nosotros"
-                variant="outline"
-                className="mt-[50px] px-7 py-3.5 text-[14px] text-primary-container md:mt-20 md:px-10 md:py-4"
+                className="mt-[50px] px-7 py-3.5 text-[14px] md:mt-20 md:px-10 md:py-4"
               >
                 Ir más profundo
               </CtaLink>
@@ -293,8 +295,7 @@ export default async function Home() {
               <RevealItem duration={0.8} delay={0.45}>
                 <CtaLink
                   href="/viajes#sesiones"
-                  variant="outline"
-                  className="px-7 py-[11px] text-[13px] text-primary-container hover:shadow-[0_0_20px_rgba(0,121,179,0.55)]"
+                  className="px-7 py-[11px] text-[13px]"
                 >
                   Explorar próximas sesiones
                 </CtaLink>
@@ -302,8 +303,28 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="flex w-full items-center justify-center bg-[linear-gradient(to_bottom_right,#6b551f_0%,#b3964b_22%,#f9d78f_50%,#b3964b_78%,#6b551f_100%)] px-6 py-[60px] text-center text-[#05125a] md:min-h-[60svh] md:px-12 md:py-20">
-            <div className="max-w-[460px]">
+          {/* El "Fondo 4" del manual de marca, que es un degrade liso y no una
+              textura: medido sobre el PNG, va de `#b3964b` (arriba a la
+              izquierda) a `#f9d78f` (abajo a la derecha), o sea los dos
+              extremos del oro de la paleta. Va en CSS y el archivo no se
+              guarda — misma decision que el navbar, el footer y "La humanidad"
+              (20/08): un degrade en PNG pesa, se pixela al escalar y banda en
+              pantallas grandes.
+
+              El degrade anterior remataba en `#6b551f` en las dos puntas, que
+              le daba unas esquinas sucias que el fondo del manual no tiene.
+
+              Encima puede ir una foto, si la clienta carga el slot. */}
+          <div className="relative flex w-full items-center justify-center overflow-hidden bg-[linear-gradient(to_bottom_right,#b3964b_0%,#f9d78f_100%)] px-6 py-[60px] text-center text-[#05125a] md:min-h-[60svh] md:px-12 md:py-20">
+            {fondoViajes && (
+              /* z-0 y contenido en z-10, nunca un z negativo: el `body` pinta su
+                 degrade despues de los descendientes de z negativo del contexto
+                 raiz y taparia la imagen (trampa del 20/08). */
+              <div className="absolute inset-0 z-0">
+                <BackgroundMedia src={fondoViajes} />
+              </div>
+            )}
+            <div className="relative z-10 max-w-[460px]">
               <RevealItem duration={0.8}>
                 <h2 className="mb-3 font-display text-[34px] leading-tight">
                   Viajes Cósmicos
@@ -326,8 +347,8 @@ export default async function Home() {
               <RevealItem duration={0.8} delay={0.45}>
                 <CtaLink
                   href="/viajes#viajes"
-                  variant="outline"
-                  className="px-7 py-[11px] text-[13px] text-[#05125a] hover:shadow-[0_0_34px_rgba(249,215,143,0.9)]"
+                  tone="dark"
+                  className="px-7 py-[11px] text-[13px]"
                 >
                   Ir más allá
                 </CtaLink>
@@ -427,8 +448,8 @@ export default async function Home() {
                     sobre este fondo se fundia. */}
                 <CtaLink
                   href="/contenidos"
-                  variant="outline"
-                  className="mt-10 px-7 py-3.5 text-[14px] text-[#05125a] md:px-10 md:py-4"
+                  tone="dark"
+                  className="mt-10 px-7 py-3.5 text-[14px] md:px-10 md:py-4"
                 >
                   Ir más profundo
                 </CtaLink>
@@ -440,12 +461,19 @@ export default async function Home() {
                 Antes se apilaba arriba del texto. */}
             <RevealItem className="hidden w-full flex-1 md:block" y={0} duration={1} scaleFrom={0.98}>
               <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl md:aspect-[4/4.4]">
+                {/* `object-top` y no centrado, por lo mismo que el hero de la
+                    home (20/08): la caja (4/4.4 = 0,909) es mas apaisada que la
+                    figura (900x1195 = 0,753), asi que `cover` escala por el
+                    ancho y le sobra alto. Centrado recorta 8,6% arriba y 8,6%
+                    abajo, y la cabeza empieza al 9% de la imagen — se la comia
+                    siempre. Anclada arriba, todo el recorte cae en el pie,
+                    donde la figura ya se deshace en particulas. */}
                 <Image
                   src={content("home.tecnologia.image")}
                   alt="Portal de luz"
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
-                  className="object-cover"
+                  className="object-cover object-top"
                 />
               </div>
             </RevealItem>
