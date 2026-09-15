@@ -137,10 +137,10 @@ export default async function Home() {
             "Desde esta perspectiva, la evolución humana pasa a ser parte de un campo de conciencia mucho más amplio, abriendo un camino hacia un conocimiento más profundo, la sabiduría cósmica y una comprensión expandida de quiénes y qué somos.",
           ]}
           keywords={[
-            { text: "conciencia", label: "Conciencia" },
-            { text: "potencial evolutivo", label: "Potencial Evolutivo" },
-            { text: "dimensión del alma", label: "Dimensión del Alma" },
-            { text: "sabiduría cósmica", label: "Sabiduría Cósmica" },
+            { text: "conciencia" },
+            { text: "potencial evolutivo" },
+            { text: "dimensión del alma" },
+            { text: "sabiduría cósmica" },
           ]}
           cta={{ label: "Explorar experiencias", href: "#calendario" }}
         />

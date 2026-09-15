@@ -10,12 +10,14 @@ import { COLLAPSIBLE_TOGGLE } from "./Collapsible";
 type Cta = { label: string; href: string };
 
 /**
- * Una frase resaltada. `text` es como aparece DENTRO del parrafo (en minuscula,
- * tal cual la escribio la clienta) y `label` como se lee en la lista final, que
- * va en capitular. Son dos strings y no uno con `capitalize`: la regla de CSS
- * pondria "Dimension Del Alma", con el articulo en mayuscula.
+ * Una frase resaltada. `text` es como aparece DENTRO del parrafo y tambien en
+ * la lista final: la frase viaja del parrafo al centro, asi que si cambiara de
+ * caja a mitad de camino se veria el salto. Por eso es UN solo string y no dos
+ * (antes habia un `label` en capitular que se desincronizo) y por eso tampoco
+ * lleva `capitalize`: la regla de CSS pondria "Dimension Del Alma", con el
+ * articulo en mayuscula. La caja la decide la clienta al escribir el parrafo.
  */
-export type StoryKeyword = { text: string; label: string };
+export type StoryKeyword = { text: string };
 
 /**
  * El "scroll story" de la home: un tramo largo de scroll durante el cual el
@@ -329,7 +331,7 @@ export function ScrollStory({
                   targets.current[i] = el;
                 }}
               >
-                {word.label}
+                {word.text}
               </TravellingKeyword>
             ))}
           </motion.div>
