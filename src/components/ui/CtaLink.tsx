@@ -1,49 +1,53 @@
 import Link from "next/link";
 
-type Variant = "solid" | "ghost" | "pill" | "glass" | "outline";
+/**
+ * EL boton del sistema. Uno solo.
+ *
+ * Contorno fino, sin relleno, con hover. Es el `.sv-btn` del mockup de Julia —
+ * el "Explorar proximas sesiones" del panel de la home — que Sofia eligio el
+ * 09/09 y que la organizacion estandarizo para todo el sitio el 15/09: **no
+ * hay mas botones rellenados**. Se fueron la pildora dorada (`pill`), la de
+ * vidrio (`glass`), el oro solido (`solid`) y el `ghost`.
+ *
+ * Por eso ya no hay prop `variant`: si aparece un boton que necesita otra
+ * forma, es una conversacion con ellas, no una variante nueva acá.
+ *
+ * El color lo elige `tone` y NO se pasa por `className`: el mismo boton vive
+ * sobre el panel azul y sobre el dorado, y el contorno, el relleno del hover y
+ * el glow tienen que seguir al texto los tres juntos. Ademas, dos utilidades
+ * de color en la misma propiedad las resuelve el orden de la hoja generada y
+ * no el orden en que se escriben (la trampa que ya salio cuatro veces en este
+ * proyecto), asi que esto se decide adentro del componente.
+ */
+export type CtaTone = "gold" | "dark";
 
-const VARIANTS: Record<Variant, string> = {
-  // CTA solido: oro champagne con texto oscuro (primary-container / on-primary)
-  solid:
-    "bg-primary-container text-on-primary hover:bg-primary-fixed shadow-[0_0_24px_rgba(249,215,143,0.25)]",
-  // "Ghost": borde dorado 1px sobre blur, sin relleno.
-  // El texto va en `primary-container` (#f9d78f) y no en el oro de acento
-  // `primary-fixed-dim` (#e3c37d): sobre el azul del panel de la home ese
-  // oro quedaba en ~4:1, abajo del minimo de 4,5:1. Con este llega a 4,9:1.
-  ghost:
-    "border border-primary-container/55 text-primary-container backdrop-blur-md hover:border-primary-container hover:text-primary-fixed bg-white/[0.03]",
-  // La pildora dorada del mockup de Julia. Es UN solo boton repetido en todo el
-  // sitio: `.about-btn-ghost` (Explorar experiencias), `.proposito-btn`,
-  // `.tec-btn` y `.navbar-cta` son el mismo diseno y solo cambian el padding.
-  // Degrade 135deg del oro claro al oscuro, borde 1.5px del oro claro, texto
-  // AZUL en Domine bold con tracking — no lleva `text-on-primary`.
-  pill:
-    "rounded-full border-[1.5px] border-primary-container bg-[linear-gradient(135deg,#f9d78f,#b3964b)] font-display font-bold tracking-[0.08em] text-[#05125a] transition-[filter,transform] hover:brightness-110",
-  // La MISMA pildora en "liquid glass": degrade azul al 50% con desenfoque
-  // detras, borde y texto dorados. Es el segundo boton del cierre de /nosotros
-  // ("IR MAS PROFUNDO") desde la correccion del 03/09 — antes era el dorado
-  // translucido, que junto al principal se leian como dos botones iguales.
-  // El brillo de arriba (`inset`) es lo que le da el canto de vidrio.
-  glass:
-    "rounded-full border-[1.5px] border-primary-container/50 bg-[linear-gradient(135deg,rgba(0,121,179,0.5),rgba(5,18,90,0.5))] font-display font-bold tracking-[0.08em] text-primary-container shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-[10px] hover:brightness-125",
-  // El boton de contorno, **el que eligio Sofia** (09/09): es el que estaba
-  // escrito a mano en los dos paneles de la home (`.sv-btn` del mockup de
-  // Julia). Contorno fino del color del texto, relleno apenas translucido y
-  // nada de degrade dorado — el que menos peso agrega a la composicion, que es
-  // justo el reclamo de "demasiados rectangulos y tres botones distintos".
+/**
+ * Contorno, color y hover del boton, en un solo lugar. Lo exporta porque
+ * `Collapsible` dibuja el mismo boton con un `<button>` en vez de un link
+ * (abre un panel, no navega) y tiene que verse identico.
+ */
+export const CTA_TONES: Record<CtaTone, string> = {
+  // Dorado sobre fondo oscuro o sobre imagen: el caso normal.
+  gold: "border-primary-container/70 text-primary-container hover:border-primary-container hover:bg-primary-container/10 hover:shadow-[0_0_26px_rgba(249,215,143,0.38)]",
+  // Azul sobre el panel dorado y sobre la franja crema.
   //
-  // El color lo pone quien lo usa con `className` (`text-*` y `border-*`): el
-  // mismo boton vive sobre el panel azul y sobre el dorado, y el contorno
-  // siempre sigue al texto. Por eso aca va `border-current` y no un color fijo.
-  outline:
-    "rounded-full border-[1.5px] border-current font-display tracking-[0.038em] transition-[filter,box-shadow,transform] duration-[250ms] hover:scale-[1.04] hover:brightness-110",
+  // Ojo con el glow: va en el BLANCO CALIDO del sistema (`primary`, #fff6eb),
+  // no en el azul del borde. Un halo azul sobre el panel dorado no se lee como
+  // luz sino como una sombra sucia — el brillo tiene que ser luz, y la luz no
+  // es del color del trazo. El tono `gold` puede darse el lujo de brillar en su
+  // propio color porque el oro ya ES la luz sobre el fondo oscuro.
+  //
+  // Y por lo mismo este tono **no lleva relleno en el hover**: el 10% de azul
+  // que lleva el dorado, sobre el panel dorado oscurecia el interior del boton
+  // justo mientras el borde se enciende. Aca el hover son el trazo, el brillo
+  // y la escala. Tampoco sirve rellenarlo de blanco: el mismo boton vive sobre
+  // la franja crema, donde un relleno claro no se ve.
+  dark: "border-[#05125a]/70 text-[#05125a] hover:border-[#05125a] hover:shadow-[0_0_28px_rgba(255,246,235,0.85)]",
 };
 
 /**
- * Boton solido / ghost del sistema.
- *
- * Ojo: `className` NO sirve para cambiar el `display`. La base ya trae
- * `inline-flex`, y Tailwind resuelve el conflicto por el orden en la hoja
+ * Ojo: `className` NO sirve para cambiar el `display` ni el color. La base ya
+ * trae `inline-flex`, y Tailwind resuelve el conflicto por el orden en la hoja
  * generada (`.inline-flex` se emite despues de `.hidden`), no por el orden en
  * que se escriben las clases. Pasarle `hidden lg:inline-flex` deja el boton
  * visible siempre. Para mostrarlo/ocultarlo por breakpoint, envolverlo en un
@@ -52,18 +56,18 @@ const VARIANTS: Record<Variant, string> = {
 export function CtaLink({
   href,
   children,
-  variant = "solid",
+  tone = "gold",
   className = "",
 }: {
   href: string;
   children: React.ReactNode;
-  variant?: Variant;
+  tone?: CtaTone;
   className?: string;
 }) {
   return (
     <Link
       href={href}
-      className={`inline-flex items-center justify-center gap-2 px-7 py-3 text-label-sm uppercase transition-all duration-300 ${variant === "pill" || variant === "glass" || variant === "outline" ? "" : "rounded-lg"} ${VARIANTS[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-full border-[1.5px] px-7 py-3 font-display text-label-sm uppercase tracking-[0.038em] transition-[color,background-color,border-color,box-shadow,transform] duration-[250ms] hover:scale-[1.04] ${CTA_TONES[tone]} ${className}`}
     >
       {children}
     </Link>

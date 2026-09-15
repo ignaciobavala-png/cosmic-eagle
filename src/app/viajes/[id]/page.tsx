@@ -358,7 +358,6 @@ export default async function ViajePage({ params }: Props) {
                           ? solicitarHref
                           : `/cuenta?next=${encodeURIComponent(solicitarHref)}`
                       }
-                      variant="pill"
                     >
                       {user ? "Completar solicitud" : "Iniciar sesión y postularme"}
                     </CtaLink>
@@ -388,7 +387,7 @@ export default async function ViajePage({ params }: Props) {
                   disponible.
                 </p>
                 <div className="mt-8 flex justify-center">
-                  <CtaLink href="/viajes" variant="pill">
+                  <CtaLink href="/viajes">
                     Ver otras experiencias
                   </CtaLink>
                 </div>

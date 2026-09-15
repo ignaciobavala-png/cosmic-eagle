@@ -2,7 +2,7 @@ import { ChevronDown } from "lucide-react";
 import { BackgroundMedia } from "./BackgroundMedia";
 import { CtaLink } from "./CtaLink";
 
-type Action = { label: string; href: string; variant?: "solid" | "ghost" };
+type Action = { label: string; href: string };
 
 /**
  * P1 — Hero de pagina. Banner full-bleed, titulo serif centrado, subtitulo,
@@ -156,7 +156,6 @@ export function PageHero({
                   <CtaLink
                     key={action.href + action.label}
                     href={action.href}
-                    variant={action.variant ?? "solid"}
                   >
                     {action.label}
                   </CtaLink>

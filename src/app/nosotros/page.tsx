@@ -389,11 +389,7 @@ export default async function NosotrosPage() {
           title={cierreTitle ? <CierreTitle text={cierreTitle} /> : null}
           actions={[
             { label: "Explorar experiencias", href: "/viajes" },
-            {
-              label: "Ir más profundo",
-              href: "/contenidos",
-              variant: "ghost",
-            },
+            { label: "Ir más profundo", href: "/contenidos" },
           ]}
           overlay={isEnabled(content("nosotros.metodologia.overlay"))}
         />

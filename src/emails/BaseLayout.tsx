@@ -242,8 +242,11 @@ export function CtaButton({ href, children }: { href: string; children: React.Re
               href={href}
               style={{
                 display: "inline-block",
-                // La pildora del sitio: redondeo completo, mayusculas y
-                // tracking (`CtaLink variant="pill"`). El degrade dorado NO se
+                // Redondeo completo, mayusculas y tracking, como el boton
+                // del sitio. **El correo NO sigue la estandarizacion del
+                // 15/09**: el sitio dejo de tener botones rellenados, pero un
+                // contorno sin relleno en un mail queda casi invisible y
+                // Outlook no lo respeta. El degrade dorado tampoco se
                 // porta: Outlook descarta `linear-gradient` y el boton se
                 // quedaria sin fondo, que es justo lo que las tres capas de
                 // `bgcolor` estan evitando.

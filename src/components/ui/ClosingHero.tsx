@@ -22,7 +22,7 @@ export function ClosingHero({
   image: string;
   imageAlt?: string;
   title: React.ReactNode;
-  actions?: { label: string; href: string; variant?: "solid" | "ghost" }[];
+  actions?: { label: string; href: string }[];
   id?: string;
   /** false deja la pantalla solo con la imagen de fondo: sin titulo ni botones. */
   overlay?: boolean;
@@ -72,17 +72,12 @@ export function ClosingHero({
                 <CtaLink
                   key={action.href + action.label}
                   href={action.href}
-                  /* Los dos botones son la misma PÍLDORA del sistema y sólo
-                     cambia el relleno (corrección del 03/09): el principal es
-                     la dorada con glow (`pill`) y el segundo la de vidrio con
-                     degradé azul al 50% (`glass`). Antes el segundo era el
-                     dorado translúcido y los dos se leían casi igual. */
-                  variant={action.variant === "ghost" ? "glass" : "pill"}
-                  className={`px-9 py-4 hover:-translate-y-0.5 ${
-                    action.variant === "ghost"
-                      ? ""
-                      : "shadow-[0_0_22px_rgba(249,215,143,0.6),0_0_43px_rgba(249,215,143,0.32)] hover:shadow-[0_0_29px_rgba(249,215,143,0.77),0_0_58px_rgba(249,215,143,0.45)]"
-                  }`}
+                  /* Los dos botones son EL MISMO boton, sin jerarquia
+                     visual (estandarizacion del 15/09). Antes el principal era
+                     la pildora dorada con glow y el segundo la de vidrio; la
+                     organizacion pidio sacar los rellenos, y con un solo boton
+                     de contorno la unica diferencia posible seria el orden. */
+                  className="px-9 py-4"
                 >
                   {action.label}
                 </CtaLink>

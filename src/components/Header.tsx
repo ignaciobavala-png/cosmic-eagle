@@ -298,7 +298,6 @@ export function Header() {
               <div className="hidden md:flex">
                 <CtaLink
                   href="/cuenta?modo=registro"
-                  variant="pill"
                   className="whitespace-nowrap px-6 py-3"
                 >
                   Unirme al círculo
@@ -426,7 +425,6 @@ export function Header() {
                 >
                   <CtaLink
                     href="/cuenta?modo=registro"
-                    variant="pill"
                     className="w-full py-4"
                   >
                     Unirme al círculo

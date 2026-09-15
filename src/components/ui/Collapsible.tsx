@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { CTA_TONES } from "./CtaLink";
 
 /**
  * Evento con el que un disparador de otra parte de la pagina abre o CIERRA un
@@ -99,10 +100,14 @@ export function Collapsible({
     };
   }, [openOnHash, open]);
 
-  const toneClasses =
-    tone === "dark"
-      ? "border-primary-container text-primary-container hover:bg-primary-container hover:text-[#05125a]"
-      : "border-[#b3964b] text-[#05125a] hover:bg-[#05125a] hover:text-white";
+  /* El MISMO boton que `CtaLink` (estandarizacion del 15/09): contorno sin
+     relleno y hover suave. Antes el hover invertia el boton entero a relleno
+     solido, que al lado del nuevo se leia como otro boton. Aca es un
+     `<button>` y no un link porque abre un panel, no navega — de ahi que
+     comparta las clases en vez de usar el componente.
+     Ojo con los nombres de `tone`: aca "light" significa "sobre fondo claro",
+     que es el `dark` de `CtaLink` (el tono del TEXTO). */
+  const toneClasses = CTA_TONES[tone === "dark" ? "gold" : "dark"];
 
   return (
     <div className="w-full">
@@ -112,7 +117,7 @@ export function Collapsible({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls={panelId}
-        className={`inline-flex items-center rounded-full border-[1.5px] px-8 py-3.5 font-display text-body-md font-bold transition-colors duration-300 ${toneClasses}`}
+        className={`inline-flex items-center rounded-full border-[1.5px] px-8 py-3.5 font-display text-body-md font-bold transition-[color,background-color,border-color,box-shadow,transform] duration-[250ms] hover:scale-[1.04] ${toneClasses}`}
       >
         {label}
       </button>

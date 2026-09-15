@@ -51,7 +51,6 @@ export async function TripsSection({
           </div>
           <CtaLink
             href={`/viajes?tipo=${tripType.slug}`}
-            variant="ghost"
             className="px-6 py-2"
           >
             Ver {tripType.label.toLowerCase()}
