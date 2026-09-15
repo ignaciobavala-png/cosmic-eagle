@@ -103,7 +103,14 @@ export default async function Home() {
                 (`.about-statement`) la PRIMERA linea es crema y la segunda
                 dorada en italica. Estaban invertidos y es la correccion del
                 02/09 de Julia. */}
-            <h2 className="font-display text-[clamp(2.25rem,4.4vw,4rem)] leading-[1.12] text-primary md:leading-[1.04]">
+            {/* El `1.04` del mockup esta calculado para un cuerpo de 80px; nosotros
+                bajamos la escala a 64 para que cada mitad entre en UNA linea
+                (correccion del 03/09), y el interlineado se encogio con ella:
+                quedaban 2,5px de aire entre las dos frases, medidos. En
+                escritorio cada mitad es una sola linea, asi que este valor no
+                controla nada mas que el hueco entre las dos — de 2,5px a 13.
+                Es una desviacion del mockup, avisada. */}
+            <h2 className="font-display text-[clamp(2.25rem,4.4vw,4rem)] leading-[1.12] text-primary md:leading-[1.2]">
               <RevealItem as="span" className="inline-block" y={40} duration={1.6}>
                 {content("home.frase.left")}
               </RevealItem>
