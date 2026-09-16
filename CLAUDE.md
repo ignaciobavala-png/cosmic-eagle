@@ -406,6 +406,19 @@ veces en el mismo archivo y el cambio se cuela donde no va.
 
 **Construcción pendiente:**
 
+- **Que el registro se sostenga solo, sin SMTP, hasta que esté el dominio**
+  (decidido el 16/09). El embudo **ya funciona sin correo**: el registro no pide
+  confirmación (el toggle de Supabase está apagado a propósito), `sendEmail`
+  nunca lanza y deja el "no se pudo avisar" en la campanita, los avisos al admin
+  los escribe un trigger, y `/cuenta` dice el **paso siguiente** de cada
+  solicitud. El único agujero es **recuperar la contraseña**:
+  `resetPasswordForEmail` sale por el SMTP de Supabase y hoy el formulario
+  responde "te mandamos un correo" **y no llega nada**. Faltan dos cosas: (1) un
+  botón en el panel que genere un link de recuperación con la API admin —el
+  cliente service-role ya existe— para que Estela lo pase por WhatsApp, y (2)
+  corregir el copy de `/cuenta/recuperar` mientras tanto. **Ojo: "Confirm email"
+  del dashboard tiene que seguir desactivado** o el registro se rompe en el acto.
+
 - Las 4 comunicaciones que faltan ([6] preparación, [7] logística completa,
   [8] integración, [9] feedback): ya tienen enum y plazo, les falta contenido.
 - `/preparacion`, que con las primitivas ya construidas es composición pura.
