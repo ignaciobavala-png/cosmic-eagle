@@ -7,7 +7,13 @@ This version has breaking changes — APIs, conventions, and file structure may 
 # Cosmic Eagle Journey
 
 Plataforma web para viajes de ceremonias ancestrales chamánicas. Cliente: Estela
-(fundadora) y Sofía (contenidos). Diseño: Julia. Desarrollo: Ignacio Bavala.
+(fundadora) y Sofía (contenidos). Desarrollo: Ignacio Bavala.
+
+**Julia, la diseñadora, salió del proyecto el 16/09.** Su rediseño queda —es lo
+que está en producción y sigue siendo la referencia—, pero **ya no hay a quién
+consultarle**: lo que antes era "preguntarle a Julia" ahora lo deciden Sofía e
+Ignacio. Los cambios sobre su diseño aprobado ya no necesitan aviso, y las
+decisiones que estaban trabadas esperándola están abajo, en "Lo que sigue".
 
 **El historial de sesiones vive en `docs/BITACORA.md`**, no acá. Este archivo es
 el estado y las reglas vigentes; la bitácora es el porqué de cada decisión. Las
@@ -411,7 +417,8 @@ veces en el mismo archivo y el cambio se cuela donde no va.
 - La corrección de Julia sobre About, sin implementar
   (`docs/entregas/2026-09-04-julia-about/`): fondo de imagen,
   `KEYWORD_START_OFFSETS` medido en vivo y no hardcodeado, y el degradé de tres
-  colores por línea.
+  colores por línea. Es su última entrega; **implementarla o descartarla lo
+  decide Sofía**, ya no se le consulta a ella.
 - i18n ES/EN — decidido: todo en `es.json`, `en.json` generado una vez por
   script, revisión manual de los términos específicos, `next-intl` estático.
 - Chatbot IA.
@@ -419,11 +426,12 @@ veces en el mismo archivo y el cambio se cuela donde no va.
 **Decisiones abiertas que esperan a las clientas:**
 
 - **Si una Sesión es siempre de un día** (abierta desde el 06/08) y **la
-  repetición de fechas** que pidió Julia: las dos piden tabla hija de fechas,
-  cupo por fecha y revisar el correo [7].
-- Si el cuerpo del sitio pasa a la serif que pide el manual de marca
-  (desacuerdo entre el manual y Julia, que cerró Montserrat explícitamente), y
-  el PDF del manual que llegó **truncado**.
+  repetición de fechas** que había pedido Julia: las dos piden tabla hija de
+  fechas, cupo por fecha y revisar el correo [7].
+- Si el cuerpo del sitio pasa a la serif que pide el manual de marca. Era un
+  desacuerdo entre el manual y Julia, que cerró Montserrat explícitamente;
+  **con ella afuera lo destraba Sofía sola**. Sigue faltando el PDF del manual
+  completo, que llegó **truncado**.
 - Los umbrales de Avanzado y Experto del CRM (10 y 20, **inventados**).
 - Si el consentimiento que se extrajo del Google Form es el texto vigente.
 - El destino de "Contacta soporte" y de los links apagados del footer.
