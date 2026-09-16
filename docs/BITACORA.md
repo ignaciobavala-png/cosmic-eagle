@@ -2377,6 +2377,75 @@ del banner, el aire bajo los dos indicadores a 390 y 360 de ancho, y las bandas
 de testimonios (cero puntos, mismo testimonio después de 7s quietos —el
 intervalo viejo era de 3— y avanzando al click).
 
+### Sesión del 2026-09-16 — el cuerpo deja de ser gris y la home se ordena en bandas
+
+Dos pedidos de Sofía, los dos sobre lo mismo: que el sitio se parezca al manual.
+
+#### "Texto negro no es parte del manual"
+
+Lo vio en el bloque de Sesiones Cósmicas de `/viajes`. Era `text-[#333]`, un gris
+casi negro que venía de los HTML de Julia y que estaba en **todo** el cuerpo
+sobre fondo claro: `/viajes`, el detalle, `/nosotros`, `/faqs`,
+`/contenidos/[slug]`, y las primitivas `FaqList`, `ArticleBody`, `ArticleCard` y
+`LegalPage`.
+
+Ya existía la excepción: el 11/09 ella había pedido el mismo cambio en la banda
+"Tecnología Humana" de la home y ahí quedó azul `#05125a`, con un comentario que
+decía "es sólo acá, el resto del sitio sigue con el gris". **Ahora la regla es
+para todo el sitio.** Medido sobre el crema `#fcedcd`: el azul da 14,62:1 contra
+los 10,91:1 del gris, y sobre la banda dorada 5,95:1 contra 4,44:1 —o sea que de
+paso arregla el único lugar donde el gris estaba abajo del mínimo AA—. Los
+rótulos chicos sobre claro **no** cambian: siguen en el oro oscuro
+`on-primary-container`, que es la regla del 28/08.
+
+Los tres comentarios que decían que el gris seguía vigente quedaron corregidos.
+Conviene avisarle a Julia: el gris era spec explícita suya (fix v3 del 03/09).
+
+#### Una pantalla, un fondo (mobile, sólo la home)
+
+Reporte de Sofía: en el teléfono "se ven muchos colores al mismo tiempo" entre
+"Nuestro propósito" y Testimonios. **Medido a 360×740, 390×844 y 412×915** antes
+de tocar nada, y era cierto: el panel doble, que en escritorio es Sesiones y
+Viajes lado a lado, apilado en mobile daba **363px cada mitad** —el 40-49% de la
+pantalla—, así que el azul del panel, el dorado del panel y la cola del azul de
+"Nuestro propósito" entraban juntos. El banner de cierre (600px fijos) ocupaba
+entre el 66% y el 81% y siempre se veía pegado a la franja dorada o al footer.
+
+Son **dos capas y las dos hacen falta**; la segunda sola no sirve de nada:
+
+1. **Cada banda mide una pantalla.** Los dos paneles llevan
+   `max-md:min-h-[100svh]`; los dos `MediaStatement` de alto fijo (Atmosférica
+   900px, Cierre 600px) llevan la prop nueva `mobileFull`, que en mobile los
+   pone en `100svh` y deja el alto del mockup **de `md` para arriba**. Ese alto
+   pasó a ir por variable CSS y no por `style`: un estilo en línea no tiene
+   breakpoint y una clase `md:h-…` nunca le gana.
+2. **El scroll se engancha al arranque de cada banda**, con
+   `scroll-snap-type: y proximity` en `html` y `scroll-snap-align: start` en
+   cada banda. `proximity` y **no** `mandatory`: el relato mide cuatro pantallas
+   y su animación va atada al progreso del scroll, y con `mandatory` el dedo
+   pelea contra el navegador adentro de ese bloque (verificado: con `proximity`
+   avanza los 400px de cada empujón, sin tirones). La regla está acotada con
+   `html:has(.snap-bands)` a la página que lleva la marca —hoy sólo la home—, y
+   el `scroll-padding-top` del navbar ya valía también para el enganche.
+
+**Un efecto secundario que había que arreglar**: el panel doble tenía **un solo
+observador para las dos mitades**, porque en el mockup las dos cascadas arrancan
+juntas. Con cada mitad midiendo una pantalla, la cascada del panel dorado se
+jugaba entera fuera de pantalla y el usuario llegaba a un panel ya quieto. Ahora
+hay un `Reveal` por panel; en escritorio no cambia nada porque los dos son
+gemelos y están a la misma altura, así que el mismo umbral los dispara en el
+mismo instante (verificado muestreando las opacidades: idénticas en los cuatro
+muestreos).
+
+Verificado en el browser, no a ojo: en los tres teléfonos, **parado en cada una
+de las diez bandas se ve un solo fondo**; el panel doble tiene 497-601px de aire
+y no recorta; un empujón corto vuelve al borde y uno largo avanza al siguiente,
+siempre a un múltiplo de la pantalla; la cartelera abierta por hash mide 933px y
+tampoco comparte pantalla; y en escritorio nada se movió (Atmosférica 900,
+Cierre 600, panel doble 540 y `scroll-snap-type: none`).
+
+---
+
 ---
 
 ## Apéndice — el `CLAUDE.md` anterior al 2026-09-15

@@ -364,7 +364,6 @@ veces en el mismo archivo y el cambio se cuela donde no va.
 - **El menú de `/nosotros` y el orden de la página van juntos** (cuatro palabras
   → Quiénes somos → propósito → frase → enfoque → cierre). Ya se revirtió una vez
   por error.
-- Footer firma: "i.vavala".
 
 ## No hacer
 

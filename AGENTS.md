@@ -114,6 +114,22 @@ const eslintConfig = defineConfig([
 export default eslintConfig
 ```
 
+## El texto de la clienta no cambia de caja
+
+Cuando un texto lo escribió la clienta, se renderiza **literal**: nada de
+`capitalize`, `uppercase` ni una segunda copia "prolija" del mismo string. Si la
+UI necesita mostrarlo en otro lado (una lista, un chip, una animación), muestra
+el mismo string, no una variante.
+
+El caso que lo motivó (Cosmic Eagle, 15/09/26): el `ScrollStory` de la home tenía
+por frase resaltada dos strings, `text` (dentro del párrafo) y `label` (en la
+lista final, en capitular). La frase *viaja* del párrafo al centro, así que el
+cambio de caja se veía a mitad de camino. Se colapsó a un solo campo.
+
+Y la regla de trabajo que va con esto: **si aparece una inconsistencia de estilo,
+marcarla en vez de imitarla.** No asumir que hubo una decisión de diseño detrás —
+puede ser un despiste. Ignacio prefiere que se le avise y decide él.
+
 ## Skills relevantes para este proyecto
 
 Ruta de cada skill: `/home/nch/Escritorio/brain-data/skills/<nombre>/SKILL.md`
@@ -230,6 +246,8 @@ Esto es un índice, no el contenido. Leer el archivo completo solo si la tarea a
   Cuando hay que hacer que una tira horizontal avance sola —para que quien no scrollea se entere de que hay…
 - `form-not-null-huerfano-y-rate-limit-global` — **Campo sacado del form + columna NOT NULL huérfana (y rate limit global que bloquea a todos)**
   Cuando un formulario público (contacto, postulación, alta, solicitud) **dejó de funcionar sin que nadie…
+- `gate-por-scroll-sin-overflow` — **Gate por scroll — el botón queda muerto cuando el texto entra sin scrollear**
+  Cada vez que un botón se habilite **recién cuando el usuario llegó al final de un texto**: aceptar términos y…
 - `rls-insert-select-returning` — **RLS — `.insert().select()` falla si el rol tiene INSERT pero no SELECT**
   Cuando un formulario público (registro, inscripción, contacto, alta de lead) que escribe con el rol `anon`…
 - `supabase-bucket-publico-select-listing` — **Bucket público de Supabase — la policy de SELECT abierta deja listar todo**
@@ -326,6 +344,8 @@ Esto es un índice, no el contenido. Leer el archivo completo solo si la tarea a
   Antes de escribir un endpoint en Astro SSR que reciba POSTs de **terceros** (webhooks de pasarelas, callbacks…
 - `supabase-cli-token-keyring-401` — **401 del Management API de Supabase después de un `supabase login` exitoso**
   Cuando un script propio le pega al Management API de Supabase (`https://api.supabase.com/v1/...`) leyendo el…
+- `next-removeconsole-borra-logs-produccion` — **removeConsole borra los logs del servidor y las fallas quedan invisibles en producción**
+  Al agregar `console.error` / `console.warn` de diagnóstico en Route Handlers, Server Actions o crons de un…
 - `astro-dev-logger-json-agente-workerd` — **Astro 7 + Cloudflare — 500 en todas las rutas cuando el dev server lo corre un agente**
   Levantás `pnpm dev` desde Claude Code (o cualquier agente) en un proyecto **Astro 7 + `@astrojs/cloudflare`**…
 - `capitalize-articulos-css` — **Capitulización correcta de frases con artículos en CSS**
