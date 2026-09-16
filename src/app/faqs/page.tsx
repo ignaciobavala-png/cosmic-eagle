@@ -5,6 +5,7 @@ import { BackToTop } from "@/components/BackToTop";
 import { PageHero } from "@/components/ui/PageHero";
 import { CreamSection, CREAM_HEX } from "@/components/ui/CreamSection";
 import { Reveal } from "@/components/ui/Reveal";
+import { TitleRule } from "@/components/ui/TitleRule";
 import { FaqList } from "@/components/ui/FaqList";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { getFaqs, FAQ_PLACEMENTS } from "@/lib/faqs";
@@ -68,14 +69,15 @@ export default async function FaqsPage() {
               // Al salir a produccion la tabla esta vacia a proposito: el texto
               // es de la clienta. Sin esto la pagina quedaria en blanco.
               <Reveal amount={0.22} once={false}>
-                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                  Preguntas frecuentes
-                </h2>
-                <div
-                  aria-hidden="true"
-                  className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]"
-                />
-                <p className="text-body-md leading-relaxed text-[#333]">
+                {/* `w-fit`: el filete mide el ancho del titulo, no el de la
+                    columna. */}
+                <div className="w-fit">
+                  <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                    Preguntas frecuentes
+                  </h2>
+                  <TitleRule className="mt-3 mb-7" />
+                </div>
+                <p className="text-body-md leading-relaxed text-[#05125a]">
                   Estamos preparando esta sección. Mientras tanto, escribinos y
                   te respondemos cualquier duda sobre las experiencias.
                 </p>
@@ -88,13 +90,12 @@ export default async function FaqsPage() {
                   className={index > 0 ? "mt-16" : ""}
                 >
                   <Reveal amount={0.22} once={false}>
-                    <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                      {placement.label}
-                    </h2>
-                    <div
-                      aria-hidden="true"
-                      className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]"
-                    />
+                    <div className="w-fit">
+                      <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                        {placement.label}
+                      </h2>
+                      <TitleRule className="mt-3 mb-7" />
+                    </div>
                   </Reveal>
 
                   <FaqList faqs={faqs[placement.value]} />

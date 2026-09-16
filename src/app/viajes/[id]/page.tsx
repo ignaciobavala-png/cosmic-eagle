@@ -9,7 +9,8 @@ import { createClient } from "@/lib/supabase/server";
 import { PageHero } from "@/components/ui/PageHero";
 import { CreamSection, CREAM_HEX } from "@/components/ui/CreamSection";
 import { CtaLink } from "@/components/ui/CtaLink";
-import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
+import { Reveal, RevealItem } from "@/components/ui/Reveal";
+import { TitleRule } from "@/components/ui/TitleRule";
 import { tripPlaceholderImage } from "@/lib/constants";
 import { formatScheduleDay, formatAmount } from "@/lib/format";
 import { groupScheduleByDay, parseSchedule } from "@/lib/trip-schedule";
@@ -198,19 +199,28 @@ export default async function ViajePage({ params }: Props) {
           reveal={{ amount: 0.18, once: false, stagger: 0 }}
         >
           <div className="mx-auto max-w-3xl">
+            {/* La etiqueta del tipo y el titulo estaban en un mismo
+                `RevealItem`. Se parten en dos con los MISMOS parametros —o sea
+                que entran igual que antes— para que el `w-fit` pueda envolver
+                al titulo con su filete y nada mas: si envolviera tambien a la
+                etiqueta, el ancho lo mandaria la mas larga de las dos. */}
             <RevealItem y={0} duration={1}>
               <p className="mb-4 text-label-sm font-bold uppercase text-on-primary-container">
                 {tipo}
               </p>
-              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                Sobre esta experiencia
-              </h2>
             </RevealItem>
-            <RevealLine className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]" />
+            <div className="w-fit">
+              <RevealItem y={0} duration={1}>
+                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                  Sobre esta experiencia
+                </h2>
+              </RevealItem>
+              <TitleRule grow className="mt-3 mb-7" />
+            </div>
 
             <RevealItem y={14} duration={0.8} delay={0.15}>
               {trip.description ? (
-                <div className="space-y-5 text-body-md leading-relaxed text-[#333] text-justify">
+                <div className="space-y-5 text-body-md leading-relaxed text-[#05125a] text-justify">
                   {trip.description
                     .split("\n")
                     .filter(Boolean)
@@ -219,7 +229,7 @@ export default async function ViajePage({ params }: Props) {
                     ))}
                 </div>
               ) : (
-                <p className="text-body-md leading-relaxed text-[#333]">
+                <p className="text-body-md leading-relaxed text-[#05125a]">
                   Pronto vamos a compartir más detalles sobre esta experiencia.
                   Escríbenos si quieres saber más.
                 </p>
@@ -253,17 +263,19 @@ export default async function ViajePage({ params }: Props) {
             {schedule.length > 0 && (
               <RevealItem y={14} duration={0.8} delay={0.4}>
                 <section className="mt-14">
-                  <h3 className="font-display text-headline-md font-bold text-[#05125a]">
-                    Programa
-                  </h3>
-                  <div className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]" />
+                  <div className="w-fit">
+                    <h3 className="font-display text-headline-md font-bold text-[#05125a]">
+                      Programa
+                    </h3>
+                    <TitleRule className="mt-3 mb-7" />
+                  </div>
                   <div className="flex flex-col gap-6">
                     {schedule.map((group) => (
                       <div key={group.day ?? "sin-jornada"}>
                         {group.day !== null && (
                           <h4 className="mb-2 flex items-baseline gap-2 text-label-sm uppercase tracking-[0.12em] text-on-primary-container">
                             Día {group.day}
-                            <span className="normal-case tracking-normal text-[#333]/70">
+                            <span className="normal-case tracking-normal text-[#05125a]/70">
                               {formatScheduleDay(trip.start_date, group.day)}
                             </span>
                           </h4>
@@ -277,7 +289,7 @@ export default async function ViajePage({ params }: Props) {
                               <span className="w-16 shrink-0 font-display text-lg tabular-nums text-on-primary-container sm:text-xl">
                                 {item.time}
                               </span>
-                              <span className="leading-snug text-[#333]">
+                              <span className="leading-snug text-[#05125a]">
                                 {item.activity}
                               </span>
                             </li>
@@ -296,11 +308,13 @@ export default async function ViajePage({ params }: Props) {
             {trip.includes && (
               <RevealItem y={14} duration={0.8} delay={0.5}>
                 <section className="mt-14">
-                  <h3 className="font-display text-headline-md font-bold text-[#05125a]">
-                    Qué incluye
-                  </h3>
-                  <div className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]" />
-                  <p className="whitespace-pre-line text-body-md leading-relaxed text-[#333]">
+                  <div className="w-fit">
+                    <h3 className="font-display text-headline-md font-bold text-[#05125a]">
+                      Qué incluye
+                    </h3>
+                    <TitleRule className="mt-3 mb-7" />
+                  </div>
+                  <p className="whitespace-pre-line text-body-md leading-relaxed text-[#05125a]">
                     {trip.includes}
                   </p>
                 </section>
@@ -322,12 +336,14 @@ export default async function ViajePage({ params }: Props) {
           <div className="mx-auto max-w-2xl text-center">
             {isOpen ? (
               <>
-                <RevealItem y={0} duration={1}>
-                  <h2 className="font-display text-headline-md font-bold text-primary-container md:text-headline-lg">
-                    Postularte a esta experiencia
-                  </h2>
-                </RevealItem>
-                <RevealLine className="mx-auto mt-3 mb-7 h-px w-16 bg-[#f9d78f]" />
+                <div className="mx-auto w-fit">
+                  <RevealItem y={0} duration={1}>
+                    <h2 className="font-display text-headline-md font-bold text-primary-container md:text-headline-lg">
+                      Postularte a esta experiencia
+                    </h2>
+                  </RevealItem>
+                  <TitleRule align="center" grow className="mt-3 mb-7" />
+                </div>
 
                 {trip.price > 0 && (
                   <RevealItem y={14} duration={0.8} delay={0.15}>

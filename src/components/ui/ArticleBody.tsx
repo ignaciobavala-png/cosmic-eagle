@@ -33,7 +33,7 @@ const TONO = {
     quote: "border-[#f9d78f] text-[#05125a]",
     bullet: "text-on-primary-container",
     lead: "text-[#05125a]",
-    body: "text-[#333]",
+    body: "text-[#05125a]",
   },
 } as const;
 

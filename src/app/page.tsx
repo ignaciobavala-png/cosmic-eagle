@@ -12,6 +12,7 @@ import { Collapsible } from "@/components/ui/Collapsible";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { BackgroundMedia } from "@/components/ui/BackgroundMedia";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
+import { TitleRule } from "@/components/ui/TitleRule";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { createPublicClient } from "@/lib/supabase/public";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
@@ -69,12 +70,24 @@ export default async function Home() {
   return (
     <>
       <Header />
-      <main className="pt-[var(--navbar-h)]">
+      {/* `snap-bands` NO es una utilidad de Tailwind: es la marca que hace que
+          en MOBILE cada hijo directo del `main` sea una banda con su punto de
+          enganche del scroll, y que el scroll se enganche a ellas (la regla
+          vive en globals.css, buscar "snap-bands"). Es el pedido de Sofia del
+          16/09: en el telefono una pantalla tiene que mostrar UN fondo, no la
+          cola del azul + el azul del panel + el arranque del dorado.
+
+          Va sobre el `main` y no sobre `html` para que sea de ESTA pagina: el
+          resto del sitio no cambia de comportamiento. */}
+      <main className="snap-bands pt-[var(--navbar-h)]">
+        {/* **Sin indicador de scroll** (pedido de Ignacio, 16/09): el hero se
+            queda con la imagen sola, sin el "Descubrir" con la flechita. Es el
+            mismo criterio con el que el 15/09 se le saco el indicador a la
+            frase atmosferica. El `id="manifiesto"` de la seccion de abajo NO se
+            borra: lo usa el recorrido de capturas. */}
         <ImmersiveHero
           image={content("home.hero.image")}
           imageAlt="Figura de partículas mirando hacia el cosmos"
-          scrollHint="Descubrir"
-          scrollTo="manifiesto"
           height="full"
         />
 
@@ -165,7 +178,14 @@ export default async function Home() {
             aire lo pone el panel cuando se abre. */}
         <section id="calendario" className="w-full bg-[#020c41]">
           <Collapsible openOnHash="calendario">
-            <div className="w-full py-20">
+            {/* Abierta, la cartelera tambien tiene que ser una banda de
+                pantalla en mobile. Medida, ya da 933px por su cuenta en los
+                tres telefonos de referencia (360/390/412), asi que el
+                `min-h` no muerde hoy: esta como garantia para una pantalla mas
+                alta, donde el carrusel se quedaria corto y dejaria asomar el
+                banner de abajo. Cerrada sigue midiendo cero, porque el
+                `Collapsible` no renderiza nada hasta que se abre. */}
+            <div className="w-full py-20 max-md:min-h-[100svh]">
               <TripCarousel
                 caption="Calendario"
                 title="Próximos Viajes"
@@ -186,6 +206,9 @@ export default async function Home() {
           veil={0.35}
           overlay={isEnabled(content("home.promesas.overlay"))}
           height={900}
+          // En mobile ocupa la pantalla entera; los 900px fijos del mockup
+          // valen de `md` para arriba. Ver `mobileFull` en el componente.
+          mobileFull
           textClassName="text-[22px] md:text-[28px]"
           // La frase va DORADA y no en el blanco cálido (pedido de Sofía,
           // 11/09). Es el token `primary-container`, el mismo oro que el resto
@@ -269,13 +292,21 @@ export default async function Home() {
             **Los dos botones son el mismo tipo** (`.sv-btn` del mockup): pildora
             con borde 1.5px del color del texto, fondo translucido del color del
             panel y glow propio en hover. Solo cambia el tono de cada panel. */}
-        <Reveal
-          id="experiencias"
-          amount={0.25}
-          stagger={0}
-          className="grid w-full md:grid-cols-2"
-        >
-          <div className="flex w-full items-center justify-center bg-[linear-gradient(135deg,#0079b3,#05125a)] px-6 py-[60px] text-center text-primary-container md:min-h-[60svh] md:px-12 md:py-20">
+        {/* **Un observador POR PANEL y no uno solo para los dos**, al reves de
+            como estuvo hasta el 16/09. En escritorio no cambia nada: los dos
+            paneles son gemelos y estan a la misma altura, asi que el mismo
+            umbral 0.25 los dispara en el mismo instante y las dos cascadas
+            siguen arrancando juntas, que es lo que pide el mockup. En mobile,
+            en cambio, ahora cada panel mide una pantalla: con el observador
+            unico sobre la seccion de dos pantallas, la cascada del panel
+            dorado se jugaba entera fuera de pantalla y el usuario llegaba a un
+            panel ya quieto. */}
+        <div id="experiencias" className="grid w-full md:grid-cols-2">
+          <Reveal
+            amount={0.25}
+            stagger={0}
+            className="snap-band flex w-full items-center justify-center bg-[linear-gradient(135deg,#0079b3,#05125a)] px-6 py-[60px] text-center text-primary-container max-md:min-h-[100svh] md:min-h-[60svh] md:px-12 md:py-20"
+          >
             <div className="max-w-[460px]">
               <RevealItem duration={0.8}>
                 <h2 className="mb-3 font-display text-[34px] leading-tight">
@@ -308,7 +339,7 @@ export default async function Home() {
                 </CtaLink>
               </RevealItem>
             </div>
-          </div>
+          </Reveal>
 
           {/* El "Fondo 4" del manual de marca, que es un degrade liso y no una
               textura: medido sobre el PNG, va de `#b3964b` (arriba a la
@@ -322,7 +353,11 @@ export default async function Home() {
               le daba unas esquinas sucias que el fondo del manual no tiene.
 
               Encima puede ir una foto, si la clienta carga el slot. */}
-          <div className="relative flex w-full items-center justify-center overflow-hidden bg-[linear-gradient(to_bottom_right,#b3964b_0%,#f9d78f_100%)] px-6 py-[60px] text-center text-[#05125a] md:min-h-[60svh] md:px-12 md:py-20">
+          <Reveal
+            amount={0.25}
+            stagger={0}
+            className="snap-band relative flex w-full items-center justify-center overflow-hidden bg-[linear-gradient(to_bottom_right,#b3964b_0%,#f9d78f_100%)] px-6 py-[60px] text-center text-[#05125a] max-md:min-h-[100svh] md:min-h-[60svh] md:px-12 md:py-20"
+          >
             {fondoViajes && (
               /* z-0 y contenido en z-10, nunca un z negativo: el `body` pinta su
                  degrade despues de los descendientes de z negativo del contexto
@@ -361,8 +396,8 @@ export default async function Home() {
                 </CtaLink>
               </RevealItem>
             </div>
-          </div>
-        </Reveal>
+          </Reveal>
+        </div>
 
         <TestimonialsSection
           id="voces"
@@ -405,24 +440,33 @@ export default async function Home() {
         >
           <div className="mx-auto flex w-full max-w-narrative flex-col items-center gap-12 md:flex-row md:gap-16">
             <div className="w-full md:flex-1">
-              <RevealItem duration={0.8}>
-                {/* El quiebre en dos renglones es fijo, no un wrap por ancho:
-                    es decisión de diseño de la v2 del fix. */}
-                <h2 className="mb-3.5 font-display text-[clamp(24px,7vw,30px)] font-bold leading-tight text-[#05125a] md:mb-3 md:text-[40px]">
-                  Tecnología Humana y<br />
-                  Ciencia del Alma
-                </h2>
-              </RevealItem>
-              {/* Oro oscuro y no el claro: sobre el fondo dorado el filete
-                  claro da 1,00:1 y no se ve. */}
-              <RevealLine className="mb-5 h-px w-20 bg-[#b3964b] md:mb-6 md:w-16" />
+              {/* El `w-fit` envuelve al titulo Y al filete: es lo que hace
+                  que el filete mida el renglon mas largo del titulo —que aca
+                  esta partido a mano con `<br>`— y no el ancho de la columna.
+                  Envolver solo al filete no sirve: `w-full` dentro de `w-fit`
+                  no tiene de donde sacar el ancho. */}
+              <div className="w-fit">
+                <RevealItem duration={0.8}>
+                  {/* El quiebre en dos renglones es fijo, no un wrap por ancho:
+                      es decisión de diseño de la v2 del fix. */}
+                  <h2 className="mb-3.5 font-display text-[clamp(24px,7vw,30px)] font-bold leading-tight text-[#05125a] md:mb-3 md:text-[40px]">
+                    Tecnología Humana y<br />
+                    Ciencia del Alma
+                  </h2>
+                </RevealItem>
+                {/* Oro oscuro y no el claro: sobre el fondo dorado el filete
+                    claro da 1,00:1 y no se ve. */}
+                <TitleRule tone="goldDark" grow className="mb-5 md:mb-6" />
+              </div>
               {/* El cuerpo va AZUL, no negro. Hasta el 11/09 era negro puro en
                   mobile y gris #333 en escritorio, que era spec explícita de
                   Julia (fix v3 del 03/09); lo cambió Sofía, que lo veía negro.
                   Sobre la banda dorada el azul mide 5,95:1 en el punto más
                   oscuro del degradé contra los 4,44:1 del gris, que estaba
-                  abajo del mínimo legible. **Es sólo acá**: el resto del sitio
-                  sigue con el gris. Conviene avisarle a Julia. */}
+                  abajo del mínimo legible. Desde el 16/09 el azul es la regla
+                  de TODO el cuerpo sobre fondo claro —no queda gris en el
+                  sitio—, por pedido de Sofía: "texto negro no es parte del
+                  manual". Conviene avisarle a Julia. */}
               <div className="space-y-5 text-[clamp(13px,3.6vw,15px)] leading-[1.8] text-[#05125a] md:max-w-[480px] md:space-y-6 md:text-[16px]">
                 <RevealItem duration={0.8} delay={0.15}>
                   <p>
@@ -495,6 +539,11 @@ export default async function Home() {
           veil={0.3}
           overlay={isEnabled(content("home.cierre.overlay"))}
           height={600}
+          // Idem Atmosférica: en mobile, pantalla completa. Medido antes del
+          // cambio, el Cierre ocupaba el 66-81% de la pantalla según el
+          // teléfono, así que SIEMPRE se veía junto a la franja dorada de
+          // arriba o al footer de abajo.
+          mobileFull
           textClassName="text-[22px] md:text-[32px]"
         />
       </main>

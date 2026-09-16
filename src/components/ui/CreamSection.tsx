@@ -35,9 +35,11 @@ export const CREAM_DEEP = CREAM;
  * Tecnologia Humana, y desde el 15/09 se esta probando como fondo de franja en
  * /contenidos. Va por la prop `background` de `CreamSection`.
  *
- * Lo que arrastra un fondo dorado, medido: el cuerpo gris `#333` cae a 4,44:1
- * contra el punto mas oscuro del degrade —abajo del minimo— y pasa al azul
- * `#05125a` (5,95:1); el oro claro como filete da 1,00:1 y pasa al oro oscuro;
+ * Lo que arrastra un fondo dorado, medido: el gris `#333` que era el cuerpo
+ * hasta el 16/09 caia a 4,44:1 contra el punto mas oscuro del degrade —abajo
+ * del minimo— y fue lo que empujo al azul `#05125a` (5,95:1), hoy el color de
+ * cuerpo de todo el sitio sobre fondo claro; el oro claro como filete da
+ * 1,00:1 y pasa al oro oscuro;
  * `on-primary-container` (`#755c21`), que es el color de texto chico sobre
  * crema, da 2,23:1 y tambien pasa al azul; y una pildora dorada se funde con el
  * fondo, asi que el boton va azul.

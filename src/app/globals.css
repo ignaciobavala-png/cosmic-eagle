@@ -419,6 +419,50 @@ html {
   }
 }
 
+/* ── Bandas de pantalla en mobile ──────────────────────────────────────────
+   Pedido de Sofia del 16/09 sobre la home: en el telefono una pantalla tiene
+   que mostrar UN fondo. Antes del cambio, medido a 360/390/412, el panel doble
+   apilaba el azul de Sesiones (363px) y el dorado de Viajes (363px) en menos
+   de una pantalla, asi que se veian los dos a la vez mas la cola del azul de
+   "Nuestro proposito" — tres fondos y dos cortes juntos.
+
+   Son dos cosas, y las dos hacen falta:
+
+   1. Cada banda mide una pantalla. Eso NO se resuelve aca sino en cada
+      seccion (`max-md:min-h-[100svh]` en los paneles, `mobileFull` en los dos
+      `MediaStatement` de alto fijo). Sin esto el enganche no sirve de nada.
+   2. El scroll se engancha al arranque de cada banda, que es esta regla.
+
+   `proximity` y no `mandatory`: el relato de la home (`ScrollStory`) mide
+   cuatro pantallas y su animacion va atada al progreso del scroll; con
+   `mandatory` el dedo pelea contra el navegador adentro de ese bloque. Con
+   `proximity` el enganche solo actua cerca de un borde.
+
+   `html:has(.snap-bands)` acota el comportamiento a la pagina que lleva la
+   marca (hoy solo la home): el contenedor de scroll es `html`, asi que la
+   propiedad tiene que ir ahi si o si, pero el `:has` la condiciona. Donde
+   `:has` no exista, el sitio queda como estaba.
+
+   El `scroll-padding-top` de arriba tambien vale para el enganche: sin el,
+   cada banda quedaria con su arranque debajo del navbar opaco.
+
+   `.snap-band` es para las bandas que NO son hijas directas del `main` — las
+   dos mitades del panel doble, que apiladas son una banda cada una.
+
+   Y el corte va en 767.98px, que es el que usa el `max-md:` de Tailwind: los
+   dos tienen que abrir y cerrar juntos, o un viewport de 767,5px se quedaria
+   con el enganche prendido y las bandas ya en su alto de escritorio. */
+@media (max-width: 767.98px) {
+  html:has(.snap-bands) {
+    scroll-snap-type: y proximity;
+  }
+
+  .snap-bands > *,
+  .snap-bands .snap-band {
+    scroll-snap-align: start;
+  }
+}
+
 /* El `background` en `html` corta la propagacion del fondo de `body` al canvas.
    Sin esto el degrade se dimensionaria contra el viewport y no contra el alto
    del documento, y el remate oscuro del pie nunca se veria. */

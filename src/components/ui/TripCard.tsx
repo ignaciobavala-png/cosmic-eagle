@@ -126,7 +126,7 @@ export function TripCard({
                   ))}
                 </div>
               ) : (
-                <div className="flex items-end justify-between gap-4">
+                <div>
                   {/* La fecha es el dato por el que se mira la tarjeta y a
                       13px quedaba por debajo de la descripcion, que es un
                       adelanto. Sube de 13px a 21px: queda por encima del
@@ -136,14 +136,17 @@ export function TripCard({
                       `toLocaleDateString` con `month: "short"`, o sea "oct" en
                       minuscula. Pedido de Ignacio del 15/09
                       (`docs/entregas/2026-09-15-ignacio-ajustes`). */}
+                  {/* **Sin el cuadradito de la flecha** (pedido de Ignacio,
+                      16/09): la ficha clara de las carteleras —Sesiones y
+                      Viajes— se queda solo con la fecha. Con el se fue el
+                      `flex items-end justify-between`, que existia para
+                      repartir fecha y flecha a los extremos. La tarjeta entera
+                      sigue siendo el link, asi que no se pierde ninguna
+                      navegacion: lo que se va es un adorno. La version oscura
+                      (`tone="dark"`, mas abajo) conserva la suya porque hoy
+                      solo la usa `TripsSection`, que no esta en ninguna ruta. */}
                   <span className="mt-1.5 block font-display text-[21px] font-bold uppercase leading-tight tracking-[0.03em] text-[#05125a]">
                     {formatDateRangeCompact(trip.start_date, trip.end_date)}
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[10px] border-2 border-[#05125a] text-lg text-[#05125a] transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#05125a] group-hover:text-white"
-                  >
-                    <ArrowUpRight size={16} />
                   </span>
                 </div>
               )}

@@ -7,9 +7,9 @@ import { WordSequence } from "@/components/ui/WordSequence";
 import { MediaStatement } from "@/components/ui/MediaStatement";
 import { StickyStory } from "@/components/ui/StickyStory";
 import { ClosingHero } from "@/components/ui/ClosingHero";
-import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
+import { Reveal, RevealItem } from "@/components/ui/Reveal";
+import { TitleRule } from "@/components/ui/TitleRule";
 import { SymbolRow } from "@/components/ui/NosSymbols";
-import { ScrollHintButton } from "@/components/ui/ScrollHintButton";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 
 export const metadata: Metadata = {
@@ -149,22 +149,28 @@ export default async function NosotrosPage() {
           className="relative flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile py-[35px] text-[#05125a] min-h-[81svh] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
         >
           <div className="mx-auto max-w-3xl">
-            <RevealItem y={0} duration={1} id="nos-proposito-title">
-              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                Nuestro propósito
-              </h2>
-            </RevealItem>
-            {/* Oro oscuro: sobre el dorado el `#f9d78f` de los otros filetes
-                da 1,20:1, o sea que no se ve. */}
-            <RevealLine className="mt-3 mb-6 h-px w-16 bg-[#755c21]" />
+            {/* `w-fit`: el filete mide el ancho del titulo y no el de la
+                columna. El `id` del `RevealItem` no se mueve: lo usan las
+                mediciones de centrado de esta pagina. */}
+            <div className="w-fit">
+              <RevealItem y={0} duration={1} id="nos-proposito-title">
+                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                  Nuestro propósito
+                </h2>
+              </RevealItem>
+              {/* Oro oscuro: sobre el dorado el `#f9d78f` de los otros filetes
+                  da 1,20:1, o sea que no se ve. */}
+              <TitleRule tone="goldDeep" grow className="mt-3 mb-6" />
+            </div>
             {/* **Los resaltados NO cambian de tipografía**, sólo de color y
                 peso: llevaban `font-display` y con Sorts Mill Goudy —que tiene
                 la altura de x mucho más baja que Montserrat— quedaban
                 visiblemente más chicos que el renglón donde viven, como si
                 estuvieran en minúscula (reporte de Ignacio del 09/09). Es la
                 misma regla que la palabra clave del relato de la home. */}
-            {/* Cuerpo azul y no el gris `#333` del resto de la pagina: sobre
-                el dorado ese gris cae a 4,44:1, abajo del minimo. */}
+            {/* Cuerpo azul, como en todo el sitio desde el 16/09. Aca ademas
+                era obligatorio: sobre el dorado el gris `#333` que habia antes
+                caia a 4,44:1, abajo del minimo. */}
             <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-justify [&_strong]:font-semibold [&_strong]:text-[#05125a]">
               <RevealItem y={14} duration={0.8} delay={0.15}>
               <p>
@@ -225,6 +231,14 @@ export default async function NosotrosPage() {
           duration={1.2}
           veil={0.3}
           overlay={isEnabled(content("nosotros.proposito.overlay"))}
+          // En el telefono la caja es vertical y de esta foto —la figura
+          // acostada, que ocupa el ancho entero— sobrevive apenas el 26% del
+          // ancho: centrado, el recorte caia en la cadera y no se entendia que
+          // era. Con el foco en el 68% entran la cabeza y el torso, que es lo
+          // que cuenta la imagen, y las piernas quedan afuera a proposito
+          // (pedido de Ignacio, 16/09). Medido sobre el asset real (1456x816)
+          // comparando cuatro posiciones a 390x844.
+          imagePositionMobile="max-md:object-[68%_center]"
         />
 
         {/* Pantalla 5 — "Nuestro enfoque", la última de contenido antes del
@@ -234,6 +248,13 @@ export default async function NosotrosPage() {
             0 a 64px en 1.2s y los parrafos van de a 14px con 0.15s de escalon.
             La frase itálica del cierre lleva 0.65s, que es el unico retardo que
             Julia escribe a mano. Padding mobile 35px como el mockup 2/9.
+
+            **Fondo dorado desde el 16/09** (pedido de las clientas), el mismo
+            degradé de "Nuestro propósito", de la franja de Tecnología Humana y
+            de la biblioteca de /contenidos. Arrastra lo de siempre: el filete
+            pasa al oro oscuro porque el claro sobre este fondo da 1,20:1. El
+            cuerpo ya estaba en azul, que sobre el punto más oscuro del degradé
+            mide 5,95:1.
 
             El `id` es el destino del desplegable de "Nosotros" del navbar
             (04/09). Ojo: `#enfoque` ya estaba tomado por la pantalla de las
@@ -245,16 +266,20 @@ export default async function NosotrosPage() {
           amount={0.25}
           once={false}
           stagger={0}
-          className="relative flex w-full flex-col items-center justify-center bg-[#fcedcd] px-margin-mobile pt-[35px] pb-[76px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
+          className="relative flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile pt-[35px] pb-[88px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
         >
           <div className="mx-auto max-w-3xl">
-            <RevealItem y={0} duration={1} id="nos-enfoque-title">
-              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                Nuestro enfoque
-              </h2>
-            </RevealItem>
-            <RevealLine className="mt-3 mb-6 h-px w-16 bg-[#f9d78f]" />
-            <div className="space-y-6 text-body-md leading-relaxed text-[#333] text-justify">
+            <div className="w-fit">
+              <RevealItem y={0} duration={1} id="nos-enfoque-title">
+                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                  Nuestro enfoque
+                </h2>
+              </RevealItem>
+              {/* Oro oscuro, igual que en "Nuestro propósito": sobre este fondo
+                  el `#f9d78f` de las franjas crema da 1,20:1 y no se ve. */}
+              <TitleRule tone="goldDeep" grow className="mt-3 mb-6" />
+            </div>
+            <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-justify">
               <RevealItem y={14} duration={0.8} delay={0.15}>
               <p>
                 Nuestro enfoque reúne conocimiento ancestral y galáctico,
@@ -292,18 +317,17 @@ export default async function NosotrosPage() {
               </p>
             </RevealItem>
           </div>
-          {/* El indicador es `absolute`, asi que no ocupa lugar: el `pb-[76px]`
-              de la seccion es el hueco que le reserva. En mobile esta seccion
-              no tiene alto minimo —la llena el texto— y con el padding de 35px
-              el indicador caia ENCIMA del cierre en italica (reporte de
-              Ignacio del 11/09, medido a 390x844: se metia 23px adentro).
-              76px = 12 del `bottom-3` + 46 que mide + 18 de aire. */}
-          <ScrollHintButton
-            label="Estela"
-            target="#estela"
-            tone="dark"
-            bottomClassName="bottom-3 md:bottom-6"
-          />
+          {/* **Sin indicador "Estela"** (pedido de Ignacio, 16/09): la frase
+              en italica cierra la pantalla y no lleva nada abajo. `#estela`
+              sigue siendo el destino del desplegable de "Nosotros" del navbar;
+              lo que se saca es el atajo, no el ancla.
+
+              El `pb-[88px]` de mobile se queda, pero **ya no es el hueco del
+              indicador sino el del boton flotante "Volver arriba"**, que es
+              `fixed` y cae justo sobre la esquina derecha del cierre en
+              italica. Medido a 390x844 con la seccion apoyada en el pie de la
+              pantalla: con los 35px del mockup el boton le tapa 47px a la
+              ultima linea, con 88px quedan 6px de aire. */}
         </Reveal>
 
         {/* Pantalla 6 — "Estela, founder", la ultima de contenido. Copy de la
@@ -331,13 +355,15 @@ export default async function NosotrosPage() {
           className="relative flex w-full flex-col items-center justify-center bg-[#fcedcd] px-margin-mobile pt-[35px] pb-[76px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
         >
           <div className="mx-auto max-w-3xl">
-            <RevealItem y={0} duration={1} id="nos-estela-title">
-              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                Estela, founder
-              </h2>
-            </RevealItem>
-            <RevealLine className="mt-3 mb-6 h-px w-16 bg-[#f9d78f]" />
-            <div className="space-y-6 text-body-md leading-relaxed text-[#333] text-justify">
+            <div className="w-fit">
+              <RevealItem y={0} duration={1} id="nos-estela-title">
+                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                  Estela, founder
+                </h2>
+              </RevealItem>
+              <TitleRule grow className="mt-3 mb-6" />
+            </div>
+            <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-justify">
               <RevealItem y={14} duration={0.8} delay={0.15}>
                 <p>
                   Estela lleva más de 25 años explorando la conciencia, la mente,

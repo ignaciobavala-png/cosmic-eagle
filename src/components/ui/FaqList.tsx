@@ -30,7 +30,7 @@ export function FaqList({ faqs }: { faqs: Faq[] }) {
                 <span className="absolute top-0 left-1/2 h-full w-px -translate-x-1/2 bg-[#755c21]" />
               </span>
             </summary>
-            <div className="space-y-4 pb-6 text-body-md leading-relaxed text-[#333]">
+            <div className="space-y-4 pb-6 text-body-md leading-relaxed text-[#05125a]">
               {faq.answer
                 .replace(/\r\n/g, "\n")
                 .split(/\n{2,}/)

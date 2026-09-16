@@ -76,7 +76,7 @@ export function ArticleCard({
           {article.title}
         </h3>
         {article.excerpt && (
-          <p className="mt-3 line-clamp-4 text-body-md text-[#333]">
+          <p className="mt-3 line-clamp-4 text-body-md text-[#05125a]">
             {article.excerpt}
           </p>
         )}

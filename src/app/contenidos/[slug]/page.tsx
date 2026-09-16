@@ -149,7 +149,7 @@ export default async function ContenidoPage({
             </h1>
 
             {teaser.excerpt && (
-              <p className="mt-5 text-body-lg text-[#333]">{teaser.excerpt}</p>
+              <p className="mt-5 text-body-lg text-[#05125a]">{teaser.excerpt}</p>
             )}
 
             <div className="mt-10 border-t border-[#f9d78f] pt-10">
@@ -160,11 +160,11 @@ export default async function ContenidoPage({
                     aria-hidden="true"
                     className="mx-auto text-on-primary-container"
                   />
-                  <p className="mt-4 text-body-lg text-[#333]">
+                  <p className="mt-4 text-body-lg text-[#05125a]">
                     {CONTENT_WALL_COPY}
                   </p>
                   <AccessCodeForm tone="light" />
-                  <p className="mt-6 text-body-md text-[#333]">
+                  <p className="mt-6 text-body-md text-[#05125a]">
                     <Link
                       href="/viajes"
                       className="text-on-primary-container underline underline-offset-4"

@@ -7,6 +7,7 @@ import { ArticleBody } from "@/components/ui/ArticleBody";
 import { Reveal } from "@/components/ui/Reveal";
 import { parseArticleBody, formatArticleDate } from "@/lib/article";
 import { CreamSection } from "./CreamSection";
+import { TitleRule } from "./TitleRule";
 import { getLegalDocument, legalDocumentMeta, type LegalSlug } from "@/lib/legal";
 
 /**
@@ -56,14 +57,16 @@ export async function LegalPage({ slug }: { slug: LegalSlug }) {
               `once`, no aparecería nunca. El cuerpo queda visible desde el
               arranque (ver CLAUDE.md, sesión del 02/09). */}
           <Reveal amount={0.3}>
-            <h1 className="font-display text-headline-lg font-bold text-[#05125a] md:text-display-lg">
-              {doc.title}
-            </h1>
-            <div aria-hidden="true" className="mt-5 h-px w-16 bg-[#f9d78f]" />
+            <div className="w-fit">
+              <h1 className="font-display text-headline-lg font-bold text-[#05125a] md:text-display-lg">
+                {doc.title}
+              </h1>
+              <TitleRule className="mt-5" />
+            </div>
           </Reveal>
 
           {doc.isProvisional && (
-            <p className="mt-8 rounded-2xl border border-[#f9d78f] border-l-2 bg-[#fff6eb] px-5 py-4 text-body-md leading-relaxed text-[#333]">
+            <p className="mt-8 rounded-2xl border border-[#f9d78f] border-l-2 bg-[#fff6eb] px-5 py-4 text-body-md leading-relaxed text-[#05125a]">
               <strong className="text-[#05125a]">
                 Versión preliminar.
               </strong>{" "}

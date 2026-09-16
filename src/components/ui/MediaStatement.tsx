@@ -27,6 +27,8 @@ export function MediaStatement({
   scrollHint,
   scrollIndicator,
   height,
+  mobileFull = false,
+  imagePositionMobile,
   textClassName,
   textColorClassName = "text-primary",
   width = "narrow",
@@ -67,6 +69,38 @@ export function MediaStatement({
    * siendo `100svh`, que es lo que piden /viajes y /nosotros.
    */
   height?: number;
+  /**
+   * Con `height`, en mobile el bloque ocupa UNA pantalla igual y el alto fijo
+   * vale recien de `md` para arriba.
+   *
+   * Existe por el pedido de Sofia del 16/09: en mobile una pantalla tiene que
+   * mostrar un solo fondo, y un banner de 600px sobre un telefono de 844
+   * siempre deja 244px de la franja vecina asomando. Medido en tres pantallas
+   * (360/390/412): el Cierre ocupaba entre el 66% y el 81% de la pantalla.
+   *
+   * **El alto va por variable CSS y no como `height` en el `style`**: un
+   * estilo en linea no tiene breakpoint, y una clase `md:h-...` nunca le
+   * ganaria. La variable la lee la clase, que si entiende de media queries.
+   */
+  mobileFull?: boolean;
+  /**
+   * Clase de `object-position` que se aplica **solo en mobile** (va con el
+   * prefijo `max-md:` escrito por quien la pasa), para elegir que parte de la
+   * foto sobrevive al recorte.
+   *
+   * Por que hace falta: la caja de un banner de pantalla completa es apaisada
+   * en escritorio y vertical en el telefono, y el panel recorta lo que sube la
+   * clienta a 16:9. En una foto de sujeto ancho, el recorte de mobile se queda
+   * con una tajada muy angosta —en el banner de /nosotros, medido, el 26% del
+   * ancho— y por defecto esa tajada sale del centro, que puede no ser donde
+   * esta lo que importa.
+   *
+   * **Ojo**: el valor apunta a una foto concreta. Si la clienta cambia la
+   * imagen del slot desde /admin/multimedia, el encuadre de mobile hay que
+   * volver a mirarlo. Por eso se usa donde el recorte automatico realmente
+   * arruina la foto, y no como ajuste fino en todos los banners.
+   */
+  imagePositionMobile?: string;
   /** Tamaño de la frase cuando el mockup fija un px (28px en Atmosférica, 32px en el Cierre). */
   textClassName?: string;
   /**
@@ -94,11 +128,28 @@ export function MediaStatement({
     <section
       id={id}
       className={`relative flex w-full items-center justify-center overflow-hidden ${
-        height ? "" : "min-h-[100svh]"
+        height
+          ? mobileFull
+            ? "h-[100svh] md:h-[var(--band-h)]"
+            : ""
+          : "min-h-[100svh]"
       }`}
-      style={height ? { height: `${height}px` } : undefined}
+      style={
+        height
+          ? mobileFull
+            ? ({ "--band-h": `${height}px` } as React.CSSProperties)
+            : { height: `${height}px` }
+          : undefined
+      }
     >
-      <BackgroundMedia src={image} alt={imageAlt} />
+      {/* El `object-cover` se escribe aca y no se delega al default de
+          `BackgroundMedia`: la prop REEMPLAZA su `className`, asi que si se
+          pasa solo la posicion se pierde el recorte. */}
+      <BackgroundMedia
+        src={image}
+        alt={imageAlt}
+        className={`object-cover${imagePositionMobile ? ` ${imagePositionMobile}` : ""}`}
+      />
       {overlay && (
         <>
           <div

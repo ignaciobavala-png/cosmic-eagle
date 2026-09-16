@@ -10,6 +10,7 @@ import { Collapsible } from "@/components/ui/Collapsible";
 import { TripCarousel } from "@/components/ui/TripCarousel";
 import { TestimonialsBand } from "@/components/ui/TestimonialsBand";
 import { RevealItem } from "@/components/ui/Reveal";
+import { TitleRule } from "@/components/ui/TitleRule";
 import { createClient } from "@/lib/supabase/server";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
@@ -136,15 +137,16 @@ export default async function ViajesPage() {
               </p>
             </RevealItem>
             <RevealItem delay={0.15}>
-              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                Sesiones Cósmicas
-              </h2>
-              <div
-                aria-hidden="true"
-                className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]"
-              />
+              {/* `w-fit` no es cosmetico: es lo que hace que el filete de
+                  abajo mida el ancho del TITULO y no el de la columna. */}
+              <div className="w-fit">
+                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                  Sesiones Cósmicas
+                </h2>
+                <TitleRule className="mt-3 mb-7" />
+              </div>
             </RevealItem>
-            <div className="mb-6 space-y-5 text-body-md leading-relaxed text-[#333] text-justify">
+            <div className="mb-6 space-y-5 text-body-md leading-relaxed text-[#05125a] text-justify">
               <RevealItem delay={0.3}>
               <p>
                 Nuestras sesiones de un día están diseñadas para sostener un
@@ -217,16 +219,17 @@ export default async function ViajesPage() {
               </p>
             </RevealItem>
             <RevealItem delay={0.15}>
-              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                Viajes Cósmicos
-              </h2>
-              <div
-                aria-hidden="true"
-                className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]"
-              />
+              {/* `w-fit` no es cosmetico: es lo que hace que el filete de
+                  abajo mida el ancho del TITULO y no el de la columna. */}
+              <div className="w-fit">
+                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                  Viajes Cósmicos
+                </h2>
+                <TitleRule className="mt-3 mb-7" />
+              </div>
             </RevealItem>
             <RevealItem delay={0.3}>
-            <p className="mb-6 text-body-md leading-relaxed text-[#333] text-justify">
+            <p className="mb-6 text-body-md leading-relaxed text-[#05125a] text-justify">
               Experiencias de una semana diseñadas para quienes se sienten listos
               para entrar en un proceso más profundo de exploración del alma,
               transformación y evolución. Realizadas en portales sagrados
@@ -272,15 +275,16 @@ export default async function ViajesPage() {
               /nosotros: es una barra estatica, asi esta en el codigo aprobado. */}
           <div className="mx-auto max-w-3xl">
             <RevealItem>
-              <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                Salud y Seguridad
-              </h2>
-              <div
-                aria-hidden="true"
-                className="mt-3 mb-7 h-px w-16 bg-[#f9d78f]"
-              />
+              {/* `w-fit` no es cosmetico: es lo que hace que el filete de
+                  abajo mida el ancho del TITULO y no el de la columna. */}
+              <div className="w-fit">
+                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                  Salud y Seguridad
+                </h2>
+                <TitleRule className="mt-3 mb-7" />
+              </div>
             </RevealItem>
-            <div className="space-y-5 text-body-md leading-relaxed text-[#333] text-justify">
+            <div className="space-y-5 text-body-md leading-relaxed text-[#05125a] text-justify">
               <RevealItem delay={0.15}>
               <p>
                 Si actualmente tomas medicamentos o estás bajo tratamiento

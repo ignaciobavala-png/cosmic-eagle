@@ -7,6 +7,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { ArticleCard } from "@/components/ui/ArticleCard";
 import { CreamSection, GOLD } from "@/components/ui/CreamSection";
 import { Reveal } from "@/components/ui/Reveal";
+import { TitleRule } from "@/components/ui/TitleRule";
 import { YouTubeFacade } from "@/components/ui/YouTubeFacade";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
@@ -120,15 +121,16 @@ export default async function ContenidosPage({
               <p className="text-label-sm font-bold uppercase text-[#05125a]">
                 Explora
               </p>
-              <h2 className="mt-3 font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                {active
-                  ? ARTICLE_CATEGORY_LIST.find((c) => c.value === active)!.label
-                  : "Biblioteca"}
-              </h2>
-              <div
-                aria-hidden="true"
-                className="mx-auto mt-3 mb-10 h-px w-16 bg-[#b3964b]"
-              />
+              {/* `w-fit mx-auto`: el filete mide el ancho del titulo —que aca
+                  va centrado— y no el de la columna entera. */}
+              <div className="mx-auto w-fit">
+                <h2 className="mt-3 font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                  {active
+                    ? ARTICLE_CATEGORY_LIST.find((c) => c.value === active)!.label
+                    : "Biblioteca"}
+                </h2>
+                <TitleRule tone="goldDark" align="center" className="mt-3 mb-10" />
+              </div>
             </Reveal>
 
             {active === "testimonios" && (

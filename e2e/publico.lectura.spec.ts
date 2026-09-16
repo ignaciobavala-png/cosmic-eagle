@@ -140,8 +140,12 @@ test("los anclajes no caen debajo del navbar", async ({ page }) => {
  *
  * Se mide el indicador y no el alto del hero a proposito: lo que importa es que
  * se vea, no cuanto mide la seccion.
+ *
+ * **La home no esta en la lista desde el 16/09**: su hero se quedo sin
+ * indicador por pedido de Ignacio, asi que no hay nada que medir. Si alguna vez
+ * vuelve el "Descubrir", vuelve tambien el "/" aca.
  */
-for (const ruta of ["/", "/nosotros", "/viajes", "/contenidos", "/faqs"]) {
+for (const ruta of ["/nosotros", "/viajes", "/contenidos", "/faqs"]) {
   test(`${ruta}: el indicador de scroll del hero entra en pantalla`, async ({ page }) => {
     await page.goto(ruta);
     await page.waitForLoadState("load");

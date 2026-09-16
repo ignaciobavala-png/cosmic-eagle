@@ -71,12 +71,14 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="mx-auto mt-14 flex max-w-narrative flex-col items-center justify-between gap-4 border-t border-primary-fixed-dim/8 pt-6 text-center md:flex-row md:text-left">
+      {/* La firma "i.vavala" se saco el 16/09 (pedido de Ignacio). Con ella se
+          fue el `justify-between` y el `md:text-left`: eran para repartir dos
+          bloques a los extremos, y con uno solo dejaban el copyright pegado a
+          la izquierda en escritorio. Ahora la linea va centrada en los dos
+          anchos. */}
+      <div className="mx-auto mt-14 flex max-w-narrative flex-col items-center justify-center gap-4 border-t border-primary-fixed-dim/8 pt-6 text-center">
         <p className="text-label-sm uppercase text-on-surface-variant/70">
           &copy; 2026 Cosmic Eagle Journey
-        </p>
-        <p className="text-label-sm uppercase text-on-surface-variant/70">
-          i.vavala
         </p>
       </div>
     </footer>
