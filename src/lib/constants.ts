@@ -126,10 +126,12 @@ export const NAV_LINKS: NavLink[] = [
       { label: "Quiénes somos", href: "/nosotros#somos" },
       { label: "Nuestro propósito", href: "/nosotros#proposito" },
       { label: "Nuestro enfoque", href: "/nosotros#nuestro-enfoque" },
-      // "Equipo" (pedido de Sofia, 11/09; antes "Fundadora"). El titulo de la
-      // pantalla sigue siendo "Estela, fundadora": la etiqueta del menu nombra
-      // la seccion, no la pantalla, y deja lugar a que despues sume mas gente.
-      { label: "Equipo", href: "/nosotros#estela" },
+      // Tercer nombre de la misma entrada: "Fundadora" -> "Equipo" (Sofia,
+      // 11/09) -> "Founder" (Ignacio, 17/09). Con este vuelve a decir lo mismo
+      // que el titulo de la pantalla a la que lleva, que es "Estela, founder"
+      // y es copy literal de la clienta: entre el 11 y el 17 el menu nombraba
+      // una seccion que en pantalla se llamaba de otra manera.
+      { label: "Founder", href: "/nosotros#estela" },
     ],
   },
   {

@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { KeyRound } from "lucide-react";
 import { redeemAccessCode, type RedeemState } from "@/app/contenidos/actions";
+import { CTA_TONES } from "./CtaLink";
 
 /**
  * Canje del codigo de acceso. Es el modal dorado que dibujo Julia (video del
@@ -44,10 +45,19 @@ export function AccessCodeForm({ tone = "dark" }: { tone?: "dark" | "light" }) {
               : "border-primary-container/45 bg-white/10 text-white focus:border-primary-container"
           }`}
         />
+        {/* El boton del sistema, no una pildora dorada rellena: esa era una de
+            las cuatro variantes que el estandar del 15/09 saco del sitio (ver
+            `CtaLink`). Se comparten las clases en vez de usar el componente
+            porque esto es un `submit` y no un link — mismo caso que
+            `Collapsible`. Ojo con los nombres: el `light` de acá es "sobre
+            fondo claro", que en `CtaLink` es el tono `dark` (el tono nombra al
+            TEXTO). */}
         <button
           type="submit"
           disabled={pending}
-          className="rounded-full bg-[#f9d78f] px-6 py-2.5 text-label-sm uppercase text-[#05125a] transition-colors hover:bg-primary-fixed disabled:opacity-40"
+          className={`inline-flex items-center justify-center rounded-full border-[1.5px] px-6 py-2.5 text-label-sm uppercase transition-[color,background-color,border-color,box-shadow,transform] duration-[250ms] hover:scale-[1.04] disabled:opacity-40 ${
+            CTA_TONES[light ? "dark" : "gold"]
+          }`}
         >
           {pending ? "Canjeando…" : "Entrar"}
         </button>

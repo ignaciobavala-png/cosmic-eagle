@@ -15,6 +15,7 @@ import { ARTICLE_CATEGORY_LIST, isArticleCategory } from "@/lib/article";
 import { canRead, CONTENT_WALL_COPY } from "@/lib/content-access";
 import { viewerContentLevel } from "@/lib/content-access-server";
 import { AccessCodeForm } from "@/components/ui/AccessCodeForm";
+import { CTA_TONES } from "@/components/ui/CtaLink";
 
 export const metadata: Metadata = {
   title: "Contenidos | Cosmic Eagle",
@@ -154,10 +155,21 @@ export default async function ContenidosPage({
                   // desaparecia: va la azul, la misma del boton de Tecnologia
                   // Humana. El inactivo pasa a borde y texto azules por lo
                   // mismo que el kicker.
-                  className={`rounded-full border px-5 py-2 text-label-sm uppercase transition-colors ${
+                  //
+                  // **El inactivo usa el hover del boton del sistema**
+                  // (`CTA_TONES.dark`, el mismo `tone` que el resto de lo que
+                  // vive sobre fondo claro) y no uno propio. Tenia
+                  // `hover:bg-[#fff6eb]`: se rellenaba de blanco al pasar por
+                  // encima, que es justo lo que el estandar del 15/09 saco de
+                  // todo el sitio —no hay mas botones rellenados, el hover son
+                  // el trazo, el brillo y la escala— (reporte de Ignacio,
+                  // 17/09). El RELLENO azul del activo se queda: no es una
+                  // variante de boton, es el estado seleccionado del filtro, y
+                  // es lo unico que lo distingue de los otros seis.
+                  className={`inline-flex items-center rounded-full border-[1.5px] px-5 py-2 text-label-sm uppercase transition-[color,background-color,border-color,box-shadow,transform] duration-[250ms] ${
                     filter.active
                       ? "border-[#05125a] bg-[#05125a] text-[#fff6eb]"
-                      : "border-[#05125a]/35 text-[#05125a] hover:border-[#05125a] hover:bg-[#fff6eb]"
+                      : `hover:scale-[1.04] ${CTA_TONES.dark}`
                   }`}
                 >
                   {filter.label}
