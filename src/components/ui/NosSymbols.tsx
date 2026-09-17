@@ -44,6 +44,7 @@ const SIDE_CLASS = {
   belowId,
   minGap = 32,
   maxGap,
+  desktopGap,
   /** Umbral del observer propio del simbolo y retardo del fade de aparicion. */
   amount = 0.4,
   delay = 0,
@@ -57,6 +58,19 @@ const SIDE_CLASS = {
   belowId: string;
   minGap?: number;
   maxGap?: number;
+  /**
+   * Tope del hueco entre el texto de arriba y el simbolo EN DESKTOP.
+   *
+   * Sin esto el simbolo reparte por la mitad todo el aire que queda hasta la
+   * seccion siguiente, asi que en una pantalla con poco texto se va al piso y
+   * el conjunto texto+simbolo se lee bajo aunque el texto este centrado (era el
+   * caso de "Nuestro proposito": 322px de aire arriba contra 112 abajo).
+   *
+   * Con el tope puesto, el hueco es fijo y quien centra el conjunto es el
+   * colchon inferior del bloque de texto, que tiene que medir
+   * `desktopGap + alto del simbolo`.
+   */
+  desktopGap?: number;
   amount?: number;
   delay?: number;
   /**
@@ -123,7 +137,10 @@ const SIDE_CLASS = {
         const belowTop = rectNoTransform(below).top;
         const symbolRect = symbol.getBoundingClientRect();
         const totalGap = belowTop - aboveBottom;
-        const half = Math.max(base, (totalGap - symbolRect.height) / 2);
+        let half = Math.max(base, (totalGap - symbolRect.height) / 2);
+        if (desktopGap) {
+          half = Math.min(half, desktopGap);
+        }
         const parent = symbol.offsetParent as HTMLElement | null;
         const parentTop = parent ? parent.getBoundingClientRect().top : 0;
         symbol.style.top = `${Math.round(aboveBottom + half - parentTop)}px`;
@@ -205,7 +222,7 @@ const SIDE_CLASS = {
       window.removeEventListener("load", scheduleApply);
       window.removeEventListener("resize", apply);
     };
-  }, [aboveId, belowId, minGap, maxGap]);
+  }, [aboveId, belowId, minGap, maxGap, desktopGap]);
 
   return (
     <motion.div

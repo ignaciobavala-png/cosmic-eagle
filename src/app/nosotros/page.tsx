@@ -148,7 +148,13 @@ export default async function NosotrosPage() {
           stagger={0}
           className="relative flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile py-[35px] text-[#05125a] min-h-[81svh] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
         >
-          <div className="mx-auto max-w-3xl">
+          {/* `md:mb-[219px]`: el colchon que centra el CONJUNTO texto+simbolo y
+              no solo el texto. El simbolo es `absolute`, asi que no pesa en el
+              `justify-center`: sin este colchon el texto quedaba centrado solo y
+              el simbolo se iba al piso (medido el 17/09 en 1440x900: 322px de
+              aire arriba contra 112 abajo). Mide `desktopGap` (121) + el alto
+              del simbolo 2 (98) — si cambia cualquiera de los dos, cambia aca. */}
+          <div className="mx-auto max-w-3xl md:mb-[219px]">
             {/* `w-fit`: el filete mide el ancho del titulo y no el de la
                 columna. El `id` del `RevealItem` no se mueve: lo usan las
                 mediciones de centrado de esta pagina. */}
@@ -204,6 +210,7 @@ export default async function NosotrosPage() {
             belowId="video"
             minGap={32}
             maxGap={121}
+            desktopGap={121}
             amount={0.6}
             delay={0.3}
             onGold
@@ -332,11 +339,22 @@ export default async function NosotrosPage() {
 
         {/* Pantalla 6 — "Estela, founder", la ultima de contenido. Copy de la
             clienta (11/09), literal: no se reescribe ni se le inventan
-            resaltados. Es el mismo bloque que "Nuestro enfoque" y "Nuestro
-            proposito" (crema profunda, titulo en la display, filete dorado,
-            cuerpo en Montserrat justificado y cierre en italica sobre el
-            filete), asi las tres pantallas de texto del recorrido se leen como
-            una sola serie.
+            resaltados. Es la misma ESTRUCTURA que "Nuestro enfoque" y "Nuestro
+            proposito" (titulo en la display, filete dorado, cuerpo en
+            Montserrat justificado y cierre en italica sobre el filete), asi las
+            tres pantallas de texto del recorrido se leen como una sola serie.
+
+            **El fondo es el azul del manual de marca** (pedido de Ignacio,
+            17/09): el `Fondos/1.png` del manual, que es un degrade diagonal de
+            `#05125a` a `#0070ab`. Va como `linear-gradient` y no como imagen —
+            es un degrade plano, el PNG son 60KB para lo que el CSS hace en cero
+            y ademas asi comparte los colores exactos del navbar y el footer.
+
+            Al invertirse el fondo se invierte toda la paleta del bloque: el
+            titulo y el cuerpo pasan a `primary` (el blanco calido) y el cierre
+            italico a `primary-container`, que es el oro que la regla del 28/08
+            reserva para texto sobre azul. El `TitleRule` se queda en su tono por
+            defecto (`gold`, `#f9d78f`): es justo el que esta pensado para esto.
 
             La frase final va en el cierre italico y no como un parrafo mas: es
             la unica que sintetiza, igual que la de "Nuestro enfoque".
@@ -352,18 +370,18 @@ export default async function NosotrosPage() {
           amount={0.25}
           once={false}
           stagger={0}
-          className="relative flex w-full flex-col items-center justify-center bg-[#fcedcd] px-margin-mobile pt-[35px] pb-[76px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
+          className="relative flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#05125a,#0079b3)] px-margin-mobile pt-[35px] pb-[76px] text-primary md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
         >
           <div className="mx-auto max-w-3xl">
             <div className="w-fit">
               <RevealItem y={0} duration={1} id="nos-estela-title">
-                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                <h2 className="font-display text-headline-md font-bold text-primary md:text-headline-lg">
                   Estela, founder
                 </h2>
               </RevealItem>
               <TitleRule grow className="mt-3 mb-6" />
             </div>
-            <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-justify">
+            <div className="space-y-6 text-body-md leading-relaxed text-primary text-justify">
               <RevealItem y={14} duration={0.8} delay={0.15}>
                 <p>
                   Estela lleva más de 25 años explorando la conciencia, la mente,
@@ -407,7 +425,19 @@ export default async function NosotrosPage() {
               </RevealItem>
             </div>
             <RevealItem y={14} duration={0.8} delay={0.8} id="nos-estela-close">
-              <p className="mt-8 border-t border-[#05125a]/15 pt-6 font-display text-xl italic leading-relaxed text-[#05125a]">
+              {/* **El cierre va en dorado**, pedido de Ignacio del 17/09: es la
+                  frase que sintetiza y el oro la separa del cuerpo. Va en
+                  `primary-container` (`#f9d78f`), que es el oro que la regla del
+                  28/08 reserva para texto sobre azul — los otros dos son todavia
+                  mas oscuros y aca el fondo ya viene claro.
+
+                  Medido contra el fondo REAL debajo de la frase: 6,96:1 del lado
+                  izquierdo y **4,41:1 en el extremo derecho**, que es donde el
+                  degradé llega a su punto mas claro. Ese peor caso queda apenas
+                  por debajo del 4,5 de AA para texto normal; lo pasaria como
+                  texto grande con 24px (hoy son 20). Anotado a proposito: si
+                  alguna vez se sube el tamaño de esta frase, deja de ser deuda. */}
+              <p className="mt-8 border-t border-primary-container/30 pt-6 font-display text-xl italic leading-relaxed text-primary-container">
                 En el centro de todo está la evolución: liberarnos de aquello que
                 nos limita, recordar quiénes somos y abrir espacio para desarrollar
                 el potencial que cada ser humano lleva dentro.

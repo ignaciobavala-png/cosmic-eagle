@@ -24,6 +24,18 @@ import { Reveal, RevealItem, RevealLine } from "./Reveal";
  * gritar, que es lo que se pidió. El azul del texto daría 9,55:1 y convertiría
  * al eslabón en un elemento fuerte.
  *
+ * **Y no es un color plano: se desvanece en las dos puntas** (pedido de Ignacio
+ * del 17/09, "más sutiles"), igual que el `TitleRule` del sitio. El tono del
+ * centro no baja —es el que sostiene que el eslabón se vea sobre el dorado—,
+ * así que lo que se afina son los bordes: el filete deja de leerse como un
+ * guión y pasa a leerse como un hilo. Por eso además es más largo (64px en
+ * fila, 48px en columna, contra los 40 y 32 de antes): con las puntas
+ * desvanecidas, un filete corto casi no deja centro visible.
+ *
+ * El degradé va en el `className` y no adentro de `RevealLine`: el componente
+ * anima la escala y no toca el fondo, así que un filete plano y uno degradado
+ * se dibujan igual.
+ *
  * Las palabras entran alternando de abajo y de arriba (±36px), escalonadas. Los
  * siete elementos —cuatro palabras y tres filetes— llevan retardos de 0.1s a
  * 1.2s, que es lo que Julia escribe a mano por `nth-child`: de ahí salen el
@@ -78,7 +90,9 @@ export function WordSequence({ words }: { words: readonly string[] }) {
                 axis={narrow ? "y" : "x"}
                 duration={narrow ? 1.1 : 0.9}
                 className={
-                  narrow ? "h-8 w-px bg-[#755c21]" : "h-px w-10 bg-[#755c21]"
+                  narrow
+                    ? "h-12 w-px bg-[linear-gradient(to_bottom,transparent_0%,#755c21_50%,transparent_100%)]"
+                    : "h-px w-16 bg-[linear-gradient(to_right,transparent_0%,#755c21_50%,transparent_100%)]"
                 }
               />,
             ]
