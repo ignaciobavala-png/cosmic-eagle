@@ -27,6 +27,15 @@ export const IMAGES = {
   // una lectura religiosa que el sitio no quiere (la estrella de seis puntas,
   // la luna con estrella).
   simboloCirculos: "/img/simbolo-circulos.webp",
+  // Marca de agua de "Nuestro enfoque" (/nosotros): el simbolo del CALIZ —dos
+  // arcos que convergen sobre un eje vertical—, del mismo set y el mismo tono
+  // que `simboloCirculos`.
+  //
+  // Se eligio por el texto de la pantalla: "nuestro enfoque REUNE conocimiento
+  // ancestral y galactico, tecnologias cosmicas y practicas de conciencia". Y
+  // porque es simetrico, que es lo que pide una decoracion que va a los dos
+  // costados de la columna.
+  simboloCaliz: "/img/simbolo-caliz.webp",
   // Rediseno de la home (docs/HOME_REDISENO.md). Los degrades de "La humanidad",
   // la banda dorada y el fondo del footer NO estan aca: se hacen en CSS.
   homeHero: "/img/home/hero.webp",

@@ -11,6 +11,7 @@ import { Reveal, RevealItem } from "@/components/ui/Reveal";
 import { TitleRule } from "@/components/ui/TitleRule";
 import { SymbolRow } from "@/components/ui/NosSymbols";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
+import { IMAGES } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Nosotros | Cosmic Eagle",
@@ -273,9 +274,40 @@ export default async function NosotrosPage() {
           amount={0.25}
           once={false}
           stagger={0}
-          className="relative flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile pt-[35px] pb-[88px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
+          className="relative overflow-hidden flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile pt-[35px] pb-[88px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
         >
-          <div className="mx-auto max-w-3xl">
+          {/* Marca de agua a los dos costados, el mismo recurso que la
+              biblioteca de /contenidos: el simbolo del manual, tono sobre tono,
+              cortado por el borde. Aca va simetrico —uno por lado— porque el
+              simbolo lo es.
+
+              **Solo desde `md`.** En mobile la columna ocupa el ancho completo
+              y el cuerpo va DIRECTO sobre el dorado, sin tarjeta que lo separe:
+              cualquier marca de agua queda atras del texto y le come
+              legibilidad. En /contenidos si se quedan en mobile porque ahi lo
+              que se apoya encima son tarjetas opacas.
+
+              Los tamaños y las posiciones estan calculados para NO entrar en la
+              columna: con `max-w-3xl` (768px) en una pantalla de 1440 quedan
+              336px libres de cada lado, y el simbolo mide 300 arrancando fuera
+              del borde. El envoltorio va en `z-0` y el contenido en `z-10`, no
+              en z-index negativo. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-0 hidden md:block"
+          >
+            <img
+              src={IMAGES.simboloCaliz}
+              alt=""
+              className="absolute -left-20 top-1/2 w-[300px] -translate-y-1/2 opacity-[0.12] lg:-left-10 lg:w-[340px]"
+            />
+            <img
+              src={IMAGES.simboloCaliz}
+              alt=""
+              className="absolute -right-20 top-1/2 w-[300px] -translate-y-1/2 opacity-[0.12] lg:-right-10 lg:w-[340px]"
+            />
+          </div>
+          <div className="relative z-10 mx-auto max-w-3xl">
             <div className="w-fit">
               <RevealItem y={0} duration={1} id="nos-enfoque-title">
                 <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
