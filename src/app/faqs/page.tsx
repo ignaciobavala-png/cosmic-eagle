@@ -24,8 +24,11 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 /**
- * Preguntas frecuentes. Existe porque "Salud y Seguridad" de /viajes ya remitia
- * acá ("visita nuestras FAQs") y era un link muerto del codigo aprobado.
+ * Preguntas frecuentes. Nacio porque "Salud y Seguridad" de /viajes ya remitia
+ * acá ("visita nuestras FAQs") y era un link muerto del codigo aprobado. Esa
+ * seccion salio el 17/09 (ver docs/COPY_HUERFANO.md §4), asi que hoy a /faqs se
+ * llega por el footer: si vuelve a hacer falta un camino desde Experiencias,
+ * hay que ponerlo a mano.
  *
  * El texto lo cargan ellas desde /admin/faqs: los dos juegos que escribio Sofia
  * estaban en los anexos de `web-cosmic-journey-ES.md`, que se perdio.

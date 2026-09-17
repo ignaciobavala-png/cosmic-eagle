@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -19,12 +18,20 @@ import { getTestimonials } from "@/lib/testimonials";
 export const metadata: Metadata = {
   title: "Experiencias | Cosmic Eagle",
   description:
-    "Sesiones Cósmicas de un día y Viajes Cósmicos de una semana en portales sagrados. Calendario, testimonios e información de salud.",
+    "Sesiones Cósmicas de un día y Viajes Cósmicos de una semana en portales sagrados. Calendario y testimonios.",
 };
 
 /**
  * /viajes según el rediseño de Julia (`EXPERIENCIAS.html`, ver
  * docs/REDISENO_JULIA_HTML.md §3).
+ *
+ * **Sin "Salud y Seguridad" desde el 17/09.** La sección cerraba la página con
+ * las contraindicaciones y el pedido de revisar la información de salud antes
+ * de postular. Sofía la sacó: todavía no se registró nadie, así que esta página
+ * es promoción —mostrar qué son las Sesiones y qué son los Viajes— y la
+ * prevención entra recién en el embudo, donde ya vive (el formulario de salud
+ * de la etapa 2 y el consentimiento). El texto es de ella y no se borra: está
+ * guardado en `docs/COPY_HUERFANO.md` para cuando se decida dónde va.
  *
  * Dejó de ser una grilla con filtros: ahora son **dos bloques narrativos**, uno
  * por tipo, cada uno con su calendario desplegable y sus testimonios. El
@@ -202,6 +209,13 @@ export default async function ViajesPage() {
           overlay={isEnabled(content("viajes.banner.overlay"))}
         />
 
+        {/* **`flushBottom` se queda aunque ahora sea la ultima seccion.** Al
+            sacar "Salud y Seguridad" la primera idea fue devolverle el padding
+            —la pagina termina aca— y se ve peor: el ultimo hijo es la banda de
+            testimonios, que es azul y a todo el ancho, asi que el padding
+            dejaba una franja crema de 96px entre esa banda y el footer, que
+            tambien es azul. Sin el, el azul de los testimonios entra directo al
+            del footer. Medido el 17/09. */}
         <CreamSection
           id="viajes"
           full={false}
@@ -264,59 +278,6 @@ export default async function ViajesPage() {
           />
         </CreamSection>
 
-        <CreamSection
-          id="salud"
-          full={false}
-          reveal={{ amount: 0.22, once: false, stagger: 0 }}
-        >
-          {/* Estandar de Experiencias: umbral 0.22 sobre la SECCION (lo pone
-              `reveal` arriba), reversible, cascada de 150ms y 0.9s por
-              elemento. La linea dorada aca NO crece, a diferencia de la home y
-              /nosotros: es una barra estatica, asi esta en el codigo aprobado. */}
-          <div className="mx-auto max-w-3xl">
-            <RevealItem>
-              {/* `w-fit` no es cosmetico: es lo que hace que el filete de
-                  abajo mida el ancho del TITULO y no el de la columna. */}
-              <div className="w-fit">
-                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                  Salud y Seguridad
-                </h2>
-                <TitleRule className="mt-3 mb-7" />
-              </div>
-            </RevealItem>
-            <div className="space-y-5 text-body-md leading-relaxed text-[#05125a] text-justify">
-              <RevealItem delay={0.15}>
-              <p>
-                Si actualmente tomas medicamentos o estás bajo tratamiento
-                médico, psiquiátrico o psicológico, por favor revisa nuestra
-                información de salud antes de postular.
-              </p>
-              </RevealItem>
-              <RevealItem delay={0.3}>
-              <p>
-                Esta experiencia no es adecuada para personas con ciertas
-                condiciones psiquiátricas, adicciones activas a sustancias,
-                trastornos de personalidad, condiciones cardiovasculares graves o
-                epilepsia.
-              </p>
-              </RevealItem>
-              <RevealItem delay={0.45}>
-              <p>
-                Para información sobre preparación, qué llevar, integración,
-                dosis, miedo y ansiedad, y otros aspectos prácticos, por favor
-                visita nuestras{" "}
-                <Link
-                  href="/faqs"
-                  className="font-medium text-on-primary-container underline underline-offset-4"
-                >
-                  preguntas frecuentes
-                </Link>
-                .
-              </p>
-              </RevealItem>
-            </div>
-          </div>
-        </CreamSection>
       </main>
       <Footer />
       <BackToTop />

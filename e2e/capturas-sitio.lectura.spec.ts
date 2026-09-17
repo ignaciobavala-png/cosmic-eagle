@@ -287,8 +287,6 @@ test("recorrido por el sitio, sección por sección", async ({ page }) => {
     await irA(page, "#viajes", 0.05);
     await capturar(page, "Viajes Cósmicos", "El mismo bloque, para los viajes de una semana.");
 
-    await irA(page, "#salud", 0.05);
-    await capturar(page, "Salud y Seguridad", "El bloque de cierre de Experiencias.");
 
     // ─── Contenidos ──────────────────────────────────────────────────────────
     capitulo = "Contenidos y preguntas";

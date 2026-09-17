@@ -153,7 +153,8 @@ test("los anclajes no caen debajo del navbar", async ({ page }) => {
   await page.goto("/viajes");
   await page.waitForLoadState("load");
 
-  for (const ancla of ["sesiones", "viajes", "salud"]) {
+  // "salud" salio de la lista el 17/09 con la seccion (ver COPY_HUERFANO §4).
+  for (const ancla of ["sesiones", "viajes"]) {
     await page.evaluate((id) => { location.hash = `#${id}`; }, ancla);
     await page.waitForTimeout(900);
 

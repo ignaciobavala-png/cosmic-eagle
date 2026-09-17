@@ -42,6 +42,33 @@ dónde van**, no que se borren. Preguntado a Julia el 27/08.
 > democratizar el acceso a los misterios celestiales, permitiendo que cada
 > individuo experimente su propia divinidad en un entorno guiado y curado.
 
+## 4. De `/viajes` — "Salud y Seguridad"
+
+**Sacada del sitio el 17/09 por pedido de Sofía**, y por una razón de momento,
+no de contenido: todavía no se registró nadie, así que `/viajes` es hoy una
+página de promoción —mostrar qué son las Sesiones y qué son los Viajes— y la
+prevención entra recién en el embudo, donde ya vive (el filtro corto, el
+formulario de salud de la etapa 2 y el consentimiento).
+
+Era el cierre de la página, la última franja crema, y **es el único lugar
+público donde estaban las contraindicaciones**. Vuelve cuando se decida dónde:
+el candidato natural es `/preparacion`, que está pendiente de construir.
+
+> Si actualmente tomas medicamentos o estás bajo tratamiento médico,
+> psiquiátrico o psicológico, por favor revisa nuestra información de salud
+> antes de postular.
+>
+> Esta experiencia no es adecuada para personas con ciertas condiciones
+> psiquiátricas, adicciones activas a sustancias, trastornos de personalidad,
+> condiciones cardiovasculares graves o epilepsia.
+>
+> Para información sobre preparación, qué llevar, integración, dosis, miedo y
+> ansiedad, y otros aspectos prácticos, por favor visita nuestras preguntas
+> frecuentes.
+
+El tercer párrafo llevaba el link a `/faqs`. Era **el único link a las FAQs
+desde `/viajes`**; queda el del footer.
+
 ---
 
 ## Pendiente de la home (todavía no se tocó)
