@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/resend";
 import { SolicitudRecibida } from "@/emails/SolicitudRecibida";
 import { formatDateRangeCompact } from "@/lib/format";
+import { todayUTC } from "@/lib/trip-dates";
 
 export type ApplicationFormState = { error: string | null };
 
@@ -39,6 +40,20 @@ export async function submitApplication(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect(`/cuenta?next=/viajes/${tripId}/solicitar`);
+
+  // El mismo cierre que hace la página, del lado del servidor: esconder el
+  // formulario no alcanza, un server action es una URL y se le puede postear a
+  // mano. No entra solicitud nueva a un viaje terminado ni a uno que no está
+  // `open` — y esto no toca a quien ya postuló, que nunca pasa por acá.
+  const { data: trip } = await supabase
+    .from("trips")
+    .select("status, end_date")
+    .eq("id", tripId)
+    .single();
+
+  if (!trip || trip.status !== "open" || trip.end_date < todayUTC()) {
+    return { error: "Este viaje ya no está recibiendo solicitudes." };
+  }
 
   const full_name = str(formData, "full_name");
   const email = str(formData, "email");

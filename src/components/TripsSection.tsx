@@ -2,6 +2,7 @@ import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal } from "@/components/ui/Reveal";
 import { TripCard } from "@/components/ui/TripCard";
 import { createClient } from "@/lib/supabase/server";
+import { todayUTC } from "@/lib/trip-dates";
 import { TRIP_TYPES } from "@/lib/constants";
 import type { Enums } from "@/lib/supabase/types";
 
@@ -31,6 +32,10 @@ export async function TripsSection({
     )
     .eq("type", type)
     .in("status", ["open", "closed"])
+    // Igual que las carteleras en uso: fuera lo que ya termino. El `limit` es
+    // el motivo de que el filtro vaya aca y no en JS — descartar despues del
+    // limite dejaria la seccion con menos de tres tarjetas habiendo mas.
+    .gte("end_date", todayUTC())
     .order("start_date", { ascending: true })
     .limit(3);
 

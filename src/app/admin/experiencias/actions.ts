@@ -177,6 +177,36 @@ function parseTripForm(formData: FormData) {
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
 /**
+ * El bucket de las portadas. `trip-cover.ts` lo tiene igual, pero solo exporta
+ * la subida (que es lo que se comparte con /admin/multimedia) y no un helper
+ * para deducir la ruta desde la URL publica. Se repite aca, que es el unico
+ * lugar que borra un viaje entero.
+ */
+const COVER_BUCKET = "trip-images";
+const COVER_PUBLIC_PREFIX = `/storage/v1/object/public/${COVER_BUCKET}/`;
+
+/**
+ * Saca la portada del bucket. Sin esto cada viaje borrado deja su imagen
+ * huerfana ocupando lugar para siempre: nadie vuelve a tener su URL.
+ *
+ * Si la URL no es del bucket (o no hay portada) no hace nada, y un fallo del
+ * remove no se propaga: la fila ya no esta, el borrado fue exitoso igual.
+ */
+async function deleteTripCover(
+  supabase: SupabaseClient,
+  imageUrl: string | null | undefined
+) {
+  if (!imageUrl?.includes(COVER_PUBLIC_PREFIX)) return;
+
+  const path = imageUrl.split(COVER_PUBLIC_PREFIX)[1]?.split("?")[0];
+  if (!path) return;
+
+  await supabase.storage
+    .from(COVER_BUCKET)
+    .remove([decodeURIComponent(path)]);
+}
+
+/**
  * Envuelve `uploadTripCover` para el form del viaje, donde la portada es un
  * campo mas del formulario y puede no venir. Devuelve `url: undefined` cuando
  * no hay archivo, para distinguir "no tocar la portada" de "portada vacia".
@@ -250,8 +280,51 @@ export async function updateTrip(
   redirect(tripAdminPath(type));
 }
 
-export async function deleteTrip(id: string) {
+export type DeleteTripState = { error: string | null };
+
+/**
+ * Borra el viaje, y si sale bien se lleva tambien la portada del bucket.
+ *
+ * El error NO se descarta: `applications.trip_id` y `consents.trip_id` apuntan a
+ * `trips` con ON DELETE RESTRICT, asi que un viaje con gente anotada no se puede
+ * borrar y Postgres devuelve 23503. Tragarse ese error dejaba la fila en su
+ * lugar, la pagina revalidada y a Estela apretando "Eliminar" tres veces
+ * pensando que el panel estaba roto.
+ */
+export async function deleteTrip(
+  id: string,
+  _prevState: DeleteTripState,
+  _formData: FormData
+): Promise<DeleteTripState> {
   const supabase = await createClient();
-  await supabase.from("trips").delete().eq("id", id);
+
+  // La portada se relee antes de borrar la fila: despues del delete ya no hay
+  // de donde sacar la URL.
+  const { data: trip } = await supabase
+    .from("trips")
+    .select("image_url")
+    .eq("id", id)
+    .single();
+
+  const { error } = await supabase.from("trips").delete().eq("id", id);
+
+  if (error) {
+    // 23503 = foreign_key_violation. Es el caso ESPERABLE, no una falla: el
+    // mensaje tiene que explicar la causa real y la salida que ya existe, que es
+    // sacarlo de la vista con el estado del formulario, no borrarlo.
+    if (error.code === "23503") {
+      return {
+        error:
+          "No se puede eliminar un viaje que ya tiene gente inscripta: se perderían sus solicitudes y consentimientos. Para que deje de verse en el sitio, editalo y cambiale el estado a Borrador o Cerrado.",
+      };
+    }
+    return { error: `No se pudo eliminar el viaje: ${error.message}` };
+  }
+
+  // La portada se borra despues de la fila y solo si el delete funciono: si
+  // falla por RLS o por una FK, el viaje sigue en pie y con su imagen.
+  await deleteTripCover(supabase, trip?.image_url);
+
   revalidateTripPaths();
+  return { error: null };
 }

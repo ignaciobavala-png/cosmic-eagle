@@ -2448,6 +2448,116 @@ Cierre 600, panel doble 540 y `scroll-snap-type: none`).
 
 ---
 
+### Sesión del 2026-09-17 (bis) — auditoría del panel antes de la reunión
+
+Dos horas antes de una reunión con Sofía, un repaso del panel buscando bugs
+silenciosos y contradicciones del flujo. Salieron quince; se arreglaron cinco, en
+tres agentes paralelos repartidos por carpeta para que no se pisaran los
+archivos. El resto está anotado abajo, sin tocar.
+
+#### El "Próximo viaje" era el más viejo de la base
+
+**Ninguna consulta de `trips` filtraba por fecha** — no había un solo
+`.gte(...)` en el proyecto. El dashboard ordenaba ascendente y recortaba a 4, así
+que la tarjeta "Próximo viaje" anunciaba el viaje **más antiguo** cargado: el
+17/09 mostraba la Sesión en Buenos Aires del 5/9, terminada doce días antes. Lo
+mismo en la home, en `/viajes` y en `/calendario`, donde las dos sesiones pasadas
+seguían en cartelera como abiertas.
+
+Va `todayUTC()` en `src/lib/trip-dates.ts` y `.gte("end_date", todayUTC())` en
+las cinco consultas. **Sobre `end_date` y no sobre `start_date`**: un Viaje de
+una semana que arrancó anteayer sigue en curso y tiene que seguir viéndose. Y en
+UTC armado con `toISOString()`, no con los getters locales: alguien en -03 que
+entra a las 22:00 ya está en el día siguiente en UTC, así que la cartelera se
+correría un día entero según dónde corra el código. El filtro va en la consulta y
+no en JS porque la home y el panel traen `limit`, y descartar después del límite
+deja menos tarjetas de las publicadas. Ojo: la home y `/calendario` son ISR, así
+que ese "hoy" queda congelado hasta que caduque la página.
+
+De paso se cerró el alta: se podía postular por URL directa a un viaje terminado.
+La página ya miraba `status`, pero no la fecha, y **el server action no miraba
+ninguna de las dos** — esconder el formulario no alcanza, un server action es una
+URL a la que se le puede postear a mano. El cierre es del **alta**, no de la
+pantalla: quien ya postuló sigue viendo su estado completo, con la logística y
+los medios de pago, que es justo cuando más los necesita.
+
+#### Cuatro botones que mandaban un correo sin preguntar
+
+"Aprobar", "Conversemos" y "Rechazar" salían con un click y el correo a la
+persona se iba en el acto, irreversible. Ahora cada uno confirma **nombrando a la
+persona y diciendo qué correo sale**; "Marcar como expirada" confirma igual pero
+avisa que no se manda nada y que la persona sólo se entera si entra al sitio. Va
+con `confirm()` del browser, que es el patrón que ya usaba `DeleteTripButton`: lo
+que hacía falta era un freno, no una pantalla nueva.
+
+#### El monto que se guardaba solo
+
+El campo del pago arrancaba en `amountPaid || depositAmount || price`. Si Estela
+apretaba "Marcar como pagado" sin tocar el número, la solicitud quedaba en `paid`
+con el monto de la seña y el correo [3C] salía diciendo "tu pago está completo"
+**con saldo pendiente**. Ahora arranca en lo efectivamente recibido, y hay un
+aviso en rojo, antes de apretar, cuando el monto no cierra con el estado que se
+va a marcar. No bloquea: puede haber un descuento acordado.
+
+El segundo agujero era que **no había forma de corregir el monto sin cambiar el
+estado**, porque los botones filtran el estado actual: un pago parcial que no
+llega al total no se podía registrar en ningún lado. Va un botón que reenvía el
+mismo estado; `markPayment` sólo manda correo cuando
+`application.payment_status !== paymentStatus`, así que guardar así no remanda
+nada. Efecto secundario aceptado: pisa `paid_at` con el `now()` del momento, que
+pasa a leerse como "fecha del último pago registrado".
+
+#### Dos pantallas que le mentían a Estela
+
+El aviso rojo de revisión manual era un ternario: si había formulario de salud se
+miraban **sólo** sus banderas. Un formulario extenso sin nada marcado hacía
+desaparecer la alerta del filtro inicial aunque la persona hubiera declarado ahí
+enfermedad grave o medicación en curso. Ahora las dos etapas **se suman** y cada
+bandera dice de cuál viene — que es como disparan los dos triggers, uno por
+etapa.
+
+Y la sección "Formulario de salud" le decía a todo el mundo "todavía no lo
+completó, lo puede cargar después del pago". A una **recurrente** eso la dejaba
+esperando algo que no existe: el formulario extenso sólo lo llenan las
+primerizas (`previous_ceremonies === 0`, el mismo criterio de `my_applications`,
+del gate de `/viajes/[id]/salud` y de `notifyPaid`). Lo que sí le corresponde es
+el consentimiento, y ahora lo dice.
+
+#### Borrar un viaje fallaba en silencio
+
+`applications.trip_id` y `consents.trip_id` son **ON DELETE RESTRICT**, así que
+un viaje con solicitudes no se puede borrar. `deleteTrip` no miraba el error: se
+confirmaba el diálogo, la página se revalidaba y el viaje seguía ahí sin que
+nadie explicara nada. Ahora el `23503` sale como un mensaje que dice la causa y
+la salida real —pasarlo a Borrador o Cerrado— y el botón pasó a `useActionState`
+para que el texto llegue a la pantalla. De paso borra la portada del Storage
+cuando el borrado sí funciona, que era otro huérfano.
+
+#### Lo que quedó anotado y no se tocó
+
+- **`capacity` es decorativo**: nada cuenta aprobados contra el cupo, ni en el
+  panel ni en público. Es el "conteo por viaje" del boceto de Sofía.
+- **La moneda no cierra**: `trips.price` está en USD y los dos rieles cobran en
+  EUR y CLP, y `amount_paid` es un número sin moneda. Entra en las 5 preguntas de
+  pagos sin responder.
+- **Ningún viaje tiene `deposit_amount`**, así que "Registrar la seña" no aparece
+  nunca y el correo [3A] no se dispara nunca: el camino de seña está vivo en el
+  código y muerto en los datos.
+- Revocar el acceso a contenidos y volver a aprobar **no lo devuelve**: el
+  trigger inserta `on conflict (application_id) do nothing`. Y rechazar o expirar
+  una solicitud ya aprobada no revoca el grant.
+- El vencimiento de un código de acceso se guarda como medianoche UTC, o sea las
+  21:00 del día anterior en Chile.
+- `content_grants` en la ficha se lee sin filtrar por `level`.
+- Dos sesiones con `price = 0.00` y dos "Sesión en Santiago" con título idéntico.
+
+Verificado con `tsc --noEmit` y `pnpm build`, los dos en verde. **No se probó
+apretando los botones**: la base no tiene ni una solicitud, así que el embudo no
+se recorrió en el browser.
+
+---
+
+---
 ## Apéndice — el `CLAUDE.md` anterior al 2026-09-15
 
 Las secciones de estado, estructura y diseño que tenía `CLAUDE.md` antes de la

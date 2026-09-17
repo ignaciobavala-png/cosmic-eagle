@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getActivePaymentMethods } from "@/lib/payments";
 import { formatAmount } from "@/lib/format";
 import { formatTripHours } from "@/lib/trip-fields";
+import { todayUTC } from "@/lib/trip-dates";
 import {
   funnelSurface,
   panel,
@@ -166,6 +167,27 @@ export default async function SolicitarPage({
   const existing = applications?.[0];
   const step = existing ? nextStep(id, existing) : null;
 
+  // Hasta acá se podía postular por URL directa a un viaje ya terminado o a uno
+  // que la clienta dejó en `draft`/`closed`: la página sólo miraba `status`, y
+  // ninguna consulta miraba la fecha.
+  //
+  // **Es un cierre del ALTA, no de la pantalla**: `step` va primero en el
+  // ternario de abajo, así que quien ya tiene solicitud sigue viendo su estado
+  // completo —cómo pagar, comprobante, logística— aunque el viaje haya pasado.
+  // Es justo el momento en que más necesita esos datos.
+  const terminado = trip.end_date < todayUTC();
+  const cierre = terminado
+    ? {
+        title: "Esta experiencia ya ocurrió",
+        body: "Las fechas de este viaje ya pasaron, así que no estamos recibiendo solicitudes. Mirá el calendario: seguro hay una próxima.",
+      }
+    : trip.status !== "open"
+      ? {
+          title: "Este viaje no está abierto a solicitudes",
+          body: "En este momento no estamos recibiendo postulaciones para esta experiencia. Podés escribirnos o mirar las fechas que sí están abiertas.",
+        }
+      : null;
+
   // Los rieles de cobro sólo se leen cuando hacen falta: son datos bancarios y
   // no tienen por qué viajar a la pantalla de alguien que todavía está en
   // revisión.
@@ -233,11 +255,13 @@ export default async function SolicitarPage({
                 </Link>
               )}
             </div>
-          ) : trip.status !== "open" ? (
+          ) : cierre ? (
             <div className={`p-6 md:p-8 ${panel}`}>
-              <p className={panelBody}>
-                Este viaje no está recibiendo solicitudes en este momento.
-              </p>
+              <h2 className={`mb-2 ${panelTitle}`}>{cierre.title}</h2>
+              <p className={panelBody}>{cierre.body}</p>
+              <Link href="/calendario" className={`mt-6 ${pillButton}`}>
+                Ver las fechas abiertas
+              </Link>
             </div>
           ) : (
             <ScreeningForm tripId={id} defaultEmail={user.email} />

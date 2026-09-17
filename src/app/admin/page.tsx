@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { TRIP_TYPES, tripAdminPath, tripTypeLabel } from "@/lib/trip-type";
+import { todayUTC } from "@/lib/trip-dates";
 
 const STATUS_LABEL: Record<string, string> = {
   pending_review: "Pendiente",
@@ -70,10 +71,15 @@ export default async function AdminDashboardPage() {
     supabase
       .from("newsletter_subscribers")
       .select("*", { count: "exact", head: true }),
+    // "Proximo" es literal: sin el filtro por fecha, el orden ascendente
+    // devolvia el viaje MAS VIEJO de la base y la tarjeta anunciaba como
+    // proximo algo que ya habia pasado. Se descarta lo terminado, no lo
+    // empezado: un viaje en curso sigue siendo el proximo hito del panel.
     supabase
       .from("trips")
       .select("id, title, start_date, end_date, capacity, status, type")
       .in("status", ["open", "closed"])
+      .gte("end_date", todayUTC())
       .order("start_date", { ascending: true })
       .limit(4),
     supabase
@@ -238,8 +244,10 @@ export default async function AdminDashboardPage() {
           </div>
 
           {!upcomingTrips || upcomingTrips.length === 0 ? (
+            // Ahora la lista puede quedar vacia con viajes cargados: son todos
+            // pasados. El vacio dice eso y no "no hay nada publicado".
             <p className="text-on-surface-variant text-sm">
-              No hay viajes publicados.
+              No hay experiencias por delante.
             </p>
           ) : (
             <ul className="flex flex-col divide-y divide-outline-variant/40">

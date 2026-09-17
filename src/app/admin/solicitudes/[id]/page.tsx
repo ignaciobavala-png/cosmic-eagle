@@ -10,6 +10,7 @@ import {
   SCREENING_FIELDS,
   HEALTH_FIELDS,
   answersFor,
+  type FieldSpec,
 } from "@/lib/health-history";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -80,17 +81,27 @@ export default async function SolicitudDetallePage({
     ? application.consents[0]
     : application.consents;
 
+  // Primeriza es la que declaró cero ceremonias previas: el mismo criterio de la
+  // vista `my_applications` y del correo del pago, y el único que decide si el
+  // formulario extenso le corresponde o no.
+  const esPrimeriza = application.previous_ceremonies === 0;
+
   // Espejo de la regla de los triggers `private.notify_new_application`
   // (migración 20260819194408, las 3 preguntas de Sofía) y
   // `private.notify_health_form` (20260819180444). Si cambia una, cambia la
   // otra: es la misma regla escrita dos veces porque una corre en Postgres y la
   // otra en React. Marcar NO es rechazar: el encuadre del filtro es
   // informativo, Estela lee todas.
-  const needsManualReview = health
-    ? health.health_condition || health.substance_use || health.trauma
-    : application.serious_illness ||
-      application.mental_health_treatment ||
-      application.current_medication;
+  //
+  // Las dos etapas SE SUMAN, no se pisan. Antes esto era un ternario —si había
+  // formulario de salud, se miraban sólo sus banderas— y un formulario extenso
+  // sin nada marcado hacía desaparecer el aviso del filtro inicial aunque la
+  // persona hubiera declarado ahí una enfermedad grave o medicación en curso.
+  // Los dos triggers también disparan por separado, uno por etapa: juntarlas acá
+  // es lo que mantiene el espejo.
+  const banderasFiltro = flaggedLabels(SCREENING_FIELDS, application);
+  const banderasSalud = flaggedLabels(HEALTH_FIELDS, health);
+  const needsManualReview = banderasFiltro.length > 0 || banderasSalud.length > 0;
 
   return (
     <div className="max-w-3xl">
@@ -120,10 +131,27 @@ export default async function SolicitudDetallePage({
       {needsManualReview && (
         <div className="glass-card border-error/40 rounded-xl px-5 py-4 mb-6">
           <p className="text-error text-sm font-medium">
-            {health
-              ? "Requiere revisión manual obligatoria: el formulario de salud declara condición de salud, uso de sustancias o trauma."
-              : "Requiere revisión manual obligatoria: el filtro declara una enfermedad grave, un tratamiento psiquiátrico o psicológico, o medicación en curso."}
+            Requiere revisión manual obligatoria.
           </p>
+          {/* Cada bandera dice de qué etapa viene: no es lo mismo lo que se
+              declaró en el filtro corto, antes de aprobar, que lo que apareció
+              en el formulario extenso, cuando el cupo ya está pagado. */}
+          <ul className="mt-2 flex flex-col gap-1 text-sm text-on-surface">
+            {banderasFiltro.map((label) => (
+              <li key={`filtro-${label}`}>
+                <span className="text-on-surface-variant">Filtro inicial:</span>{" "}
+                {label}
+              </li>
+            ))}
+            {banderasSalud.map((label) => (
+              <li key={`salud-${label}`}>
+                <span className="text-on-surface-variant">
+                  Formulario de salud:
+                </span>{" "}
+                {label}
+              </li>
+            ))}
+          </ul>
           {/* La salida prevista para este caso no es rechazar: es el correo [2A]
               de Sofía (docs/COMUNICACIONES.md). Hasta que existió "Conversemos"
               este aviso no ofrecía ningún camino intermedio. */}
@@ -142,7 +170,11 @@ export default async function SolicitudDetallePage({
             Pídele a otro admin que la revise.
           </p>
         ) : (
-          <ReviewButtons id={id} currentStatus={application.status} />
+          <ReviewButtons
+            id={id}
+            currentStatus={application.status}
+            fullName={application.full_name}
+          />
         )}
       </div>
 
@@ -211,10 +243,27 @@ export default async function SolicitudDetallePage({
         </div>
 
         {!health ? (
-          <p className="text-on-surface-variant text-sm">
-            Todavía no lo completó. Lo puede cargar después de que la solicitud
-            esté aprobada y el pago registrado.
-          </p>
+          // El formulario extenso lo llenan sólo las primerizas: /viajes/[id]/salud
+          // exige `is_first_time`, o sea cero ceremonias previas (mismo criterio
+          // que la vista `my_applications` y que el correo del pago). A una
+          // recurrente este recuadro le decía "todavía no lo completó" y dejaba
+          // a Estela esperando algo que nunca iba a llegar. El paso que sí le
+          // corresponde es el consentimiento, igual que se lo dice `nextStep` en
+          // la pantalla de la persona.
+          esPrimeriza ? (
+            <p className="text-on-surface-variant text-sm">
+              Todavía no lo completó. Lo puede cargar después de que la solicitud
+              esté aprobada y el pago registrado.
+            </p>
+          ) : (
+            <p className="text-on-surface-variant text-sm">
+              No le corresponde: el formulario extenso es sólo para quienes
+              vienen por primera vez, y esta persona ya tiene ceremonias previas.
+              Lo que sí se le pide después del pago es el consentimiento. Su
+              historial de salud está en el filtro inicial de acá arriba y en la
+              ficha de la persona.
+            </p>
+          )
         ) : (
           <>
             <AnswerList answers={answersFor(HEALTH_FIELDS, health, null)}>
@@ -238,7 +287,13 @@ export default async function SolicitudDetallePage({
 
         {!consent ? (
           <p className="text-on-surface-variant text-sm">
-            Todavía no lo firmó. Se abre después del formulario de salud.
+            {/* Mismo cuidado que arriba: a la recurrente no le precede ningún
+                formulario de salud, así que nombrarlo la manda a buscar un paso
+                que no existe. */}
+            Todavía no lo firmó. Se abre{" "}
+            {esPrimeriza
+              ? "después del formulario de salud."
+              : "en cuanto el pago está registrado."}
           </p>
         ) : (
           <dl className="flex flex-col gap-4">
@@ -276,6 +331,22 @@ export default async function SolicitudDetallePage({
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * Las banderas marcadas de una etapa, con la etiqueta que ya usa el resto del
+ * panel. Sale de `flag: true` en las listas de `@/lib/health-history` y no de
+ * una lista de nombres de columna escrita acá: así, cuando se agrega una
+ * pregunta que obliga a revisión, este aviso se entera solo.
+ */
+function flaggedLabels<T extends object>(
+  fields: FieldSpec<T>[],
+  row: T | null | undefined
+): string[] {
+  if (!row) return [];
+  return fields.flatMap((field) =>
+    field.kind === "bool" && field.flag && row[field.key] ? [field.label] : []
   );
 }
 

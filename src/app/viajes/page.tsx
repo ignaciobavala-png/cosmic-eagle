@@ -11,6 +11,7 @@ import { TestimonialsBand } from "@/components/ui/TestimonialsBand";
 import { RevealItem } from "@/components/ui/Reveal";
 import { TitleRule } from "@/components/ui/TitleRule";
 import { createClient } from "@/lib/supabase/server";
+import { todayUTC } from "@/lib/trip-dates";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { getTestimonials } from "@/lib/testimonials";
@@ -51,12 +52,16 @@ export default async function ViajesPage() {
   const content = await getSiteContent();
 
   const supabase = await createClient();
+  // Ademas de los borradores se descarta lo que ya termino (`end_date` y no
+  // `start_date`: un Viaje en curso sigue en el calendario). La pagina es
+  // dinamica, asi que aca el "hoy" es el de la visita.
   const { data } = await supabase
     .from("trips")
     .select(
       "id, title, description, location, start_date, end_date, status, image_url, type"
     )
     .in("status", ["open", "closed"])
+    .gte("end_date", todayUTC())
     .order("start_date", { ascending: true });
 
   const trips = (data ?? []) as TripCardData[];

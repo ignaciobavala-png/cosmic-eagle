@@ -8,6 +8,7 @@ import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal, RevealItem } from "@/components/ui/Reveal";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { createPublicClient } from "@/lib/supabase/public";
+import { todayUTC } from "@/lib/trip-dates";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 
 export const metadata: Metadata = {
@@ -56,12 +57,19 @@ export default async function CalendarioPage() {
   // Mismo filtro que /viajes: la policy `trips_select_public` deja leer TODOS
   // los trips a `anon`, borradores incluidos, así que los estados se filtran
   // acá. Cualquier ruta pública nueva que lea `trips` tiene que hacer lo mismo.
+  //
+  // Y lo mismo con las fechas: fuera lo que ya terminó, que en una página que
+  // es sólo calendario es donde más se notaba. Como es ISR, el "hoy" queda
+  // congelado hasta que la página se revalida (la hora de arriba, o el
+  // `revalidateTripPaths` del panel), así que una fecha recién pasada puede
+  // seguir listada un rato.
   const { data } = await supabase
     .from("trips")
     .select(
       "id, title, description, location, start_date, end_date, status, image_url, type"
     )
     .in("status", ["open", "closed"])
+    .gte("end_date", todayUTC())
     .order("start_date", { ascending: true });
 
   const trips = (data ?? []) as TripCardData[];

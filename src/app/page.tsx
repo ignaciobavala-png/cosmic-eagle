@@ -15,6 +15,7 @@ import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
 import { TitleRule } from "@/components/ui/TitleRule";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { createPublicClient } from "@/lib/supabase/public";
+import { todayUTC } from "@/lib/trip-dates";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { getTestimonials } from "@/lib/testimonials";
 
@@ -55,12 +56,21 @@ export default async function Home() {
 
   // Cliente sin cookies a proposito: los viajes publicados son publicos, y leer
   // `cookies()` volveria dinamica la pagina y anularia el ISR de arriba.
+  //
+  // El `gte` saca de la cartelera lo que ya termino. Ojo con el ISR de arriba:
+  // el "hoy" queda congelado en la pagina servida, asi que una experiencia
+  // recien terminada puede seguir en la home hasta una hora de mas. Es
+  // aceptable —el alta de solicitudes esta cerrada igual del lado del servidor
+  // (viajes/[id]/solicitar/actions.ts), asi que lo peor que pasa es una
+  // tarjeta de mas— y el server action del panel revalida esta ruta cuando la
+  // clienta toca una experiencia.
   const { data } = await createPublicClient()
     .from("trips")
     .select(
       "id, title, description, location, start_date, end_date, status, image_url, type"
     )
     .in("status", ["open", "closed"])
+    .gte("end_date", todayUTC())
     .order("start_date", { ascending: true })
     .limit(8);
 
