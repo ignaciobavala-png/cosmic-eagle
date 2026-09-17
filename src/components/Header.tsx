@@ -132,9 +132,47 @@ export function Header() {
             {NAV_LINKS.filter((l) => l.href !== "/cuenta").map((link) => {
               const isActive = pathname.startsWith(link.href);
               return (
-                <li key={link.href} className="relative group">
+                // El Escape va en el `li` y no en el panel: cuando el
+                // desplegable se abre por teclado el foco puede estar en el
+                // link PADRE, que es hijo directo de este `li` y no del panel.
+                // Cierra soltando el foco, que es el unico disparador que se
+                // queda pegado (el hover se va solo y no se puede apagar desde
+                // JS).
+                <li
+                  key={link.href}
+                  className="relative group"
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      (e.target as HTMLElement).blur();
+                    }
+                  }}
+                >
+                  {/* **El `blur` al click es lo que despega el desplegable.**
+                      El panel tiene dos disparadores, `:hover` y
+                      `:focus-within`; el segundo no se apaga solo, y un link
+                      clickeado con el mouse se queda con el foco en Chrome y
+                      Firefox (Safari no se lo da, de ahi que el sintoma se vea
+                      "en algunos navegadores"). Cuando el click ADEMAS cambia
+                      de ruta no se notaba, porque Next devuelve el foco al
+                      `body` en la transicion; pero los hijos son anclas de la
+                      misma pagina, asi que no hay transicion y el menu quedaba
+                      abierto hasta clickear en cualquier otro lado — ni Escape
+                      ni el scroll lo cerraban (medido el 17/09).
+
+                      `detail > 0` distingue el click de puntero del Enter del
+                      teclado, que llega como click con `detail: 0`: ahi el foco
+                      NO se suelta, o se perderia la navegacion por teclado.
+
+                      Se hace asi y no cambiando `focus-within` por
+                      `:has(:focus-visible)` —que seria la solucion elegante—
+                      porque con eso Chromium pierde el foco al tabular del
+                      padre al primer hijo y saltea el submenu entero (medido:
+                      el Tab cae en `body`). */}
                   <Link
                     href={link.href}
+                    onClick={(e) => {
+                      if (e.detail > 0) e.currentTarget.blur();
+                    }}
                     className="flex items-center gap-1.5 whitespace-nowrap px-[1.75rem] py-2 font-display text-[13px] uppercase tracking-[0.115em]"
                   >
                     {/* El dorado va en DEGRADE (#f9d78f -> #b3964b, pedido de
@@ -194,7 +232,18 @@ export function Header() {
                       Por eso el ancho `w-[21rem]` y el `-ml-[10.5rem]` van
                       juntos: si cambia uno, cambia el otro. */}
                   {link.children && (
-                    <div className="invisible absolute left-1/2 top-full z-50 -ml-[10.5rem] pt-2 opacity-0 transition-opacity duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                    <div className="pointer-events-none invisible absolute left-1/2 top-full z-50 -ml-[10.5rem] pt-2 opacity-0 transition-opacity duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                      {/* El puente entre el link y el primer item: son 30px
+                          muertos (los 8 del `pt-2` de este wrapper mas los 22
+                          del `pt` de la lista) que el puntero cruza al bajar y
+                          que, sin algo que sostenga el hover, cierran el menu a
+                          mitad de camino. Va del ancho entero para tolerar la
+                          bajada en diagonal, y no se come el click del primer
+                          item porque termina justo donde el arranca. */}
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-auto absolute inset-x-0 top-0 h-[30px]"
+                      />
                       {/* El panel dejo de ser una caja (pedido de la clienta,
                           10/09: "seguimos viendo un cuadrado"). Ya no lleva
                           borde, ni radio, ni sombra, ni fondo propio: lo que lo
@@ -222,7 +271,16 @@ export function Header() {
                           El panel entra ademas subiendo 6px. El desplazamiento
                           va aca adentro y no en el wrapper, que tiene que
                           quedarse pegado al link (ver arriba). */}
-                      <ul className="relative isolate mt-1.5 w-[21rem] px-[18px] pb-[54px] pt-[22px] transition-[margin] duration-200 group-hover:mt-0 group-focus-within:mt-0">
+                      {/* `pointer-events-none` en la lista y `auto` en cada
+                          item: el `pb-[54px]` y el `px-[18px]` son el margen
+                          que usa la mascara para disolver los cantos (ver
+                          abajo), NO zona de menu. Capturando el puntero, esa
+                          franja invisible de 54px mantenia el desplegable
+                          abierto con el mouse bien lejos del ultimo item —
+                          medido: el panel llegaba a y=234 y el texto terminaba
+                          en y=180. El hover igual sube por los ancestros, asi
+                          que el `group-hover` del `li` sigue funcionando. */}
+                      <ul className="pointer-events-none relative isolate mt-1.5 w-[21rem] px-[18px] pb-[54px] pt-[22px] transition-[margin] duration-200 group-hover:mt-0 group-focus-within:mt-0">
                         {/* El velo va como elemento propio y no como fondo del
                             `ul` porque necesita salirse de su caja (`-bottom-10`)
                             y quedar DETRAS del texto. El `isolate` del padre lo
@@ -245,7 +303,7 @@ export function Header() {
                           className="absolute left-1/2 top-0 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-primary-container shadow-[0_0_10px_rgba(249,215,143,0.55)]"
                         />
                         {link.children.map((child, i, todos) => (
-                          <li key={child.href} className="relative">
+                          <li key={child.href} className="pointer-events-auto relative">
                             {/* La linea entre opciones se apaga en las puntas:
                                 una que cruzara entera volveria a dibujar filas
                                 dentro de un rectangulo. El hover ya no pinta un
@@ -253,6 +311,9 @@ export function Header() {
                                 dorado por la crema. */}
                             <Link
                               href={child.href}
+                              onClick={(e) => {
+                                if (e.detail > 0) e.currentTarget.blur();
+                              }}
                               className="nav-dropdown-item block px-1 py-[13px] text-center font-display text-base font-bold tracking-[0.03em] text-primary-container transition-colors hover:text-primary"
                             >
                               {child.label}
