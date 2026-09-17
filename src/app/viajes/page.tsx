@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { PageHero } from "@/components/ui/PageHero";
 import { MediaStatement } from "@/components/ui/MediaStatement";
-import { CreamSection } from "@/components/ui/CreamSection";
+import { CreamSection, GOLD } from "@/components/ui/CreamSection";
 import { Collapsible } from "@/components/ui/Collapsible";
 import { TripCarousel } from "@/components/ui/TripCarousel";
 import { TestimonialsBand } from "@/components/ui/TestimonialsBand";
@@ -131,6 +131,7 @@ export default async function ViajesPage() {
           id="sesiones"
           full={false}
           flushBottom
+          background={GOLD}
           reveal={{ amount: 0.22, once: false, stagger: 0 }}
         >
           {/* Estandar de Experiencias: umbral 0.22 sobre la SECCION (lo pone
@@ -138,11 +139,6 @@ export default async function ViajesPage() {
               elemento. La linea dorada aca NO crece, a diferencia de la home y
               /nosotros: es una barra estatica, asi esta en el codigo aprobado. */}
           <div className="mx-auto max-w-3xl">
-            <RevealItem>
-              <p className="mb-4 text-label-sm font-bold uppercase text-on-primary-container">
-                Portales de transformación
-              </p>
-            </RevealItem>
             <RevealItem delay={0.15}>
               {/* `w-fit` no es cosmetico: es lo que hace que el filete de
                   abajo mida el ancho del TITULO y no el de la columna. */}
@@ -150,7 +146,7 @@ export default async function ViajesPage() {
                 <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
                   Sesiones Cósmicas
                 </h2>
-                <TitleRule className="mt-3 mb-7" />
+                <TitleRule tone="goldDeep" className="mt-3 mb-7" />
               </div>
             </RevealItem>
             <div className="mb-6 space-y-5 text-body-md leading-relaxed text-[#05125a] text-justify">
@@ -220,6 +216,7 @@ export default async function ViajesPage() {
           id="viajes"
           full={false}
           flushBottom
+          background={GOLD}
           reveal={{ amount: 0.22, once: false, stagger: 0 }}
         >
           {/* Estandar de Experiencias: umbral 0.22 sobre la SECCION (lo pone
@@ -227,11 +224,6 @@ export default async function ViajesPage() {
               elemento. La linea dorada aca NO crece, a diferencia de la home y
               /nosotros: es una barra estatica, asi esta en el codigo aprobado. */}
           <div className="mx-auto max-w-3xl">
-            <RevealItem>
-              <p className="mb-4 text-label-sm font-bold uppercase text-on-primary-container">
-                Portales de transformación
-              </p>
-            </RevealItem>
             <RevealItem delay={0.15}>
               {/* `w-fit` no es cosmetico: es lo que hace que el filete de
                   abajo mida el ancho del TITULO y no el de la columna. */}
@@ -239,7 +231,7 @@ export default async function ViajesPage() {
                 <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
                   Viajes Cósmicos
                 </h2>
-                <TitleRule className="mt-3 mb-7" />
+                <TitleRule tone="goldDeep" className="mt-3 mb-7" />
               </div>
             </RevealItem>
             <RevealItem delay={0.3}>
