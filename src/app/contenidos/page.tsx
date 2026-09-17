@@ -16,6 +16,7 @@ import { canRead, CONTENT_WALL_COPY } from "@/lib/content-access";
 import { viewerContentLevel } from "@/lib/content-access-server";
 import { AccessCodeForm } from "@/components/ui/AccessCodeForm";
 import { CTA_TONES } from "@/components/ui/CtaLink";
+import { IMAGES } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Contenidos | Cosmic Eagle",
@@ -114,18 +115,62 @@ export default async function ContenidosPage({
             llegaria al umbral y, siendo reversible, la grilla quedaria invisible
             para siempre. El encabezado mide lo mismo con dos articulos que con
             cincuenta. */}
-        <CreamSection id="biblioteca" background={GOLD} full={false}>
-          <div className="mx-auto max-w-narrative">
+        {/* **La franja dorada no va pelada** (pedido de Ignacio, 17/09: "un
+            golden plano no le hace gala a una seccion tan importante"). Lleva
+            la marca de agua que el propio manual usa en sus fondos: el simbolo
+            de marca gigante, tono sobre tono, CORTADO POR EL BORDE — es
+            exactamente lo que hace `Fondos/2.png`, y por eso no hace falta
+            inventar decoracion nueva.
+
+            Los dos simbolos van al 16% y 12% (subidos desde 10% y 7% el mismo
+            dia, se perdian): sobre el dorado el oro oscuro del asset a opacidad
+            plena compite con las tarjetas, y la marca de agua tiene que leerse
+            como textura del fondo y no como un elemento mas.
+
+            Y en mobile van bastante mas chicos (190px y 160px contra 460 y 380):
+            el mismo tamaño sobre 390px de ancho deja de ser marca de agua y
+            pasa a cruzar por detras de los chips.
+
+            `overflow-hidden` recorta lo que sobresale, que es justo el efecto
+            buscado. Y el envoltorio va en `z-0` con el contenido en `z-10`, y
+            NO con un z-index negativo: un `-z-10` lo manda detras del degrade
+            del `body` y el simbolo desaparece (la trampa que ya costo una
+            seccion entera en la home). */}
+        <CreamSection
+          id="biblioteca"
+          background={GOLD}
+          full={false}
+          className="relative overflow-hidden"
+        >
+          <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+            {/* Arriba a la derecha, saliendose por el borde: el simbolo entra
+                en diagonal con el degrade, que en 135 grados va del oro claro
+                (arriba izquierda) al oscuro. */}
+            <img
+              src={IMAGES.simboloCirculos}
+              alt=""
+              className="absolute -right-16 -top-12 w-[190px] opacity-[0.16] md:-right-32 md:-top-16 md:w-[460px]"
+            />
+            {/* El segundo, abajo a la izquierda y mas tenue: cierra la diagonal
+                sin cerrar la composicion. */}
+            <img
+              src={IMAGES.simboloCirculos}
+              alt=""
+              className="absolute -bottom-20 -left-16 w-[160px] opacity-[0.12] md:-bottom-28 md:-left-36 md:w-[380px]"
+            />
+          </div>
+          <div className="relative z-10 mx-auto max-w-narrative">
             <Reveal amount={0.22} once={false} className="text-center">
-              {/* Azul y no `on-primary-container`: ese es el color de texto
-                  chico sobre CREMA y sobre el dorado cae a 2,23:1. */}
-              <p className="text-label-sm font-bold uppercase text-[#05125a]">
-                Explora
-              </p>
-              {/* `w-fit mx-auto`: el filete mide el ancho del titulo —que aca
+              {/* **Sin "Explora" encima del titulo** (Ignacio, 17/09), como en
+                  /viajes, que el mismo dia perdio su "Portales de
+                  transformacion": el eyebrow en Montserrat versalita arriba de
+                  un titulo en la display metia una segunda tipografia para no
+                  decir nada que el titulo no diga.
+
+                  `w-fit mx-auto`: el filete mide el ancho del titulo —que aca
                   va centrado— y no el de la columna entera. */}
               <div className="mx-auto w-fit">
-                <h2 className="mt-3 font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
                   {active
                     ? ARTICLE_CATEGORY_LIST.find((c) => c.value === active)!.label
                     : "Biblioteca"}

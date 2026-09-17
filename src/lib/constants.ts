@@ -16,6 +16,17 @@ export const IMAGES = {
   // servidos desde /public, igual que el logo). Giran 30s/vuelta antihorario.
   nosSymbol1: "/img/nos-symbol-1.png",
   nosSymbol2: "/img/nos-symbol-2.png",
+  // Marca de agua de la biblioteca (/contenidos): el simbolo de los TRES
+  // CIRCULOS sobre un eje, del set de iconos del manual de marca, en su version
+  // de oro oscuro y trazo fino (`Iconos/PNG/iconos_cosmic_eagle_4_*copia.png`,
+  // copiado a `docs/entregas/2026-09-17-manual-iconos/`).
+  //
+  // Se eligio ese simbolo y no otro: son tres, como las tres etapas del Manual
+  // Evolutivo y los tres niveles de acceso de la biblioteca. Los otros del set
+  // o ya estan usados en /nosotros (la triqueta y la triple luna) o arrastran
+  // una lectura religiosa que el sitio no quiere (la estrella de seis puntas,
+  // la luna con estrella).
+  simboloCirculos: "/img/simbolo-circulos.webp",
   // Rediseno de la home (docs/HOME_REDISENO.md). Los degrades de "La humanidad",
   // la banda dorada y el fondo del footer NO estan aca: se hacen en CSS.
   homeHero: "/img/home/hero.webp",
