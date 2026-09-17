@@ -147,10 +147,18 @@ export const NAV_LINKS: NavLink[] = [
     // propia y ya no una grilla filtrada por `?tipo=`, asi que los hijos del
     // desplegable apuntan al ancla de su bloque. Los rotulos son Sesiones y
     // Viajes desde la entrega del 02/09, que cerro esa pregunta.
-    children: TRIP_TYPES.map((t) => ({
-      label: t.label,
-      href: `/viajes#${t.value === "ceremonia" ? "sesiones" : "viajes"}`,
-    })),
+    // "Calendario" es el unico hijo que NO es un ancla de /viajes: es una
+    // pagina propia con las dos carteleras abiertas, para quien entra a ver
+    // cual es la proxima fecha y no a leer el relato de cada tipo de
+    // experiencia (pedido de Ignacio, 17/09). Va ultimo a proposito: primero
+    // el indice de la pagina, despues el atajo que se va del sitio narrativo.
+    children: [
+      ...TRIP_TYPES.map((t) => ({
+        label: t.label,
+        href: `/viajes#${t.value === "ceremonia" ? "sesiones" : "viajes"}`,
+      })),
+      { label: "Calendario", href: "/calendario" },
+    ],
   },
   { label: "Contenidos", href: "/contenidos", icon: "BookOpen" },
   { label: "Mi Cuenta", href: "/cuenta", icon: "User" },

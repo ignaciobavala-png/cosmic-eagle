@@ -359,6 +359,43 @@ export const SITE_GROUPS = [
     ],
   },
   {
+    id: "calendario",
+    title: "Calendario",
+    href: "/calendario",
+    slots: [
+      {
+        key: "calendario.hero.image",
+        label: "Imagen de portada",
+        help: "La franja de arriba de la página de Calendario. Es más baja que los otros banners a propósito, para que las fechas se vean sin scrollear. Apaisada, con la figura hacia el centro: los bordes se recortan.",
+        type: "image",
+        fallback: IMAGES.heroViajes,
+        ratio: "16/9",
+        maxPx: 1920,
+      },
+      {
+        key: "calendario.hero.title",
+        label: "Título de portada",
+        help: "El texto grande sobre la franja de Calendario.",
+        type: "text",
+        fallback: "Calendario",
+      },
+      {
+        key: "calendario.hero.subtitle",
+        label: "Bajada de portada",
+        help: "La frase corta debajo del título de Calendario.",
+        type: "text",
+        fallback: "Todas las fechas abiertas, de un vistazo.",
+      },
+      {
+        key: "calendario.hero.overlay",
+        label: "Mostrar el título sobre la portada",
+        help: "Si lo destildas, la franja queda solo con la imagen: no se ven ni el título ni la bajada.",
+        type: "boolean",
+        fallback: "true",
+      },
+    ],
+  },
+  {
     id: "faqs",
     title: "Preguntas frecuentes",
     href: "/faqs",

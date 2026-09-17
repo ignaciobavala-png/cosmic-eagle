@@ -46,13 +46,18 @@ export function PageHero({
   overlay?: boolean;
   /**
    * `banner` es el hero historico (82% del alto, con el pie desvanecido sobre
-   * el fondo de la pagina). `full` es el del rediseño de Julia: ocupa la
+   * el fondo de la pagina). `compact` es el mismo banner a poco menos de media
+   * pantalla: existe para /calendario, donde el hero no puede empujar las
+   * fechas debajo del pliegue —la pagina existe justamente para llegar rapido a
+   * la proxima fecha— pero tampoco queremos una pagina sin portada, sola
+   * dentro del sitio. Si alguna vez se unifica con `banner`, se cambia ahi y
+   * listo: nadie mas lo usa. `full` es el del rediseño de Julia: ocupa la
    * pantalla VISIBLE (una pantalla menos el navbar) y corta seco, porque debajo
    * arranca una seccion opaca con su propio fondo y no hay degrade del `body`
    * que dejar ver. Sin `min-h`: un piso en `rem` volveria a empujar el
    * indicador debajo del pliegue en una pantalla baja.
    */
-  height?: "banner" | "full";
+  height?: "banner" | "compact" | "full";
   /**
    * Color al que se funde el PIE del banner, cuando lo que sigue es una seccion
    * opaca con fondo propio (en la practica, siempre una `CreamSection`: se pasa
@@ -109,7 +114,14 @@ export function PageHero({
       className={
         full
           ? "relative h-[calc(100svh-var(--navbar-h))] w-full overflow-hidden"
-          : "relative min-h-[30rem] h-[82svh] max-h-[min(52rem,calc(100svh-var(--navbar-h)))] w-full overflow-hidden md:min-h-[36rem] md:h-[82vh]"
+          : height === "compact"
+            ? // El piso en `rem` no es simetrico con el de `banner` por la misma
+              // razon que alla: el indicador de scroll vive a 32px del pie y el
+              // titulo ocupa el centro, asi que por debajo de ~19rem se pisan.
+              // El tope se mide contra el pliegue, no en `rem`, o en una
+              // pantalla baja el hero "corto" vuelve a tapar el carrusel.
+              "relative min-h-[19rem] h-[46svh] max-h-[min(26rem,calc(100svh-var(--navbar-h)))] w-full overflow-hidden md:min-h-[21rem] md:h-[46vh]"
+            : "relative min-h-[30rem] h-[82svh] max-h-[min(52rem,calc(100svh-var(--navbar-h)))] w-full overflow-hidden md:min-h-[36rem] md:h-[82vh]"
       }
     >
       {/* La foto y sus tintes van juntos dentro de un grupo enmascarado: el borde

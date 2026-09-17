@@ -13,6 +13,7 @@ const RUTAS = [
   { path: "/", titulo: /Cosmic Eagle/i },
   { path: "/nosotros", titulo: /Cosmic Eagle/i },
   { path: "/viajes", titulo: /Cosmic Eagle/i },
+  { path: "/calendario", titulo: /Calendario/i },
   { path: "/contenidos", titulo: /Contenidos/i },
   { path: "/faqs", titulo: /Preguntas frecuentes/i },
   { path: "/cuenta", titulo: /Cosmic Eagle/i },
@@ -33,6 +34,42 @@ for (const ruta of RUTAS) {
     expect(errores, `errores de JS en ${ruta.path}`).toEqual([]);
   });
 }
+
+/**
+ * /calendario existe para una sola cosa: llegar rapido a la proxima fecha. Si
+ * el hero vuelve a crecer o las carteleras vuelven a quedar detras de un
+ * "Ver fechas disponibles", la pagina deja de tener sentido y nadie se entera
+ * —se ve igual de bien—. Por eso las dos invariantes se miden acá.
+ */
+test("/calendario: las dos carteleras, abiertas y sin scrollear", async ({
+  page,
+}) => {
+  await page.goto("/calendario");
+
+  await expect(
+    page.getByRole("heading", { name: "Próximas Sesiones" })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Próximos Viajes" })
+  ).toBeVisible();
+
+  // Ninguna de las dos cuelga de un boton: el `Collapsible` de /viajes no esta.
+  await expect(
+    page.getByRole("button", { name: /Ver fechas disponibles/i })
+  ).toHaveCount(0);
+
+  // El hero no puede empujar el calendario debajo del pliegue.
+  const pliegue = page.viewportSize()?.height ?? 0;
+  const pie = await page.evaluate(
+    () =>
+      document
+        .querySelector("main section")!
+        .getBoundingClientRect().bottom
+  );
+  expect(pie, "el hero de /calendario se come la pantalla").toBeLessThan(
+    pliegue
+  );
+});
 
 test("una ruta inexistente da 404", async ({ page }) => {
   const res = await page.goto("/no-existe-esta-ruta");

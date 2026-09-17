@@ -87,7 +87,10 @@ expone los metadatos de lo cerrado para dibujar el candado, la habilitación
 queda ninguna sobre el chrome viejo. Home puramente narrativa y **estática**
 (`○`, sin consultar Supabase con cookies), `/nosotros`, `/viajes` (dos bloques
 narrativos con calendario desplegable), `/viajes/[id]`, `/contenidos`,
-`/contenidos/[slug]`, `/faqs`, `/privacidad`, `/terminos`, `/cuenta`.
+`/contenidos/[slug]`, `/faqs`, `/privacidad`, `/terminos`, `/cuenta`. Desde el
+17/09 hay ademas `/calendario`: las dos carteleras abiertas y nada mas, el
+atajo para quien entra a ver la proxima fecha. Es el tercer hijo del
+desplegable de Experiencias y el unico que no es un ancla de `/viajes`.
 
 **Tests.** Playwright en `e2e/` (`docs/E2E.md`): 38 públicos + 18 del panel, más
 dos recorridos que generan capturas para mostrarle el producto a la clienta
@@ -127,6 +130,7 @@ src/
 │   │       ├── solicitar/        # ETAPA 1: filtro corto + pantalla de estado + Cómo pagar
 │   │       ├── salud/            # ETAPA 2: sólo aprobada + pagada
 │   │       └── consentimiento/   # firma, después del formulario de salud
+│   ├── calendario/               # atajo: las dos carteleras abiertas, hero corto
 │   ├── contenidos/               # biblioteca + [slug] (muro si el nivel no alcanza)
 │   ├── faqs/  privacidad/  terminos/
 │   ├── cuenta/                   # acceso (AuthScreen) + panel del viajero

@@ -19,6 +19,10 @@ function revalidateTripPaths() {
   revalidatePath(TRIP_TYPES.retiro.adminPath);
   revalidatePath(TRIP_TYPES.ceremonia.adminPath);
   revalidatePath("/viajes");
+  // /calendario es ISR igual que la home: sin esto, una fecha nueva tarda
+  // hasta una hora en aparecer justo en la pagina que existe para verlas.
+  revalidatePath("/calendario");
+  revalidatePath("/");
 }
 
 /**
