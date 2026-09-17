@@ -109,12 +109,17 @@ export async function saveSlot(
     // Llega ya comprimido del browser; el tope es una red de contencion por si
     // la compresion no corrio (formato raro, o el fallback al original). El del
     // video es mas alto porque un clip comprimido pesa mas que una foto, y el
-    // bucket corta en 8MB de todos modos.
+    // bucket corta en 8MB de todos modos (`storage.buckets.file_size_limit`).
+    //
+    // **Son MEGABYTES, no segundos.** El limite de duracion es otro y vive en
+    // `MAX_DURATION_SECONDS` (40). El mensaje decia "prueba con un clip mas
+    // corto" y se leia como un tope de duracion: a 1,2 Mbps un clip de 15
+    // segundos pesa ~2,3MB y entra de sobra.
     const limitMb = isVideo ? 8 : 5;
     if (file.size > limitMb * 1024 * 1024) {
       return {
         error: isVideo
-          ? "El video no puede superar los 8MB. Prueba con un clip más corto."
+          ? "El video no puede superar los 8MB. Prueba con un clip más liviano o de menor resolución."
           : "La imagen no puede superar los 5MB.",
       };
     }

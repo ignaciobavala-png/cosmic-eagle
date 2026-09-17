@@ -127,10 +127,26 @@ function transcode(video: HTMLVideoElement, originalName: string): Promise<File>
 
     let frame = 0;
 
+    /**
+     * **Una pausa NO termina la grabacion.** Hasta el 17/09 `draw` cortaba con
+     * `video.ended || video.paused`, y esa segunda condicion cortaba el clip a
+     * la mitad: el navegador pausa solo el video de una pestaña que pasa a
+     * segundo plano, asi que si la clienta cambiaba de pestaña mientras subia
+     * —y la recodificacion corre en TIEMPO REAL, o sea que un clip de 15
+     * segundos la tiene 15 segundos esperando— el archivo quedaba con lo que
+     * se hubiera grabado hasta ahi, sin ningun aviso. Los tres videos de los
+     * heros en produccion estaban cortados en ~4,7 segundos.
+     *
+     * Ahora una pausa intenta reanudar y la grabacion sigue: lo unico que la
+     * termina es `ended`, que es el final real del clip.
+     */
     function draw() {
-      if (video.ended || video.paused) {
+      if (video.ended) {
         recorder.stop();
         return;
+      }
+      if (video.paused) {
+        void video.play().catch(() => {});
       }
       ctx!.drawImage(video, 0, 0, canvas.width, canvas.height);
       frame = requestAnimationFrame(draw);
