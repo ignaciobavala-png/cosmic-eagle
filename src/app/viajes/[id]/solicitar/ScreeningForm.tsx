@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import {
   NumberInput,
+  PhoneInput,
   YesNoQuestion,
   inputClass,
   labelClass,
@@ -86,8 +87,8 @@ export function ScreeningForm({
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Teléfono (opcional)</label>
-          <input name="phone" type="tel" className={inputClass} />
+          <label className={labelClass}>Teléfono</label>
+          <PhoneInput required />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className={labelClass}>País de residencia</label>
@@ -113,12 +114,19 @@ export function ScreeningForm({
         Por eso nos gustaría que nos cuentes
       </h2>
 
+      <p className={`pb-2 text-sm leading-relaxed ${panelBody}`}>
+        Te pedimos responder con la mayor honestidad y detalle posible. Esta
+        información es confidencial y su único propósito es cuidarte. Nada de
+        lo que nos cuentes cierra la puerta de entrada: solo nos permite saber
+        qué cuidados necesita tu proceso, y conversarlo contigo con calma.
+      </p>
+
       <YesNoQuestion
         name="serious_illness"
         detailRequired
         label="¿Tienes o has tenido alguna enfermedad grave?"
         hint="Cardíaca, neurológica, epilepsia, hepática, oncológica, autoinmune u otra."
-        placeholder="Contanos cuál y cuándo."
+        placeholder="Cuéntanos cuál y cuándo."
       />
       <YesNoQuestion
         name="mental_health_treatment"
@@ -135,27 +143,11 @@ export function ScreeningForm({
         placeholder="Medicamentos, suplementos y hierbas."
       />
 
-      <p
-        className={`border-b py-4 text-sm leading-relaxed ${panelDivider} ${panelBody}`}
-      >
-        Te pedimos responder con la mayor honestidad y detalle posible. Esta
-        información es confidencial y su único propósito es cuidarte. Nada de lo
-        que nos cuentes cierra la puerta de entrada: solo nos permite saber qué
-        cuidados necesita tu proceso, y conversarlo contigo con calma.
-      </p>
-
       <div className="flex flex-col gap-1.5 py-4">
         <label className={labelClass}>
           Tema o intención que quieres trabajar (opcional)
         </label>
         <textarea name="theme" rows={2} className={inputClass} />
-      </div>
-
-      <div className="flex flex-col gap-1.5 py-2">
-        <label className={labelClass}>
-          Algo más que quieras compartir (opcional)
-        </label>
-        <textarea name="comment" rows={2} className={inputClass} />
       </div>
 
       {state.error && (

@@ -29,7 +29,7 @@ function parseForm(formData: FormData) {
     typeof answer !== "string" ||
     !answer.trim()
   ) {
-    return { error: "Completá el bloque, la pregunta y la respuesta.", data: null } as const;
+    return { error: "Completa el bloque, la pregunta y la respuesta.", data: null } as const;
   }
 
   const parsedOrder = Number(sortOrder);

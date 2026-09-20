@@ -311,30 +311,52 @@ export default async function Home() {
             unico sobre la seccion de dos pantallas, la cascada del panel
             dorado se jugaba entera fuera de pantalla y el usuario llegaba a un
             panel ya quieto. */}
-        <div id="experiencias" className="grid w-full md:grid-cols-2">
+        {/* Pedido de Sofía (reunión del 20/09): "se mezclan tantos colores y
+            cuadrados en una sola pantalla". La causa real no era mobile
+            solamente — en escritorio el panel medía `60svh` y NUNCA llegaba a
+            ocupar una pantalla propia, así que el scroll siempre dejaba a la
+            vista el cierre de "Nuestro propósito" (arriba) junto con las dos
+            mitades de este panel, los tres colores a la vez. Y en mobile eran
+            DOS pantallas llenas, una por color, que es la otra cara del mismo
+            problema.
+
+            Ahora el panel ocupa `100svh` en los dos breakpoints — como
+            cualquier otra sección de la home — y punto de snap propio, así que
+            el scroll SÍ lo trata como una pantalla dedicada y no se superpone
+            con la vecina. Sigue dividido como en escritorio (no es un slide
+            que alterna): en mobile arriba/abajo, en escritorio lado a lado,
+            con `grid-rows`/`grid-cols` repartiendo la misma altura completa. */}
+        <div
+          id="experiencias"
+          className="snap-band grid w-full min-h-[100svh] grid-rows-2 md:grid-cols-2 md:grid-rows-1"
+        >
           <Reveal
             amount={0.25}
             stagger={0}
-            className="snap-band flex w-full items-center justify-center bg-[linear-gradient(135deg,#0079b3,#05125a)] px-6 py-[60px] text-center text-primary-container max-md:min-h-[100svh] md:min-h-[60svh] md:px-12 md:py-20"
+            className="flex w-full items-center justify-center bg-[linear-gradient(135deg,#0079b3,#05125a)] px-6 py-6 text-center text-primary-container md:px-12 md:py-20"
           >
-            <div className="max-w-[460px]">
+            <div className="max-w-[460px] md:max-w-[560px]">
               <RevealItem duration={0.8}>
-                <h2 className="mb-3 font-display text-[34px] leading-tight">
+                <h2 className="mb-3 font-display text-[34px] leading-tight md:mb-5 md:text-[56px]">
                   Sesiones Cósmicas
                 </h2>
               </RevealItem>
               {/* Mismo filete que "Nuestro propósito" (pedido de Sofía,
                   12/09): 1px que se desvanece en las puntas, en vez del oro
                   sólido corto. Más corta que la de esa sección porque el
-                  bloque acá mide 460px de ancho, no 640. */}
-              <RevealLine className="mx-auto mb-[18px] h-px w-[100px] bg-[linear-gradient(to_right,transparent_0%,var(--color-primary-container)_50%,transparent_100%)] md:w-[120px]" />
+                  bloque acá mide 460px de ancho, no 640 — y ahora que el panel
+                  entero llegó a `100svh` (pedido de Sofía, 20/09), el texto
+                  escala en la misma proporción que ese cambio de alto, con los
+                  mismos tamaños de destino que "Nuestro propósito" usa a los
+                  460→56/20px. */}
+              <RevealLine className="mx-auto mb-[18px] h-px w-[100px] bg-[linear-gradient(to_right,transparent_0%,var(--color-primary-container)_50%,transparent_100%)] md:mb-6 md:w-[160px]" />
               <RevealItem duration={0.8} delay={0.15}>
-                <p className="mb-[18px] text-[15px] opacity-85">
+                <p className="mb-[18px] text-[15px] opacity-85 md:mb-6 md:text-[20px]">
                   Un espacio para ir más profundo
                 </p>
               </RevealItem>
               <RevealItem duration={0.8} delay={0.3}>
-                <p className="mb-[22px] text-[14px] leading-[1.6] opacity-90">
+                <p className="mb-[22px] text-[14px] leading-[1.6] opacity-90 md:mb-10 md:text-[17px] md:leading-[1.8]">
                   Nuestras sesiones de un día están diseñadas para sostener un
                   trabajo interior profundo y la conexión con la dimensión del
                   alma.
@@ -343,7 +365,7 @@ export default async function Home() {
               <RevealItem duration={0.8} delay={0.45}>
                 <CtaLink
                   href="/viajes#sesiones"
-                  className="px-7 py-[11px] text-[13px]"
+                  className="px-7 py-[11px] text-[13px] md:px-10 md:py-4 md:text-[14px]"
                 >
                   Explorar próximas sesiones
                 </CtaLink>
@@ -366,7 +388,7 @@ export default async function Home() {
           <Reveal
             amount={0.25}
             stagger={0}
-            className="snap-band relative flex w-full items-center justify-center overflow-hidden bg-[linear-gradient(to_bottom_right,#b3964b_0%,#f9d78f_100%)] px-6 py-[60px] text-center text-[#05125a] max-md:min-h-[100svh] md:min-h-[60svh] md:px-12 md:py-20"
+            className="relative flex w-full items-center justify-center overflow-hidden bg-[linear-gradient(to_bottom_right,#b3964b_0%,#f9d78f_100%)] px-6 py-6 text-center text-[#05125a] md:px-12 md:py-20"
           >
             {fondoViajes && (
               /* z-0 y contenido en z-10, nunca un z negativo: el `body` pinta su
@@ -376,22 +398,23 @@ export default async function Home() {
                 <BackgroundMedia src={fondoViajes} />
               </div>
             )}
-            <div className="relative z-10 max-w-[460px]">
+            <div className="relative z-10 max-w-[460px] md:max-w-[560px]">
               <RevealItem duration={0.8}>
-                <h2 className="mb-3 font-display text-[34px] leading-tight">
+                <h2 className="mb-3 font-display text-[34px] leading-tight md:mb-5 md:text-[56px]">
                   Viajes Cósmicos
                 </h2>
               </RevealItem>
               {/* El mismo filete que el panel de Sesiones, en el azul del
-                  panel dorado. */}
-              <RevealLine className="mx-auto mb-[18px] h-px w-[100px] bg-[linear-gradient(to_right,transparent_0%,#05125a_50%,transparent_100%)] md:w-[120px]" />
+                  panel dorado. Mismo escalado a 100svh, ver el comentario del
+                  panel de Sesiones. */}
+              <RevealLine className="mx-auto mb-[18px] h-px w-[100px] bg-[linear-gradient(to_right,transparent_0%,#05125a_50%,transparent_100%)] md:mb-6 md:w-[160px]" />
               <RevealItem duration={0.8} delay={0.15}>
-                <p className="mb-[18px] text-[15px] opacity-85">
+                <p className="mb-[18px] text-[15px] opacity-85 md:mb-6 md:text-[20px]">
                   Un espacio para ir más profundo
                 </p>
               </RevealItem>
               <RevealItem duration={0.8} delay={0.3}>
-                <p className="mb-[22px] text-[14px] leading-[1.6] opacity-90">
+                <p className="mb-[22px] text-[14px] leading-[1.6] opacity-90 md:mb-10 md:text-[17px] md:leading-[1.8]">
                   Experiencias de una semana en portales sagrados alrededor del
                   mundo, para quienes están listos para un proceso más profundo.
                 </p>
@@ -400,7 +423,7 @@ export default async function Home() {
                 <CtaLink
                   href="/viajes#viajes"
                   tone="dark"
-                  className="px-7 py-[11px] text-[13px]"
+                  className="px-7 py-[11px] text-[13px] md:px-10 md:py-4 md:text-[14px]"
                 >
                   Ir más allá
                 </CtaLink>
@@ -521,7 +544,22 @@ export default async function Home() {
             {/* En mobile la imagen se oculta ENTERA y queda solo el texto
                 (`.tec-image` es `display:none` abajo de 768px en el mockup).
                 Antes se apilaba arriba del texto. */}
-            <RevealItem className="hidden w-full flex-1 md:block" y={0} duration={1} scaleFrom={0.98}>
+            {/* Pedido de Sofía (reunión del 20/09): el corte recto de abajo de
+                la imagen "no le convencía" — quería que flotara/se integrara
+                con el fondo en vez de leerse como una caja suelta sobre el
+                dorado. Su solución: apoyar la imagen contra el borde de ABAJO
+                de la sección, para que el corte recto coincida con el límite
+                real de la franja (donde el dorado ya termina) y no quede
+                colgando en el medio del campo dorado. `md:self-end` la ancla
+                al pie de la fila y `md:-mb-24` cancela el `py-24` de
+                `CreamSection` — el mismo valor, para que el borde de la imagen
+                llegue justo al borde real de la franja y no se pase. */}
+            <RevealItem
+              className="hidden w-full flex-1 md:block md:-mb-24 md:self-end"
+              y={0}
+              duration={1}
+              scaleFrom={0.98}
+            >
               <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl md:aspect-[4/4.4]">
                 {/* `object-top` y no centrado, por lo mismo que el hero de la
                     home (20/08): la caja (4/4.4 = 0,909) es mas apaisada que la
@@ -555,6 +593,11 @@ export default async function Home() {
           // arriba o al footer de abajo.
           mobileFull
           textClassName="text-[22px] md:text-[32px]"
+          // Dorada, no el blanco cálido por defecto — Sofía la marcó el 20/09
+          // como la frase que quedó afuera de la coherencia que ya tiene
+          // "Atmosférica" (pedido del 11/09, misma regla: `primary-container`
+          // y no `primary-fixed-dim`, ver ese comentario más arriba).
+          textColorClassName="text-primary-container"
         />
       </main>
       <Footer />

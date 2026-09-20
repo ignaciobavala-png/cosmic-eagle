@@ -70,8 +70,8 @@ export async function LegalPage({ slug }: { slug: LegalSlug }) {
               <strong className="text-[#05125a]">
                 Versión preliminar.
               </strong>{" "}
-              Este texto está en revisión y puede cambiar. Si algo de lo que leés
-              acá no coincide con lo que te dijimos, escribinos y lo aclaramos.
+              Este texto está en revisión y puede cambiar. Si algo de lo que lees
+              aquí no coincide con lo que te dijimos, escríbenos y lo aclaramos.
             </p>
           )}
 

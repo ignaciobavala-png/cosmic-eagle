@@ -79,13 +79,13 @@ export function PaymentControls({
     // tiene aviso propio: ahi no se marca nada nuevo, queda como esta.
     const accion =
       opt === currentStatus
-        ? `Si guardás el monto, el estado queda en «${LABEL[opt]}»`
+        ? `Si guardas el monto, el estado queda en «${LABEL[opt]}»`
         : `Vas a marcar «${LABEL[opt]}»`;
     if (opt === "paid" && saldo > 0) {
       return `${accion} con ${formatAmount(monto)} de ${formatAmount(price)}: le queda un saldo de ${formatAmount(saldo)}, y a la persona se le dice que su pago está completo.`;
     }
     if (opt === "deposit_paid" && monto <= 0) {
-      return `${accion} sin ningún monto recibido: revisá el número antes de guardar.`;
+      return `${accion} sin ningún monto recibido: revisa el número antes de guardar.`;
     }
     if (opt === "deposit_paid" && saldo <= 0) {
       return `${accion} con el total ya cubierto (${formatAmount(monto)} de ${formatAmount(price)}). Si pagó todo, va «Marcar como pagado».`;

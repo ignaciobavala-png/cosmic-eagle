@@ -7,6 +7,7 @@ import { sendEmail } from "@/lib/email/resend";
 import { SolicitudRecibida } from "@/emails/SolicitudRecibida";
 import { formatDateRangeCompact } from "@/lib/format";
 import { todayUTC } from "@/lib/trip-dates";
+import { dialCodeFor } from "@/lib/phone-countries";
 
 export type ApplicationFormState = { error: string | null };
 
@@ -60,9 +61,15 @@ export async function submitApplication(
   const residence_country = str(formData, "residence_country");
   const previous_ceremonies = Number(str(formData, "previous_ceremonies"));
 
-  if (!full_name || !email || !residence_country) {
+  const phone_country = str(formData, "phone_country");
+  const phone_number = str(formData, "phone_number");
+  const phone_dial = dialCodeFor(phone_country);
+
+  if (!full_name || !email || !residence_country || !phone_number || !phone_dial) {
     return { error: "Completa todos los campos requeridos." };
   }
+
+  const phone = `+${phone_dial} ${phone_number}`;
   if (!Number.isInteger(previous_ceremonies) || previous_ceremonies < 0) {
     return { error: "Las ceremonias previas tienen que ser un número entero." };
   }
@@ -87,7 +94,7 @@ export async function submitApplication(
     trip_id: tripId,
     full_name,
     email,
-    phone: str(formData, "phone") || null,
+    phone,
     residence_country,
     previous_ceremonies,
     serious_illness,

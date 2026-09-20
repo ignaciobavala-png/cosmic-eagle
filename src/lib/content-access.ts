@@ -93,12 +93,12 @@ export function redeemMessage(result: RedeemResult): string {
     case "ok":
       return "Listo: tu cuenta quedó habilitada.";
     case "vencido":
-      return "Ese código ya venció. Escribinos y te damos uno nuevo.";
+      return "Ese código ya venció. Escríbenos y te damos uno nuevo.";
     case "agotado":
       return "Ese código ya se usó todas las veces disponibles.";
     case "sin_sesion":
-      return "Iniciá sesión para canjear el código.";
+      return "Inicia sesión para canjear el código.";
     default:
-      return "No encontramos ese código. Revisá que esté bien escrito.";
+      return "No encontramos ese código. Revisa que esté bien escrito.";
   }
 }

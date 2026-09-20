@@ -57,14 +57,14 @@ function nextStep(
   if (app.status === "needs_conversation") {
     return {
       title: "Nos gustaría conversar contigo",
-      body: "Hay algunos aspectos de lo que nos contaste que preferimos mirar juntos, con calma. Esto no significa que no puedas participar: te vamos a escribir para coordinar, y también podés responder el correo que te mandamos.",
+      body: "Hay algunos aspectos de lo que nos contaste que preferimos mirar juntos, con calma. Esto no significa que no puedas participar: te vamos a escribir para coordinar, y también puedes responder el correo que te mandamos.",
     };
   }
 
   if (app.status !== "approved") {
     return {
       title: "Tu solicitud está en revisión",
-      body: "Estela la está leyendo. Te vamos a avisar apenas tengamos una respuesta, y ahí seguimos con la reserva del cupo.",
+      body: "Muchas gracias, tu solicitud está en proceso. Nos comunicaremos a la brevedad.",
     };
   }
 
@@ -110,7 +110,7 @@ function nextStep(
     return {
       title: "Cupo reservado",
       body: formulario
-        ? `Recibimos tu seña y tu lugar está guardado. Abajo está el saldo y cómo completarlo, cuando quieras. Mientras tanto podés seguir con ${formulario.body}.`
+        ? `Recibimos tu seña y tu lugar está guardado. Abajo está el saldo y cómo completarlo, cuando quieras. Mientras tanto puedes seguir con ${formulario.body}.`
         : "Recibimos tu seña y tu lugar está guardado. Abajo está el saldo y los medios para completarlo cuando quieras.",
       cta: formulario?.cta,
     };
@@ -179,12 +179,12 @@ export default async function SolicitarPage({
   const cierre = terminado
     ? {
         title: "Esta experiencia ya ocurrió",
-        body: "Las fechas de este viaje ya pasaron, así que no estamos recibiendo solicitudes. Mirá el calendario: seguro hay una próxima.",
+        body: "Las fechas de este viaje ya pasaron, así que no estamos recibiendo solicitudes. Mira el calendario: seguro hay una próxima.",
       }
     : trip.status !== "open"
       ? {
           title: "Este viaje no está abierto a solicitudes",
-          body: "En este momento no estamos recibiendo postulaciones para esta experiencia. Podés escribirnos o mirar las fechas que sí están abiertas.",
+          body: "En este momento no estamos recibiendo postulaciones para esta experiencia. Puedes escribirnos o mirar las fechas que sí están abiertas.",
         }
       : null;
 
@@ -286,12 +286,12 @@ export default async function SolicitarPage({
                       <span className={`font-medium ${panelStrong}`}>
                         {formatAmount(trip.price - (existing.amount_paid ?? 0))}
                       </span>
-                      , que podés completar de una vez o en partes.
+                      , que puedes completar de una vez o en partes.
                     </p>
                   ) : trip.deposit_amount ? (
                     // Las dos opciones, como las pide el correo [2] de Sofía.
                     <p>
-                      Podés reservar tu cupo con una seña de{" "}
+                      Puedes reservar tu cupo con una seña de{" "}
                       <span className={`font-medium ${panelStrong}`}>
                         {formatAmount(trip.deposit_amount)}
                       </span>{" "}
@@ -356,7 +356,7 @@ export default async function SolicitarPage({
                 trip.payment_url ? null : (
                   <p className={panelBody}>
                     Te vamos a escribir con los datos para hacer el pago. Cuando
-                    lo hagas, podés enviarnos el comprobante desde acá.
+                    lo hagas, puedes enviarnos el comprobante desde acá.
                   </p>
                 )
               ) : (

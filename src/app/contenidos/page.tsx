@@ -68,14 +68,11 @@ export default async function ContenidosPage({
     (article) => !canRead(article.access_level ?? "miembros", viewerLevel)
   ).length;
 
-  const filters = [
-    { label: "Todos", href: "/contenidos", active: !active },
-    ...ARTICLE_CATEGORY_LIST.map((category) => ({
-      label: category.label,
-      href: `/contenidos?categoria=${category.value}`,
-      active: active === category.value,
-    })),
-  ];
+  const filters = ARTICLE_CATEGORY_LIST.map((category) => ({
+    label: category.label,
+    href: `/contenidos?categoria=${category.value}`,
+    active: active === category.value,
+  }));
 
   return (
     <>

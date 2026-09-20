@@ -28,7 +28,7 @@ export function AccessCodeForm({ tone = "dark" }: { tone?: "dark" | "light" }) {
         }`}
       >
         <KeyRound size={14} aria-hidden="true" />
-        ¿Tenés un código de acceso?
+        ¿Tienes un código de acceso?
       </label>
 
       <div className="mx-auto mt-3 flex max-w-sm flex-col gap-3 sm:flex-row">

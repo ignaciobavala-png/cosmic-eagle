@@ -68,11 +68,11 @@ export function HealthForm({
       />
       <YesNoQuestion
         name="substance_use"
-        label="¿Consumís medicación, alcohol u otras sustancias regularmente?"
+        label="¿Consumes medicación, alcohol u otras sustancias regularmente?"
       />
       <YesNoQuestion
         name="stress_anxiety"
-        label="¿Sufrís de estrés o ansiedad con frecuencia?"
+        label="¿Sufres de estrés o ansiedad con frecuencia?"
       />
       <YesNoQuestion
         name="allergies"

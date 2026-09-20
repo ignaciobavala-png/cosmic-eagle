@@ -183,6 +183,10 @@ function ImageField({
   const [preview, setPreview] = useState<string | null>(null);
   const [previewIsVideo, setPreviewIsVideo] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
+  // Distinto de `problem`: no bloquea el guardado (puede terminar entrando
+  // igual bajo el límite del bucket), pero avisa ANTES de apretar Guardar en
+  // vez de dejar que el error crudo de Storage sea la primera noticia.
+  const [fellBack, setFellBack] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
 
@@ -192,6 +196,7 @@ function ImageField({
   useEffect(() => {
     setPreview(null);
     setInfo(null);
+    setFellBack(false);
     setProblem(null);
   }, [value]);
 
@@ -208,6 +213,7 @@ function ImageField({
     if (!file) return;
 
     setProblem(null);
+    setFellBack(false);
     setWorking(true);
 
     if (file.type.startsWith("video/")) {
@@ -229,9 +235,22 @@ function ImageField({
       attach(result.file);
       setPreview(URL.createObjectURL(result.file));
       setPreviewIsVideo(true);
-      setInfo(
-        `${formatSize(file.size)} → ${formatSize(result.file.size)} · listo para subir`
-      );
+
+      // Comprimido con exito siempre sale en WebM (compress-video.ts). Si el
+      // archivo que llego no es ese tipo, `compressVideo` cayo en el fallback
+      // silencioso (MediaRecorder no soportado, codec rechazado) y esto es el
+      // original tal cual — que facil supera los 8MB del bucket sin que nadie
+      // se entere hasta que Guardar tire el error crudo de Storage.
+      if (result.file.type !== "video/webm") {
+        setFellBack(true);
+        setInfo(
+          `Este navegador no pudo comprimir el video: se va a subir el original (${formatSize(result.file.size)}). Si supera los 8MB, Guardar va a fallar — probá con otro navegador o un clip más liviano.`
+        );
+      } else {
+        setInfo(
+          `${formatSize(file.size)} → ${formatSize(result.file.size)} · listo para subir`
+        );
+      }
       return;
     }
 
@@ -241,9 +260,18 @@ function ImageField({
     attach(compressed);
     setPreview(URL.createObjectURL(compressed));
     setPreviewIsVideo(false);
-    setInfo(
-      `${formatSize(file.size)} → ${formatSize(compressed.size)} · lista para subir`
-    );
+
+    // Mismo criterio que el video: una compresion exitosa siempre sale en WebP.
+    if (compressed.type !== "image/webp") {
+      setFellBack(true);
+      setInfo(
+        `Este navegador no pudo comprimir la imagen: se va a subir el original (${formatSize(compressed.size)}). Si supera los 5MB, Guardar va a fallar.`
+      );
+    } else {
+      setInfo(
+        `${formatSize(file.size)} → ${formatSize(compressed.size)} · lista para subir`
+      );
+    }
   }
 
   const showVideo = preview ? previewIsVideo : isVideoUrl(value);
@@ -309,7 +337,11 @@ function ImageField({
           </p>
         )}
 
-        {info && <p className="text-xs text-on-surface-variant">{info}</p>}
+        {info && (
+          <p className={`text-xs ${fellBack ? "text-error" : "text-on-surface-variant"}`}>
+            {info}
+          </p>
+        )}
         {problem && <p className="text-xs text-error">{problem}</p>}
 
         <div>

@@ -187,9 +187,18 @@ export const NAV_LINKS: NavLink[] = [
 ];
 
 // Columnas del footer segun el mockup de Julia. `href: null` = la ruta todavia
-// no existe (Blog y Soporte estan diferidos a segunda etapa, ver docs/RECORRIDO.md);
-// el Footer las pinta apagadas en vez de generar links muertos.
-export const FOOTER_COLUMNS = [
+// no existe; el Footer las pinta apagadas en vez de generar links muertos.
+// El tipo explicito evita que dos columnas con `links` de largo distinto
+// (tuplas literales por `as const`) hagan que TS infiera `never` al mapear
+// `column.links` en Footer.tsx: sin anotar, cada columna queda con su propio
+// tipo tupla exacto, y `.map` sobre la union de tuplas de largo distinto no
+// unifica el parametro del callback.
+type FooterColumn = {
+  title: string;
+  links: { label: string; href: string | null }[];
+};
+
+export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: "Explorar",
     links: [
@@ -208,10 +217,9 @@ export const FOOTER_COLUMNS = [
       { label: "Privacidad", href: "/privacidad" },
       { label: "Términos de Servicio", href: "/terminos" },
       { label: "Contacto", href: "mailto:contacto@cosmiceaglejourney.com" },
-      { label: "Soporte", href: null },
     ],
   },
-] as const;
+];
 
 // Carrusel "Portales de transformación" de la home. Las imagenes salen de
 // site-content (son editables desde /admin/multimedia), aca queda solo el texto

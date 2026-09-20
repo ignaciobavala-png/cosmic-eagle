@@ -190,13 +190,11 @@ export default async function NosotrosPage() {
               </RevealItem>
               <RevealItem y={14} duration={0.8} delay={0.3} id="nos-proposito-close">
               <p>
-                <strong>
-                  Nuestro trabajo acompaña a personas en distintas etapas de este
-                  camino:
-                </strong>{" "}
-                desde quienes comienzan un proceso profundo de transformación,
-                hasta sanadores, guías y practicantes experimentados que entran
-                en nuevas etapas de evolución, desarrollo y servicio.
+                Nuestro trabajo acompaña a personas en distintas etapas de este
+                camino: desde quienes comienzan un proceso profundo de{" "}
+                <strong>transformación</strong>, hasta sanadores, guías y
+                practicantes experimentados que entran en nuevas etapas de{" "}
+                <strong>evolución</strong>, desarrollo y servicio.
               </p>
               </RevealItem>
             </div>
@@ -382,11 +380,16 @@ export default async function NosotrosPage() {
             es un degrade plano, el PNG son 60KB para lo que el CSS hace en cero
             y ademas asi comparte los colores exactos del navbar y el footer.
 
-            Al invertirse el fondo se invierte toda la paleta del bloque: el
-            titulo y el cuerpo pasan a `primary` (el blanco calido) y el cierre
-            italico a `primary-container`, que es el oro que la regla del 28/08
-            reserva para texto sobre azul. El `TitleRule` se queda en su tono por
-            defecto (`gold`, `#f9d78f`): es justo el que esta pensado para esto.
+            Al invertirse el fondo se invierte toda la paleta del bloque.
+            **Revisado el 20/09**: el titulo y el cuerpo arrancaron en `primary`
+            (el blanco calido), pero quedaba inconsistente con el resto de las
+            pantallas de fondo azul del sitio — "Nuestro proposito" de la home
+            usa titulo en `primary-container` (el oro) y cuerpo en el tostado
+            `#d0c5b4`, y esta pantalla es la unica que no seguia esa regla. Ahora
+            usa el mismo par, y el cierre italico se queda en `primary-container`
+            tambien, que es el oro que la regla del 28/08 reserva para texto
+            sobre azul. El `TitleRule` se queda en su tono por defecto (`gold`,
+            `#f9d78f`): es justo el que esta pensado para esto.
 
             La frase final va en el cierre italico y no como un parrafo mas: es
             la unica que sintetiza, igual que la de "Nuestro enfoque".
@@ -402,18 +405,23 @@ export default async function NosotrosPage() {
           amount={0.25}
           once={false}
           stagger={0}
-          className="relative flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#05125a,#0079b3)] px-margin-mobile pt-[35px] pb-[76px] text-primary md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
+          className="relative flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#05125a,#0079b3)] px-margin-mobile pt-[35px] pb-[76px] text-[#d0c5b4] md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
         >
           <div className="mx-auto max-w-3xl">
             <div className="w-fit">
               <RevealItem y={0} duration={1} id="nos-estela-title">
-                <h2 className="font-display text-headline-md font-bold text-primary md:text-headline-lg">
+                {/* Dorado, no el blanco cálido por defecto — coherencia con el
+                    resto de las secciones de fondo azul (pedido de Ignacio,
+                    20/09): "Nuestro propósito" de la home usa este mismo
+                    tratamiento, título en `primary-container` y cuerpo en el
+                    tostado `#d0c5b4`. */}
+                <h2 className="font-display text-headline-md font-bold text-primary-container md:text-headline-lg">
                   Estela, founder
                 </h2>
               </RevealItem>
               <TitleRule grow className="mt-3 mb-6" />
             </div>
-            <div className="space-y-6 text-body-md leading-relaxed text-primary text-justify">
+            <div className="space-y-6 text-body-md leading-relaxed text-justify">
               <RevealItem y={14} duration={0.8} delay={0.15}>
                 <p>
                   Estela lleva más de 25 años explorando la conciencia, la mente,

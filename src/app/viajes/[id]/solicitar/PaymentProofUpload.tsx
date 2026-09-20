@@ -95,7 +95,7 @@ export function PaymentProofUpload({
           htmlFor="note"
           className={fieldLabel}
         >
-          ¿Querés aclarar algo? (opcional)
+          ¿Quieres aclarar algo? (opcional)
         </label>
         <input
           id="note"

@@ -81,7 +81,7 @@ export default async function FaqsPage() {
                   <TitleRule className="mt-3 mb-7" />
                 </div>
                 <p className="text-body-md leading-relaxed text-[#05125a]">
-                  Estamos preparando esta sección. Mientras tanto, escribinos y
+                  Estamos preparando esta sección. Mientras tanto, escríbenos y
                   te respondemos cualquier duda sobre las experiencias.
                 </p>
               </Reveal>

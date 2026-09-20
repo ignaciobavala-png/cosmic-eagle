@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 import { fieldInput, fieldLabel, panelDivider } from "./styles";
+import {
+  countryFlag,
+  DEFAULT_PHONE_COUNTRY,
+  PHONE_COUNTRIES,
+} from "@/lib/phone-countries";
 
 /**
  * Los controles que comparten el filtro corto (etapa 1) y el formulario de
@@ -69,7 +74,7 @@ export function YesNoQuestion({
   name,
   label,
   hint,
-  placeholder = "Contanos más...",
+  placeholder = "Cuéntanos más...",
   detailName,
   detailRequired = false,
   detailLabel = "Aclaraciones",
@@ -125,5 +130,42 @@ export function YesNoQuestion({
         </div>
       )}
     </fieldset>
+  );
+}
+
+/**
+ * Teléfono con selector de país (bandera + código de discado), pedido de
+ * Sofía el 20/09/2026: hasta ahora era un `<input type="tel">` suelto, sin
+ * prefijo y opcional. El país y el número van en dos campos separados
+ * (`phone_country` / `phone_number`) — el server action es quien arma el
+ * `+<dial> <número>` final, así el mapa ISO2 → código no se duplica acá.
+ */
+export function PhoneInput({ required }: { required?: boolean }) {
+  const [country, setCountry] = useState(DEFAULT_PHONE_COUNTRY);
+
+  return (
+    <div className="flex gap-2">
+      <select
+        name="phone_country"
+        value={country}
+        onChange={(e) => setCountry(e.target.value)}
+        aria-label="País"
+        className={`${inputClass} w-[6.5rem] shrink-0`}
+      >
+        {PHONE_COUNTRIES.map((c) => (
+          <option key={c.iso2} value={c.iso2}>
+            {countryFlag(c.iso2)} +{c.dial}
+          </option>
+        ))}
+      </select>
+      <input
+        name="phone_number"
+        type="tel"
+        inputMode="tel"
+        required={required}
+        placeholder="11 2345 6789"
+        className={`${inputClass} flex-1`}
+      />
+    </div>
   );
 }

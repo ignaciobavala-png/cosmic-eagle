@@ -43,7 +43,7 @@ export async function createAccessCode(
   }
 
   if (!isContentAccessLevel(level) || level === "publico") {
-    return { error: "Elegí qué nivel habilita el código." };
+    return { error: "Elige qué nivel habilita el código." };
   }
 
   const parsedUses = Number(maxUses);

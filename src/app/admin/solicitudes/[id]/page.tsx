@@ -178,39 +178,11 @@ export default async function SolicitudDetallePage({
         )}
       </div>
 
-      <div className="glass-card rounded-2xl p-6 md:p-8 mb-6">
-        <h2 className="font-display text-xl text-primary-fixed-dim mb-4">Pago</h2>
-        {/* El comprobante primero: la decisión de marcar pagado se toma
-            mirándolo, no al revés. */}
-        <PaymentProofList applicationId={id} />
-        <PaymentControls
-          id={id}
-          currentStatus={application.payment_status}
-          currentReference={application.payment_reference}
-          amountPaid={application.amount_paid}
-          price={application.trips?.price ?? 0}
-          depositAmount={application.trips?.deposit_amount ?? null}
-        />
-      </div>
-
-      <div className="glass-card rounded-2xl p-6 md:p-8 mb-6">
-        <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
-          Acceso a contenidos
-        </h2>
-        <p className="mb-4 text-sm text-on-surface-variant">
-          Se habilita sola al aprobar la solicitud. Una vez habilitada, la
-          persona sigue leyendo los contenidos después del viaje, hasta que le
-          quites el acceso.
-        </p>
-        <GrantAccessPanel
-          applicationId={id}
-          userId={application.user_id}
-          fullName={application.full_name}
-          approved={application.status === "approved"}
-          grant={grant ?? null}
-        />
-      </div>
-
+      {/* Orden pedido por Sofía (reunión del 20/09): primero la ficha completa
+          del postulante, después con qué pagó, y recién ahí la salud y el
+          consentimiento. "Revisión" queda arriba de todo porque es la acción,
+          no un dato de la ficha; "Acceso a contenidos" queda al final porque es
+          una consecuencia de aprobar, no algo que se consulte para decidir. */}
       <div className="glass-card rounded-2xl p-6 md:p-8 mb-6">
         <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
           Filtro inicial
@@ -227,6 +199,21 @@ export default async function SolicitudDetallePage({
             />
           )}
         </AnswerList>
+      </div>
+
+      <div className="glass-card rounded-2xl p-6 md:p-8 mb-6">
+        <h2 className="font-display text-xl text-primary-fixed-dim mb-4">Pago</h2>
+        {/* El comprobante primero: la decisión de marcar pagado se toma
+            mirándolo, no al revés. */}
+        <PaymentProofList applicationId={id} />
+        <PaymentControls
+          id={id}
+          currentStatus={application.payment_status}
+          currentReference={application.payment_reference}
+          amountPaid={application.amount_paid}
+          price={application.trips?.price ?? 0}
+          depositAmount={application.trips?.deposit_amount ?? null}
+        />
       </div>
 
       <div className="glass-card rounded-2xl p-6 md:p-8">
@@ -329,6 +316,24 @@ export default async function SolicitudDetallePage({
             </div>
           </dl>
         )}
+      </div>
+
+      <div className="glass-card rounded-2xl p-6 md:p-8 mt-6">
+        <h2 className="font-display text-xl text-primary-fixed-dim mb-2">
+          Acceso a contenidos
+        </h2>
+        <p className="mb-4 text-sm text-on-surface-variant">
+          Se habilita sola al aprobar la solicitud. Una vez habilitada, la
+          persona sigue leyendo los contenidos después del viaje, hasta que le
+          quites el acceso.
+        </p>
+        <GrantAccessPanel
+          applicationId={id}
+          userId={application.user_id}
+          fullName={application.full_name}
+          approved={application.status === "approved"}
+          grant={grant ?? null}
+        />
       </div>
     </div>
   );

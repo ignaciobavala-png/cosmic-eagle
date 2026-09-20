@@ -38,6 +38,15 @@ export function TripCarousel({
   // carga. El detalle esta en `groupTripsByPlace`.
   const groups = groupTripsByPlace(trips);
 
+  // La pista duplica el juego de tarjetas para que el loop del marquee cierre
+  // en `-50%` (ver el comentario de mas abajo), pero con pocas tarjetas ese
+  // segundo juego entra completo en pantalla junto al primero y se lee como
+  // una tarjeta repetida (reporte de Ignacio, "Sesion en Tulum" duplicada,
+  // 20/09: con solo 2 grupos publicados, ambos juegos entraban a la vez). Sin
+  // suficientes tarjetas para que el loop tenga sentido, no hay nada que
+  // animar: se corta la copia y la animacion.
+  const canLoop = groups.length >= 4;
+
   return (
     <div className="rounded-[20px] bg-[linear-gradient(135deg,#7a6329_0%,#f9d78f_30%,#fbe9c0_50%,#b3964b_75%,#6b551f_100%)] px-5 py-11">
       <p className="text-center text-[12px] uppercase tracking-[0.167em] text-[#05125a]/70">
@@ -65,22 +74,23 @@ export function TripCarousel({
               corrido del arranque del segundo juego y el loop pega un saltito
               en cada vuelta. Con el margen adentro de cada item el ancho es
               exactamente `2n * (tarjeta + separador)` y `-50%` cierra justo. */}
-          <div className="animate-marquee flex w-max">
+          <div className={`flex w-max ${canLoop ? "animate-marquee" : ""}`}>
             {groups.map((group) => (
               <div key={group.key} className="mr-[22px] w-[17rem] shrink-0 sm:w-[20rem]">
                 <TripCard trip={group.trip} tone="light" dates={group.dates} />
               </div>
             ))}
-            {groups.map((group) => (
-              <div
-                key={`copia-${group.key}`}
-                aria-hidden="true"
-                tabIndex={-1}
-                className="mr-[22px] hidden w-[17rem] shrink-0 sm:w-[20rem] md:block"
-              >
-                <TripCard trip={group.trip} tone="light" dates={group.dates} />
-              </div>
-            ))}
+            {canLoop &&
+              groups.map((group) => (
+                <div
+                  key={`copia-${group.key}`}
+                  aria-hidden="true"
+                  tabIndex={-1}
+                  className="mr-[22px] hidden w-[17rem] shrink-0 sm:w-[20rem] md:block"
+                >
+                  <TripCard trip={group.trip} tone="light" dates={group.dates} />
+                </div>
+              ))}
           </div>
         </div>
         </ExperienceGate>
