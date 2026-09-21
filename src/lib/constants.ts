@@ -1,3 +1,5 @@
+import { ARTICLE_CATEGORY_LIST } from "@/lib/article";
+
 export const IMAGES = {
   // Logo oficial de la disenadora (PNG con alpha, 1207x433), servido desde /public
   logo: "/logo.png",
@@ -182,7 +184,15 @@ export const NAV_LINKS: NavLink[] = [
       { label: "Calendario", href: "/calendario" },
     ],
   },
-  { label: "Contenidos", href: "/contenidos", icon: "BookOpen" },
+  {
+    label: "Contenidos",
+    href: "/contenidos",
+    icon: "BookOpen",
+    children: ARTICLE_CATEGORY_LIST.map((c) => ({
+      label: c.label,
+      href: `/contenidos?categoria=${c.value}`,
+    })),
+  },
   { label: "Mi Cuenta", href: "/cuenta", icon: "User" },
 ];
 

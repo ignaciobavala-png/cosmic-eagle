@@ -94,14 +94,6 @@ export function TripCard({
             <h3 className="font-display text-headline-md text-[#05125a]">
               {trip.title}
             </h3>
-            {/* Tres lineas y puntos suspensivos: correccion del 03/09 de
-                Julia. La descripcion de la tarjeta es un adelanto, el texto
-                completo esta en la pagina del viaje. */}
-            {trip.description && (
-              <p className="mt-2 line-clamp-3 flex-1 text-[13px] leading-relaxed text-[#05125a]/85">
-                {trip.description}
-              </p>
-            )}
 
             <div className="mt-4 border-t border-[#e0e0e0] pt-4">
               {/* El label va en `on-primary-container` y no en el `#b3964b`

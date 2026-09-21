@@ -4,7 +4,6 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { PageHero, renderTitle } from "@/components/ui/PageHero";
 import { TripCarousel } from "@/components/ui/TripCarousel";
-import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal, RevealItem } from "@/components/ui/Reveal";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { createPublicClient } from "@/lib/supabase/public";
@@ -125,22 +124,6 @@ export default async function CalendarioPage() {
                 trips={retiros}
                 emptyLabel="No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
               />
-            </RevealItem>
-
-            {/* El cierre no es un llamado a inscribirse —eso lo decide cada
-                experiencia, desde su propia página— sino la puerta a lo que
-                esta página deliberadamente no cuenta. */}
-            <RevealItem className="px-margin-mobile text-center md:px-margin-desktop">
-              <p className="mx-auto mb-7 max-w-xl text-body-md leading-relaxed text-primary/85">
-                ¿Todavía no sabes cuál es para ti? En Experiencias contamos en
-                qué se diferencia una Sesión Cósmica de un Viaje Cósmico, y qué
-                tener en cuenta antes de postular.
-              </p>
-              {/* `tone="gold"` es el default y es el que va: el botón cae
-                  sobre el azul de la sección, no sobre el panel dorado. */}
-              <CtaLink href="/viajes">
-                Conocer las experiencias
-              </CtaLink>
             </RevealItem>
           </Reveal>
         </section>

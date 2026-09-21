@@ -58,7 +58,7 @@ export function ClosingHero({
             /* `clamp(1.5rem,5vw,3rem)`, el del mockup: en mobile el titulo
                tiene que entrar en DOS lineas y con la escala anterior se pasaba.
                `text-balance` reparte el corte entre las dos. */
-            <h2 className="font-display text-[clamp(1.5rem,5vw,3rem)] font-bold uppercase leading-[1.3] text-primary text-balance">
+            <h2 className="font-display text-[clamp(1.5rem,5vw,3rem)] font-bold uppercase leading-[1.3] text-primary-container text-balance">
               {title}
             </h2>
           )}

@@ -18,7 +18,7 @@ export type ArticleStatus = Enums<"article_status">;
 export const ARTICLE_CATEGORIES = {
   preparacion: {
     value: "preparacion",
-    label: "Preparación e Integración",
+    label: "Preparación & Integración",
     description: "Cómo llegar al viaje y cómo asentar lo que se abrió.",
   },
   salud: {
