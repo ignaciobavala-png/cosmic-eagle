@@ -76,3 +76,14 @@ desde `/viajes`**; queda el del footer.
 Cuando se rehaga `/`, el mismo problema aparece con el bloque dorado **"La
 humanidad"** (`HumanitySection`, copy en `constants.ts`) y con las **cuatro
 promesas** (`ImageStatements`), que tampoco están en el diseño nuevo.
+
+## Frase final de Founder (sacada 23/09)
+
+Cerraba `/nosotros#estela`, a pedido de la organización se sacó de ahí
+(`docs/entregas/2026-09-23-feedback-org/CEJ_Correcciones_Nosotros.docx`, item
+9: "no es necesario cerrar Founder con esta frase... puede reservarse para
+evaluar su uso en otra sección"):
+
+> En el centro de todo está la evolución: liberarnos de aquello que nos
+> limita, recordar quiénes somos y abrir espacio para desarrollar el
+> potencial que cada ser humano lleva dentro.

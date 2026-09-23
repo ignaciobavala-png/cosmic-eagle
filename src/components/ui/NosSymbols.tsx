@@ -235,14 +235,17 @@ const SIDE_CLASS = {
       className="flex w-full items-center justify-center md:absolute md:left-1/2 md:z-[2] md:w-full md:max-w-[1160px] md:-translate-x-1/2 md:justify-between md:px-6"
     >
       {/* El row esta centrado por CSS; el `top`/margenes los fija el hook. El
-          central se ve en los dos anchos; los laterales solo en desktop. */}
-      <img src={src} alt="" className={`${SIDE_CLASS[variant]}${tone}`} />
+          central se ve en los dos anchos; los laterales solo en desktop.
+          `opacity-60`: pedido de la organización (23/09), "más transparentes
+          y sutiles" — no compite con el `opacity` animado del contenedor,
+          se multiplica sobre él. */}
+      <img src={src} alt="" className={`opacity-60 ${SIDE_CLASS[variant]}${tone}`} />
       <img
         src={src}
         alt={alt}
-        className={`block shrink-0 animate-nos-spin ${CENTER_CLASS[variant]}${tone}`}
+        className={`block shrink-0 animate-nos-spin opacity-60 ${CENTER_CLASS[variant]}${tone}`}
       />
-      <img src={src} alt="" className={`${SIDE_CLASS[variant]}${tone}`} />
+      <img src={src} alt="" className={`opacity-60 ${SIDE_CLASS[variant]}${tone}`} />
     </motion.div>
   );
 }

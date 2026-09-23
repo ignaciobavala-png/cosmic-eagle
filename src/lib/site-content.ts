@@ -258,7 +258,9 @@ export const SITE_GROUPS = [
         label: "Título del cierre",
         help: "El titular de la última pantalla. Cada salto de línea que escribas parte el título en una línea nueva. Si lo dejas vacío se muestran solo los botones.",
         type: "multiline",
-        fallback: "Un viaje hacia el\nHumano Luminoso",
+        // Pedido de la organización (23/09): "Humano de Luz" en vez de
+        // "Humano Luminoso" — en inglés se mantiene "Luminous Human".
+        fallback: "Un viaje hacia el\nHumano de Luz",
       },
     ],
   },
