@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { Check, ImageUp, RotateCcw } from "lucide-react";
 import { compressImage } from "@/lib/compress-image";
 import { compressVideo, MAX_DURATION_SECONDS } from "@/lib/compress-video";
@@ -98,10 +98,15 @@ function TextField({
   saving: boolean;
 }) {
   const [draft, setDraft] = useState(value);
+  const [lastValue, setLastValue] = useState(value);
 
   // Tras guardar, el server manda el valor nuevo por props: si el borrador no
-  // se resincroniza, el textarea sigue mostrando lo viejo al restaurar.
-  useEffect(() => setDraft(value), [value]);
+  // se resincroniza, el textarea sigue mostrando lo viejo al restaurar. Se
+  // ajusta durante el render (estado derivado) para no encadenar renders.
+  if (lastValue !== value) {
+    setLastValue(value);
+    setDraft(value);
+  }
 
   const dirty = draft.trim() !== value.trim();
 
@@ -189,16 +194,19 @@ function ImageField({
   const [fellBack, setFellBack] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
+  const [lastValue, setLastValue] = useState(value);
 
   const acceptsVideo = slot.video === true;
 
-  // Al guardar, el valor nuevo llega por props y la preview local sobra.
-  useEffect(() => {
+  // Al guardar, el valor nuevo llega por props y la preview local sobra. Se
+  // limpia durante el render (estado derivado) para no encadenar renders.
+  if (lastValue !== value) {
+    setLastValue(value);
     setPreview(null);
     setInfo(null);
     setFellBack(false);
     setProblem(null);
-  }, [value]);
+  }
 
   function attach(file: File) {
     // El input tiene que llevar el archivo comprimido, no el original: es lo
