@@ -356,12 +356,22 @@ export function Header() {
             ) : (
               // El `hidden` va en el wrapper, no en el CtaLink: su base trae
               // `inline-flex` y le gana a `hidden` por orden de la hoja.
-              <div className="hidden md:flex">
+              //
+              // Pedido de la organización (23/09): Login y Registrarse como
+              // dos acciones independientes, no una sola. `/cuenta` sin
+              // `modo` ya es el formulario de login (ver `cuenta/page.tsx`).
+              <div className="hidden md:flex items-center gap-5">
+                <Link
+                  href="/cuenta"
+                  className="font-display text-label-sm uppercase text-on-surface-variant transition-colors duration-300 hover:text-primary-fixed-dim"
+                >
+                  Login
+                </Link>
                 <CtaLink
                   href="/cuenta?modo=registro"
                   className="whitespace-nowrap px-6 py-3"
                 >
-                  Unirme al círculo
+                  Registrarse
                 </CtaLink>
               </div>
             )}
@@ -481,14 +491,20 @@ export function Header() {
 
               {!profile && (
                 <div
-                  className="mt-auto px-6"
+                  className="mt-auto flex flex-col gap-3 px-6"
                   onClick={() => setDrawerOpen(false)}
                 >
+                  <Link
+                    href="/cuenta"
+                    className="text-center font-display text-label-sm uppercase text-on-surface-variant"
+                  >
+                    Login
+                  </Link>
                   <CtaLink
                     href="/cuenta?modo=registro"
                     className="w-full py-4"
                   >
-                    Unirme al círculo
+                    Registrarse
                   </CtaLink>
                 </div>
               )}
