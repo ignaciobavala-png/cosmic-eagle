@@ -22,12 +22,15 @@ export function ImmersiveHero({
   scrollTo,
   priority = true,
   height = "banner",
+  videoRate = 1,
 }: {
   image: string;
   imageAlt?: string;
   scrollHint?: string;
   scrollTo?: string;
   priority?: boolean;
+  /** Velocidad de reproducción si `image` es un video (1 = normal). */
+  videoRate?: number;
   /**
    * `full` ocupa la pantalla VISIBLE (una pantalla menos el navbar) y corta
    * seco, que es como pide el hero el rediseño de Julia: debajo arranca una
@@ -82,6 +85,7 @@ export function ImmersiveHero({
             src={image}
             alt={imageAlt}
             priority={priority}
+            rate={videoRate}
             /* `object-top` y no el centro por defecto: la figura tiene la
                cabeza pegada al borde superior de la foto, y en un viewport
                ancho y bajo (1920x870, por ejemplo) la caja del hero queda mas

@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { isVideoUrl } from "@/lib/media";
 
 /**
@@ -22,15 +25,29 @@ export function BackgroundMedia({
   alt = "",
   priority = false,
   className = "object-cover",
+  // Pedido de la organización, 23/09: el video del hero se sentía "rápido"
+  // y pidieron una secuencia lenta y contemplativa. El archivo no se
+  // recorta ni se re-exporta: se reproduce a velocidad reducida.
+  rate = 1,
 }: {
   src: string;
   alt?: string;
   priority?: boolean;
   className?: string;
+  rate?: number;
 }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // `playbackRate` no existe como atributo de video en HTML/JSX: hay que
+  // fijarlo de forma imperativa sobre el elemento montado.
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.playbackRate = rate;
+  }, [rate]);
+
   if (isVideoUrl(src)) {
     return (
       <video
+        ref={videoRef}
         src={src}
         aria-hidden="true"
         autoPlay

@@ -2,48 +2,25 @@ import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
-import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { ImmersiveHero } from "@/components/ui/ImmersiveHero";
 import { ScrollStory } from "@/components/ui/ScrollStory";
 import { MediaStatement } from "@/components/ui/MediaStatement";
 import { CreamSection, GOLD } from "@/components/ui/CreamSection";
-import { TripCarousel } from "@/components/ui/TripCarousel";
-import { Collapsible } from "@/components/ui/Collapsible";
 import { CtaLink } from "@/components/ui/CtaLink";
-import { BackgroundMedia } from "@/components/ui/BackgroundMedia";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
 import { TitleRule } from "@/components/ui/TitleRule";
-import type { TripCardData } from "@/components/ui/TripCard";
-import { createPublicClient } from "@/lib/supabase/public";
-import { todayUTC } from "@/lib/trip-dates";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
-import { getTestimonials } from "@/lib/testimonials";
-
-/**
- * La home vuelve a consultar `trips` (la cartelera del rediseño), asi que ya no
- * puede ser prerender puro. Con ISR se sigue sirviendo desde el CDN y se
- * revalida sola una vez por hora: la clienta publica un viaje y aparece en la
- * home sin deploy, sin que cada visita pegue a Supabase.
- */
-export const revalidate = 3600;
 
 /**
  * Home según el rediseño de Julia (`HOMEPAGE.html`, ver
- * docs/REDISENO_JULIA_HTML.md §2).
+ * docs/REDISENO_JULIA_HTML.md §2), simplificada por pedido de la
+ * organización (23/09, `docs/entregas/2026-09-23-feedback-org/`): el home
+ * público deja de mostrar la cartelera, el panel Sesiones/Viajes y los
+ * testimonios — esa profundidad queda en /viajes. Ver
+ * `docs/ARQUITECTURA_ACCESO_PUBLICO.md`.
  *
- * Recorrido: hero → frase manifiesto → relato que se destila con el scroll y
- * abre el calendario → frase sobre imagen → Nuestro propósito → panel doble
- * Sesiones/Viajes → Voces de Luz → Tecnología del Alma → cierre.
- *
- * Reemplaza a la home del 21/08. Lo que sale: la frase partida en dos con
- * máscara (QuoteBand), el bloque dorado "La humanidad" (HumanitySection), las
- * cuatro promesas (ImageStatements) y la banda dorada (GoldDivider) — el
- * degradé dorado ahora vive en el footer. El copy que queda sin lugar está
- * guardado en docs/COPY_HUERFANO.md.
- *
- * **Los viajes vuelven a la home**, al revés de la decisión del 20/08. Es lo que
- * pide el mockup y es el único camino al embudo de inscripción además del
- * navbar.
+ * Recorrido: hero → frase manifiesto → relato que se destila con el scroll →
+ * frase sobre imagen → Nuestro propósito → Contenidos → cierre.
  *
  * Las keys de los slots se conservan aunque la sección cambie, para no perder lo
  * que la clienta ya subió: `home.frase.*` pasa a ser la frase manifiesto grande
@@ -51,31 +28,6 @@ export const revalidate = 3600;
  */
 export default async function Home() {
   const content = await getSiteContent();
-  // Vacio = el panel dorado se queda con el degrade del manual de marca.
-  const fondoViajes = content("home.viajes.image").trim();
-
-  // Cliente sin cookies a proposito: los viajes publicados son publicos, y leer
-  // `cookies()` volveria dinamica la pagina y anularia el ISR de arriba.
-  //
-  // El `gte` saca de la cartelera lo que ya termino. Ojo con el ISR de arriba:
-  // el "hoy" queda congelado en la pagina servida, asi que una experiencia
-  // recien terminada puede seguir en la home hasta una hora de mas. Es
-  // aceptable —el alta de solicitudes esta cerrada igual del lado del servidor
-  // (viajes/[id]/solicitar/actions.ts), asi que lo peor que pasa es una
-  // tarjeta de mas— y el server action del panel revalida esta ruta cuando la
-  // clienta toca una experiencia.
-  const { data } = await createPublicClient()
-    .from("trips")
-    .select(
-      "id, title, description, location, start_date, end_date, status, image_url, type"
-    )
-    .in("status", ["open", "closed"])
-    .gte("end_date", todayUTC())
-    .order("start_date", { ascending: true })
-    .limit(8);
-
-  const trips = (data ?? []) as TripCardData[];
-  const testimonials = await getTestimonials("home");
 
   return (
     <>
@@ -99,6 +51,10 @@ export default async function Home() {
           image={content("home.hero.image")}
           imageAlt="Figura de partículas mirando hacia el cosmos"
           height="full"
+          // Pedido de la organización, 23/09: "mucho más lento... la sensación
+          // general debe ser lenta, profunda, elegante y contemplativa". A la
+          // mitad de velocidad, sin recortar el clip.
+          videoRate={0.5}
         />
 
         {/* Frase manifiesto: pantalla completa, tipografía grande, sin imagen.
@@ -109,7 +65,11 @@ export default async function Home() {
           id="manifiesto"
           amount={0.3}
           stagger={0.15}
-          className="flex min-h-[100svh] w-full items-center bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] py-24"
+          // Pedido de la organización, 23/09: "queda demasiado espacio azul
+          // entre el título principal y el texto que viene debajo". El
+          // padding vertical baja de 24 a 12 para acercar la frase al borde
+          // de la pantalla y conectarla mejor con el relato que sigue.
+          className="flex min-h-[100svh] w-full items-center bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] py-12"
         >
           {/* Las dos lineas entran por separado, la segunda 0.15s despues:
               es el `transition-delay` que Julia le pone al `.line-reveal` que
@@ -163,48 +123,15 @@ export default async function Home() {
             { text: "conciencia" },
             { text: "potencial evolutivo" },
             { text: "dimensión del alma" },
+            { text: "un conocimiento más profundo" },
             { text: "sabiduría cósmica" },
           ]}
-          cta={{ label: "Explorar experiencias", href: "#calendario" }}
+          // El calendario y la cartelera de home se sacaron (pedido de la
+          // organización, 23/09: "sacar del home público sesiones, viajes,
+          // calendario y testimonios"). El CTA pasa a llevar directo a
+          // Experiencias.
+          cta={{ label: "Explorar experiencias", href: "/viajes" }}
         />
-
-        {/* La cartelera en la home. Va sobre el mismo azul con el que termina el
-            relato, para que no haya corte de color entre las dos.
-
-            Es UNA sola vista general a todo el ancho, como pide Julia: un
-            carrusel que integra sesiones y viajes (cada tarjeta con su tag).
-            No son dos carruseles separados: a la sección específica de cada
-            tipo se accede desde el panel o desde /viajes. El "Explorar
-            experiencias" del relato ancla hasta acá. */}
-        {/* La cartelera arranca CERRADA y la despliega el botón "Explorar
-            experiencias" del relato (correción del 02/09 de Julia: "si el
-            usuario no toca el botoncito, el calendario queda oculto"). El
-            disparador está 400vh más arriba, dentro del sticky del relato, así
-            que el panel no lleva botón propio: se abre por hash, que es lo que
-            fija `StoryCta`.
-
-            La sección no lleva padding vertical propio — cerrada tiene que
-            medir cero, o queda una franja azul vacía en el medio de la home. El
-            aire lo pone el panel cuando se abre. */}
-        <section id="calendario" className="w-full bg-[#020c41]">
-          <Collapsible openOnHash="calendario">
-            {/* Abierta, la cartelera tambien tiene que ser una banda de
-                pantalla en mobile. Medida, ya da 933px por su cuenta en los
-                tres telefonos de referencia (360/390/412), asi que el
-                `min-h` no muerde hoy: esta como garantia para una pantalla mas
-                alta, donde el carrusel se quedaria corto y dejaria asomar el
-                banner de abajo. Cerrada sigue midiendo cero, porque el
-                `Collapsible` no renderiza nada hasta que se abre. */}
-            <div className="w-full py-20 max-md:min-h-[100svh]">
-              <TripCarousel
-                caption="Calendario"
-                title="Próximos Viajes"
-                trips={trips}
-                emptyLabel="No hay experiencias publicadas por el momento. Vuelve a visitarnos pronto."
-              />
-            </div>
-          </Collapsible>
-        </section>
 
         {/* Julia pidió imagen a pantalla completa con una frase encima. La key
             del slot es la de las cuatro promesas, que el rediseño elimina. */}
@@ -260,16 +187,17 @@ export default async function Home() {
               duration={1.6}
               className="mx-auto mt-4 h-px w-[120px] bg-[linear-gradient(to_right,transparent_0%,var(--color-primary-container)_50%,transparent_100%)] md:mt-5 md:w-[160px]"
             />
+            {/* Texto reemplazado a pedido de la organización (23/09): tiene
+                que declarar PARA QUÉ existe Cosmic Eagle Journey, no describir
+                solamente lo que hace. Mismo copy que /nosotros. */}
             <RevealItem y={30} duration={0.9} delay={0.45}>
             <p className="mx-auto mt-[30px] max-w-[640px] text-[16px] leading-[1.8] tracking-[0.3px] text-[#d0c5b4] md:mt-[50px] md:text-[20px] md:leading-[1.9]">
-              Acompañamos procesos de transformación interior y expansión de
-              conciencia.{" "}
+              Nuestro propósito es{" "}
               <span className="text-primary-container">
-                Creamos espacios para que las personas reconecten con su luz
-                interior
+                impulsar la evolución humana, creando espacios que permitan a
+                cada persona transformar su realidad, expandir su conciencia
               </span>{" "}
-              y trasciendan patrones limitantes, en cualquier etapa de su
-              evolución.
+              y profundizar la conexión con su alma.
             </p>
             </RevealItem>
             <RevealItem y={30} duration={0.9} delay={0.75}>
@@ -283,163 +211,17 @@ export default async function Home() {
           </div>
         </Reveal>
 
-        {/* Panel doble: Sesiones (azul) y Viajes (dorado), LADO A LADO en
-            escritorio y apilados en mobile, con el contenido centrado. Pedido de
-            Sofía (07/09): apilados en dos bandas horizontales y con el texto
-            pegado a la izquierda le quedaba desbalanceado.
+        {/* El panel Sesiones/Viajes y los testimonios de "Voces de Luz" se
+            sacaron del home público a pedido de la organización (23/09):
+            siguen existiendo en /viajes, no en la puerta de entrada. Ver
+            `docs/ARQUITECTURA_ACCESO_PUBLICO.md`. */}
 
-            **OJO, esto revierte una decisión de Julia**: su spec del 1/9
-            (`.sesiones-viajes`) los apila a propósito, y el lado a lado ya se
-            había probado y descartado. Si vuelve a pedir lo apilado, se saca el
-            `md:grid-cols-2` del `Reveal` y se devuelve el texto a la izquierda.
-
-            **Un solo observador para los dos paneles** (umbral 0.25), no uno por
-            panel: en el mockup las dos cascadas arrancan juntas. Por eso el
-            `Reveal` ES la seccion. La cascada no es pareja — titulo y linea
-            entran los dos en 0ms — asi que va `stagger={0}` y el escalon lo pone
-            cada item con su `delay`.
-
-            **Los dos botones son el mismo tipo** (`.sv-btn` del mockup): pildora
-            con borde 1.5px del color del texto, fondo translucido del color del
-            panel y glow propio en hover. Solo cambia el tono de cada panel. */}
-        {/* **Un observador POR PANEL y no uno solo para los dos**, al reves de
-            como estuvo hasta el 16/09. En escritorio no cambia nada: los dos
-            paneles son gemelos y estan a la misma altura, asi que el mismo
-            umbral 0.25 los dispara en el mismo instante y las dos cascadas
-            siguen arrancando juntas, que es lo que pide el mockup. En mobile,
-            en cambio, ahora cada panel mide una pantalla: con el observador
-            unico sobre la seccion de dos pantallas, la cascada del panel
-            dorado se jugaba entera fuera de pantalla y el usuario llegaba a un
-            panel ya quieto. */}
-        {/* Pedido de Sofía (reunión del 20/09): "se mezclan tantos colores y
-            cuadrados en una sola pantalla". La causa real no era mobile
-            solamente — en escritorio el panel medía `60svh` y NUNCA llegaba a
-            ocupar una pantalla propia, así que el scroll siempre dejaba a la
-            vista el cierre de "Nuestro propósito" (arriba) junto con las dos
-            mitades de este panel, los tres colores a la vez. Y en mobile eran
-            DOS pantallas llenas, una por color, que es la otra cara del mismo
-            problema.
-
-            Ahora el panel ocupa `100svh` en los dos breakpoints — como
-            cualquier otra sección de la home — y punto de snap propio, así que
-            el scroll SÍ lo trata como una pantalla dedicada y no se superpone
-            con la vecina. Sigue dividido como en escritorio (no es un slide
-            que alterna): en mobile arriba/abajo, en escritorio lado a lado,
-            con `grid-rows`/`grid-cols` repartiendo la misma altura completa. */}
-        <div
-          id="experiencias"
-          className="snap-band grid w-full min-h-[100svh] grid-rows-2 md:grid-cols-2 md:grid-rows-1"
-        >
-          <Reveal
-            amount={0.25}
-            stagger={0}
-            className="flex w-full items-center justify-center bg-[linear-gradient(135deg,#0079b3,#05125a)] px-6 py-6 text-center text-primary-container md:px-12 md:py-20"
-          >
-            <div className="max-w-[460px] md:max-w-[560px]">
-              <RevealItem duration={0.8}>
-                <h2 className="mb-3 font-display text-[34px] leading-tight md:mb-5 md:text-[56px]">
-                  Sesiones Cósmicas
-                </h2>
-              </RevealItem>
-              {/* Mismo filete que "Nuestro propósito" (pedido de Sofía,
-                  12/09): 1px que se desvanece en las puntas, en vez del oro
-                  sólido corto. Más corta que la de esa sección porque el
-                  bloque acá mide 460px de ancho, no 640 — y ahora que el panel
-                  entero llegó a `100svh` (pedido de Sofía, 20/09), el texto
-                  escala en la misma proporción que ese cambio de alto, con los
-                  mismos tamaños de destino que "Nuestro propósito" usa a los
-                  460→56/20px. */}
-              <RevealLine className="mx-auto mb-[18px] h-px w-[100px] bg-[linear-gradient(to_right,transparent_0%,var(--color-primary-container)_50%,transparent_100%)] md:mb-6 md:w-[160px]" />
-              <RevealItem duration={0.8} delay={0.15}>
-                <p className="mb-[18px] text-[15px] opacity-85 md:mb-6 md:text-[20px]">
-                  Un espacio para ir más profundo
-                </p>
-              </RevealItem>
-              <RevealItem duration={0.8} delay={0.3}>
-                <p className="mb-[22px] text-[14px] leading-[1.6] opacity-90 md:mb-10 md:text-[17px] md:leading-[1.8]">
-                  Nuestras sesiones de un día están diseñadas para sostener un
-                  trabajo interior profundo y la conexión con la dimensión del
-                  alma.
-                </p>
-              </RevealItem>
-              <RevealItem duration={0.8} delay={0.45}>
-                <CtaLink
-                  href="/viajes#sesiones"
-                  className="px-7 py-[11px] text-[13px] md:px-10 md:py-4 md:text-[14px]"
-                >
-                  Explorar próximas sesiones
-                </CtaLink>
-              </RevealItem>
-            </div>
-          </Reveal>
-
-          {/* El "Fondo 4" del manual de marca, que es un degrade liso y no una
-              textura: medido sobre el PNG, va de `#b3964b` (arriba a la
-              izquierda) a `#f9d78f` (abajo a la derecha), o sea los dos
-              extremos del oro de la paleta. Va en CSS y el archivo no se
-              guarda — misma decision que el navbar, el footer y "La humanidad"
-              (20/08): un degrade en PNG pesa, se pixela al escalar y banda en
-              pantallas grandes.
-
-              El degrade anterior remataba en `#6b551f` en las dos puntas, que
-              le daba unas esquinas sucias que el fondo del manual no tiene.
-
-              Encima puede ir una foto, si la clienta carga el slot. */}
-          <Reveal
-            amount={0.25}
-            stagger={0}
-            className="relative flex w-full items-center justify-center overflow-hidden bg-[linear-gradient(to_bottom_right,#b3964b_0%,#f9d78f_100%)] px-6 py-6 text-center text-[#05125a] md:px-12 md:py-20"
-          >
-            {fondoViajes && (
-              /* z-0 y contenido en z-10, nunca un z negativo: el `body` pinta su
-                 degrade despues de los descendientes de z negativo del contexto
-                 raiz y taparia la imagen (trampa del 20/08). */
-              <div className="absolute inset-0 z-0">
-                <BackgroundMedia src={fondoViajes} />
-              </div>
-            )}
-            <div className="relative z-10 max-w-[460px] md:max-w-[560px]">
-              <RevealItem duration={0.8}>
-                <h2 className="mb-3 font-display text-[34px] leading-tight md:mb-5 md:text-[56px]">
-                  Viajes Cósmicos
-                </h2>
-              </RevealItem>
-              {/* El mismo filete que el panel de Sesiones, en el azul del
-                  panel dorado. Mismo escalado a 100svh, ver el comentario del
-                  panel de Sesiones. */}
-              <RevealLine className="mx-auto mb-[18px] h-px w-[100px] bg-[linear-gradient(to_right,transparent_0%,#05125a_50%,transparent_100%)] md:mb-6 md:w-[160px]" />
-              <RevealItem duration={0.8} delay={0.15}>
-                <p className="mb-[18px] text-[15px] opacity-85 md:mb-6 md:text-[20px]">
-                  Un espacio para ir más profundo
-                </p>
-              </RevealItem>
-              <RevealItem duration={0.8} delay={0.3}>
-                <p className="mb-[22px] text-[14px] leading-[1.6] opacity-90 md:mb-10 md:text-[17px] md:leading-[1.8]">
-                  Experiencias de una semana en portales sagrados alrededor del
-                  mundo, para quienes están listos para un proceso más profundo.
-                </p>
-              </RevealItem>
-              <RevealItem duration={0.8} delay={0.45}>
-                <CtaLink
-                  href="/viajes#viajes"
-                  tone="dark"
-                  className="px-7 py-[11px] text-[13px] md:px-10 md:py-4 md:text-[14px]"
-                >
-                  Ir más allá
-                </CtaLink>
-              </RevealItem>
-            </div>
-          </Reveal>
-        </div>
-
-        <TestimonialsSection
-          id="voces"
-          testimonials={testimonials}
-          image={content("home.voces.image")}
-        />
-
-        {/* Tecnología del Alma: la puerta a /contenidos. */}
-        {/* Tecnología del Alma: la puerta a /contenidos.
+        {/* Contenidos: la puerta a /contenidos. Título y copy actualizados
+            (pedido de la organización, 23/09): pasa a llamarse "Contenidos" y
+            el texto ya no describe metodologías, sino que invita a
+            profundizar. La composición en dos columnas (texto izquierda /
+            frase destacada derecha) que pide el doc queda para una pasada de
+            diseño aparte — acá se resuelve sólo el copy y el título.
 
             Umbral 0.25 y un solo observador para texto e imagen: en el mockup
             entran juntos. Titulo, linea e imagen a 0ms; los tres parrafos a
@@ -483,8 +265,7 @@ export default async function Home() {
                   {/* El quiebre en dos renglones es fijo, no un wrap por ancho:
                       es decisión de diseño de la v2 del fix. */}
                   <h2 className="mb-3.5 font-display text-[clamp(24px,7vw,30px)] font-bold leading-tight text-[#05125a] md:mb-3 md:text-[40px]">
-                    Tecnología Humana y<br />
-                    Ciencia del Alma
+                    Contenidos
                   </h2>
                 </RevealItem>
                 {/* Oro oscuro y no el claro: sobre el fondo dorado el filete
@@ -503,22 +284,9 @@ export default async function Home() {
               <div className="space-y-5 text-[clamp(13px,3.6vw,15px)] leading-[1.8] text-[#05125a] md:max-w-[480px] md:space-y-6 md:text-[16px]">
                 <RevealItem duration={0.8} delay={0.15}>
                   <p>
-                    A medida que expandimos nuestra conciencia, emergen nuevas
-                    capacidades de percepción, intuición y sanación.
-                  </p>
-                </RevealItem>
-                <RevealItem duration={0.8} delay={0.3}>
-                  <p>
-                    Esta exploración nos conecta con conocimiento ancestral y
-                    cósmico, permitiéndonos integrar una comprensión más profunda
-                    de quiénes somos en nuestra vida cotidiana: en nuestro cuerpo,
-                    relaciones y propósito.
-                  </p>
-                </RevealItem>
-                <RevealItem duration={0.8} delay={0.45}>
-                  <p>
-                    Aquí reunimos ideas, marcos y recursos para acompañar ese
-                    proceso de expansión y evolución.
+                    Compartimos contenidos creados para acompañar cada etapa
+                    del camino, integrar los aprendizajes y profundizar en el
+                    propio proceso evolutivo.
                   </p>
                 </RevealItem>
               </div>
@@ -583,7 +351,10 @@ export default async function Home() {
         <MediaStatement
           image={content("home.cierre.image")}
           imageAlt="Amanecer sobre el horizonte"
-          text="Un viaje hacia el Humano Luminoso"
+          // Frase de cierre pedida por la organización, 23/09: "un cierre
+          // limpio, simple y contemplativo, sin agregar más información
+          // después".
+          text="Cuando el alma está lista, el camino aparece."
           veil={0.3}
           overlay={isEnabled(content("home.cierre.overlay"))}
           height={600}
