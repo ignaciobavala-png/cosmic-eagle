@@ -47,6 +47,15 @@ export const metadata: Metadata = {
  *
  * Sigue filtrando `draft` en la consulta: la policy `trips_select_public` deja
  * leer todos los trips a `anon`, incluidos los borradores.
+ *
+ * **Pendiente del feedback del 23/09**
+ * (docs/entregas/2026-09-23-feedback-org/CEJ_Correcciones_Experiencias_Final.docx):
+ * pide filtros TODAS·SESIONES·RETIROS y que la cartelera se muestre siempre
+ * abierta (no en un `Collapsible`) inmediatamente después de la intro, como
+ * sección principal. Eso es un rediseño de esta página (nuevo componente de
+ * filtro + sacar el Collapsible de los dos bloques), no un cambio rápido de
+ * copy — queda para una pasada aparte. Lo que sí se aplicó ya: intro
+ * acortada, y cierre con imagen + frase.
  */
 export default async function ViajesPage() {
   const content = await getSiteContent();
@@ -88,7 +97,11 @@ export default async function ViajesPage() {
           overlay={isEnabled(content("viajes.hero.overlay"))}
         />
 
-        {/* Julia pidió video de fondo; va la imagen hasta que llegue. */}
+        {/* Julia pidió video de fondo; va la imagen hasta que llegue.
+            Texto acortado a pedido de la organización (23/09): "reducir al
+            mínimo los textos explicativos y dar protagonismo a las
+            experiencias disponibles". Las tres párrafos largos quedan en
+            docs/COPY_HUERFANO.md. */}
         <MediaStatement
           id="experiencias"
           image={content("viajes.about.image")}
@@ -101,35 +114,12 @@ export default async function ViajesPage() {
           duration={0.9}
           overlay={isEnabled(content("viajes.about.overlay"))}
         >
-          {/* **Los resaltados NO cambian de tipografía**, sólo de color y
-              peso: llevaban `font-display` y con Sorts Mill Goudy —que tiene
-              la altura de x mucho más baja que Montserrat— quedaban
-              visiblemente más chicos que el renglón donde viven, como si
-              estuvieran en minúscula (reporte de Ignacio del 09/09). Es la
-              misma regla que la palabra clave del relato de la home. */}
-          <div className="space-y-6 text-body-md leading-relaxed text-primary text-justify md:text-body-lg [&_strong]:font-semibold [&_strong]:text-primary-container">
-            <p>
-              Nuestras experiencias cósmicas son{" "}
-              <strong>viajes de exploración interior</strong> diseñados para
-              revelar las estructuras profundas de tu ser y tu conexión con la{" "}
-              <strong>realidad multidimensional</strong>.
-            </p>
-            <p>
-              A través de la guía cuidadosa, la música canalizada y el trabajo
-              con seres de luz, creamos espacios seguros donde puedes acceder a
-              la memoria de tu alma personal, ancestral y cósmica, para{" "}
-              <strong>transformar tu comprensión</strong> de quién eres y qué es
-              posible.
-            </p>
-            <p>
-              <strong>Cada experiencia es un acto de valentía</strong>: un
-              compromiso contigo mismo de ir más allá de lo conocido, de disolver
-              los límites que creíste fijos y de reconectar con el poder y la
-              sabiduría que habita en ti. Ya sea en una sesión de un día o en un
-              viaje de una semana, trabajamos con tu ritmo, tu proceso único y el
-              colectivo que acompaña tu camino.
-            </p>
-          </div>
+          <p className="text-body-md leading-relaxed text-primary text-justify md:text-body-lg [&_strong]:font-semibold [&_strong]:text-primary-container">
+            Experiencias para{" "}
+            <strong>profundizar en tu proceso de transformación</strong>,
+            expandir la conciencia y conectar con el alma. En sesiones de un
+            día o retiros de varios días.
+          </p>
         </MediaStatement>
 
         <CreamSection
@@ -275,6 +265,24 @@ export default async function ViajesPage() {
           />
         </CreamSection>
 
+        {/* Cierre pedido por la organización (23/09): "cerrar la página con
+            una imagen limpia y potente... no agregar contenido después de
+            esta imagen". Hasta ahora la página terminaba en la banda de
+            testimonios. */}
+        <MediaStatement
+          image={content("viajes.cierre.image")}
+          imageAlt="Amanecer sobre un paisaje sagrado"
+          height={600}
+          mobileFull
+        >
+          <p className="text-balance text-center font-display text-[20px] italic leading-snug text-primary-container md:text-[28px]">
+            Un viaje hacia adentro.
+            <br />
+            Un recuerdo de nuestra naturaleza más profunda.
+            <br />
+            Una activación de la luz que habita en nosotros.
+          </p>
+        </MediaStatement>
       </main>
       <Footer />
       <BackToTop />

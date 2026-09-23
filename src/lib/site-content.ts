@@ -320,6 +320,16 @@ export const SITE_GROUPS = [
         type: "boolean",
         fallback: "true",
       },
+      {
+        key: "viajes.cierre.image",
+        label: "Imagen de cierre",
+        help: "La última imagen de la página, a pantalla completa, con la frase de cierre encima.",
+        type: "image",
+        fallback: IMAGES.almas,
+        ratio: "16/9",
+        maxPx: 1920,
+        video: true,
+      },
     ],
   },
   {
