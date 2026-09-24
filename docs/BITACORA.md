@@ -2557,6 +2557,51 @@ se recorrió en el browser.
 
 ---
 
+### Sesión del 2026-09-24 — el feedback del 23/09, con DeepSeek de por medio
+
+Llegaron cuatro documentos de correcciones de la organización
+(`docs/entregas/2026-09-23-feedback-org/`, sobre home, nosotros, viajes y
+contenidos). Las de home, nosotros, header y el ajuste corto de viajes se
+hicieron directo (`3106463`, `703e4fb`, `77482e1`, `9fecff7`).
+
+Las dos que quedaban —el rediseño de `/contenidos` como biblioteca y el de
+`/viajes` con filtros— eran trabajo pesado de UI, así que se armó un prompt
+autocontenido con el texto literal de los dos documentos y se lo delegó a
+**DeepSeek** para la implementación. Volvió con un reporte de lo hecho,
+decisiones de diseño y verificación propia (`tsc`, `build`, chequeo en
+browser).
+
+**Control del reporte contra el repo real**, no contra lo que decía el
+reporte: se releyó cada archivo tocado, se cruzó la vista `articles_public`
+contra la migración que la define, se confirmó que `"multiline"` es un
+`SlotType` válido, y se corrió `tsc --noEmit` + `pnpm build` de cero (no se
+confió en el "verde" que reportaba DeepSeek). Todo cerró, con una excepción:
+**el desplegable de "Experiencias" del header quedó con links muertos**. Los
+hijos "Sesiones" y "Viajes" apuntaban a `/viajes#sesiones` y `/viajes#viajes`,
+anchors que el `/viajes` rediseñado ya no tiene (ahora es una sola cartelera,
+`id="cartelera"`, con filtro de estado en vez de dos bloques). El reporte no
+lo mencionaba porque no tocó `constants.ts`.
+
+Se resolvió cableando `?tipo=` como el resto del sitio ya hace con
+`?categoria=` en `/contenidos`: la página de `/viajes` lee `searchParams`,
+calcula el filtro inicial y se lo pasa a `ExperienceFilter`, que lo usa como
+estado inicial y sincroniza cualquier cambio de vuelta a la URL con
+`history.replaceState`. Los links del header pasan a
+`/viajes?tipo=<valor>#cartelera` — deja de estar roto y de paso preselecciona
+el filtro correcto, que es lo que el link siempre debería haber hecho.
+
+Commits: `e385e9d` (contenidos) y `31da5d3` (viajes, con el fix del
+desplegable incluido). `AGENTS.md` (auto-generado) y
+`docs/entregas/2026-09-23-dns-cutover/` (fuera de alcance de esta sesión)
+quedan sin commitear a propósito.
+
+Quedó en el tintero, todo documentado como TODO en el código o en
+`COPY_HUERFANO.md`: el copy exacto del botón de cada tarjeta de la cartelera,
+el título de esa sección, la discrepancia "Retiro" (nueva) vs. "Viaje"
+(`trip-type.ts`, sin tocar en esta pasada), la elección del juego de
+testimonios y el destino final del banner de frase del medio que salió de
+`/viajes`.
+
 ---
 ## Apéndice — el `CLAUDE.md` anterior al 2026-09-15
 
