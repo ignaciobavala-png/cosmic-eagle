@@ -8,11 +8,16 @@ import { useSignedIn } from "@/lib/use-signed-in";
 
 export function Footer() {
   // Pedido de Sofia (24/09): el link de Privacidad del footer no lo puede
-  // apretar un guest. `!== true` y no `=== false` a proposito: mientras la
-  // sesion no se sabe (`null`) se deja pasar, igual que en Header — es
-  // preferible que alguien logueado no se coma el candado un instante.
+  // apretar un guest, y el 24/09 (repaso) agregó Experiencias y Contenidos —
+  // mismo criterio que ya rige el desplegable del navbar y el CTA "Explorar
+  // experiencias" (ver Header y ScrollStory): sin sesión, esas dos secciones
+  // no se navegan desde acá. `=== false` y no `!== true`: mientras la sesión
+  // no se sabe (`null`) se deja pasar, igual que en Header — es preferible
+  // que alguien logueado no se coma el candado un instante.
   const signedIn = useSignedIn();
-  const privacyLocked = signedIn === false;
+  const LOCKED_FOR_GUESTS = ["Privacidad", "Experiencias", "Contenidos"];
+  const isLockedForGuests = (label: string) =>
+    signedIn === false && LOCKED_FOR_GUESTS.includes(label);
 
   return (
     <footer // El degrade va en CSS: el PNG que entrego la disenadora era un
@@ -46,7 +51,7 @@ export function Footer() {
             </h2>
             <ul className="space-y-3">
               {column.links.map((link) => {
-                const locked = link.label === "Privacidad" && privacyLocked;
+                const locked = isLockedForGuests(link.label);
                 return (
                 <li key={link.label}>
                   {locked ? (

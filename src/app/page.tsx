@@ -260,12 +260,14 @@ export default async function Home() {
             dorada se funde. */}
         {/* Pedido de Sofia (24/09): "que el slide contenidos ocupe el alto
             de la pantalla 1:1" — antes era pantalla completa solo en mobile
-            (`max-md:`), ahora en cualquier ancho. */}
+            (`max-md:`), ahora en cualquier ancho.
+            `relative`: la imagen se pinea contra el borde REAL de la sección
+            (ver más abajo), no contra la fila de texto. */}
         <CreamSection
           id="tecnologia"
           background={GOLD}
           full={false}
-          className="flex min-h-[100svh] items-center"
+          className="relative flex min-h-[100svh] items-center"
           reveal={{ amount: 0.25, stagger: 0 }}
         >
           <div className="mx-auto flex w-full max-w-narrative flex-col items-center gap-12 md:flex-row md:gap-16">
@@ -330,24 +332,39 @@ export default async function Home() {
 
             {/* En mobile la imagen se oculta ENTERA y queda solo el texto
                 (`.tec-image` es `display:none` abajo de 768px en el mockup).
-                Antes se apilaba arriba del texto. */}
-            {/* Pedido de Sofía (reunión del 20/09): el corte recto de abajo de
-                la imagen "no le convencía" — quería que flotara/se integrara
-                con el fondo en vez de leerse como una caja suelta sobre el
-                dorado. Su solución: apoyar la imagen contra el borde de ABAJO
-                de la sección, para que el corte recto coincida con el límite
-                real de la franja (donde el dorado ya termina) y no quede
-                colgando en el medio del campo dorado. `md:self-end` la ancla
-                al pie de la fila y `md:-mb-24` cancela el `py-24` de
-                `CreamSection` — el mismo valor, para que el borde de la imagen
-                llegue justo al borde real de la franja y no se pase. */}
+                Antes se apilaba arriba del texto. Acá sólo queda un espaciador
+                del mismo ancho (`flex-1`, invisible) para que la columna de
+                texto conserve su proporción de dos columnas: la imagen de
+                verdad se mudó fuera de esta fila (ver más abajo). */}
+            <div className="hidden w-full flex-1 md:block" aria-hidden="true" />
+          </div>
+
+          {/* Pedido de Sofía (reunión del 20/09): el corte recto de abajo de
+              la imagen "no le convencía" — quería que apoyara contra el borde
+              de ABAJO de la sección, para que coincida con el límite real de
+              la franja dorada y no quede colgando en el medio.
+              Vive FUERA de la fila de texto (a diferencia de antes) porque
+              desde que la sección pasó a `min-h-[100svh]` con `items-center`
+              (pedido de Sofía, 24/09: "que ocupe el alto de pantalla 1:1"), la
+              fila entera queda centrada verticalmente con aire de sobra
+              arriba y abajo — el viejo truco (`self-end` + `-mb-24` cancelando
+              el `py-24` de `CreamSection`) anclaba contra el borde de la FILA,
+              no de la SECCIÓN, y con la fila centrada la imagen quedaba
+              flotando de nuevo. Por eso pasa a `absolute bottom-0` contra la
+              sección (que ahora es `relative`), con su propio contenedor
+              `max-w-narrative` para caer en la misma columna que ocupaba
+              dentro de la fila (el padding horizontal de `CreamSection` es
+              simétrico, así que centrar sobre el ancho completo de la sección
+              da la misma posición que centrar sobre su columna con padding). */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 mx-auto hidden w-full max-w-narrative md:flex md:gap-16">
+            <div className="flex-1" aria-hidden="true" />
             <RevealItem
-              className="hidden w-full flex-1 md:block md:-mb-24 md:self-end"
+              className="w-full flex-1"
               y={0}
               duration={1}
               scaleFrom={0.98}
             >
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl md:aspect-[4/4.4]">
+              <div className="relative aspect-[4/4.4] w-full overflow-hidden rounded-xl">
                 {/* `object-top` y no centrado, por lo mismo que el hero de la
                     home (20/08): la caja (4/4.4 = 0,909) es mas apaisada que la
                     figura (900x1195 = 0,753), asi que `cover` escala por el
@@ -355,7 +372,7 @@ export default async function Home() {
                     abajo, y la cabeza empieza al 9% de la imagen — se la comia
                     siempre. Anclada arriba, todo el recorte cae en el pie,
                     donde la figura ya se deshace en particulas. */}
-                {/* `-scale-x-100`: pedido de Sofia (24/09), "la chica de
+                {/* `scale-x-[-1]`: pedido de Sofia (24/09), "la chica de
                     contenidos que mire para el otro lado, efecto espejo". No
                     afecta el recorte de `object-top`: el flip es puramente
                     horizontal. */}
