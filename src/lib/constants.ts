@@ -167,9 +167,11 @@ export const NAV_LINKS: NavLink[] = [
     icon: "Sparkles",
     // El desplegable no reemplaza al link: "Viajes" sigue yendo al listado
     // completo, los hijos son atajos al mismo listado ya filtrado.
-    // Desde el rediseno de Julia (27/08) /viajes son dos bloques con ancla
-    // propia y ya no una grilla filtrada por `?tipo=`, asi que los hijos del
-    // desplegable apuntan al ancla de su bloque. Los rotulos son Sesiones y
+    // Desde el rediseno de la organizacion (24/09) /viajes es una sola
+    // cartelera (`id="cartelera"`, ya no los bloques con ancla propia
+    // `#sesiones`/`#viajes` de la entrega de Julia) con filtro TODAS ·
+    // SESIONES · RETIROS que lee `?tipo=` (mismo criterio que `?categoria=`
+    // en Contenidos, ver `ExperienceFilter`). Los rotulos son Sesiones y
     // Viajes desde la entrega del 02/09, que cerro esa pregunta.
     // "Calendario" es el unico hijo que NO es un ancla de /viajes: es una
     // pagina propia con las dos carteleras abiertas, para quien entra a ver
@@ -179,7 +181,7 @@ export const NAV_LINKS: NavLink[] = [
     children: [
       ...TRIP_TYPES.map((t) => ({
         label: t.label,
-        href: `/viajes#${t.value === "ceremonia" ? "sesiones" : "viajes"}`,
+        href: `/viajes?tipo=${t.value}#cartelera`,
       })),
       { label: "Calendario", href: "/calendario" },
     ],

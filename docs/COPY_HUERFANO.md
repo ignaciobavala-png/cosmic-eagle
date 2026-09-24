@@ -108,3 +108,16 @@ evaluar su uso en otra sección"):
 > En el centro de todo está la evolución: liberarnos de aquello que nos
 > limita, recordar quiénes somos y abrir espacio para desarrollar el
 > potencial que cada ser humano lleva dentro.
+
+## Banner de frase del medio de /viajes (sacado 24/09)
+
+Estaba entre los bloques de Sesiones y Viajes, sobre la imagen
+`viajes.banner.image`. No figura en la estructura final del documento
+(`CEJ_Correcciones_Experiencias_Final.docx` §7, que va del listado directo a
+los testimonios) y se solapaba con la frase de cierre "Un viaje hacia
+adentro..." que sí quedó. Queda guardado por si se reubica:
+
+> El viaje cósmico es, en última instancia, un viaje hacia adentro: un
+> recuerdo de nuestra naturaleza más profunda, una activación de nuestra luz
+> original y un movimiento hacia una experiencia humana más consciente,
+> conectada y luminosa.
