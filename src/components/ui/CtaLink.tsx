@@ -67,7 +67,12 @@ export type CtaSize = "md" | "sm";
 
 const CTA_SIZES: Record<CtaSize, string> = {
   md: "border-[1.5px] px-7 py-3",
-  sm: "border px-5 py-2",
+  // `pt`/`pb` asimétricos y no `py-2`: Sorts Mill Goudy en mayúsculas casi no
+  // tiene descendentes, así que su tinta queda arriba de la caja de línea que
+  // el navegador centra — con padding parejo el texto se ve corrido hacia
+  // arriba (reporte de Ignacio, 24/09). 2px de más abajo que arriba lo
+  // balancea a ojo, medido en capturas a 3x.
+  sm: "border pt-[9px] pb-[7px] px-5",
 };
 
 export function CtaLink({

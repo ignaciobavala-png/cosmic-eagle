@@ -519,6 +519,14 @@ function StoryCta({ label, href }: Cta) {
  * Con el primer párrafo encendido, la sección entra desde abajo con el texto ya
  * puesto y el vacío desaparece. La destilación no se pierde: siguen entrando
  * dos párrafos con el scroll, y la fase 2 no se toca.
+ *
+ * **El primero, además, sube un poco al entrar** (pedido de Ignacio, 24/09:
+ * sin esto se sentía "caído" — como si ya estuviera puesto de siempre en vez
+ * de haber llegado). La opacidad fija en 1 sigue igual (es lo que evita el
+ * hueco en blanco de arriba), pero un `y` que baja de 22px a 0 en el primer
+ * 6% del progreso le da el mismo gesto de entrada que tiene el resto del
+ * sitio (`RevealItem`), sin reabrir el hueco: a esa altura el progreso ya
+ * pasó de 0 en cuanto el usuario mueve la rueda un poco.
  */
 function StoryParagraph({
   children,
@@ -538,9 +546,13 @@ function StoryParagraph({
     index === 0 ? [0, 1] : [start, start + window_],
     index === 0 ? [1, 1] : [0, 1]
   );
+  const y = useTransform(progress, [0, 0.06], [22, 0]);
 
   return (
-    <motion.p style={{ opacity }} className={PARAGRAPH_CLASS}>
+    <motion.p
+      style={index === 0 ? { opacity, y } : { opacity }}
+      className={PARAGRAPH_CLASS}
+    >
       {children}
     </motion.p>
   );
