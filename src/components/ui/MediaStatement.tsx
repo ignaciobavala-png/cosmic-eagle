@@ -29,6 +29,7 @@ export function MediaStatement({
   height,
   mobileFull = false,
   imagePositionMobile,
+  imagePosition,
   textClassName,
   textColorClassName = "text-primary",
   width = "narrow",
@@ -36,6 +37,7 @@ export function MediaStatement({
   once = true,
   y = 30,
   duration = 1,
+  offsetClassName = "",
 }: {
   image: string;
   imageAlt?: string;
@@ -101,6 +103,18 @@ export function MediaStatement({
    * arruina la foto, y no como ajuste fino en todos los banners.
    */
   imagePositionMobile?: string;
+  /**
+   * `object-position` de la imagen en TODOS los anchos (a diferencia de
+   * `imagePositionMobile`, que solo pisa mobile). Por defecto el recorte
+   * queda centrado, que en un banner `min-h-[100svh]` depende del aspect
+   * ratio de la pantalla de quien mira: la misma foto se ve distinto en una
+   * ventana ancha y baja que en una alta y angosta. Cuando el sujeto de la
+   * foto tiene la cabeza cerca del borde (para que el texto centrado no la
+   * tape en algunas pantallas y sí en otras, como pasó en el Cierre el
+   * 24/09), conviene anclar con `object-top` en vez de confiar en que el
+   * centro de la imagen y el centro del texto no coincidan.
+   */
+  imagePosition?: string;
   /** Tamaño de la frase cuando el mockup fija un px (28px en Atmosférica, 32px en el Cierre). */
   textClassName?: string;
   /**
@@ -123,6 +137,16 @@ export function MediaStatement({
   once?: boolean;
   y?: number;
   duration?: number;
+  /**
+   * Empuja la frase hacia abajo dentro de la sección, sin dejar de estar
+   * centrada horizontalmente ni romper el `y` de entrada de `Reveal` (que
+   * anima `transform` y vuelve a `0` en reposo — un `margin-top` en el mismo
+   * nodo no compite con eso). Pedido de Ignacio (24/09): en el Cierre la
+   * frase, centrada a secas, caía justo sobre la cara del personaje de la
+   * foto. No es un ajuste por defecto porque el bloque se reutiliza con otras
+   * fotos donde el centro sí es el lugar correcto.
+   */
+  offsetClassName?: string;
 }) {
   return (
     <section
@@ -148,7 +172,7 @@ export function MediaStatement({
       <BackgroundMedia
         src={image}
         alt={imageAlt}
-        className={`object-cover${imagePositionMobile ? ` ${imagePositionMobile}` : ""}`}
+        className={`object-cover${imagePosition ? ` ${imagePosition}` : ""}${imagePositionMobile ? ` ${imagePositionMobile}` : ""}`}
       />
       {overlay && (
         <>
@@ -164,7 +188,7 @@ export function MediaStatement({
             duration={duration}
             className={`relative z-10 px-margin-mobile md:px-margin-desktop ${
               width === "prose" ? "max-w-3xl" : "max-w-2xl text-center"
-            }`}
+            } ${offsetClassName}`}
           >
             {text && (
               <p

@@ -412,6 +412,12 @@ export default async function Home() {
         <MediaStatement
           image={content("home.cierre.image")}
           imageAlt="Amanecer sobre el horizonte"
+          // Sin anclar, el recorte de `object-cover` depende del aspect
+          // ratio de la pantalla de quien mira: en algunas la cabeza del
+          // personaje cae bajo el texto centrado y en otras no (reporte de
+          // Ignacio, 24/09: se veía bien en su pantalla y mal en la de
+          // Sofía). `object-top` fija el mismo encuadre en cualquier ancho.
+          imagePosition="object-top"
           // Frase de cierre pedida por la organización, 23/09: "un cierre
           // limpio, simple y contemplativo, sin agregar más información
           // después".
@@ -428,6 +434,10 @@ export default async function Home() {
           // "Atmosférica" (pedido del 11/09, misma regla: `primary-container`
           // y no `primary-fixed-dim`, ver ese comentario más arriba).
           textColorClassName="text-primary-container"
+          // Pedido de Ignacio (24/09, con captura): centrada a secas la frase
+          // caía justo sobre la cara del personaje. La baja un poco sin
+          // perder el centrado horizontal.
+          offsetClassName="mt-20 md:mt-28"
         />
       </main>
       <Footer />
