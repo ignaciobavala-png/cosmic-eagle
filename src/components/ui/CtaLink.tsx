@@ -28,7 +28,10 @@ export type CtaTone = "gold" | "dark";
  */
 export const CTA_TONES: Record<CtaTone, string> = {
   // Dorado sobre fondo oscuro o sobre imagen: el caso normal.
-  gold: "border-primary-container/70 text-primary-container hover:border-primary-container hover:bg-primary-container/10 hover:shadow-[0_0_26px_rgba(249,215,143,0.38)]",
+  // Brillo del hover subido a pedido de Sofia (24/09: "subir el brillo a los
+  // botones, shining un poquito mas fuerte"): de 0,38 a 0,55 de opacidad y el
+  // radio de difusion de 26 a 34px.
+  gold: "border-primary-container/70 text-primary-container hover:border-primary-container hover:bg-primary-container/10 hover:shadow-[0_0_34px_rgba(249,215,143,0.55)]",
   // Azul sobre el panel dorado y sobre la franja crema.
   //
   // Ojo con el glow: va en el BLANCO CALIDO del sistema (`primary`, #fff6eb),
@@ -53,21 +56,37 @@ export const CTA_TONES: Record<CtaTone, string> = {
  * visible siempre. Para mostrarlo/ocultarlo por breakpoint, envolverlo en un
  * contenedor que lleve el `hidden`.
  */
+/**
+ * `sm` es el pedido puntual de Sofia del 24/09 para el navbar ("la
+ * circunferencia del botón un poquito más pequeña, más delicado"): mismo
+ * botón, borde más fino y menos padding. Sigue siendo EL botón del sistema —
+ * no una forma nueva, un tamaño más para donde el contorno de 1.5px se lee
+ * pesado en una barra angosta.
+ */
+export type CtaSize = "md" | "sm";
+
+const CTA_SIZES: Record<CtaSize, string> = {
+  md: "border-[1.5px] px-7 py-3",
+  sm: "border px-5 py-2",
+};
+
 export function CtaLink({
   href,
   children,
   tone = "gold",
+  size = "md",
   className = "",
 }: {
   href: string;
   children: React.ReactNode;
   tone?: CtaTone;
+  size?: CtaSize;
   className?: string;
 }) {
   return (
     <Link
       href={href}
-      className={`inline-flex items-center justify-center gap-2 rounded-full border-[1.5px] px-7 py-3 font-display text-label-sm uppercase tracking-[0.038em] transition-[color,background-color,border-color,box-shadow,transform] duration-[250ms] hover:scale-[1.04] ${CTA_TONES[tone]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-full font-display text-label-sm uppercase tracking-[0.038em] transition-[color,background-color,border-color,box-shadow,transform] duration-[250ms] hover:scale-[1.04] ${CTA_SIZES[size]} ${CTA_TONES[tone]} ${className}`}
     >
       {children}
     </Link>

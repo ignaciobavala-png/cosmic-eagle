@@ -125,6 +125,13 @@ export type NavLink = {
   // reunion del 04/09 ("dejemos solo titulos"). El `href` puede ser un ancla a
   // una seccion de la propia pagina del padre.
   children?: { label: string; href: string }[];
+  /**
+   * Pedido de Sofia (24/09): sin sesion iniciada, los hijos de Experiencias y
+   * Contenidos se VEN pero no hacen nada al pinchar — no es un candado sobre
+   * la pagina (que sigue siendo publica), es sobre el atajo del desplegable.
+   * "Nosotros" no lleva esto: sus hijos son anclas a la propia pagina publica.
+   */
+  childrenRequireAuth?: boolean;
 };
 
 // "Inicio" no va en el nav: al home se llega tocando el logo (desktop y drawer)
@@ -185,6 +192,7 @@ export const NAV_LINKS: NavLink[] = [
       })),
       { label: "Calendario", href: "/calendario" },
     ],
+    childrenRequireAuth: true,
   },
   {
     label: "Contenidos",
@@ -194,6 +202,7 @@ export const NAV_LINKS: NavLink[] = [
       label: c.label,
       href: `/contenidos?categoria=${c.value}`,
     })),
+    childrenRequireAuth: true,
   },
   { label: "Mi Cuenta", href: "/cuenta", icon: "User" },
 ];
@@ -227,7 +236,6 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
       // /admin/legales. Salieron con un texto preliminar nuestro, no con el
       // anexo de Sofia, que se perdio con `web-cosmic-journey-ES.md`.
       { label: "Privacidad", href: "/privacidad" },
-      { label: "Términos de Servicio", href: "/terminos" },
       { label: "Contacto", href: "mailto:contacto@cosmiceaglejourney.com" },
     ],
   },

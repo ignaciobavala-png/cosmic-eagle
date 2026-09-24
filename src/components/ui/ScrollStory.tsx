@@ -5,6 +5,7 @@ import { CTA_TONES } from "./CtaLink";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useTransform, useReducedMotion, type MotionValue } from "framer-motion";
 import { useSectionProgress } from "@/lib/use-section-progress";
+import { useSignedIn } from "@/lib/use-signed-in";
 import { COLLAPSIBLE_TOGGLE } from "./Collapsible";
 
 type Cta = { label: string; href: string };
@@ -453,6 +454,13 @@ function StoryCta({ label, href }: Cta) {
   // intercepta el click para abrir la cartelera, que esta 400vh mas abajo
   // dentro del sticky de este mismo relato (ver el comentario de arriba).
   // Se escapo de la primera pasada justamente por no ser un `CtaLink`.
+  //
+  // Pedido de Sofia (24/09): sin sesion, "Explorar experiencias" lleva a
+  // login en vez de a /viajes. Solo aplica a un `href` real (no a los "#"
+  // que abren la cartelera in-page, que no son navegacion a Experiencias).
+  const signedIn = useSignedIn();
+  const resolvedHref =
+    !href.startsWith("#") && signedIn === false ? "/cuenta" : href;
   const className =
     `inline-flex items-center justify-center gap-2 rounded-full border-[1.5px] px-10 py-4 font-display text-[14px] uppercase tracking-[0.071em] transition-[color,background-color,border-color,box-shadow,transform] duration-[250ms] hover:scale-[1.04] ${CTA_TONES.gold}`;
   // Sin flecha adentro: la regla de Julia del 08/09 es que ningun boton la
@@ -487,7 +495,7 @@ function StoryCta({ label, href }: Cta) {
       {content}
     </a>
   ) : (
-    <Link href={href} className={className}>
+    <Link href={resolvedHref} className={className}>
       {content}
     </Link>
   );

@@ -93,7 +93,10 @@ export default async function Home() {
                 escritorio cada mitad es una sola linea, asi que este valor no
                 controla nada mas que el hueco entre las dos — de 2,5px a 13.
                 Es una desviacion del mockup, avisada. */}
-            <h2 className="font-display text-[clamp(2.25rem,4.4vw,4rem)] leading-[1.12] text-primary md:leading-[1.2]">
+            {/* `text-h1` (token de globals.css, 24/09): es la frase que
+                Sofia marcó como el h1 de la página al definir el sistema de
+                escala. Mismo tamaño que tenía en duro, ahora nombrado. */}
+            <h1 className="font-display text-h1 text-primary">
               <RevealItem as="span" className="inline-block" y={40} duration={1.6}>
                 {content("home.frase.left")}
               </RevealItem>
@@ -103,7 +106,7 @@ export default async function Home() {
                   {content("home.frase.right")}
                 </em>
               </RevealItem>
-            </h2>
+            </h1>
           </div>
         </Reveal>
 
@@ -173,7 +176,9 @@ export default async function Home() {
               pendiente como paso aparte. */}
           <div className="mx-auto w-full max-w-3xl">
             <RevealItem y={30} duration={1.6}>
-              <h2 className="font-display text-[34px] font-bold tracking-[0.5px] text-primary-container md:text-[56px]">
+              {/* `text-h2`: mismo tamaño que tenía en duro (34px/56px),
+                  ahora nombrado en el token de globals.css. */}
+              <h2 className="font-display text-h2 font-bold tracking-[0.5px] text-primary-container">
                 Nuestro propósito
               </h2>
             </RevealItem>
@@ -191,13 +196,20 @@ export default async function Home() {
                 que declarar PARA QUÉ existe Cosmic Eagle Journey, no describir
                 solamente lo que hace. Mismo copy que /nosotros. */}
             <RevealItem y={30} duration={0.9} delay={0.45}>
+            {/* Pedido de Sofia (24/09): resaltar SOLO estas 4 palabras
+                sueltas — evolución, transformar, conciencia, alma — y nada
+                más. Antes se resaltaba la frase entera "impulsar la
+                evolución... expandir su conciencia", que era mucho más que
+                lo que pidió. */}
             <p className="mx-auto mt-[30px] max-w-[640px] text-[16px] leading-[1.8] tracking-[0.3px] text-[#d0c5b4] md:mt-[50px] md:text-[20px] md:leading-[1.9]">
-              Nuestro propósito es{" "}
-              <span className="text-primary-container">
-                impulsar la evolución humana, creando espacios que permitan a
-                cada persona transformar su realidad, expandir su conciencia
-              </span>{" "}
-              y profundizar la conexión con su alma.
+              Nuestro propósito es impulsar la{" "}
+              <span className="text-primary-container">evolución</span>{" "}
+              humana, creando espacios que permitan a cada persona{" "}
+              <span className="text-primary-container">transformar</span> su
+              realidad, expandir su{" "}
+              <span className="text-primary-container">conciencia</span> y
+              profundizar la conexión con su{" "}
+              <span className="text-primary-container">alma</span>.
             </p>
             </RevealItem>
             <RevealItem y={30} duration={0.9} delay={0.75}>
@@ -246,11 +258,14 @@ export default async function Home() {
             con el: el filete pasa al oro oscuro (el claro da 1,00:1 sobre este
             fondo, o sea invisible) y el boton pasa a la pildora azul, porque la
             dorada se funde. */}
+        {/* Pedido de Sofia (24/09): "que el slide contenidos ocupe el alto
+            de la pantalla 1:1" — antes era pantalla completa solo en mobile
+            (`max-md:`), ahora en cualquier ancho. */}
         <CreamSection
           id="tecnologia"
           background={GOLD}
           full={false}
-          className="max-md:flex max-md:min-h-[100svh] max-md:items-center"
+          className="flex min-h-[100svh] items-center"
           reveal={{ amount: 0.25, stagger: 0 }}
         >
           <div className="mx-auto flex w-full max-w-narrative flex-col items-center gap-12 md:flex-row md:gap-16">
@@ -264,7 +279,11 @@ export default async function Home() {
                 <RevealItem duration={0.8}>
                   {/* El quiebre en dos renglones es fijo, no un wrap por ancho:
                       es decisión de diseño de la v2 del fix. */}
-                  <h2 className="mb-3.5 font-display text-[clamp(24px,7vw,30px)] font-bold leading-tight text-[#05125a] md:mb-3 md:text-[40px]">
+                  {/* `text-h3`: Sofia aclaró (24/09) que este título NO puede
+                      ser el mismo nivel que "Nuestro propósito" ("no es
+                      simétrico"), así que queda un escalón debajo en el
+                      sistema h1/h2/h3 en vez de igualar su tamaño. */}
+                  <h2 className="mb-3.5 font-display text-h3 font-bold text-[#05125a] md:mb-3">
                     Contenidos
                   </h2>
                 </RevealItem>
@@ -336,12 +355,16 @@ export default async function Home() {
                     abajo, y la cabeza empieza al 9% de la imagen — se la comia
                     siempre. Anclada arriba, todo el recorte cae en el pie,
                     donde la figura ya se deshace en particulas. */}
+                {/* `-scale-x-100`: pedido de Sofia (24/09), "la chica de
+                    contenidos que mire para el otro lado, efecto espejo". No
+                    afecta el recorte de `object-top`: el flip es puramente
+                    horizontal. */}
                 <Image
                   src={content("home.tecnologia.image")}
                   alt="Portal de luz"
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
-                  className="object-cover object-top"
+                  className="scale-x-[-1] object-cover object-top"
                 />
               </div>
             </RevealItem>
@@ -357,13 +380,11 @@ export default async function Home() {
           text="Cuando el alma está lista, el camino aparece."
           veil={0.3}
           overlay={isEnabled(content("home.cierre.overlay"))}
-          height={600}
-          // Idem Atmosférica: en mobile, pantalla completa. Medido antes del
-          // cambio, el Cierre ocupaba el 66-81% de la pantalla según el
-          // teléfono, así que SIEMPRE se veía junto a la franja dorada de
-          // arriba o al footer de abajo.
-          mobileFull
-          textClassName="text-[22px] md:text-[32px]"
+          // Pedido de Sofia (24/09): agrandar la frase y que ocupe 1 pantalla
+          // completa. Antes era 600px fijos (`mobileFull` para tapar el
+          // hueco solo en mobile); sin `height` el componente cae en su
+          // default `min-h-[100svh]`, pantalla completa en cualquier ancho.
+          textClassName="text-h2"
           // Dorada, no el blanco cálido por defecto — Sofía la marcó el 20/09
           // como la frase que quedó afuera de la coherencia que ya tiene
           // "Atmosférica" (pedido del 11/09, misma regla: `primary-container`

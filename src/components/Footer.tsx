@@ -1,9 +1,19 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { FOOTER_COLUMNS, IMAGES } from "@/lib/constants";
 import { NewsletterForm } from "./NewsletterForm";
+import { useSignedIn } from "@/lib/use-signed-in";
 
 export function Footer() {
+  // Pedido de Sofia (24/09): el link de Privacidad del footer no lo puede
+  // apretar un guest. `!== true` y no `=== false` a proposito: mientras la
+  // sesion no se sabe (`null`) se deja pasar, igual que en Header — es
+  // preferible que alguien logueado no se coma el candado un instante.
+  const signedIn = useSignedIn();
+  const privacyLocked = signedIn === false;
+
   return (
     <footer // El degrade va en CSS: el PNG que entrego la disenadora era un
     // degrade plano de 1,7 KB. Los extremos salen del mockup aprobado
@@ -31,13 +41,22 @@ export function Footer() {
                 orden de la hoja generada, no el orden en que se escriben. Se
                 conservan la mayuscula, el tracking y el peso de la etiqueta:
                 lo unico que cambia es el cuerpo. */}
-            <h2 className="text-[18px] font-semibold uppercase leading-6 tracking-[0.1em] text-primary-fixed-dim">
+            <h2 className="font-display text-[18px] font-semibold uppercase leading-6 tracking-[0.1em] text-primary-fixed-dim">
               {column.title}
             </h2>
             <ul className="space-y-3">
-              {column.links.map((link) => (
+              {column.links.map((link) => {
+                const locked = link.label === "Privacidad" && privacyLocked;
+                return (
                 <li key={link.label}>
-                  {link.href ? (
+                  {locked ? (
+                    <span
+                      aria-disabled="true"
+                      className="cursor-default text-body-md text-on-surface-variant/50"
+                    >
+                      {link.label}
+                    </span>
+                  ) : link.href ? (
                     <Link
                       href={link.href}
                       className="text-body-md text-on-surface-variant transition-colors hover:text-primary-fixed-dim"
@@ -54,14 +73,15 @@ export function Footer() {
                     </span>
                   )}
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </nav>
         ))}
 
         <div className="space-y-4">
           {/* Mismo cuerpo que los otros tres titulos de columna, ver arriba. */}
-          <h2 className="text-[18px] font-semibold uppercase leading-6 tracking-[0.1em] text-primary-fixed-dim">
+          <h2 className="font-display text-[18px] font-semibold uppercase leading-6 tracking-[0.1em] text-primary-fixed-dim">
             Sintoniza
           </h2>
           <p className="text-body-md text-on-surface-variant">
