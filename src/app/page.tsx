@@ -128,19 +128,11 @@ export default async function Home() {
             "Nuestro trabajo explora este potencial evolutivo y la naturaleza multidimensional de la experiencia humana: nuestra capacidad de transformarnos, de acceder a niveles más profundos de inteligencia y de reconectar con la dimensión del alma.",
             "Desde esta perspectiva, la evolución humana pasa a ser parte de un campo de conciencia mucho más amplio, abriendo un camino hacia un conocimiento más profundo, la sabiduría cósmica y una comprensión expandida de quiénes y qué somos.",
           ]}
-          // Pedido de Ignacio, repetido (24/09): "un camino hacia un
-          // conocimiento más profundo" tiene que pesar igual que el cierre
-          // ("Cuando el alma está lista..."). La keyword capturaba sólo "un
-          // conocimiento más profundo" — la frase que de verdad queda sola en
-          // pantalla en la lista final era más corta que la que él tiene en
-          // mente. Se extiende a la frase completa, que existe igual en el
-          // párrafo de arriba ("...abriendo un camino hacia un conocimiento
-          // más profundo, la sabiduría cósmica...").
           keywords={[
             { text: "conciencia" },
             { text: "potencial evolutivo" },
             { text: "dimensión del alma" },
-            { text: "un camino hacia un conocimiento más profundo" },
+            { text: "un conocimiento más profundo" },
             { text: "sabiduría cósmica" },
           ]}
           // El calendario y la cartelera de home se sacaron (pedido de la
@@ -163,7 +155,11 @@ export default async function Home() {
           // En mobile ocupa la pantalla entera; los 900px fijos del mockup
           // valen de `md` para arriba. Ver `mobileFull` en el componente.
           mobileFull
-          textClassName="text-[22px] md:text-[28px]"
+          // `text-h2`: acá es donde de verdad vive "Un camino hacia un
+          // conocimiento más profundo" (slot `home.atmos.text`, pedido de
+          // Ignacio 24/09 — que pese igual que el cierre "Cuando el alma
+          // está lista..."). Antes era 22-28px, bastante más chico.
+          textClassName="text-h2"
           // La frase va DORADA y no en el blanco cálido (pedido de Sofía,
           // 11/09). Es el token `primary-container`, el mismo oro que el resto
           // del sitio usa sobre fondo azul — no el `primary-fixed-dim` de

@@ -651,16 +651,13 @@ function TravellingKeyword({
     <motion.span
       ref={register}
       style={{ x, y, scale }}
-      // `text-h2`: pedido de Ignacio (24/09) — "cuando hay frases para todo
-      // un slide, queda grande". Cuando el párrafo se apaga del todo, esta
-      // lista es lo ÚNICO que queda en pantalla (junto al CTA): es, en los
-      // hechos, su propio slide, y tiene que pesar tanto como el cierre
-      // "Cuando el alma está lista..." (mismo token). Antes era un tamaño
-      // fijo (32px/47px) bastante más chico. El offset de viaje se mide en
-      // vivo contra el DOM (ver el comentario de arriba), así que el cambio
-      // de tamaño no rompe el cálculo — sólo cambia cuánto crece cada
-      // palabra al llegar a su lugar.
-      className="block bg-[linear-gradient(90deg,#f9d78f,#b3964b,#f9d78f)] bg-clip-text font-display text-h2 font-semibold text-transparent"
+      // Vuelta al tamaño fijo original (24/09): la subida a `text-h2` fue por
+      // una confusión — la frase "un camino hacia un conocimiento más
+      // profundo" que había que agrandar no es esta lista, es el banner de
+      // Atmosférica (`home.atmos.text`, más abajo en `page.tsx`). El
+      // "comienzo" (el `y` de entrada del primer párrafo, arriba en este
+      // archivo) sí quedó bien y no se toca.
+      className="block bg-[linear-gradient(90deg,#f9d78f,#b3964b,#f9d78f)] bg-clip-text font-display text-[32px] font-semibold leading-[47px] text-transparent"
     >
       {children}
     </motion.span>
