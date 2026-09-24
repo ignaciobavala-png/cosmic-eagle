@@ -3,6 +3,7 @@
 import { useUIStore } from "@/lib/store";
 import { IMAGES, NAV_LINKS } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
+import { useSignedIn } from "@/lib/use-signed-in";
 import { AnimatePresence, motion } from "framer-motion";
 import { CtaLink } from "@/components/ui/CtaLink";
 import {
@@ -37,6 +38,7 @@ export function Header() {
   const { drawerOpen, toggleDrawer, setDrawerOpen } = useUIStore();
   const pathname = usePathname();
   const [profile, setProfile] = useState<AccountProfile>(null);
+  const signedIn = useSignedIn();
 
   useEffect(() => {
     const supabase = createClient();
@@ -302,22 +304,41 @@ export function Header() {
                           aria-hidden="true"
                           className="absolute left-1/2 top-0 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-primary-container shadow-[0_0_10px_rgba(249,215,143,0.55)]"
                         />
-                        {link.children.map((child, i, todos) => (
+                        {/* Pedido de Sofia (24/09): sin sesion, los hijos de
+                            Experiencias y Contenidos se ven pero no hacen nada
+                            al pinchar — no es un candado sobre /viajes ni
+                            /contenidos (que siguen siendo publicas), es sobre
+                            el atajo del desplegable. Por eso `span` y no
+                            `Link` con `preventDefault`: asi tampoco se puede
+                            abrir en pestaña nueva ni copiar el link. */}
+                        {link.children.map((child, i, todos) => {
+                          const locked =
+                            link.childrenRequireAuth && signedIn === false;
+                          return (
                           <li key={child.href} className="pointer-events-auto relative">
                             {/* La linea entre opciones se apaga en las puntas:
                                 una que cruzara entera volveria a dibujar filas
                                 dentro de un rectangulo. El hover ya no pinta un
                                 fondo (eso era, otra vez, una cajita): cambia el
                                 dorado por la crema. */}
-                            <Link
-                              href={child.href}
-                              onClick={(e) => {
-                                if (e.detail > 0) e.currentTarget.blur();
-                              }}
-                              className="nav-dropdown-item block px-1 py-[13px] text-center font-display text-base font-bold tracking-[0.03em] text-primary-container transition-colors hover:text-primary"
-                            >
-                              {child.label}
-                            </Link>
+                            {locked ? (
+                              <span
+                                aria-disabled="true"
+                                className="nav-dropdown-item block cursor-default px-1 py-[13px] text-center font-display text-base font-bold tracking-[0.03em] text-primary-container/60"
+                              >
+                                {child.label}
+                              </span>
+                            ) : (
+                              <Link
+                                href={child.href}
+                                onClick={(e) => {
+                                  if (e.detail > 0) e.currentTarget.blur();
+                                }}
+                                className="nav-dropdown-item block px-1 py-[13px] text-center font-display text-base font-bold tracking-[0.03em] text-primary-container transition-colors hover:text-primary"
+                              >
+                                {child.label}
+                              </Link>
+                            )}
                             {i < todos.length - 1 && (
                               <span
                                 aria-hidden="true"
@@ -325,7 +346,8 @@ export function Header() {
                               />
                             )}
                           </li>
-                        ))}
+                          );
+                        })}
                       </ul>
                     </div>
                   )}
@@ -356,12 +378,28 @@ export function Header() {
             ) : (
               // El `hidden` va en el wrapper, no en el CtaLink: su base trae
               // `inline-flex` y le gana a `hidden` por orden de la hoja.
-              <div className="hidden md:flex">
+              //
+              // Pedido de la organización (23/09): Login y Registrarse como
+              // dos acciones independientes, no una sola. `/cuenta` sin
+              // `modo` ya es el formulario de login (ver `cuenta/page.tsx`).
+              //
+              // Pedido de Sofia (24/09): los DOS tienen que ser botones (antes
+              // solo Registrarse lo era) y la circunferencia un poco mas chica
+              // y delicada — de ahi `size="sm"` (borde de 1px y menos padding,
+              // ver CtaLink). Login usa `tone="dark"`... no: el navbar es
+              // azul, asi que se queda en `gold`, el tono normal sobre fondo
+              // oscuro; lo que lo distingue de Registrarse es que va sin
+              // relleno solido, mismo contorno fino que su vecino.
+              <div className="hidden md:flex items-center gap-3">
+                <CtaLink href="/cuenta" size="sm" className="whitespace-nowrap">
+                  Login
+                </CtaLink>
                 <CtaLink
                   href="/cuenta?modo=registro"
-                  className="whitespace-nowrap px-6 py-3"
+                  size="sm"
+                  className="whitespace-nowrap"
                 >
-                  Unirme al círculo
+                  Registrarse
                 </CtaLink>
               </div>
             )}
@@ -458,20 +496,35 @@ export function Header() {
                       </Link>
 
                       {/* En el drawer no hay hover: los hijos se muestran
-                          siempre, indentados bajo el padre. */}
+                          siempre, indentados bajo el padre. Mismo gate que en
+                          escritorio (ver arriba): sin sesion, Experiencias y
+                          Contenidos se ven pero no navegan. */}
                       {link.children && (
                         <ul className="mb-1 ml-[3.25rem] mr-2 flex flex-col border-l border-primary-fixed-dim/30 pl-3">
-                          {link.children.map((child) => (
-                            <li key={child.href}>
-                              <Link
-                                href={child.href}
-                                onClick={() => setDrawerOpen(false)}
-                                className="block px-3 py-2 font-display text-sm tracking-[0.05em] text-primary-container uppercase transition-colors hover:text-primary"
-                              >
-                                {child.label}
-                              </Link>
-                            </li>
-                          ))}
+                          {link.children.map((child) => {
+                            const locked =
+                              link.childrenRequireAuth && signedIn === false;
+                            return (
+                              <li key={child.href}>
+                                {locked ? (
+                                  <span
+                                    aria-disabled="true"
+                                    className="block cursor-default px-3 py-2 font-display text-sm tracking-[0.05em] text-primary-container/60 uppercase"
+                                  >
+                                    {child.label}
+                                  </span>
+                                ) : (
+                                  <Link
+                                    href={child.href}
+                                    onClick={() => setDrawerOpen(false)}
+                                    className="block px-3 py-2 font-display text-sm tracking-[0.05em] text-primary-container uppercase transition-colors hover:text-primary"
+                                  >
+                                    {child.label}
+                                  </Link>
+                                )}
+                              </li>
+                            );
+                          })}
                         </ul>
                       )}
                     </li>
@@ -481,14 +534,17 @@ export function Header() {
 
               {!profile && (
                 <div
-                  className="mt-auto px-6"
+                  className="mt-auto flex flex-col gap-3 px-6"
                   onClick={() => setDrawerOpen(false)}
                 >
+                  <CtaLink href="/cuenta" className="w-full py-4">
+                    Login
+                  </CtaLink>
                   <CtaLink
                     href="/cuenta?modo=registro"
                     className="w-full py-4"
                   >
-                    Unirme al círculo
+                    Registrarse
                   </CtaLink>
                 </div>
               )}

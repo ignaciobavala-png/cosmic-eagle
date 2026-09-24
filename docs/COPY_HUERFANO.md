@@ -76,3 +76,48 @@ desde `/viajes`**; queda el del footer.
 Cuando se rehaga `/`, el mismo problema aparece con el bloque dorado **"La
 humanidad"** (`HumanitySection`, copy en `constants.ts`) y con las **cuatro
 promesas** (`ImageStatements`), que tampoco están en el diseño nuevo.
+
+## Intro larga de /viajes (acortada 23/09)
+
+Reemplazada por un párrafo breve sobre el hero
+(`docs/entregas/2026-09-23-feedback-org/CEJ_Correcciones_Experiencias_Final.docx`,
+§2: "reducir al mínimo los textos explicativos"):
+
+> Nuestras experiencias cósmicas son viajes de exploración interior diseñados
+> para revelar las estructuras profundas de tu ser y tu conexión con la
+> realidad multidimensional.
+>
+> A través de la guía cuidadosa, la música canalizada y el trabajo con seres
+> de luz, creamos espacios seguros donde puedes acceder a la memoria de tu
+> alma personal, ancestral y cósmica, para transformar tu comprensión de
+> quién eres y qué es posible.
+>
+> Cada experiencia es un acto de valentía: un compromiso contigo mismo de ir
+> más allá de lo conocido, de disolver los límites que creíste fijos y de
+> reconectar con el poder y la sabiduría que habita en ti. Ya sea en una
+> sesión de un día o en un viaje de una semana, trabajamos con tu ritmo, tu
+> proceso único y el colectivo que acompaña tu camino.
+
+## Frase final de Founder (sacada 23/09)
+
+Cerraba `/nosotros#estela`, a pedido de la organización se sacó de ahí
+(`docs/entregas/2026-09-23-feedback-org/CEJ_Correcciones_Nosotros.docx`, item
+9: "no es necesario cerrar Founder con esta frase... puede reservarse para
+evaluar su uso en otra sección"):
+
+> En el centro de todo está la evolución: liberarnos de aquello que nos
+> limita, recordar quiénes somos y abrir espacio para desarrollar el
+> potencial que cada ser humano lleva dentro.
+
+## Banner de frase del medio de /viajes (sacado 24/09)
+
+Estaba entre los bloques de Sesiones y Viajes, sobre la imagen
+`viajes.banner.image`. No figura en la estructura final del documento
+(`CEJ_Correcciones_Experiencias_Final.docx` §7, que va del listado directo a
+los testimonios) y se solapaba con la frase de cierre "Un viaje hacia
+adentro..." que sí quedó. Queda guardado por si se reubica:
+
+> El viaje cósmico es, en última instancia, un viaje hacia adentro: un
+> recuerdo de nuestra naturaleza más profunda, una activación de nuestra luz
+> original y un movimiento hacia una experiencia humana más consciente,
+> conectada y luminosa.

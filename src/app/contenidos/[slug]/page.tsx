@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { ArticleBody } from "@/components/ui/ArticleBody";
 import { CreamSection } from "@/components/ui/CreamSection";
+import { LibraryNav } from "@/components/ui/LibraryNav";
 import { createClient } from "@/lib/supabase/server";
 import { AccessCodeForm } from "@/components/ui/AccessCodeForm";
 import { CONTENT_WALL_COPY } from "@/lib/content-access";
@@ -16,6 +17,27 @@ import {
   formatArticleDate,
   parseArticleBody,
 } from "@/lib/article";
+
+/**
+ * Los "otros contenidos" que van debajo del recuadro de lectura (pedido de la
+ * organización, 23/09 §6). Se prioriza el mismo tema y, si no alcanza, se
+ * completa con lo demás publicado. Son las fichas de `articles_public`: no
+ * hace falta el cuerpo.
+ */
+async function getOthers(slug: string, category: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("articles_public")
+    .select("slug, title, category, published_at")
+    .neq("slug", slug)
+    .order("published_at", { ascending: false, nullsFirst: false });
+
+  const rows = (data ?? []).filter((row) => row.slug && row.title);
+  const same = rows.filter((row) => row.category === category);
+  const rest = rows.filter((row) => row.category !== category);
+
+  return [...same, ...rest].slice(0, 6);
+}
 
 /**
  * La portada del articulo, que es publica para todos: titulo, bajada, categoria
@@ -97,6 +119,7 @@ export default async function ContenidoPage({
 
   const blocks = article ? parseArticleBody(article.body) : [];
   const date = formatArticleDate(teaser.published_at);
+  const others = await getOthers(slug, teaser.category!);
 
   return (
     <>
@@ -124,7 +147,9 @@ export default async function ContenidoPage({
             sistema anterior y acá, con una lectura de varios minutos, es
             justamente donde peor se sostiene. */}
         <CreamSection full={false}>
-          <article className="mx-auto max-w-3xl">
+          <LibraryNav active={teaser.category!} />
+
+          <article className="mx-auto mt-12 max-w-3xl">
             <Link
               href="/contenidos"
               className="inline-flex items-center gap-2 text-label-sm uppercase text-on-primary-container transition-colors hover:text-[#05125a]"
@@ -174,9 +199,41 @@ export default async function ContenidoPage({
                   </p>
                 </div>
               ) : (
-                <ArticleBody blocks={blocks} tone="light" />
+                // El recuadro de lectura acotado: el cuerpo scrollea adentro y
+                // la página no se convierte en el artículo entero, como pide el
+                // documento §5.
+                <div className="max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-[#f9d78f] bg-white/60 p-5 sm:p-8">
+                  <ArticleBody blocks={blocks} tone="light" />
+                </div>
               )}
             </div>
+
+            {others.length > 0 && (
+              <section className="mt-14">
+                <h2 className="text-label-sm uppercase text-[#05125a]/70">
+                  Otros contenidos disponibles
+                </h2>
+                <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {others.map((other) => (
+                    <li key={other.slug}>
+                      <Link
+                        href={`/contenidos/${other.slug}`}
+                        className="flex h-full items-center justify-between gap-4 rounded-xl border border-[#f9d78f] bg-[#fff6eb] px-4 py-3 transition-colors hover:border-on-primary-container/50"
+                      >
+                        <span className="min-w-0">
+                          <span className="block text-[11px] uppercase tracking-[0.12em] text-on-primary-container">
+                            {articleCategoryLabel(other.category!)}
+                          </span>
+                          <span className="mt-0.5 block truncate font-display text-body-lg text-[#05125a]">
+                            {other.title}
+                          </span>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
           </article>
         </CreamSection>
       </main>

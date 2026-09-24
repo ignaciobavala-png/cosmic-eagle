@@ -258,7 +258,9 @@ export const SITE_GROUPS = [
         label: "Título del cierre",
         help: "El titular de la última pantalla. Cada salto de línea que escribas parte el título en una línea nueva. Si lo dejas vacío se muestran solo los botones.",
         type: "multiline",
-        fallback: "Un viaje hacia el\nHumano Luminoso",
+        // Pedido de la organización (23/09): "Humano de Luz" en vez de
+        // "Humano Luminoso" — en inglés se mantiene "Luminous Human".
+        fallback: "Un viaje hacia el\nHumano de Luz",
       },
     ],
   },
@@ -318,6 +320,16 @@ export const SITE_GROUPS = [
         type: "boolean",
         fallback: "true",
       },
+      {
+        key: "viajes.cierre.image",
+        label: "Imagen de cierre",
+        help: "La última imagen de la página, a pantalla completa, con la frase de cierre encima.",
+        type: "image",
+        fallback: IMAGES.almas,
+        ratio: "16/9",
+        maxPx: 1920,
+        video: true,
+      },
     ],
   },
   {
@@ -343,11 +355,15 @@ export const SITE_GROUPS = [
       },
       {
         key: "contenidos.hero.subtitle",
-        label: "Bajada de portada",
-        help: "La frase corta debajo del título de Contenidos.",
-        type: "text",
+        label: "Introducción de la portada",
+        help: "El texto que aparece debajo del título de Contenidos. Es la introducción breve de la biblioteca.",
+        type: "multiline",
+        // Pedido de la organización (23/09,
+        // docs/entregas/2026-09-23-feedback-org/CEJ_Correcciones_Contenidos.docx
+        // §2): "Mantener el título CONTENIDOS e incorporar una introducción
+        // breve". Es copy de la clienta, literal.
         fallback:
-          "Textos para preparar el viaje, sostener la integración y seguir el camino.",
+          "Los textos que encontrarás aquí están creados para ayudarte a profundizar en tu proceso, sostener la integración y avanzar en tu camino sobre ciertas bases fundamentales. Es requisito que todas las personas que participen en nuestras actividades revisen los contenidos disponibles.",
       },
       {
         key: "contenidos.hero.overlay",

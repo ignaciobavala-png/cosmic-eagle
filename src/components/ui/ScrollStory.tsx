@@ -5,6 +5,7 @@ import { CTA_TONES } from "./CtaLink";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useTransform, useReducedMotion, type MotionValue } from "framer-motion";
 import { useSectionProgress } from "@/lib/use-section-progress";
+import { useSignedIn } from "@/lib/use-signed-in";
 import { COLLAPSIBLE_TOGGLE } from "./Collapsible";
 
 type Cta = { label: string; href: string };
@@ -261,8 +262,13 @@ export function ScrollStory({
       className="relative h-[400vh] w-full bg-[linear-gradient(to_bottom,#011360_0%,#020c41_100%)]"
     >
       {/* El `pt` compensa el navbar: el sticky se pega al techo de la pantalla,
-          que es justo donde está la banda opaca. */}
-      <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden pt-[var(--navbar-h)]">
+          que es justo donde está la banda opaca.
+          `items-start` y no `items-center` (pedido de Ignacio, 24/09: "sigo
+          viendo mucha distancia" entre la frase manifiesto y el primer
+          párrafo): con el texto centrado en su propia pantalla completa,
+          quedaba otro tramo de aire arriba justo donde termina el manifiesto.
+          El `pt` extra (navbar + un respiro) reemplaza al centrado. */}
+      <div className="sticky top-0 flex h-[100svh] items-start overflow-hidden pt-[calc(var(--navbar-h)+8vh)]">
         <motion.div
           style={{ opacity: textOpacity }}
           className="relative z-[3] mx-auto max-w-[820px] px-[6vw]"
@@ -453,6 +459,13 @@ function StoryCta({ label, href }: Cta) {
   // intercepta el click para abrir la cartelera, que esta 400vh mas abajo
   // dentro del sticky de este mismo relato (ver el comentario de arriba).
   // Se escapo de la primera pasada justamente por no ser un `CtaLink`.
+  //
+  // Pedido de Sofia (24/09): sin sesion, "Explorar experiencias" lleva a
+  // login en vez de a /viajes. Solo aplica a un `href` real (no a los "#"
+  // que abren la cartelera in-page, que no son navegacion a Experiencias).
+  const signedIn = useSignedIn();
+  const resolvedHref =
+    !href.startsWith("#") && signedIn === false ? "/cuenta" : href;
   const className =
     `inline-flex items-center justify-center gap-2 rounded-full border-[1.5px] px-10 py-4 font-display text-[14px] uppercase tracking-[0.071em] transition-[color,background-color,border-color,box-shadow,transform] duration-[250ms] hover:scale-[1.04] ${CTA_TONES.gold}`;
   // Sin flecha adentro: la regla de Julia del 08/09 es que ningun boton la
@@ -487,7 +500,7 @@ function StoryCta({ label, href }: Cta) {
       {content}
     </a>
   ) : (
-    <Link href={href} className={className}>
+    <Link href={resolvedHref} className={className}>
       {content}
     </Link>
   );
@@ -511,6 +524,14 @@ function StoryCta({ label, href }: Cta) {
  * Con el primer párrafo encendido, la sección entra desde abajo con el texto ya
  * puesto y el vacío desaparece. La destilación no se pierde: siguen entrando
  * dos párrafos con el scroll, y la fase 2 no se toca.
+ *
+ * **El primero, además, sube un poco al entrar** (pedido de Ignacio, 24/09:
+ * sin esto se sentía "caído" — como si ya estuviera puesto de siempre en vez
+ * de haber llegado). La opacidad fija en 1 sigue igual (es lo que evita el
+ * hueco en blanco de arriba), pero un `y` que baja de 22px a 0 en el primer
+ * 6% del progreso le da el mismo gesto de entrada que tiene el resto del
+ * sitio (`RevealItem`), sin reabrir el hueco: a esa altura el progreso ya
+ * pasó de 0 en cuanto el usuario mueve la rueda un poco.
  */
 function StoryParagraph({
   children,
@@ -530,9 +551,13 @@ function StoryParagraph({
     index === 0 ? [0, 1] : [start, start + window_],
     index === 0 ? [1, 1] : [0, 1]
   );
+  const y = useTransform(progress, [0, 0.06], [22, 0]);
 
   return (
-    <motion.p style={{ opacity }} className={PARAGRAPH_CLASS}>
+    <motion.p
+      style={index === 0 ? { opacity, y } : { opacity }}
+      className={PARAGRAPH_CLASS}
+    >
       {children}
     </motion.p>
   );
@@ -626,6 +651,12 @@ function TravellingKeyword({
     <motion.span
       ref={register}
       style={{ x, y, scale }}
+      // Vuelta al tamaño fijo original (24/09): la subida a `text-h2` fue por
+      // una confusión — la frase "un camino hacia un conocimiento más
+      // profundo" que había que agrandar no es esta lista, es el banner de
+      // Atmosférica (`home.atmos.text`, más abajo en `page.tsx`). El
+      // "comienzo" (el `y` de entrada del primer párrafo, arriba en este
+      // archivo) sí quedó bien y no se toca.
       className="block bg-[linear-gradient(90deg,#f9d78f,#b3964b,#f9d78f)] bg-clip-text font-display text-[32px] font-semibold leading-[47px] text-transparent"
     >
       {children}

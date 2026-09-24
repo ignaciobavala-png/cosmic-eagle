@@ -125,6 +125,13 @@ export type NavLink = {
   // reunion del 04/09 ("dejemos solo titulos"). El `href` puede ser un ancla a
   // una seccion de la propia pagina del padre.
   children?: { label: string; href: string }[];
+  /**
+   * Pedido de Sofia (24/09): sin sesion iniciada, los hijos de Experiencias y
+   * Contenidos se VEN pero no hacen nada al pinchar — no es un candado sobre
+   * la pagina (que sigue siendo publica), es sobre el atajo del desplegable.
+   * "Nosotros" no lleva esto: sus hijos son anclas a la propia pagina publica.
+   */
+  childrenRequireAuth?: boolean;
 };
 
 // "Inicio" no va en el nav: al home se llega tocando el logo (desktop y drawer)
@@ -167,9 +174,11 @@ export const NAV_LINKS: NavLink[] = [
     icon: "Sparkles",
     // El desplegable no reemplaza al link: "Viajes" sigue yendo al listado
     // completo, los hijos son atajos al mismo listado ya filtrado.
-    // Desde el rediseno de Julia (27/08) /viajes son dos bloques con ancla
-    // propia y ya no una grilla filtrada por `?tipo=`, asi que los hijos del
-    // desplegable apuntan al ancla de su bloque. Los rotulos son Sesiones y
+    // Desde el rediseno de la organizacion (24/09) /viajes es una sola
+    // cartelera (`id="cartelera"`, ya no los bloques con ancla propia
+    // `#sesiones`/`#viajes` de la entrega de Julia) con filtro TODAS ·
+    // SESIONES · RETIROS que lee `?tipo=` (mismo criterio que `?categoria=`
+    // en Contenidos, ver `ExperienceFilter`). Los rotulos son Sesiones y
     // Viajes desde la entrega del 02/09, que cerro esa pregunta.
     // "Calendario" es el unico hijo que NO es un ancla de /viajes: es una
     // pagina propia con las dos carteleras abiertas, para quien entra a ver
@@ -179,10 +188,11 @@ export const NAV_LINKS: NavLink[] = [
     children: [
       ...TRIP_TYPES.map((t) => ({
         label: t.label,
-        href: `/viajes#${t.value === "ceremonia" ? "sesiones" : "viajes"}`,
+        href: `/viajes?tipo=${t.value}#cartelera`,
       })),
       { label: "Calendario", href: "/calendario" },
     ],
+    childrenRequireAuth: true,
   },
   {
     label: "Contenidos",
@@ -192,6 +202,7 @@ export const NAV_LINKS: NavLink[] = [
       label: c.label,
       href: `/contenidos?categoria=${c.value}`,
     })),
+    childrenRequireAuth: true,
   },
   { label: "Mi Cuenta", href: "/cuenta", icon: "User" },
 ];
@@ -225,7 +236,6 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
       // /admin/legales. Salieron con un texto preliminar nuestro, no con el
       // anexo de Sofia, que se perdio con `web-cosmic-journey-ES.md`.
       { label: "Privacidad", href: "/privacidad" },
-      { label: "Términos de Servicio", href: "/terminos" },
       { label: "Contacto", href: "mailto:contacto@cosmiceaglejourney.com" },
     ],
   },

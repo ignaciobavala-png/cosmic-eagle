@@ -91,6 +91,28 @@
   --text-label-sm--letter-spacing: 0.1em;
   --text-label-sm--font-weight: 600;
 
+  /* Escala h1/h2/h3, pedida por Sofía el 24/09 para dejar de elegir tamaños a
+     mano en cada sección: h1 es la frase manifiesto de la home ("Un viaje
+     hacia la evolución humana..."), h2 son los títulos de sección grandes
+     ("Nuestro propósito", el cierre "Cuando el alma está lista..."), h3 es un
+     título de sección más chico (el slide de Contenidos, que a propósito NO
+     es h2: "no es simétrico" con Nuestro propósito, pidió ella). Todo en
+     `font-display` (Sorts Mill Goudy), como el resto de los títulos del
+     sitio. */
+  --text-h1: clamp(2.25rem, 4.4vw, 4rem);
+  --text-h1--line-height: 1.15;
+  --text-h2: clamp(2.125rem, 5vw, 3.5rem);
+  --text-h2--line-height: 1.15;
+  /* Subido ~15% el 24/09: "ahora que ocupa un slide [entero], que todas las
+     letras sean relativamente un poquito más grandes para que quede
+     compensado con que el slide ahora es más alto" (era 28-40px, pensado
+     para la franja de contenido normal, de antes de que Contenidos pasara
+     a ocupar la pantalla completa). Sigue por debajo de `--text-h2` — la
+     regla de que este título "no es simétrico" con Nuestro propósito no
+     cambia, sólo el punto de partida de la escala. */
+  --text-h3: clamp(2rem, 6.5vw, 2.875rem);
+  --text-h3--line-height: 1.2;
+
   /* Radios: contenedores en 4-8px, sin esquinas "burbuja" */
   --radius-sm: 0.125rem;
   --radius-md: 0.375rem;

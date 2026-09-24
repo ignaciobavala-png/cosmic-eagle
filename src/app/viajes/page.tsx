@@ -5,11 +5,9 @@ import { BackToTop } from "@/components/BackToTop";
 import { PageHero } from "@/components/ui/PageHero";
 import { MediaStatement } from "@/components/ui/MediaStatement";
 import { CreamSection, GOLD } from "@/components/ui/CreamSection";
-import { Collapsible } from "@/components/ui/Collapsible";
-import { TripCarousel } from "@/components/ui/TripCarousel";
+import { ExperienceFilter } from "@/components/ui/ExperienceFilter";
+import { ExperienceGate } from "@/components/ui/ExperienceGate";
 import { TestimonialsBand } from "@/components/ui/TestimonialsBand";
-import { RevealItem } from "@/components/ui/Reveal";
-import { TitleRule } from "@/components/ui/TitleRule";
 import { createClient } from "@/lib/supabase/server";
 import { todayUTC } from "@/lib/trip-dates";
 import type { TripCardData } from "@/components/ui/TripCard";
@@ -19,36 +17,52 @@ import { getTestimonials } from "@/lib/testimonials";
 export const metadata: Metadata = {
   title: "Experiencias | Cosmic Eagle",
   description:
-    "Sesiones Cósmicas de un día y Viajes Cósmicos de una semana en portales sagrados. Calendario y testimonios.",
+    "Sesiones de un día y retiros de varios días en portales sagrados. Fechas e inscripción.",
 };
 
 /**
  * /viajes según el rediseño de Julia (`EXPERIENCIAS.html`, ver
- * docs/REDISENO_JULIA_HTML.md §3).
+ * docs/REDISENO_JULIA_HTML.md §3) y el feedback de la organización del 23/09
+ * (docs/entregas/2026-09-23-feedback-org/CEJ_Correcciones_Experiencias_Final.docx).
  *
  * **Sin "Salud y Seguridad" desde el 17/09.** La sección cerraba la página con
  * las contraindicaciones y el pedido de revisar la información de salud antes
  * de postular. Sofía la sacó: todavía no se registró nadie, así que esta página
- * es promoción —mostrar qué son las Sesiones y qué son los Viajes— y la
+ * es promoción —mostrar qué son las Sesiones y qué son los Retiros— y la
  * prevención entra recién en el embudo, donde ya vive (el formulario de salud
  * de la etapa 2 y el consentimiento). El texto es de ella y no se borra: está
  * guardado en `docs/COPY_HUERFANO.md` para cuando se decida dónde va.
  *
- * Dejó de ser una grilla con filtros: ahora son **dos bloques narrativos**, uno
- * por tipo, cada uno con su calendario desplegable y sus testimonios. El
- * desplegable del navbar apunta a las anclas `#sesiones` y `#viajes`, que es lo
- * que reemplaza al viejo `?tipo=`.
+ * **Dejó de ser dos bloques narrativos con acordeón.** El documento §4 pide
+ * todas las experiencias disponibles inmediatamente después de la intro, con
+ * filtros simples TODAS · SESIONES · RETIROS y la cartelera siempre abierta. El
+ * listado vive en `ExperienceFilter` (client, filtrado en memoria sobre los
+ * `trips` que trae este Server Component); los dos `Collapsible` de "Ver fechas
+ * disponibles" salieron de la página, pero el componente sigue en
+ * `src/components/ui/` porque `ScrollStory` lo usa en la home.
  *
- * Los títulos usan el vocabulario de Sofía ("Sesión Cósmica" = ceremonia,
- * "Viaje Cósmico" = retiro) porque es el copy del mockup. Desde la entrega de
- * Julia del 02/09 ese vocabulario vale **en todo el sitio**, navbar y panel
- * incluidos: "Ceremonias" es "Sesiones" y "Retiros" es "Viajes". Lo único que
- * sigue diciendo `retiro`/`ceremonia` es el enum de la base.
+ * **Sin el banner de frase del medio.** El texto "El viaje cósmico es, en última
+ * instancia, un viaje hacia adentro..." no está en la estructura final del
+ * documento (§7) y se solapaba con la frase de cierre; se guardó en
+ * `docs/COPY_HUERFANO.md`. El cierre con imagen + frase que sí pide el
+ * documento ya había entrado en `9fecff7`.
  *
  * Sigue filtrando `draft` en la consulta: la policy `trips_select_public` deja
  * leer todos los trips a `anon`, incluidos los borradores.
+ *
+ * **`?tipo=`** preselecciona el filtro de `ExperienceFilter` (mismo criterio
+ * que `?categoria=` en `/contenidos`): es lo que necesitan los hijos
+ * "Sesiones"/"Viajes" del desplegable de `Header`, que hasta el rediseño del
+ * 24/09 apuntaban a los anchors `#sesiones`/`#viajes` que esta página ya no
+ * tiene (ahora es una sola cartelera con filtro de estado, no dos bloques).
  */
-export default async function ViajesPage() {
+export default async function ViajesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tipo?: string }>;
+}) {
+  const { tipo } = await searchParams;
+  const initialFilter = tipo === "ceremonia" || tipo === "retiro" ? tipo : "todas";
   const content = await getSiteContent();
 
   const supabase = await createClient();
@@ -65,14 +79,11 @@ export default async function ViajesPage() {
     .order("start_date", { ascending: true });
 
   const trips = (data ?? []) as TripCardData[];
-  const ceremonias = trips.filter((t) => t.type === "ceremonia");
-  const retiros = trips.filter((t) => t.type === "retiro");
 
-  // Cada bloque tiene su propio juego de testimonios (Julia, 27/08).
-  const [testimoniosSesiones, testimoniosViajes] = await Promise.all([
-    getTestimonials("sesiones"),
-    getTestimonials("viajes"),
-  ]);
+  // Después del listado va una sola banda de testimonios: el documento §5 pide
+  // "solamente una selección breve". Se usa el juego de "viajes", que es el más
+  // completo; el de "sesiones" hoy está cargado con nombres de prueba.
+  const testimonios = await getTestimonials("viajes");
 
   return (
     <>
@@ -88,7 +99,11 @@ export default async function ViajesPage() {
           overlay={isEnabled(content("viajes.hero.overlay"))}
         />
 
-        {/* Julia pidió video de fondo; va la imagen hasta que llegue. */}
+        {/* Julia pidió video de fondo; va la imagen hasta que llegue.
+            Texto acortado a pedido de la organización (23/09): "reducir al
+            mínimo los textos explicativos y dar protagonismo a las
+            experiencias disponibles". Las tres párrafos largos quedan en
+            docs/COPY_HUERFANO.md. */}
         <MediaStatement
           id="experiencias"
           image={content("viajes.about.image")}
@@ -101,180 +116,60 @@ export default async function ViajesPage() {
           duration={0.9}
           overlay={isEnabled(content("viajes.about.overlay"))}
         >
-          {/* **Los resaltados NO cambian de tipografía**, sólo de color y
-              peso: llevaban `font-display` y con Sorts Mill Goudy —que tiene
-              la altura de x mucho más baja que Montserrat— quedaban
-              visiblemente más chicos que el renglón donde viven, como si
-              estuvieran en minúscula (reporte de Ignacio del 09/09). Es la
-              misma regla que la palabra clave del relato de la home. */}
-          <div className="space-y-6 text-body-md leading-relaxed text-primary text-justify md:text-body-lg [&_strong]:font-semibold [&_strong]:text-primary-container">
-            <p>
-              Nuestras experiencias cósmicas son{" "}
-              <strong>viajes de exploración interior</strong> diseñados para
-              revelar las estructuras profundas de tu ser y tu conexión con la{" "}
-              <strong>realidad multidimensional</strong>.
-            </p>
-            <p>
-              A través de la guía cuidadosa, la música canalizada y el trabajo
-              con seres de luz, creamos espacios seguros donde puedes acceder a
-              la memoria de tu alma personal, ancestral y cósmica, para{" "}
-              <strong>transformar tu comprensión</strong> de quién eres y qué es
-              posible.
-            </p>
-            <p>
-              <strong>Cada experiencia es un acto de valentía</strong>: un
-              compromiso contigo mismo de ir más allá de lo conocido, de disolver
-              los límites que creíste fijos y de reconectar con el poder y la
-              sabiduría que habita en ti. Ya sea en una sesión de un día o en un
-              viaje de una semana, trabajamos con tu ritmo, tu proceso único y el
-              colectivo que acompaña tu camino.
-            </p>
-          </div>
+          <p className="text-body-md leading-relaxed text-primary text-justify md:text-body-lg [&_strong]:font-semibold [&_strong]:text-primary-container">
+            Experiencias para{" "}
+            <strong>profundizar en tu proceso de transformación</strong>,
+            expandir la conciencia y conectar con el alma. En sesiones de un
+            día o retiros de varios días.
+          </p>
         </MediaStatement>
 
+        {/* La cartelera es la sección principal (documento §4): va pegada a la
+            intro, siempre abierta y con las fechas al frente. El `reveal` de
+            sección NO se usa acá a propósito: el listado lo decide la clienta
+            —publica las experiencias que quiera— y una sección más alta que
+            ~4,5 pantallas nunca alcanzaría el umbral de 0.22 del resto del
+            sitio, así que quedaría invisible para siempre. La banda de
+            testimonios trae su propio reveal, que mide bien porque tiene alto
+            fijo.
+
+            `flushBottom` se mantiene: el último hijo es la banda azul de
+            testimonios, que va a sangre; sin el quedaría una franja dorada
+            colgando debajo. */}
         <CreamSection
-          id="sesiones"
+          id="cartelera"
           full={false}
           flushBottom
           background={GOLD}
-          reveal={{ amount: 0.22, once: false, stagger: 0 }}
         >
-          {/* Estandar de Experiencias: umbral 0.22 sobre la SECCION (lo pone
-              `reveal` arriba), reversible, cascada de 150ms y 0.9s por
-              elemento. La linea dorada aca NO crece, a diferencia de la home y
-              /nosotros: es una barra estatica, asi esta en el codigo aprobado. */}
-          <div className="mx-auto max-w-3xl">
-            <RevealItem delay={0.15}>
-              {/* `w-fit` no es cosmetico: es lo que hace que el filete de
-                  abajo mida el ancho del TITULO y no el de la columna. */}
-              <div className="w-fit">
-                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                  Sesiones Cósmicas
-                </h2>
-                <TitleRule tone="goldDeep" className="mt-3 mb-7" />
-              </div>
-            </RevealItem>
-            <div className="mb-6 space-y-5 text-body-md leading-relaxed text-[#05125a] text-justify">
-              <RevealItem delay={0.3}>
-              <p>
-                Nuestras sesiones de un día están diseñadas para sostener un
-                trabajo interior profundo, la exploración multidimensional y la
-                conexión con la dimensión del alma.
-              </p>
-              </RevealItem>
-              <RevealItem delay={0.45}>
-              <p>
-                Cada experiencia se sostiene cuidadosamente con amor, presencia,
-                atención personal y un profundo respeto por la privacidad de cada
-                persona.
-              </p>
-              </RevealItem>
-            </div>
-          </div>
-
-          {/* La cartelera va FUERA de la columna de texto, como banda propia a
-              todo el ancho de la pantalla. Los margenes negativos cancelan el
-              padding de la CreamSection (`-mx-margin-*`) para que el panel
-              dorado quede full-bleed, y así el `overflow-hidden` del panel
-              desplegable del Collapsible no recorta el carrusel a la columna. */}
-          <RevealItem
-            delay={0.6}
-            className="-mx-margin-mobile text-center md:-mx-margin-desktop"
-          >
-            <Collapsible label="Ver fechas disponibles">
-              <TripCarousel
-                caption="Calendario"
-                title="Próximas Sesiones"
-                trips={ceremonias}
-                emptyLabel="No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto."
-              />
-            </Collapsible>
-          </RevealItem>
-
-          <TestimonialsBand
-            title="Nuestros Sanadores"
-            label="Lo que dicen quienes vivieron las sesiones"
-            testimonials={testimoniosSesiones}
-          />
-        </CreamSection>
-
-        <MediaStatement
-          image={content("viajes.banner.image")}
-          imageAlt="Siluetas de almas en partículas de luz"
-          text="El viaje cósmico es, en última instancia, un viaje hacia adentro: un recuerdo de nuestra naturaleza más profunda, una activación de nuestra luz original y un movimiento hacia una experiencia humana más consciente, conectada y luminosa."
-          veil={0.4}
-          amount={0.22}
-          once={false}
-          y={24}
-          duration={0.9}
-          overlay={isEnabled(content("viajes.banner.overlay"))}
-        />
-
-        {/* **`flushBottom` se queda aunque ahora sea la ultima seccion.** Al
-            sacar "Salud y Seguridad" la primera idea fue devolverle el padding
-            —la pagina termina aca— y se ve peor: el ultimo hijo es la banda de
-            testimonios, que es azul y a todo el ancho, asi que el padding
-            dejaba una franja crema de 96px entre esa banda y el footer, que
-            tambien es azul. Sin el, el azul de los testimonios entra directo al
-            del footer. Medido el 17/09. */}
-        <CreamSection
-          id="viajes"
-          full={false}
-          flushBottom
-          background={GOLD}
-          reveal={{ amount: 0.22, once: false, stagger: 0 }}
-        >
-          {/* Estandar de Experiencias: umbral 0.22 sobre la SECCION (lo pone
-              `reveal` arriba), reversible, cascada de 150ms y 0.9s por
-              elemento. La linea dorada aca NO crece, a diferencia de la home y
-              /nosotros: es una barra estatica, asi esta en el codigo aprobado. */}
-          <div className="mx-auto max-w-3xl">
-            <RevealItem delay={0.15}>
-              {/* `w-fit` no es cosmetico: es lo que hace que el filete de
-                  abajo mida el ancho del TITULO y no el de la columna. */}
-              <div className="w-fit">
-                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                  Viajes Cósmicos
-                </h2>
-                <TitleRule tone="goldDeep" className="mt-3 mb-7" />
-              </div>
-            </RevealItem>
-            <RevealItem delay={0.3}>
-            <p className="mb-6 text-body-md leading-relaxed text-[#05125a] text-justify">
-              Experiencias de una semana diseñadas para quienes se sienten listos
-              para entrar en un proceso más profundo de exploración del alma,
-              transformación y evolución. Realizadas en portales sagrados
-              alrededor del mundo, cada locación es elegida intencionalmente por
-              su energía única, su historia y su conexión con el propósito
-              profundo del viaje.
-            </p>
-            </RevealItem>
-          </div>
-
-          {/* Banda full-bleed, igual que en Sesiones: fuera de la columna de
-              texto, con margenes negativos que cancelan el padding de la
-              CreamSection. */}
-          <RevealItem
-            delay={0.45}
-            className="-mx-margin-mobile text-center md:-mx-margin-desktop"
-          >
-            <Collapsible label="Ver fechas disponibles">
-              <TripCarousel
-                caption="Calendario"
-                title="Próximos Viajes"
-                trips={retiros}
-                emptyLabel="No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
-              />
-            </Collapsible>
-          </RevealItem>
+          <ExperienceGate>
+            <ExperienceFilter trips={trips} initialFilter={initialFilter} />
+          </ExperienceGate>
 
           <TestimonialsBand
             title="Nuestros Viajeros"
             label="Voces de quienes ya hicieron el camino"
-            testimonials={testimoniosViajes}
+            testimonials={testimonios}
           />
         </CreamSection>
 
+        {/* Cierre pedido por la organización (23/09): "cerrar la página con
+            una imagen limpia y potente... no agregar contenido después de
+            esta imagen". */}
+        <MediaStatement
+          image={content("viajes.cierre.image")}
+          imageAlt="Amanecer sobre un paisaje sagrado"
+          height={600}
+          mobileFull
+        >
+          <p className="text-balance text-center font-display text-[20px] italic leading-snug text-primary-container md:text-[28px]">
+            Un viaje hacia adentro.
+            <br />
+            Un recuerdo de nuestra naturaleza más profunda.
+            <br />
+            Una activación de la luz que habita en nosotros.
+          </p>
+        </MediaStatement>
       </main>
       <Footer />
       <BackToTop />
