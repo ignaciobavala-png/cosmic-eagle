@@ -75,7 +75,15 @@ export default async function Home() {
           // relato. El resto de la pantalla, arriba, se queda con el aire que
           // tenía — la frase entra igual de "pantalla completa", sólo que
           // apoyada contra el piso en vez de flotando en el medio.
-          className="flex min-h-[100svh] w-full items-end bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] pt-12 pb-20 md:pb-24"
+          //
+          // Ese `min-h-[100svh]` + `items-end` en un telefono alto deja el
+          // hueco vacio ARRIBA en vez de abajo (reporte de Ignacio, 24/09,
+          // captura mobile: "todo el espacio que sobra"). En mobile la
+          // seccion no necesita ocupar la pantalla entera — eso era para que
+          // la frase "entrara pantalla completa" en desktop — asi que ahi se
+          // centra sobre su propio contenido con padding parejo, y el efecto
+          // full-screen apoyado abajo queda solo de `md` para arriba.
+          className="flex w-full items-center bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] py-20 md:min-h-[100svh] md:items-end md:pt-12 md:pb-24"
         >
           {/* Las dos lineas entran por separado, la segunda 0.15s despues:
               es el `transition-delay` que Julia le pone al `.line-reveal` que
