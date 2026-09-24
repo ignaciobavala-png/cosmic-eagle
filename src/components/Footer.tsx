@@ -8,14 +8,20 @@ import { useSignedIn } from "@/lib/use-signed-in";
 
 export function Footer() {
   // Pedido de Sofia (24/09): el link de Privacidad del footer no lo puede
-  // apretar un guest, y el 24/09 (repaso) agregó Experiencias y Contenidos —
-  // mismo criterio que ya rige el desplegable del navbar y el CTA "Explorar
-  // experiencias" (ver Header y ScrollStory): sin sesión, esas dos secciones
-  // no se navegan desde acá. `=== false` y no `!== true`: mientras la sesión
-  // no se sabe (`null`) se deja pasar, igual que en Header — es preferible
-  // que alguien logueado no se coma el candado un instante.
+  // apretar un guest, y el 24/09 (repaso) agregó Experiencias, Contenidos y
+  // Preguntas frecuentes — mismo criterio que ya rige el desplegable del
+  // navbar y el CTA "Explorar experiencias" (ver Header y ScrollStory): sin
+  // sesión, esas secciones se ven pero no se navegan desde acá. `=== false`
+  // y no `!== true`: mientras la sesión no se sabe (`null`) se deja pasar,
+  // igual que en Header — es preferible que alguien logueado no se coma el
+  // candado un instante.
   const signedIn = useSignedIn();
-  const LOCKED_FOR_GUESTS = ["Privacidad", "Experiencias", "Contenidos"];
+  const LOCKED_FOR_GUESTS = [
+    "Privacidad",
+    "Experiencias",
+    "Contenidos",
+    "Preguntas frecuentes",
+  ];
   const isLockedForGuests = (label: string) =>
     signedIn === false && LOCKED_FOR_GUESTS.includes(label);
 
