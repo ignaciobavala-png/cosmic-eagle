@@ -262,8 +262,13 @@ export function ScrollStory({
       className="relative h-[400vh] w-full bg-[linear-gradient(to_bottom,#011360_0%,#020c41_100%)]"
     >
       {/* El `pt` compensa el navbar: el sticky se pega al techo de la pantalla,
-          que es justo donde está la banda opaca. */}
-      <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden pt-[var(--navbar-h)]">
+          que es justo donde está la banda opaca.
+          `items-start` y no `items-center` (pedido de Ignacio, 24/09: "sigo
+          viendo mucha distancia" entre la frase manifiesto y el primer
+          párrafo): con el texto centrado en su propia pantalla completa,
+          quedaba otro tramo de aire arriba justo donde termina el manifiesto.
+          El `pt` extra (navbar + un respiro) reemplaza al centrado. */}
+      <div className="sticky top-0 flex h-[100svh] items-start overflow-hidden pt-[calc(var(--navbar-h)+8vh)]">
         <motion.div
           style={{ opacity: textOpacity }}
           className="relative z-[3] mx-auto max-w-[820px] px-[6vw]"

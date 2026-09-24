@@ -66,10 +66,16 @@ export default async function Home() {
           amount={0.3}
           stagger={0.15}
           // Pedido de la organización, 23/09: "queda demasiado espacio azul
-          // entre el título principal y el texto que viene debajo". El
-          // padding vertical baja de 24 a 12 para acercar la frase al borde
-          // de la pantalla y conectarla mejor con el relato que sigue.
-          className="flex min-h-[100svh] w-full items-center bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] py-12"
+          // entre el título principal y el texto que viene debajo" — bajamos
+          // el padding de 24 a 12, pero con `items-center` la frase sigue
+          // centrada en su propia pantalla y la mitad de abajo queda vacía
+          // igual. Ignacio insiste el 24/09 ("sigo viendo mucha distancia"):
+          // `items-end` acerca la frase al borde de ABAJO en vez de sólo
+          // recortar el padding, que es lo que realmente conecta con el
+          // relato. El resto de la pantalla, arriba, se queda con el aire que
+          // tenía — la frase entra igual de "pantalla completa", sólo que
+          // apoyada contra el piso en vez de flotando en el medio.
+          className="flex min-h-[100svh] w-full items-end bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] pt-12 pb-20 md:pb-24"
         >
           {/* Las dos lineas entran por separado, la segunda 0.15s despues:
               es el `transition-delay` que Julia le pone al `.line-reveal` que
