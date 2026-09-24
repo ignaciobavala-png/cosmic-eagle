@@ -308,7 +308,10 @@ export default async function Home() {
                   de TODO el cuerpo sobre fondo claro —no queda gris en el
                   sitio—, por pedido de Sofía: "texto negro no es parte del
                   manual". Conviene avisarle a Julia. */}
-              <div className="space-y-5 text-[clamp(13px,3.6vw,15px)] leading-[1.8] text-[#05125a] md:max-w-[480px] md:space-y-6 md:text-[16px]">
+              {/* Subido junto con el título (24/09): "que todas las letras
+                  sean relativamente un poquito más grandes para que quede
+                  compensado con que el slide ahora es más alto". */}
+              <div className="space-y-5 text-[clamp(15px,4vw,17px)] leading-[1.8] text-[#05125a] md:max-w-[480px] md:space-y-6 md:text-[18px]">
                 <RevealItem duration={0.8} delay={0.15}>
                   <p>
                     Compartimos contenidos creados para acompañar cada etapa
@@ -329,7 +332,7 @@ export default async function Home() {
                 <CtaLink
                   href="/contenidos"
                   tone="dark"
-                  className="mt-10 px-7 py-3.5 text-[14px] md:px-10 md:py-4"
+                  className="mt-10 px-7 py-3.5 text-[15px] md:px-10 md:py-4"
                 >
                   Ir más profundo
                 </CtaLink>
