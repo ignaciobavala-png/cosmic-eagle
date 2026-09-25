@@ -133,6 +133,33 @@ export function Header() {
           <ul className="hidden md:flex items-center justify-center gap-2">
             {NAV_LINKS.filter((l) => l.href !== "/cuenta").map((link) => {
               const isActive = pathname.startsWith(link.href);
+              // Pedido de Ignacio (25/09): si los hijos del desplegable estan
+              // bloqueados para invitados, el link padre tampoco puede
+              // navegar directo a la pagina — antes se podia sortear el
+              // candado de los hijos tocando "Experiencias"/"Contenidos" y
+              // era inconsistente. Mismo criterio en mobile (ver mas abajo).
+              const parentLocked =
+                link.childrenRequireAuth && signedIn === false;
+              const labelContent = (
+                <>
+                  <span
+                    className={`transition-[filter] duration-200 group-hover:brightness-110 ${
+                      isActive
+                        ? "text-primary-container"
+                        : "bg-[linear-gradient(90deg,#f9d78f,#b3964b)] bg-clip-text text-transparent"
+                    }`}
+                  >
+                    {link.label}
+                  </span>
+                  {link.children && (
+                    <ChevronDown
+                      size={13}
+                      aria-hidden="true"
+                      className="text-primary-fixed-dim transition-transform duration-200 group-hover:rotate-180"
+                    />
+                  )}
+                </>
+              );
               return (
                 // El Escape va en el `li` y no en el panel: cuando el
                 // desplegable se abre por teclado el foco puede estar en el
@@ -170,44 +197,38 @@ export function Header() {
                       porque con eso Chromium pierde el foco al tabular del
                       padre al primer hijo y saltea el submenu entero (medido:
                       el Tab cae en `body`). */}
-                  <Link
-                    href={link.href}
-                    onClick={(e) => {
-                      if (e.detail > 0) e.currentTarget.blur();
-                    }}
-                    className="flex items-center gap-1.5 whitespace-nowrap px-[1.75rem] py-2 font-display text-[13px] uppercase tracking-[0.115em]"
-                  >
-                    {/* El dorado va en DEGRADE (#f9d78f -> #b3964b, pedido de
-                        Julia del 08/09), y un degrade solo se puede pintar
-                        sobre el fondo: de ahi el `bg-clip-text` con el texto
-                        transparente.
+                  {/* El dorado va en DEGRADE (#f9d78f -> #b3964b, pedido de
+                      Julia del 08/09), y un degrade solo se puede pintar
+                      sobre el fondo: de ahi el `bg-clip-text` con el texto
+                      transparente.
 
-                        Por eso el degrade va en un `span` propio y NO en el
-                        Link: con el texto transparente heredado, el chevron
-                        —que es un SVG con `currentColor`— se volveria
-                        invisible. El icono se pinta aparte.
+                      Por eso el degrade va en un `span` propio y NO en el
+                      Link: con el texto transparente heredado, el chevron
+                      —que es un SVG con `currentColor`— se volveria
+                      invisible. El icono se pinta aparte.
 
-                        La seccion activa se distingue con el dorado claro
-                        entero (`primary-container`, que es el extremo brillante
-                        del mismo degrade) en vez de con otro color: asi el
-                        estado activo no se sale de lo que pidio. */}
+                      La seccion activa se distingue con el dorado claro
+                      entero (`primary-container`, que es el extremo brillante
+                      del mismo degrade) en vez de con otro color: asi el
+                      estado activo no se sale de lo que pidio. */}
+                  {parentLocked ? (
                     <span
-                      className={`transition-[filter] duration-200 group-hover:brightness-110 ${
-                        isActive
-                          ? "text-primary-container"
-                          : "bg-[linear-gradient(90deg,#f9d78f,#b3964b)] bg-clip-text text-transparent"
-                      }`}
+                      aria-disabled="true"
+                      className="flex cursor-default items-center gap-1.5 whitespace-nowrap px-[1.75rem] py-2 font-display text-[13px] uppercase tracking-[0.115em]"
                     >
-                      {link.label}
+                      {labelContent}
                     </span>
-                    {link.children && (
-                      <ChevronDown
-                        size={13}
-                        aria-hidden="true"
-                        className="text-primary-fixed-dim transition-transform duration-200 group-hover:rotate-180"
-                      />
-                    )}
-                  </Link>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      onClick={(e) => {
+                        if (e.detail > 0) e.currentTarget.blur();
+                      }}
+                      className="flex items-center gap-1.5 whitespace-nowrap px-[1.75rem] py-2 font-display text-[13px] uppercase tracking-[0.115em]"
+                    >
+                      {labelContent}
+                    </Link>
+                  )}
 
                   {/* El wrapper arranca pegado al link (`top-full`) y la
                       separacion visual la da su `pt-2`: con un `top` desplazado
@@ -462,44 +483,69 @@ export function Header() {
                 {NAV_LINKS.map((link) => {
                   const Icon = iconMap[link.icon];
                   const isActive = pathname === link.href;
+                  // Mismo candado que el link padre de escritorio (pedido de
+                  // Ignacio, 25/09): si los hijos estan bloqueados para
+                  // invitados, tocar "Experiencias"/"Contenidos" tampoco tiene
+                  // que navegar — sino se sorteaba el candado de los hijos
+                  // yendo directo a la pagina desde el propio padre.
+                  const parentLocked =
+                    link.childrenRequireAuth && signedIn === false;
+                  const rowContent = (
+                    <>
+                      {/* Mismo criterio que la barra de escritorio: el dorado
+                          va en DEGRADE sobre el texto (`bg-clip-text`) y por
+                          eso el icono se pinta aparte — con el color
+                          transparente heredado, un SVG con `currentColor`
+                          desaparece. La seccion activa se distingue con el
+                          dorado claro entero, que es el extremo brillante del
+                          mismo degrade. */}
+                      <Icon
+                        size={20}
+                        className={
+                          isActive
+                            ? "text-primary-container"
+                            : "text-primary-fixed-dim"
+                        }
+                      />
+                      <span
+                        className={`font-display tracking-[0.1em] font-semibold text-sm uppercase transition-[filter] duration-200 group-hover:brightness-110 ${
+                          isActive
+                            ? "text-primary-container"
+                            : "bg-[linear-gradient(90deg,#f9d78f,#b3964b)] bg-clip-text text-transparent"
+                        }`}
+                      >
+                        {link.label}
+                      </span>
+                    </>
+                  );
                   return (
                     <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        onClick={() => setDrawerOpen(false)}
-                        className="group mx-2 flex items-center gap-4 px-4 py-3 transition-transform duration-200 active:scale-[0.98]"
-                      >
-                        {/* Mismo criterio que la barra de escritorio: el dorado
-                            va en DEGRADE sobre el texto (`bg-clip-text`) y por
-                            eso el icono se pinta aparte — con el color
-                            transparente heredado, un SVG con `currentColor`
-                            desaparece. La seccion activa se distingue con el
-                            dorado claro entero, que es el extremo brillante del
-                            mismo degrade. */}
-                        <Icon
-                          size={20}
-                          className={
-                            isActive
-                              ? "text-primary-container"
-                              : "text-primary-fixed-dim"
-                          }
-                        />
+                      {parentLocked ? (
                         <span
-                          className={`font-display tracking-[0.1em] font-semibold text-sm uppercase transition-[filter] duration-200 group-hover:brightness-110 ${
-                            isActive
-                              ? "text-primary-container"
-                              : "bg-[linear-gradient(90deg,#f9d78f,#b3964b)] bg-clip-text text-transparent"
-                          }`}
+                          aria-disabled="true"
+                          className="mx-2 flex cursor-default items-center gap-4 px-4 py-3"
                         >
-                          {link.label}
+                          {rowContent}
                         </span>
-                      </Link>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          onClick={() => setDrawerOpen(false)}
+                          className="group mx-2 flex items-center gap-4 px-4 py-3 transition-transform duration-200 active:scale-[0.98]"
+                        >
+                          {rowContent}
+                        </Link>
+                      )}
 
-                      {/* En el drawer no hay hover: los hijos se muestran
-                          siempre, indentados bajo el padre. Mismo gate que en
-                          escritorio (ver arriba): sin sesion, Experiencias y
-                          Contenidos se ven pero no navegan. */}
-                      {link.children && (
+                      {/* En el drawer no hay hover: los hijos que se
+                          muestran van siempre indentados bajo el padre.
+                          Mismo gate que en escritorio (ver arriba): sin
+                          sesion, Experiencias y Contenidos se ven pero no
+                          navegan. `hideChildrenOnMobile` saca del drawer los
+                          desplegables que lo recargaban (pedido de la
+                          organizacion, 25/09): sólo Experiencias conserva los
+                          suyos ahí. */}
+                      {link.children && !link.hideChildrenOnMobile && (
                         <ul className="mb-1 ml-[3.25rem] mr-2 flex flex-col border-l border-primary-fixed-dim/30 pl-3">
                           {link.children.map((child) => {
                             const locked =

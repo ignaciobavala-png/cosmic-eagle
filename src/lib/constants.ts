@@ -132,6 +132,14 @@ export type NavLink = {
    * "Nosotros" no lleva esto: sus hijos son anclas a la propia pagina publica.
    */
   childrenRequireAuth?: boolean;
+  /**
+   * Pedido de la organizacion (25/09): el drawer de mobile quedó muy
+   * recargado con los tres desplegables abiertos a la vez. En mobile sólo
+   * "Experiencias" conserva sus hijos (Sesiones/Viajes/Calendario); "Nosotros"
+   * y "Contenidos" quedan como un link simple. El desplegable de escritorio
+   * (hover) no cambia: esto sólo afecta al `ul` del drawer.
+   */
+  hideChildrenOnMobile?: boolean;
 };
 
 // "Inicio" no va en el nav: al home se llega tocando el logo (desktop y drawer)
@@ -162,6 +170,7 @@ export const NAV_LINKS: NavLink[] = [
       // una seccion que en pantalla se llamaba de otra manera.
       { label: "Founder", href: "/nosotros#estela" },
     ],
+    hideChildrenOnMobile: true,
   },
   {
     // El mockup del rediseno lo llama "Experiencias", que ademas resuelve el
@@ -203,6 +212,7 @@ export const NAV_LINKS: NavLink[] = [
       href: `/contenidos?categoria=${c.value}`,
     })),
     childrenRequireAuth: true,
+    hideChildrenOnMobile: true,
   },
   { label: "Mi Cuenta", href: "/cuenta", icon: "User" },
 ];
