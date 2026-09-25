@@ -267,8 +267,13 @@ export function ScrollStory({
           viendo mucha distancia" entre la frase manifiesto y el primer
           párrafo): con el texto centrado en su propia pantalla completa,
           quedaba otro tramo de aire arriba justo donde termina el manifiesto.
-          El `pt` extra (navbar + un respiro) reemplaza al centrado. */}
-      <div className="sticky top-0 flex h-[100svh] items-start overflow-hidden pt-[calc(var(--navbar-h)+8vh)]">
+          El `pt` extra (navbar + un respiro) reemplaza al centrado. Bajado de
+          8vh a 3vh (pedido de la organizacion, 25/09): seguia quedando hueco
+          de más entre la frase y el primer párrafo. Y en mobile bajado a 0
+          (misma fecha, dos capturas): en mobile el párrafo arranca pegado al
+          navbar, sin respiro extra — el `pb` del manifiesto ya deja algo de
+          aire. Desktop no cambia. */}
+      <div className="sticky top-0 flex h-[100svh] items-start overflow-hidden pt-[var(--navbar-h)] md:pt-[calc(var(--navbar-h)+3vh)]">
         <motion.div
           style={{ opacity: textOpacity }}
           className="relative z-[3] mx-auto max-w-[820px] px-[6vw]"
@@ -509,30 +514,38 @@ function StoryCta({ label, href }: Cta) {
 /**
  * Fase 1: cada párrafo tiene su propia ventana de scroll, sólo opacidad.
  *
- * **El primero está visible desde el arranque** y los demás se reparten el
- * tramo. Es la única desviación del motor aprobado, y arregla un agujero que el
- * mockup tambien tiene: el progreso vale 0 hasta que la sección llega al techo
- * de la pantalla, así que con los tres párrafos en opacidad 0 quedaba **media
- * pantalla en blanco** entre la frase manifiesto —que ya se fue por arriba— y
- * el primer párrafo, que no empieza a encenderse hasta estar 250px adentro.
+ * **Los dos primeros están visibles desde el arranque** y los que quedan se
+ * reparten el tramo. Es la única desviación del motor aprobado, y arregla un
+ * agujero que el mockup tambien tiene: el progreso vale 0 hasta que la sección
+ * llega al techo de la pantalla, así que con los tres párrafos en opacidad 0
+ * quedaba **media pantalla en blanco** entre la frase manifiesto —que ya se
+ * fue por arriba— y el primer párrafo, que no empieza a encenderse hasta estar
+ * 250px adentro.
  *
  * Medido antes del arreglo, barriendo el documento de a 100px: 500px de scroll
  * sin un solo texto legible a 1440x900, 400px a 1885x810 y 500px a 390x844. El
  * mismo barrido sobre `homepage_correccion.html` da el mismo tramo vacío, o sea
  * que no era nuestro: viene del motor de Julia. **Avisarle.**
  *
- * Con el primer párrafo encendido, la sección entra desde abajo con el texto ya
- * puesto y el vacío desaparece. La destilación no se pierde: siguen entrando
- * dos párrafos con el scroll, y la fase 2 no se toca.
+ * Con el primer párrafo encendido solo, quedaba un instante rarísimo (reporte
+ * de Ignacio, 25/09): la sección entraba con un único párrafo flotando sobre
+ * el azul, y recién con el próximo tramo de scroll aparecía el segundo —se
+ * leía como una pantalla vacía a mitad de camino. Por eso ahora **los primeros
+ * DOS** arrancan encendidos juntos y sólo el resto se destila con el scroll.
+ * `FIXED_PARAGRAPHS` es el numero de parrafos fijos: si el dia de mañana el
+ * relato pasa a tener cuatro parrafos, los dos primeros siguen arrancando
+ * juntos y los otros dos se reparten la fase 1.
  *
- * **El primero, además, sube un poco al entrar** (pedido de Ignacio, 24/09:
- * sin esto se sentía "caído" — como si ya estuviera puesto de siempre en vez
+ * **Los fijos, además, suben un poco al entrar** (pedido de Ignacio, 24/09:
+ * sin esto se sentía "caído" — como si ya estuvieran puestos de siempre en vez
  * de haber llegado). La opacidad fija en 1 sigue igual (es lo que evita el
  * hueco en blanco de arriba), pero un `y` que baja de 22px a 0 en el primer
- * 6% del progreso le da el mismo gesto de entrada que tiene el resto del
+ * 6% del progreso les da el mismo gesto de entrada que tiene el resto del
  * sitio (`RevealItem`), sin reabrir el hueco: a esa altura el progreso ya
  * pasó de 0 en cuanto el usuario mueve la rueda un poco.
  */
+const FIXED_PARAGRAPHS = 2;
+
 function StoryParagraph({
   children,
   progress,
@@ -544,18 +557,20 @@ function StoryParagraph({
   index: number;
   total: number;
 }) {
-  const window_ = PHASE1_END / Math.max(1, total - 1);
-  const start = window_ * (index - 1);
+  const fixed = index < Math.min(FIXED_PARAGRAPHS, total);
+  const animatedCount = Math.max(0, total - FIXED_PARAGRAPHS);
+  const window_ = PHASE1_END / Math.max(1, animatedCount);
+  const start = window_ * (index - FIXED_PARAGRAPHS);
   const opacity = useTransform(
     progress,
-    index === 0 ? [0, 1] : [start, start + window_],
-    index === 0 ? [1, 1] : [0, 1]
+    fixed ? [0, 1] : [start, start + window_],
+    fixed ? [1, 1] : [0, 1]
   );
   const y = useTransform(progress, [0, 0.06], [22, 0]);
 
   return (
     <motion.p
-      style={index === 0 ? { opacity, y } : { opacity }}
+      style={fixed ? { opacity, y } : { opacity }}
       className={PARAGRAPH_CLASS}
     >
       {children}

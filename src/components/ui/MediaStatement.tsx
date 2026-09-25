@@ -41,8 +41,10 @@ export function MediaStatement({
 }: {
   image: string;
   imageAlt?: string;
-  /** Frase suelta, centrada y en serif. Es el uso corriente del bloque. */
-  text?: string;
+  /** Frase suelta, centrada y en serif. Es el uso corriente del bloque.
+   * Acepta nodo (no sólo string) para poder forzar un `<br/>` cuando
+   * `text-balance` deja una palabra sola colgando en la última línea. */
+  text?: React.ReactNode;
   /** Alternativa a `text` para varios parrafos (el "About" de /viajes). */
   children?: React.ReactNode;
   id?: string;
@@ -127,7 +129,10 @@ export function MediaStatement({
    * trampa que ya documentan `CtaLink`, `CreamSection` y `ScrollHintButton`.
    */
   textColorClassName?: string;
-  width?: "narrow" | "prose";
+  /** "wide": centrada como "narrow" pero con más ancho de caja (`max-w-3xl`),
+   * para una frase con un `<br/>` a mano que a `text-h2` no entra en dos
+   * líneas dentro de `max-w-2xl`. */
+  width?: "narrow" | "prose" | "wide";
   /**
    * Los valores por defecto son los de la frase atmosferica de la home (umbral
    * 0.4, 30px, 1s). En /viajes el mismo bloque usa el estandar de Experiencias
@@ -187,7 +192,11 @@ export function MediaStatement({
             y={y}
             duration={duration}
             className={`relative z-10 px-margin-mobile md:px-margin-desktop ${
-              width === "prose" ? "max-w-3xl" : "max-w-2xl text-center"
+              width === "prose"
+                ? "max-w-3xl"
+                : width === "wide"
+                  ? "max-w-3xl text-center"
+                  : "max-w-2xl text-center"
             } ${offsetClassName}`}
           >
             {text && (

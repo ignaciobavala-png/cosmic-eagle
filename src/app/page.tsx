@@ -83,7 +83,14 @@ export default async function Home() {
           // la frase "entrara pantalla completa" en desktop — asi que ahi se
           // centra sobre su propio contenido con padding parejo, y el efecto
           // full-screen apoyado abajo queda solo de `md` para arriba.
-          className="flex w-full items-center bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] py-20 md:min-h-[100svh] md:items-end md:pt-12 md:pb-24"
+          //
+          // `pb-2` en mobile (antes `py-20` parejo, 80px abajo; despues `pb-8`,
+          // 32px): dos capturas de la organizacion el 25/09 ("fix.png" y
+          // "asd.jpeg", en docs/entregas/) — con `pb-8` el hueco entre la
+          // frase y "Los seres humanos..." todavia se leia como "todo el
+          // espacio que sobra". Achicar SOLO el padding de abajo achica el
+          // salto sin tocar el aire de arriba, que es el que centra la frase.
+          className="flex w-full items-center bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] pt-20 pb-2 md:min-h-[100svh] md:items-end md:pt-12 md:pb-24"
         >
           {/* Las dos lineas entran por separado, la segunda 0.15s despues:
               es el `transition-delay` que Julia le pone al `.line-reveal` que
@@ -134,13 +141,20 @@ export default async function Home() {
           paragraphs={[
             "Los seres humanos estamos en constante evolución. A medida que expandimos nuestra conciencia, comenzamos a descubrir que somos mucho más que nuestra historia personal, nuestra mente o la realidad que percibimos a través de los sentidos.",
             "Nuestro trabajo explora este potencial evolutivo y la naturaleza multidimensional de la experiencia humana: nuestra capacidad de transformarnos, de acceder a niveles más profundos de inteligencia y de reconectar con la dimensión del alma.",
-            "Desde esta perspectiva, la evolución humana pasa a ser parte de un campo de conciencia mucho más amplio, abriendo un camino hacia un conocimiento más profundo, la sabiduría cósmica y una comprensión expandida de quiénes y qué somos.",
+            "Desde esta perspectiva, la evolución humana pasa a ser parte de un campo de conciencia mucho más amplio, abriendo un camino hacia un conocimiento profundo, la sabiduría cósmica y una comprensión expandida de quiénes y qué somos.",
           ]}
+          // Pedido de la organizacion (25/09): las 5 palabras clave pasan a
+          // ser Conciencia / Potencial evolutivo / Dimensión del alma /
+          // Conocimiento profundo / Sabiduría cósmica. El `text` de cada una
+          // tiene que aparecer LITERAL dentro del párrafo (ver `splitStory`
+          // más abajo en `ScrollStory.tsx`), por eso el párrafo de arriba
+          // perdió el "más" ("un conocimiento profundo", no "un conocimiento
+          // más profundo").
           keywords={[
             { text: "conciencia" },
             { text: "potencial evolutivo" },
             { text: "dimensión del alma" },
-            { text: "un conocimiento más profundo" },
+            { text: "conocimiento profundo" },
             { text: "sabiduría cósmica" },
           ]}
           // El calendario y la cartelera de home se sacaron (pedido de la
@@ -421,7 +435,20 @@ export default async function Home() {
           // Frase de cierre pedida por la organización, 23/09: "un cierre
           // limpio, simple y contemplativo, sin agregar más información
           // después".
-          text="Cuando el alma está lista, el camino aparece."
+          // `<br/>` a mano (pedido de Ignacio, 25/09): `text-balance` dejaba
+          // "lista" sola en su propio renglón. El corte fijo separa la
+          // condición de la consecuencia, que es como se lee la frase.
+          // `width="wide"` porque con el `max-w-2xl` de por defecto la
+          // primera mitad ("Cuando el alma está lista,") todavía no entraba
+          // en un solo renglón a este tamaño de fuente.
+          text={
+            <>
+              Cuando el alma está lista,
+              <br />
+              el camino aparece.
+            </>
+          }
+          width="wide"
           veil={0.3}
           overlay={isEnabled(content("home.cierre.overlay"))}
           // Pedido de Sofia (24/09): agrandar la frase y que ocupe 1 pantalla
