@@ -81,8 +81,7 @@ export default async function Home() {
           // captura mobile: "todo el espacio que sobra"). En mobile la
           // seccion no necesita ocupar la pantalla entera — eso era para que
           // la frase "entrara pantalla completa" en desktop — asi que ahi se
-          // centra sobre su propio contenido con padding parejo, y el efecto
-          // full-screen apoyado abajo queda solo de `md` para arriba.
+          // centra sobre su propio contenido con padding parejo.
           //
           // `pb-2` en mobile (antes `py-20` parejo, 80px abajo; despues `pb-8`,
           // 32px): dos capturas de la organizacion el 25/09 ("fix.png" y
@@ -90,7 +89,13 @@ export default async function Home() {
           // frase y "Los seres humanos..." todavia se leia como "todo el
           // espacio que sobra". Achicar SOLO el padding de abajo achica el
           // salto sin tocar el aire de arriba, que es el que centra la frase.
-          className="flex w-full items-center bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] pt-20 pb-2 md:min-h-[100svh] md:items-end md:pt-12 md:pb-24"
+          //
+          // El `md:min-h-[100svh]` que forzaba pantalla completa en desktop se
+          // saca el 27/09: tres rondas de retoque de padding (23, 24 y 25/09)
+          // no alcanzaron porque el problema no era el padding, era el alto
+          // forzado dejando aire arriba. Mismo criterio que ya se aplico en
+          // mobile: la seccion se ajusta a su contenido.
+          className="flex w-full items-center bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] pt-20 pb-2 md:items-end md:pt-12 md:pb-24"
         >
           {/* Las dos lineas entran por separado, la segunda 0.15s despues:
               es el `transition-delay` que Julia le pone al `.line-reveal` que
