@@ -95,7 +95,12 @@ export default async function Home() {
           // no alcanzaron porque el problema no era el padding, era el alto
           // forzado dejando aire arriba. Mismo criterio que ya se aplico en
           // mobile: la seccion se ajusta a su contenido.
-          className="flex w-full items-center bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] pt-20 pb-2 md:items-end md:pt-12 md:pb-24"
+          //
+          // Sin el `min-h-[100svh]`, `md:pt-12` (el valor del 23/09, pensado
+          // para una pantalla completa) se quedaba corto: la frase quedaba
+          // pegada al borde de arriba. Sube a `md:pt-16`, sin volver al
+          // `pt-24` original (27/09).
+          className="flex w-full items-center bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] pt-20 pb-2 md:items-end md:pt-16 md:pb-24"
         >
           {/* Las dos lineas entran por separado, la segunda 0.15s despues:
               es el `transition-delay` que Julia le pone al `.line-reveal` que
