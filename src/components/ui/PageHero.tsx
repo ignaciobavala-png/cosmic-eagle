@@ -23,6 +23,7 @@ export function PageHero({
   overlay = true,
   fadeTo,
   hardEdge = false,
+  titleClassName = "text-primary",
 }: {
   image: string;
   imageAlt?: string;
@@ -93,6 +94,13 @@ export function PageHero({
    * gusta, se vuelve poniendo `fadeTo={GOLD_HEX}` y sacando este flag.
    */
   hardEdge?: boolean;
+  /**
+   * Color del titulo. Por defecto el blanco calido; /contenidos lo pide en oro
+   * (`text-primary-fixed-dim`, el oro de acento para headings sobre oscuro).
+   * Va por prop y no por `className`: dos utilidades de color compiten y gana
+   * el orden de la hoja, no el de las clases.
+   */
+  titleClassName?: string;
 }) {
   const full = height === "full";
   return (
@@ -171,7 +179,7 @@ export function PageHero({
         {overlay && (
           <>
             {eyebrow && <div className="mb-5">{eyebrow}</div>}
-            <h1 className="font-display text-display-mobile md:text-display-lg text-primary text-shadow-glow max-w-3xl text-balance">
+            <h1 className={`font-display text-display-mobile md:text-display-lg ${titleClassName} text-shadow-glow max-w-3xl text-balance`}>
               {title}
             </h1>
             {subtitle && (

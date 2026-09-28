@@ -110,6 +110,7 @@ export default async function ContenidosPage({
           scrollTo="biblioteca"
           overlay={isEnabled(content("contenidos.hero.overlay"))}
           hardEdge
+          titleClassName="text-primary-fixed-dim"
         />
 
         {/* La biblioteca vive sobre la banda dorada. **El envoltorio NO lleva
