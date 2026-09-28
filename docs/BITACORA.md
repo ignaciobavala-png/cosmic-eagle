@@ -2816,3 +2816,16 @@ Decisiones abiertas que bloquean trabajo (detalle en `docs/FORMULARIOS.md`): có
 
 **Frontend de Julia, orden de trabajo (ver `docs/RECORRIDO.md` §5)**: hecho el chrome global (fondo + navbar + footer), `/nosotros`, `/viajes` completa (P1 + P4 + P6) y, de la home, el hero, el carrusel y Próximos Retiros conectado a `trips` con portada real. De las 8 primitivas solo falta P7.
 
+
+## 2026-09-28 — FAQs de la home
+
+Llegó `preguntas frecuentes del Home.docx` (ES + EN, copiado a
+`docs/entregas/2026-09-28-faqs-home/`): 10 preguntas de presentación y un botón
+"Explorar más". Decisiones de Ignacio: van **sólo en la home**, **no editables**
+(texto literal en `src/lib/home-faqs.ts`, fuera de la tabla `faqs`) y el botón
+**no lleva a ningún lado por ahora** (es un `span` con forma de botón y sin
+hover). Se ubican entre Contenidos y la frase de cierre: son las dudas que
+quedan después de leer qué es y para qué existe, la última pregunta desemboca
+en "Cuando el alma está lista, el camino aparece", y el cierre sigue siendo lo
+último (pedido del 23/09). `FaqList` ganó `tone="dark"` para el fondo azul. La
+home sigue estática (`○`). El inglés queda en la entrega para cuando haya i18n.

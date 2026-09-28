@@ -9,6 +9,8 @@ import { CreamSection, GOLD } from "@/components/ui/CreamSection";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
 import { TitleRule } from "@/components/ui/TitleRule";
+import { FaqList } from "@/components/ui/FaqList";
+import { HOME_FAQS } from "@/lib/home-faqs";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 
 /**
@@ -432,6 +434,62 @@ export default async function Home() {
             </RevealItem>
           </div>
         </CreamSection>
+
+        {/* Preguntas frecuentes de la home (entrega del 28/09, texto fijo en
+            `src/lib/home-faqs.ts`). Van DESPUÉS de todo lo que presenta el
+            trabajo y ANTES del cierre: son las dudas que quedan una vez que
+            se leyó qué es y para qué existe, y la última pregunta ("¿Cómo
+            puedo saber más?") desemboca en la frase "Cuando el alma está
+            lista, el camino aparece". El cierre sigue siendo lo último de la
+            página (pedido del 23/09: nada después de él).
+
+            Fondo azul, el mismo degradé de "Nuestro propósito": viene de la
+            banda dorada de Contenidos y va a la imagen del cierre, así que
+            alterna igual que el resto de la página.
+
+            Se revela SÓLO el encabezado (umbral sobre algo de alto fijo): la
+            sección entera, con respuestas abiertas, puede pasar varias
+            pantallas y un umbral sobre ella no dispararía nunca. */}
+        <section
+          id="preguntas"
+          className="w-full bg-[linear-gradient(180deg,#0a1660_0%,#05125a_55%,#030b38_100%)] px-6 py-24 md:py-32"
+        >
+          <div className="mx-auto w-full max-w-3xl">
+            <Reveal amount={0.3} stagger={0} className="text-center">
+              <RevealItem y={30} duration={1.2}>
+                <h2 className="font-display text-h3 font-bold text-primary-container">
+                  ¿Con curiosidad por el viaje?
+                </h2>
+              </RevealItem>
+              {/* El ancho va en el envoltorio: `TitleRule` ya trae `w-full` y
+                  un `w-[160px]` por className perdería contra él. */}
+              <div className="mx-auto mt-4 w-[120px] md:mt-5 md:w-[160px]">
+                <TitleRule tone="gold" align="center" grow />
+              </div>
+              <RevealItem y={30} duration={0.9} delay={0.3}>
+                <p className="mx-auto mt-6 max-w-[560px] text-[16px] leading-[1.8] text-[#d0c5b4] md:mt-8 md:text-[18px]">
+                  Aquí van algunas cosas que quizás quieras saber antes de
+                  seguir explorando.
+                </p>
+              </RevealItem>
+            </Reveal>
+
+            <div className="mt-12 md:mt-16">
+              <FaqList faqs={HOME_FAQS} tone="dark" />
+            </div>
+
+            {/* "Explorar más" todavía no lleva a ningún lado (28/09): el
+                "espacio privado" del que habla la última respuesta no está
+                definido. Es un `span` con la forma del botón y SIN hover, para
+                que no prometa un click que no hace nada. Cuando tenga destino
+                pasa a `CtaLink`. */}
+            <div className="mt-12 text-center md:mt-16">
+              <span className="inline-flex items-center justify-center gap-2 rounded-full border-[1.5px] border-primary-container/70 px-7 py-3.5 font-display text-label-sm uppercase tracking-[0.038em] text-primary-container md:px-10 md:py-4">
+                Explorar más →
+              </span>
+            </div>
+          </div>
+        </section>
 
         <MediaStatement
           image={content("home.cierre.image")}
