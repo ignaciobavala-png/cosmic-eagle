@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/navigation";
+import { getTranslations } from "next-intl/server";
 import { ARTICLE_CATEGORY_LIST } from "@/lib/article";
 import { CTA_TONES } from "./CtaLink";
 
@@ -15,10 +16,13 @@ import { CTA_TONES } from "./CtaLink";
  * menú de `/contenidos`, para que las dos pantallas se lean como la misma
  * biblioteca. El ancestro no puede tener `overflow-hidden`.
  */
-export function LibraryNav({ active }: { active: string }) {
+export async function LibraryNav({ active }: { active: string }) {
+  const t = await getTranslations("Contenidos");
+  const tCat = await getTranslations("ArticleCategories");
+
   return (
     <nav
-      aria-label="Temas de la biblioteca"
+      aria-label={t("library.ariaNav")}
       className="sticky top-[var(--navbar-h)] z-30 mx-auto w-full max-w-3xl rounded-2xl border border-[#b3964b]/40 bg-[#fff6eb]/95 px-3 py-3 shadow-[0_10px_30px_-16px_rgba(5,18,90,0.55)] backdrop-blur-sm sm:px-4"
     >
       <ul className="flex flex-nowrap justify-start gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] md:flex-wrap md:justify-center md:overflow-visible [&::-webkit-scrollbar]:hidden">
@@ -35,7 +39,7 @@ export function LibraryNav({ active }: { active: string }) {
                     : `hover:scale-[1.04] ${CTA_TONES.dark}`
                 }`}
               >
-                {category.label}
+                {tCat(category.value)}
               </Link>
             </li>
           );

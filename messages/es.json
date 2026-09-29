@@ -144,6 +144,55 @@
       "profundizar": "Ir más profundo"
     }
   },
+  "GateModal": {
+    "title": "¿Quieres seguir explorando?",
+    "login": "Inicia sesión",
+    "signup": "Crear cuenta",
+    "help": "¿Necesitas ayuda?",
+    "close": "Cerrar"
+  },
+  "Legal": {
+    "provisional": "<strong>Versión preliminar.</strong> Este texto está en revisión y puede cambiar. Si algo de lo que lees aquí no coincide con lo que te dijimos, escríbenos y lo aclaramos.",
+    "updated": "Última actualización: {date}"
+  },
+  "Contenidos": {
+    "meta": {
+      "title": "Contenidos | Cosmic Eagle",
+      "description": "Preparación e integración, salud, evolución, tecnología humana y testimonios: la biblioteca de contenidos de Cosmic Eagle.",
+      "notFound": "Contenido no encontrado | Cosmic Eagle"
+    },
+    "hero": {
+      "scrollHint": "Ver la biblioteca"
+    },
+    "library": {
+      "ariaNav": "Temas de la biblioteca",
+      "fallback": "Biblioteca",
+      "empty": "Todavía no hay contenidos publicados en esta categoría.",
+      "readerAria": "Lectura",
+      "back": "Volver",
+      "locked": "Este contenido requiere un nivel de acceso que tu cuenta todavía no alcanza.",
+      "viewAccess": "Ver cómo acceder",
+      "others": "Otros contenidos disponibles",
+      "program": "Del programa",
+      "statusLocked": "Contenido",
+      "statusPublished": "Publicado",
+      "requiresAccess": "Requiere acceso",
+      "wall": "Estos contenidos se entregan a quienes participan del programa evolutivo. Para acceder, es necesario completar el formulario de postulación y participar de una primera experiencia.",
+      "nextExperiences": "Ver las próximas experiencias",
+      "accessLabel": "¿Tienes un código de acceso?",
+      "redeeming": "Canjeando…",
+      "redeemSubmit": "Entrar",
+      "redeemEmpty": "Escribí el código.",
+      "redeemError": "No se pudo canjear el código. Probá de nuevo.",
+      "redeem": {
+        "ok": "Listo: tu cuenta quedó habilitada.",
+        "vencido": "Ese código ya venció. Escríbenos y te damos uno nuevo.",
+        "agotado": "Ese código ya se usó todas las veces disponibles.",
+        "sin_sesion": "Inicia sesión para canjear el código.",
+        "invalido": "No encontramos ese código. Revisa que esté bien escrito."
+      }
+    }
+  },
   "Calendario": {
     "meta": {
       "title": "Calendario | Cosmic Eagle",

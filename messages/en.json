@@ -144,6 +144,55 @@
       "profundizar": "Go deeper"
     }
   },
+  "GateModal": {
+    "title": "Want to keep exploring?",
+    "login": "Log in",
+    "signup": "Create account",
+    "help": "Need help?",
+    "close": "Close"
+  },
+  "Legal": {
+    "provisional": "<strong>Preliminary version.</strong> This text is under review and may change. If anything you read here doesn't match what we told you, write to us and we'll clarify it.",
+    "updated": "Last updated: {date}"
+  },
+  "Contenidos": {
+    "meta": {
+      "title": "Content | Cosmic Eagle",
+      "description": "Preparation and integration, health, evolution, human technology, and testimonials: the Cosmic Eagle content library.",
+      "notFound": "Content not found | Cosmic Eagle"
+    },
+    "hero": {
+      "scrollHint": "View the library"
+    },
+    "library": {
+      "ariaNav": "Library topics",
+      "fallback": "Library",
+      "empty": "There is no content published in this category yet.",
+      "readerAria": "Reading",
+      "back": "Back",
+      "locked": "This content requires an access level your account doesn't reach yet.",
+      "viewAccess": "See how to access",
+      "others": "Other available content",
+      "program": "Program",
+      "statusLocked": "Content",
+      "statusPublished": "Published",
+      "requiresAccess": "Access required",
+      "wall": "This content is shared with those taking part in the evolutionary program. To access it, you need to complete the application form and take part in a first experience.",
+      "nextExperiences": "See upcoming experiences",
+      "accessLabel": "Do you have an access code?",
+      "redeeming": "Redeeming…",
+      "redeemSubmit": "Enter",
+      "redeemEmpty": "Write the code.",
+      "redeemError": "We couldn't redeem the code. Please try again.",
+      "redeem": {
+        "ok": "Done: your account is now enabled.",
+        "vencido": "That code has expired. Write to us and we'll give you a new one.",
+        "agotado": "That code has already been used all the available times.",
+        "sin_sesion": "Log in to redeem the code.",
+        "invalido": "We couldn't find that code. Check that it's spelled correctly."
+      }
+    }
+  },
   "Calendario": {
     "meta": {
       "title": "Calendar | Cosmic Eagle",

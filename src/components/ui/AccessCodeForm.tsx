@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { KeyRound } from "lucide-react";
 import { redeemAccessCode, type RedeemState } from "@/app/[locale]/contenidos/actions";
 import { CTA_TONES } from "./CtaLink";
@@ -12,6 +13,7 @@ import { CTA_TONES } from "./CtaLink";
  * `sin_sesion` y el muro de arriba ya ofrece el link para entrar.
  */
 export function AccessCodeForm({ tone = "dark" }: { tone?: "dark" | "light" }) {
+  const t = useTranslations("Contenidos");
   const [state, formAction, pending] = useActionState<RedeemState, FormData>(
     redeemAccessCode,
     { message: null, ok: false }
@@ -28,7 +30,7 @@ export function AccessCodeForm({ tone = "dark" }: { tone?: "dark" | "light" }) {
         }`}
       >
         <KeyRound size={14} aria-hidden="true" />
-        ¿Tienes un código de acceso?
+        {t("library.accessLabel")}
       </label>
 
       <div className="mx-auto mt-3 flex max-w-sm flex-col gap-3 sm:flex-row">
@@ -59,7 +61,7 @@ export function AccessCodeForm({ tone = "dark" }: { tone?: "dark" | "light" }) {
             CTA_TONES[light ? "dark" : "gold"]
           }`}
         >
-          {pending ? "Canjeando…" : "Entrar"}
+          {pending ? t("library.redeeming") : t("library.redeemSubmit")}
         </button>
       </div>
 

@@ -1,7 +1,9 @@
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Lock } from "lucide-react";
-import { articleCategoryLabel, formatArticleDate } from "@/lib/article";
+import { formatArticleDate } from "@/lib/article";
+import type { FormatLocale } from "@/lib/format";
 
 export type ArticleCardData = {
   slug: string;
@@ -30,14 +32,17 @@ export type ArticleCardData = {
  * articulo existe igual y muestra el muro con el copy de la clienta y el canje
  * del codigo. Cortar la navegacion aca dejaria a la persona sin saber que hacer.
  */
-export function ArticleCard({
+export async function ArticleCard({
   article,
   locked = false,
 }: {
   article: ArticleCardData;
   locked?: boolean;
 }) {
-  const date = formatArticleDate(article.published_at);
+  const t = await getTranslations("Contenidos");
+  const tCat = await getTranslations("ArticleCategories");
+  const locale: FormatLocale = (await getLocale()) === "en" ? "en" : "es";
+  const date = formatArticleDate(article.published_at, locale);
 
   return (
     <Link
@@ -61,12 +66,12 @@ export function ArticleCard({
         <div className="absolute inset-0 bg-[#05102a]/20" />
         {/* La etiqueta va sobre la foto: opaca, no translucida. */}
         <span className="absolute left-4 top-4 rounded-full bg-[#f9d78f] px-3 py-1 text-label-sm uppercase text-[#05125a]">
-          {articleCategoryLabel(article.category)}
+          {tCat(article.category)}
         </span>
         {locked && (
           <span className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-[#05125a]/85 px-3 py-1 text-label-sm uppercase text-[#f9d78f]">
             <Lock size={12} aria-hidden="true" />
-            Del programa
+            {t("library.program")}
           </span>
         )}
       </div>
@@ -89,10 +94,10 @@ export function ArticleCard({
               (2,66:1): va `on-primary-container`, que es el rol del sistema
               para eso. Regla del 28/08. */}
           <span className="block text-label-sm uppercase text-on-primary-container">
-            {locked ? "Contenido" : "Publicado"}
+            {locked ? t("library.statusLocked") : t("library.statusPublished")}
           </span>
           <span className="mt-1 block text-body-md text-[#05125a]">
-            {locked ? "Requiere acceso" : (date ?? "—")}
+            {locked ? t("library.requiresAccess") : (date ?? "—")}
           </span>
         </div>
       </div>
