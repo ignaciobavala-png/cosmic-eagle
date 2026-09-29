@@ -144,6 +144,99 @@
       "profundizar": "Ir más profundo"
     }
   },
+  "Viajes": {
+    "meta": {
+      "title": "Experiencias | Cosmic Eagle",
+      "description": "Sesiones de un día y retiros de varios días en portales sagrados. Fechas e inscripción."
+    },
+    "hero": {
+      "imageAlt": "Portal de luz sobre un cielo estrellado",
+      "title": "Portales de Transformación",
+      "scrollHint": "Explorar"
+    },
+    "about": {
+      "imageAlt": "Círculo de ceremonia iluminado",
+      "body": "Experiencias para <strong>profundizar en tu proceso de transformación</strong>, expandir la conciencia y conectar con el alma. En sesiones de un día o retiros de varios días."
+    },
+    "testimonials": {
+      "title": "Nuestros Viajeros",
+      "label": "Voces de quienes ya hicieron el camino"
+    },
+    "cierre": {
+      "imageAlt": "Amanecer sobre un paisaje sagrado",
+      "text": "Un viaje hacia adentro.<br></br>Un recuerdo de nuestra naturaleza más profunda.<br></br>Una activación de la luz que habita en nosotros."
+    },
+    "filter": {
+      "groupLabel": "Filtrar experiencias",
+      "todas": "Todas",
+      "sesiones": "Sesiones",
+      "retiros": "Retiros",
+      "badgeCeremonia": "Sesión",
+      "badgeRetiro": "Retiro"
+    },
+    "empty": {
+      "sesiones": "No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto.",
+      "retiros": "No hay retiros publicados por el momento. Vuelve a visitarnos pronto.",
+      "todas": "No hay experiencias publicadas por el momento. Vuelve a visitarnos pronto."
+    },
+    "card": {
+      "date": "Fecha",
+      "view": "Ver experiencia"
+    }
+  },
+  "ViajeDetalle": {
+    "meta": {
+      "notFound": "Viaje no encontrado"
+    },
+    "hero": {
+      "scrollHint": "Ver la experiencia",
+      "portadaAlt": "Portada de {title}",
+      "postularme": "Postularme",
+      "loginPostularme": "Iniciar sesión y postularme"
+    },
+    "detail": {
+      "title": "Sobre esta experiencia",
+      "empty": "Pronto vamos a compartir más detalles sobre esta experiencia. Escríbenos si quieres saber más."
+    },
+    "fields": {
+      "fechas": "Fechas",
+      "duracion": "Duración",
+      "horario": "Horario",
+      "lugar": "Lugar",
+      "cupo": "Cupo",
+      "dirigidoA": "Dirigido a",
+      "aporte": "Aporte"
+    },
+    "capacity": "{count, plural, one {# persona} other {# personas}}",
+    "nights": "{count, plural, one {1 día} other {# días}}",
+    "priceConfirm": "A confirmar",
+    "hours": {
+      "range": "{from} a {to}",
+      "until": "hasta {to}"
+    },
+    "program": {
+      "title": "Programa",
+      "day": "Día {day}"
+    },
+    "includes": {
+      "title": "Qué incluye"
+    },
+    "postulate": {
+      "title": "Postularte a esta experiencia",
+      "deposit": "o reservá tu cupo con {amount}",
+      "body": "La participación se define a través de una solicitud con unas preguntas de salud. Nuestro equipo la revisa y te responde.",
+      "submit": "Completar solicitud",
+      "loginSubmit": "Iniciar sesión y postularme",
+      "needAccount": "Necesitás una cuenta para postularte. <link>Crear cuenta</link>"
+    },
+    "closed": {
+      "completed": "Esta experiencia ya finalizó",
+      "closed": "Inscripciones cerradas",
+      "body": "Mira el resto del calendario para encontrar la próxima fecha disponible.",
+      "cta": "Ver otras experiencias"
+    },
+    "cancellations": "Cancelaciones"
+  },
   "Site": {
     "title": "Cosmic Eagle | Sabiduría Cósmica para la Evolución Humana",
     "description": "Cosmic Eagle explora el potencial más profundo de la conciencia humana. A través de experiencias inmersivas, enseñanzas y prácticas de integración, reconectamos con la inteligencia del alma."

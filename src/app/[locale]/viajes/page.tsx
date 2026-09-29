@@ -13,12 +13,20 @@ import { todayUTC } from "@/lib/trip-dates";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { getTestimonials } from "@/lib/testimonials";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Experiencias | Cosmic Eagle",
-  description:
-    "Sesiones de un día y retiros de varios días en portales sagrados. Fechas e inscripción.",
-};
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/viajes">): Promise<Metadata> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Viajes");
+
+  return {
+    title: t("meta.title"),
+    description: t("meta.description"),
+  };
+}
 
 /**
  * /viajes según el rediseño de Julia (`EXPERIENCIAS.html`, ver
@@ -57,10 +65,12 @@ export const metadata: Metadata = {
  * tiene (ahora es una sola cartelera con filtro de estado, no dos bloques).
  */
 export default async function ViajesPage({
+  params,
   searchParams,
-}: {
-  searchParams: Promise<{ tipo?: string }>;
-}) {
+}: PageProps<"/[locale]/viajes">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Viajes");
   const { tipo } = await searchParams;
   const initialFilter = tipo === "ceremonia" || tipo === "retiro" ? tipo : "todas";
   const content = await getSiteContent();
@@ -91,9 +101,9 @@ export default async function ViajesPage({
       <main className="pt-[var(--navbar-h)]">
         <PageHero
           image={content("viajes.hero.image")}
-          imageAlt="Portal de luz sobre un cielo estrellado"
-          title="Portales de Transformación"
-          scrollHint="Explorar"
+          imageAlt={t("hero.imageAlt")}
+          title={t("hero.title")}
+          scrollHint={t("hero.scrollHint")}
           scrollTo="experiencias"
           height="full"
           overlay={isEnabled(content("viajes.hero.overlay"))}
@@ -107,7 +117,7 @@ export default async function ViajesPage({
         <MediaStatement
           id="experiencias"
           image={content("viajes.about.image")}
-          imageAlt="Círculo de ceremonia iluminado"
+          imageAlt={t("about.imageAlt")}
           width="prose"
           veil={0.68}
           amount={0.22}
@@ -117,10 +127,9 @@ export default async function ViajesPage({
           overlay={isEnabled(content("viajes.about.overlay"))}
         >
           <p className="text-body-md leading-relaxed text-primary text-justify md:text-body-lg [&_strong]:font-semibold [&_strong]:text-primary-container">
-            Experiencias para{" "}
-            <strong>profundizar en tu proceso de transformación</strong>,
-            expandir la conciencia y conectar con el alma. En sesiones de un
-            día o retiros de varios días.
+            {t.rich("about.body", {
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
         </MediaStatement>
 
@@ -147,8 +156,8 @@ export default async function ViajesPage({
           </ExperienceGate>
 
           <TestimonialsBand
-            title="Nuestros Viajeros"
-            label="Voces de quienes ya hicieron el camino"
+            title={t("testimonials.title")}
+            label={t("testimonials.label")}
             testimonials={testimonios}
           />
         </CreamSection>
@@ -158,16 +167,12 @@ export default async function ViajesPage({
             esta imagen". */}
         <MediaStatement
           image={content("viajes.cierre.image")}
-          imageAlt="Amanecer sobre un paisaje sagrado"
+          imageAlt={t("cierre.imageAlt")}
           height={600}
           mobileFull
         >
           <p className="text-balance text-center font-display text-[20px] italic leading-snug text-primary-container md:text-[28px]">
-            Un viaje hacia adentro.
-            <br />
-            Un recuerdo de nuestra naturaleza más profunda.
-            <br />
-            Una activación de la luz que habita en nosotros.
+            {t.rich("cierre.text", { br: () => <br /> })}
           </p>
         </MediaStatement>
       </main>

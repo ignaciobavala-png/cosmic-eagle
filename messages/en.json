@@ -144,6 +144,99 @@
       "profundizar": "Go deeper"
     }
   },
+  "Viajes": {
+    "meta": {
+      "title": "Experiences | Cosmic Eagle",
+      "description": "One-day sessions and multi-day journeys in sacred portals. Dates and registration."
+    },
+    "hero": {
+      "imageAlt": "A portal of light over a starry sky",
+      "title": "Portals of Transformation",
+      "scrollHint": "Explore"
+    },
+    "about": {
+      "imageAlt": "A lit ceremony circle",
+      "body": "Experiences to <strong>go deeper into your process of transformation</strong>, expand consciousness, and connect with the soul. In one-day sessions or multi-day journeys."
+    },
+    "testimonials": {
+      "title": "Our Travelers",
+      "label": "Voices of those who have already walked the path"
+    },
+    "cierre": {
+      "imageAlt": "Sunrise over a sacred landscape",
+      "text": "A journey inward.<br></br>A remembrance of our deepest nature.<br></br>An activation of the light that lives within us."
+    },
+    "filter": {
+      "groupLabel": "Filter experiences",
+      "todas": "All",
+      "sesiones": "Sessions",
+      "retiros": "Retreats",
+      "badgeCeremonia": "Session",
+      "badgeRetiro": "Retreat"
+    },
+    "empty": {
+      "sesiones": "There are no sessions published right now. Come back soon.",
+      "retiros": "There are no retreats published right now. Come back soon.",
+      "todas": "There are no experiences published right now. Come back soon."
+    },
+    "card": {
+      "date": "Date",
+      "view": "View the experience"
+    }
+  },
+  "ViajeDetalle": {
+    "meta": {
+      "notFound": "Trip not found"
+    },
+    "hero": {
+      "scrollHint": "View the experience",
+      "portadaAlt": "Cover of {title}",
+      "postularme": "Apply",
+      "loginPostularme": "Log in and apply"
+    },
+    "detail": {
+      "title": "About this experience",
+      "empty": "We will share more details about this experience soon. Write to us if you would like to know more."
+    },
+    "fields": {
+      "fechas": "Dates",
+      "duracion": "Duration",
+      "horario": "Schedule",
+      "lugar": "Location",
+      "cupo": "Spots",
+      "dirigidoA": "For",
+      "aporte": "Contribution"
+    },
+    "capacity": "{count, plural, one {# person} other {# people}}",
+    "nights": "{count, plural, one {1 day} other {# days}}",
+    "priceConfirm": "To be confirmed",
+    "hours": {
+      "range": "{from} to {to}",
+      "until": "until {to}"
+    },
+    "program": {
+      "title": "Program",
+      "day": "Day {day}"
+    },
+    "includes": {
+      "title": "What's included"
+    },
+    "postulate": {
+      "title": "Apply for this experience",
+      "deposit": "or reserve your spot with {amount}",
+      "body": "Participation is defined through an application with a few health questions. Our team reviews it and replies to you.",
+      "submit": "Complete application",
+      "loginSubmit": "Log in and apply",
+      "needAccount": "You need an account to apply. <link>Create account</link>"
+    },
+    "closed": {
+      "completed": "This experience has already finished",
+      "closed": "Registration closed",
+      "body": "Look at the rest of the calendar to find the next available date.",
+      "cta": "See other experiences"
+    },
+    "cancellations": "Cancellations"
+  },
   "Site": {
     "title": "Cosmic Eagle | Cosmic Wisdom for Human Evolution",
     "description": "Cosmic Eagle explores the deepest potential of human consciousness. Through immersive experiences, teachings, and integration practices, we reconnect with the intelligence of the soul."

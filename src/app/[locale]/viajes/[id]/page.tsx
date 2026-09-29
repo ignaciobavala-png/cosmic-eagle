@@ -18,17 +18,12 @@ import {
   type FormatLocale,
 } from "@/lib/format";
 import { groupScheduleByDay, parseSchedule } from "@/lib/trip-schedule";
-import { tripTypeLabel } from "@/lib/trip-type";
-import { formatTripHours, tripCategoryLabel } from "@/lib/trip-fields";
+import { isTripType } from "@/lib/trip-type";
+import { formatTripTime, isTripCategory } from "@/lib/trip-fields";
 import { getSiteContent } from "@/lib/site-content";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 type Props = { params: Promise<{ locale: string; id: string }> };
-
-const STATUS_LABEL: Record<string, string> = {
-  open: "Cupos disponibles",
-  closed: "Cupo completo",
-  completed: "Finalizado",
-};
 
 // Las etiquetas viven sobre la portada del hero, o sea sobre una foto: van
 // opacas y no translucidas, que es lo unico que se lee sobre cualquier imagen.
@@ -62,12 +57,11 @@ function formatDateRange(
     : `${formatDate(startDate, locale)} — ${formatDate(endDate, locale)}`;
 }
 
-function nightsLabel(startDate: string, endDate: string) {
+function nightsCount(startDate: string, endDate: string) {
   const ms =
     new Date(`${endDate}T00:00:00Z`).getTime() -
     new Date(`${startDate}T00:00:00Z`).getTime();
-  const days = Math.round(ms / 86_400_000) + 1;
-  return days === 1 ? "1 día" : `${days} días`;
+  return Math.round(ms / 86_400_000) + 1;
 }
 
 async function getTrip(id: string) {
@@ -86,10 +80,12 @@ async function getTrip(id: string) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const { locale, id } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("ViajeDetalle");
   const trip = await getTrip(id);
 
-  if (!trip) return { title: "Viaje no encontrado" };
+  if (!trip) return { title: t("meta.notFound") };
 
   return {
     title: `${trip.title} | Cosmic Eagle Journey`,
@@ -101,7 +97,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ViajePage({ params }: Props) {
   const { locale, id } = await params;
+  setRequestLocale(locale);
   const formatLocale: FormatLocale = locale === "en" ? "en" : "es";
+  const t = await getTranslations("ViajeDetalle");
+  const tTrip = await getTranslations("TripTypes");
   const trip = await getTrip(id);
 
   if (!trip) notFound();
@@ -114,8 +113,16 @@ export default async function ViajePage({ params }: Props) {
   const solicitarHref = `/viajes/${trip.id}/solicitar`;
   const isOpen = trip.status === "open";
   const schedule = groupScheduleByDay(parseSchedule(trip.schedule));
-  const hours = formatTripHours(trip.start_time, trip.end_time);
-  const categoria = tripCategoryLabel(trip.category);
+  const hourFrom = formatTripTime(trip.start_time);
+  const hourTo = formatTripTime(trip.end_time);
+  const hours =
+    hourFrom && hourTo
+      ? t("hours.range", { from: hourFrom, to: hourTo })
+      : (hourFrom ?? (hourTo ? t("hours.until", { to: hourTo }) : null));
+  const categoria =
+    isTripCategory(trip.category) && trip.category !== "mixto"
+      ? tTrip(`category.${trip.category}`)
+      : null;
   const content = await getSiteContent();
   // Una sola politica para todas las experiencias (decision del 03/09): vive en
   // /admin/multimedia y no en `trips`. Vacia = la seccion no se dibuja.
@@ -124,22 +131,24 @@ export default async function ViajePage({ params }: Props) {
   const details = [
     {
       icon: CalendarDays,
-      label: "Fechas",
+      label: t("fields.fechas"),
       value: formatDateRange(trip.start_date, trip.end_date, formatLocale),
     },
     {
       icon: Clock,
-      label: "Duración",
-      value: nightsLabel(trip.start_date, trip.end_date),
+      label: t("fields.duracion"),
+      value: t("nights", {
+        count: nightsCount(trip.start_date, trip.end_date),
+      }),
     },
     // Las horas van pegadas a las fechas y no como dato aparte: "11:00 a 21:00"
     // sin fecha no dice nada, y en una Sesion de un dia es la mitad del dato.
-    ...(hours ? [{ icon: Clock, label: "Horario", value: hours }] : []),
+    ...(hours ? [{ icon: Clock, label: t("fields.horario"), value: hours }] : []),
     ...(trip.location
       ? [
           {
             icon: MapPin,
-            label: "Lugar",
+            label: t("fields.lugar"),
             // El tipo de establecimiento acompaña a la ciudad: "Casa de retiro ·
             // Guangualí, Los Vilos, Chile". La direccion exacta NO sale aca.
             value: trip.venue_type
@@ -148,17 +157,25 @@ export default async function ViajePage({ params }: Props) {
           },
         ]
       : []),
-    { icon: Users, label: "Cupo", value: `${trip.capacity} personas` },
-    ...(categoria ? [{ icon: Users, label: "Dirigido a", value: categoria }] : []),
+    {
+      icon: Users,
+      label: t("fields.cupo"),
+      value: t("capacity", { count: trip.capacity }),
+    },
+    ...(categoria
+      ? [{ icon: Users, label: t("fields.dirigidoA"), value: categoria }]
+      : []),
     {
       icon: Wallet,
-      label: "Aporte",
+      label: t("fields.aporte"),
       value:
-        trip.price > 0 ? formatAmount(trip.price, formatLocale) : "A confirmar",
+        trip.price > 0
+          ? formatAmount(trip.price, formatLocale)
+          : t("priceConfirm"),
     },
   ];
 
-  const tipo = tripTypeLabel(trip.type);
+  const tipo = isTripType(trip.type) ? tTrip(`${trip.type}.one`) : trip.type;
   const cover = trip.image_url ?? tripPlaceholderImage(trip.id);
 
   return (
@@ -172,7 +189,7 @@ export default async function ViajePage({ params }: Props) {
             a sangre. */}
         <PageHero
           image={cover}
-          imageAlt={`Portada de ${trip.title}`}
+          imageAlt={t("hero.portadaAlt", { title: trip.title })}
           eyebrow={
             <div className="flex flex-wrap items-center justify-center gap-2">
               <span className="rounded-full bg-[#f9d78f] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#05125a]">
@@ -183,19 +200,23 @@ export default async function ViajePage({ params }: Props) {
                   STATUS_CLASS[trip.status] ?? ""
                 }`}
               >
-                {STATUS_LABEL[trip.status] ?? trip.status}
+                {["open", "closed", "completed"].includes(trip.status)
+                  ? tTrip(`status.${trip.status}`)
+                  : trip.status}
               </span>
             </div>
           }
           title={trip.title}
           subtitle={trip.location ?? undefined}
-          scrollHint="Ver la experiencia"
+          scrollHint={t("hero.scrollHint")}
           scrollTo="detalle"
           actions={
             isOpen
               ? [
                   {
-                    label: user ? "Postularme" : "Iniciar sesión y postularme",
+                    label: user
+                      ? t("hero.postularme")
+                      : t("hero.loginPostularme"),
                     href: user
                       ? solicitarHref
                       : `/cuenta?next=${encodeURIComponent(solicitarHref)}`,
@@ -225,7 +246,7 @@ export default async function ViajePage({ params }: Props) {
             <div className="w-fit">
               <RevealItem y={0} duration={1}>
                 <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                  Sobre esta experiencia
+                  {t("detail.title")}
                 </h2>
               </RevealItem>
               <TitleRule grow className="mt-3 mb-7" />
@@ -243,8 +264,7 @@ export default async function ViajePage({ params }: Props) {
                 </div>
               ) : (
                 <p className="text-body-md leading-relaxed text-[#05125a]">
-                  Pronto vamos a compartir más detalles sobre esta experiencia.
-                  Escríbenos si quieres saber más.
+                  {t("detail.empty")}
                 </p>
               )}
             </RevealItem>
@@ -278,7 +298,7 @@ export default async function ViajePage({ params }: Props) {
                 <section className="mt-14">
                   <div className="w-fit">
                     <h3 className="font-display text-headline-md font-bold text-[#05125a]">
-                      Programa
+                      {t("program.title")}
                     </h3>
                     <TitleRule className="mt-3 mb-7" />
                   </div>
@@ -287,7 +307,7 @@ export default async function ViajePage({ params }: Props) {
                       <div key={group.day ?? "sin-jornada"}>
                         {group.day !== null && (
                           <h4 className="mb-2 flex items-baseline gap-2 text-label-sm uppercase tracking-[0.12em] text-on-primary-container">
-                            Día {group.day}
+                            {t("program.day", { day: group.day })}
                             <span className="normal-case tracking-normal text-[#05125a]/70">
                               {formatScheduleDay(
                                 trip.start_date,
@@ -327,7 +347,7 @@ export default async function ViajePage({ params }: Props) {
                 <section className="mt-14">
                   <div className="w-fit">
                     <h3 className="font-display text-headline-md font-bold text-[#05125a]">
-                      Qué incluye
+                      {t("includes.title")}
                     </h3>
                     <TitleRule className="mt-3 mb-7" />
                   </div>
@@ -356,7 +376,7 @@ export default async function ViajePage({ params }: Props) {
                 <div className="mx-auto w-fit">
                   <RevealItem y={0} duration={1}>
                     <h2 className="font-display text-headline-md font-bold text-primary-container md:text-headline-lg">
-                      Postularte a esta experiencia
+                      {t("postulate.title")}
                     </h2>
                   </RevealItem>
                   <TitleRule align="center" grow className="mt-3 mb-7" />
@@ -373,8 +393,9 @@ export default async function ViajePage({ params }: Props) {
                         línea no aparece. */}
                     {trip.deposit_amount && (
                       <p className="mt-1 text-sm text-white/70">
-                        o reservá tu cupo con{" "}
-                        {formatAmount(trip.deposit_amount, formatLocale)}
+                        {t("postulate.deposit", {
+                          amount: formatAmount(trip.deposit_amount, formatLocale),
+                        })}
                       </p>
                     )}
                   </RevealItem>
@@ -382,8 +403,7 @@ export default async function ViajePage({ params }: Props) {
 
                 <RevealItem y={14} duration={0.8} delay={0.3}>
                   <p className="mx-auto mt-6 max-w-lg text-body-md leading-relaxed text-white/75">
-                    La participación se define a través de una solicitud con unas
-                    preguntas de salud. Nuestro equipo la revisa y te responde.
+                    {t("postulate.body")}
                   </p>
                   <div className="mt-8 flex justify-center">
                     <CtaLink
@@ -393,18 +413,23 @@ export default async function ViajePage({ params }: Props) {
                           : `/cuenta?next=${encodeURIComponent(solicitarHref)}`
                       }
                     >
-                      {user ? "Completar solicitud" : "Iniciar sesión y postularme"}
+                      {user
+                        ? t("postulate.submit")
+                        : t("postulate.loginSubmit")}
                     </CtaLink>
                   </div>
                   {!user && (
                     <p className="mt-4 text-xs text-white/60">
-                      Necesitás una cuenta para postularte.{" "}
-                      <Link
-                        href={`/cuenta?modo=registro&next=${encodeURIComponent(solicitarHref)}`}
-                        className="text-primary-container underline underline-offset-4"
-                      >
-                        Crear cuenta
-                      </Link>
+                      {t.rich("postulate.needAccount", {
+                        link: (chunks) => (
+                          <Link
+                            href={`/cuenta?modo=registro&next=${encodeURIComponent(solicitarHref)}`}
+                            className="text-primary-container underline underline-offset-4"
+                          >
+                            {chunks}
+                          </Link>
+                        ),
+                      })}
                     </p>
                   )}
                 </RevealItem>
@@ -413,17 +438,14 @@ export default async function ViajePage({ params }: Props) {
               <RevealItem y={0} duration={1}>
                 <h2 className="font-display text-headline-md font-bold text-primary-container md:text-headline-lg">
                   {trip.status === "completed"
-                    ? "Esta experiencia ya finalizó"
-                    : "Inscripciones cerradas"}
+                    ? t("closed.completed")
+                    : t("closed.closed")}
                 </h2>
                 <p className="mx-auto mt-5 max-w-lg text-body-md leading-relaxed text-white/75">
-                  Mira el resto del calendario para encontrar la próxima fecha
-                  disponible.
+                  {t("closed.body")}
                 </p>
                 <div className="mt-8 flex justify-center">
-                  <CtaLink href="/viajes">
-                    Ver otras experiencias
-                  </CtaLink>
+                  <CtaLink href="/viajes">{t("closed.cta")}</CtaLink>
                 </div>
               </RevealItem>
             )}
@@ -441,7 +463,7 @@ export default async function ViajePage({ params }: Props) {
                   {cancelacion && (
                     <>
                       <p className="mb-2 mt-6 text-xs uppercase tracking-widest text-primary-container">
-                        Cancelaciones
+                        {t("cancellations")}
                       </p>
                       <p className="whitespace-pre-line text-sm leading-relaxed text-white/70">
                         {cancelacion}
