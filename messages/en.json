@@ -2,6 +2,101 @@
   "LocaleSwitch": {
     "label": "Language"
   },
+  "Header": {
+    "nav": {
+      "nosotros": "About us",
+      "experiencias": "Experiences",
+      "contenidos": "Content",
+      "miCuenta": "My Account"
+    },
+    "nosotros": {
+      "quienesSomos": "Who we are",
+      "proposito": "Our purpose",
+      "enfoque": "Our approach",
+      "founder": "Founder"
+    },
+    "tipo": {
+      "retiro": "Journeys",
+      "ceremonia": "Sessions"
+    },
+    "experiencias": {
+      "calendario": "Calendar"
+    },
+    "categoria": {
+      "preparacion": "Preparation & Integration",
+      "salud": "Health & Wellbeing",
+      "evolucion": "Evolution & Consciousness",
+      "tecnologia": "Human Technology",
+      "testimonios": "Testimonials"
+    },
+    "accountFallback": "My Account",
+    "login": "Log in",
+    "signup": "Sign up",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "Footer": {
+    "columns": {
+      "explorar": "Explore",
+      "legal": "Legal"
+    },
+    "links": {
+      "nosotros": "About us",
+      "experiencias": "Experiences",
+      "contenidos": "Content",
+      "preguntasFrecuentes": "Frequently asked questions",
+      "privacidad": "Privacy",
+      "contacto": "Contact"
+    },
+    "newsletter": {
+      "title": "Stay in tune",
+      "copy": "Be the first to hear our news."
+    },
+    "comingSoon": "Coming soon",
+    "copyright": "© 2026 Cosmic Eagle Journey"
+  },
+  "Newsletter": {
+    "placeholder": "Your email address",
+    "submit": "Subscribe",
+    "invalid": "Check your email, it doesn't look valid.",
+    "error": "We couldn't sign you up. Please try again.",
+    "ok": "Done, we'll be in touch."
+  },
+  "BackToTop": {
+    "label": "Back to top"
+  },
+  "TripTypes": {
+    "retiro": {
+      "one": "Journey",
+      "plural": "Journeys",
+      "upcoming": "Upcoming Journeys"
+    },
+    "ceremonia": {
+      "one": "Session",
+      "plural": "Sessions",
+      "upcoming": "Upcoming Sessions"
+    },
+    "view": "View {tipo}",
+    "category": {
+      "mujeres": "Women only",
+      "hombres": "Men only",
+      "avanzados": "Advanced"
+    },
+    "status": {
+      "open": "Spots available",
+      "closed": "Full",
+      "completed": "Completed"
+    },
+    "date": "Date",
+    "dates": "Dates"
+  },
+  "ArticleCategories": {
+    "preparacion": "Preparation & Integration",
+    "salud": "Health & Wellbeing",
+    "evolucion": "Evolution & Consciousness",
+    "tecnologia": "Human Technology",
+    "testimonios": "Testimonials"
+  },
   "Home": {
     "heroAlt": "A figure made of particles gazing into the cosmos"
   }

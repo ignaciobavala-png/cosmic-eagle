@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { FOOTER_COLUMNS, IMAGES } from "@/lib/constants";
 import { NewsletterForm } from "./NewsletterForm";
 import { useSignedIn } from "@/lib/use-signed-in";
 
 export function Footer() {
+  const t = useTranslations("Footer");
   // Pedido de Sofia (24/09): el link de Privacidad del footer no lo puede
   // apretar un guest, y el 24/09 (repaso) agregó Experiencias, Contenidos y
   // Preguntas frecuentes — mismo criterio que ya rige el desplegable del
@@ -16,14 +18,16 @@ export function Footer() {
   // igual que en Header — es preferible que alguien logueado no se coma el
   // candado un instante.
   const signedIn = useSignedIn();
+  // Las keys de los links (ver FOOTER_COLUMNS), no las etiquetas traducidas:
+  // el candado sigue funcionando en cualquier idioma.
   const LOCKED_FOR_GUESTS = [
-    "Privacidad",
-    "Experiencias",
-    "Contenidos",
-    "Preguntas frecuentes",
+    "privacidad",
+    "experiencias",
+    "contenidos",
+    "preguntasFrecuentes",
   ];
-  const isLockedForGuests = (label: string) =>
-    signedIn === false && LOCKED_FOR_GUESTS.includes(label);
+  const isLockedForGuests = (key: string) =>
+    signedIn === false && LOCKED_FOR_GUESTS.includes(key);
 
   return (
     <footer // El degrade va en CSS: el PNG que entrego la disenadora era un
@@ -43,7 +47,7 @@ export function Footer() {
         </Link>
 
         {FOOTER_COLUMNS.map((column) => (
-          <nav key={column.title} className="space-y-4">
+          <nav key={column.titleKey} className="space-y-4">
             {/* 18px y no `text-label-sm`: el titulo de columna media 12px y
                 sus propios links 16px, o sea que el encabezado era MAS CHICO
                 que lo que encabeza (reporte de Sofia, 11/09). Los tres valores
@@ -53,34 +57,35 @@ export function Footer() {
                 conservan la mayuscula, el tracking y el peso de la etiqueta:
                 lo unico que cambia es el cuerpo. */}
             <h2 className="font-display text-[18px] font-semibold uppercase leading-6 tracking-[0.1em] text-primary-fixed-dim">
-              {column.title}
+              {t(column.titleKey)}
             </h2>
             <ul className="space-y-3">
               {column.links.map((link) => {
-                const locked = isLockedForGuests(link.label);
+                const locked = isLockedForGuests(link.key);
+                const label = t(`links.${link.key}`);
                 return (
-                <li key={link.label}>
+                <li key={link.key}>
                   {locked ? (
                     <span
                       aria-disabled="true"
                       className="cursor-default text-body-md text-on-surface-variant/50"
                     >
-                      {link.label}
+                      {label}
                     </span>
                   ) : link.href ? (
                     <Link
                       href={link.href}
                       className="text-body-md text-on-surface-variant transition-colors hover:text-primary-fixed-dim"
                     >
-                      {link.label}
+                      {label}
                     </Link>
                   ) : (
                     // Sin ruta todavia: se muestra apagado en vez de linkear a "#"
                     <span
                       className="text-body-md text-on-surface-variant/40"
-                      title="Próximamente"
+                      title={t("comingSoon")}
                     >
-                      {link.label}
+                      {label}
                     </span>
                   )}
                 </li>
@@ -93,10 +98,10 @@ export function Footer() {
         <div className="space-y-4">
           {/* Mismo cuerpo que los otros tres titulos de columna, ver arriba. */}
           <h2 className="font-display text-[18px] font-semibold uppercase leading-6 tracking-[0.1em] text-primary-fixed-dim">
-            Sintoniza
+            {t("newsletter.title")}
           </h2>
           <p className="text-body-md text-on-surface-variant">
-            Enterate de las novedades antes que nadie.
+            {t("newsletter.copy")}
           </p>
           <NewsletterForm />
         </div>
@@ -109,7 +114,7 @@ export function Footer() {
           anchos. */}
       <div className="mx-auto mt-14 flex max-w-narrative flex-col items-center justify-center gap-4 border-t border-primary-fixed-dim/8 pt-6 text-center">
         <p className="text-label-sm uppercase text-on-surface-variant/70">
-          &copy; 2026 Cosmic Eagle Journey
+          {t("copyright")}
         </p>
       </div>
     </footer>

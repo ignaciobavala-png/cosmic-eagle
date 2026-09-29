@@ -2,6 +2,101 @@
   "LocaleSwitch": {
     "label": "Idioma"
   },
+  "Header": {
+    "nav": {
+      "nosotros": "Nosotros",
+      "experiencias": "Experiencias",
+      "contenidos": "Contenidos",
+      "miCuenta": "Mi Cuenta"
+    },
+    "nosotros": {
+      "quienesSomos": "Quiénes somos",
+      "proposito": "Nuestro propósito",
+      "enfoque": "Nuestro enfoque",
+      "founder": "Founder"
+    },
+    "tipo": {
+      "retiro": "Viajes",
+      "ceremonia": "Sesiones"
+    },
+    "experiencias": {
+      "calendario": "Calendario"
+    },
+    "categoria": {
+      "preparacion": "Preparación & Integración",
+      "salud": "Salud & Bienestar",
+      "evolucion": "Evolución & Conciencia",
+      "tecnologia": "Tecnología Humana",
+      "testimonios": "Testimonios"
+    },
+    "accountFallback": "Mi Cuenta",
+    "login": "Login",
+    "signup": "Registrarse",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
+  },
+  "Footer": {
+    "columns": {
+      "explorar": "Explorar",
+      "legal": "Legal"
+    },
+    "links": {
+      "nosotros": "Nosotros",
+      "experiencias": "Experiencias",
+      "contenidos": "Contenidos",
+      "preguntasFrecuentes": "Preguntas frecuentes",
+      "privacidad": "Privacidad",
+      "contacto": "Contacto"
+    },
+    "newsletter": {
+      "title": "Sintoniza",
+      "copy": "Enterate de las novedades antes que nadie."
+    },
+    "comingSoon": "Próximamente",
+    "copyright": "© 2026 Cosmic Eagle Journey"
+  },
+  "Newsletter": {
+    "placeholder": "Tu correo electrónico",
+    "submit": "Suscribirme",
+    "invalid": "Revisa el correo, no parece válido.",
+    "error": "No pudimos registrarte. Prueba de nuevo.",
+    "ok": "Listo, te vamos a escribir."
+  },
+  "BackToTop": {
+    "label": "Volver arriba"
+  },
+  "TripTypes": {
+    "retiro": {
+      "one": "Viaje",
+      "plural": "Viajes",
+      "upcoming": "Próximos Viajes"
+    },
+    "ceremonia": {
+      "one": "Sesión",
+      "plural": "Sesiones",
+      "upcoming": "Próximas Sesiones"
+    },
+    "view": "Ver {tipo}",
+    "category": {
+      "mujeres": "Solo mujeres",
+      "hombres": "Solo hombres",
+      "avanzados": "Avanzados"
+    },
+    "status": {
+      "open": "Cupos disponibles",
+      "closed": "Cupo completo",
+      "completed": "Finalizado"
+    },
+    "date": "Fecha",
+    "dates": "Fechas"
+  },
+  "ArticleCategories": {
+    "preparacion": "Preparación & Integración",
+    "salud": "Salud & Bienestar",
+    "evolucion": "Evolución & Conciencia",
+    "tecnologia": "Tecnología Humana",
+    "testimonios": "Testimonios"
+  },
   "Home": {
     "heroAlt": "Figura de partículas mirando hacia el cosmos"
   }

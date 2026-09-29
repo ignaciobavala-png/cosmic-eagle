@@ -94,29 +94,13 @@ export function tripPlaceholderImage(id: string) {
 // siguen siendo los del enum de la base (`retiro` / `ceremonia`) y el `slug`
 // tambien: era el valor del viejo `?tipo=`, que ya nadie escribe, y cambiarlo
 // solo romperia links viejos.
+//
+// i18n (etapa 2): las etiquetas ya no viven aca. El `value` es tambien la clave
+// del mensaje (`TripTypes.<value>.one|plural|upcoming`), asi que la etiqueta se
+// resuelve con `t` donde se muestra. El valor de la base NO se traduce.
 export const TRIP_TYPES = [
-  {
-    value: "ceremonia",
-    slug: "ceremonias",
-    label: "Sesiones",
-    singular: "Sesión",
-    upcoming: "Próximas Sesiones",
-    // Copy del mockup aprobado de Julia (`.dropdown-desc`). YA NO SE MUESTRA:
-    // desde la reunion del 04/09 el desplegable del navbar lleva solo titulos
-    // (ver NAV_LINKS). Se conserva porque es copy de la clienta y el bloque de
-    // /viajes puede necesitarlo; si en un mes sigue sin usarse, se borra.
-    description: "Encuentros de un día para ir más profundo",
-  },
-  {
-    value: "retiro",
-    slug: "retiros",
-    label: "Viajes",
-    singular: "Viaje",
-    // El titulo va armado y no concatenado con "Proximos": "Proximos Viajes"
-    // pero "Proximas Sesiones", el genero cambia.
-    upcoming: "Próximos Viajes",
-    description: "Experiencias de una semana en portales sagrados",
-  },
+  { value: "ceremonia", slug: "ceremonias" },
+  { value: "retiro", slug: "retiros" },
 ] as const;
 
 export type TripTypeSlug = (typeof TRIP_TYPES)[number]["slug"];
@@ -127,13 +111,17 @@ export function tripTypeFromSlug(slug: string | undefined) {
 }
 
 export type NavLink = {
-  label: string;
+  /**
+   * Clave del mensaje del label, relativa al namespace `Header` (i18n etapa 2).
+   * El `href` y el `icon` no se traducen.
+   */
+  labelKey: string;
   href: string;
   icon: "Info" | "Sparkles" | "BookOpen" | "User";
   // Los hijos del desplegable son SOLO titulos: la descripcion salio en la
   // reunion del 04/09 ("dejemos solo titulos"). El `href` puede ser un ancla a
   // una seccion de la propia pagina del padre.
-  children?: { label: string; href: string }[];
+  children?: { labelKey: string; href: string }[];
   /**
    * Pedido de Sofia (24/09): sin sesion iniciada, los hijos de Experiencias y
    * Contenidos se VEN pero no hacen nada al pinchar — no es un candado sobre
@@ -154,7 +142,7 @@ export type NavLink = {
 // "Inicio" no va en el nav: al home se llega tocando el logo (desktop y drawer)
 export const NAV_LINKS: NavLink[] = [
   {
-    label: "Nosotros",
+    labelKey: "nav.nosotros",
     href: "/nosotros",
     icon: "Info",
     // Pedido de la reunion del 04/09: "Nosotros" tambien despliega, con scroll
@@ -169,15 +157,15 @@ export const NAV_LINKS: NavLink[] = [
     // como su indice. **No invertirlo de nuevo**: el 08/09 se hizo justamente
     // eso, tomando este orden por un descuido, y era una decision.
     children: [
-      { label: "Quiénes somos", href: "/nosotros#somos" },
-      { label: "Nuestro propósito", href: "/nosotros#proposito" },
-      { label: "Nuestro enfoque", href: "/nosotros#nuestro-enfoque" },
+      { labelKey: "nosotros.quienesSomos", href: "/nosotros#somos" },
+      { labelKey: "nosotros.proposito", href: "/nosotros#proposito" },
+      { labelKey: "nosotros.enfoque", href: "/nosotros#nuestro-enfoque" },
       // Tercer nombre de la misma entrada: "Fundadora" -> "Equipo" (Sofia,
       // 11/09) -> "Founder" (Ignacio, 17/09). Con este vuelve a decir lo mismo
       // que el titulo de la pantalla a la que lleva, que es "Estela, founder"
       // y es copy literal de la clienta: entre el 11 y el 17 el menu nombraba
       // una seccion que en pantalla se llamaba de otra manera.
-      { label: "Founder", href: "/nosotros#estela" },
+      { labelKey: "nosotros.founder", href: "/nosotros#estela" },
     ],
     hideChildrenOnMobile: true,
   },
@@ -187,7 +175,7 @@ export const NAV_LINKS: NavLink[] = [
     // Cosmico" es solo el retiro, y el paraguas se habia quedado sin nombre.
     // Cambia la etiqueta, NO la ruta: /viajes sigue igual y no hace falta
     // redirect ni tocar los links existentes.
-    label: "Experiencias",
+    labelKey: "nav.experiencias",
     href: "/viajes",
     icon: "Sparkles",
     // El desplegable no reemplaza al link: "Viajes" sigue yendo al listado
@@ -205,25 +193,25 @@ export const NAV_LINKS: NavLink[] = [
     // el indice de la pagina, despues el atajo que se va del sitio narrativo.
     children: [
       ...TRIP_TYPES.map((t) => ({
-        label: t.label,
+        labelKey: `tipo.${t.value}`,
         href: `/viajes?tipo=${t.value}#cartelera`,
       })),
-      { label: "Calendario", href: "/calendario" },
+      { labelKey: "experiencias.calendario", href: "/calendario" },
     ],
     childrenRequireAuth: true,
   },
   {
-    label: "Contenidos",
+    labelKey: "nav.contenidos",
     href: "/contenidos",
     icon: "BookOpen",
     children: ARTICLE_CATEGORY_LIST.map((c) => ({
-      label: c.label,
+      labelKey: `categoria.${c.value}`,
       href: `/contenidos?categoria=${c.value}`,
     })),
     childrenRequireAuth: true,
     hideChildrenOnMobile: true,
   },
-  { label: "Mi Cuenta", href: "/cuenta", icon: "User" },
+  { labelKey: "nav.miCuenta", href: "/cuenta", icon: "User" },
 ];
 
 // Columnas del footer segun el mockup de Julia. `href: null` = la ruta todavia
@@ -234,28 +222,33 @@ export const NAV_LINKS: NavLink[] = [
 // tipo tupla exacto, y `.map` sobre la union de tuplas de largo distinto no
 // unifica el parametro del callback.
 type FooterColumn = {
-  title: string;
-  links: { label: string; href: string | null }[];
+  /** Clave del titulo, relativa al namespace `Footer` (i18n etapa 2). */
+  titleKey: string;
+  /**
+   * `key` es la clave del label relativa al namespace `Footer`; se usa tambien
+   * para el candado de invitados (ver `Footer`, `LOCKED_FOR_GUESTS`).
+   */
+  links: { key: string; href: string | null }[];
 };
 
 export const FOOTER_COLUMNS: FooterColumn[] = [
   {
-    title: "Explorar",
+    titleKey: "columns.explorar",
     links: [
-      { label: "Nosotros", href: "/nosotros" },
-      { label: "Experiencias", href: "/viajes" },
-      { label: "Contenidos", href: "/contenidos" },
-      { label: "Preguntas frecuentes", href: "/faqs" },
+      { key: "nosotros", href: "/nosotros" },
+      { key: "experiencias", href: "/viajes" },
+      { key: "contenidos", href: "/contenidos" },
+      { key: "preguntasFrecuentes", href: "/faqs" },
     ],
   },
   {
-    title: "Legal",
+    titleKey: "columns.legal",
     links: [
       // Las dos existen desde el 04/09 y las edita la clienta desde
       // /admin/legales. Salieron con un texto preliminar nuestro, no con el
       // anexo de Sofia, que se perdio con `web-cosmic-journey-ES.md`.
-      { label: "Privacidad", href: "/privacidad" },
-      { label: "Contacto", href: "mailto:contacto@cosmiceaglejourney.com" },
+      { key: "privacidad", href: "/privacidad" },
+      { key: "contacto", href: "mailto:contacto@cosmiceaglejourney.com" },
     ],
   },
 ];

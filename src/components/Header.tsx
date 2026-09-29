@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useUIStore } from "@/lib/store";
 import { IMAGES, NAV_LINKS, SHOW_LOCALE_SWITCH } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
@@ -41,6 +42,7 @@ type AccountProfile = {
 } | null;
 
 export function Header() {
+  const t = useTranslations("Header");
   const { drawerOpen, toggleDrawer, setDrawerOpen } = useUIStore();
   const pathname = usePathname();
   const [profile, setProfile] = useState<AccountProfile>(null);
@@ -102,7 +104,7 @@ export function Header() {
         <CircleUser size={20} />
       )}
       <span className="font-display text-label-sm uppercase">
-        {profile.fullName?.split(" ")[0] || "Mi Cuenta"}
+        {profile.fullName?.split(" ")[0] || t("accountFallback")}
       </span>
     </>
   ) : null;
@@ -175,7 +177,7 @@ export function Header() {
                         : "bg-[linear-gradient(90deg,#f9d78f,#b3964b)] bg-clip-text text-transparent"
                     }`}
                   >
-                    {link.label}
+                    {t(link.labelKey)}
                   </span>
                   {link.children && (
                     <ChevronDown
@@ -373,7 +375,7 @@ export function Header() {
                                 aria-disabled="true"
                                 className="nav-dropdown-item block cursor-default px-1 py-[13px] text-center font-display text-base font-bold tracking-[0.03em] text-primary-container/60"
                               >
-                                {child.label}
+                                {t(child.labelKey)}
                               </span>
                             ) : (
                               <Link
@@ -383,7 +385,7 @@ export function Header() {
                                 }}
                                 className="nav-dropdown-item block px-1 py-[13px] text-center font-display text-base font-bold tracking-[0.03em] text-primary-container transition-colors hover:text-primary"
                               >
-                                {child.label}
+                                {t(child.labelKey)}
                               </Link>
                             )}
                             {i < todos.length - 1 && (
@@ -444,14 +446,14 @@ export function Header() {
               // relleno solido, mismo contorno fino que su vecino.
               <div className="hidden lg:flex items-center gap-3">
                 <CtaLink href="/cuenta" size="sm" className="whitespace-nowrap">
-                  Login
+                  {t("login")}
                 </CtaLink>
                 <CtaLink
                   href="/cuenta?modo=registro"
                   size="sm"
                   className="whitespace-nowrap"
                 >
-                  Registrarse
+                  {t("signup")}
                 </CtaLink>
               </div>
             )}
@@ -459,7 +461,7 @@ export function Header() {
             <button
               onClick={toggleDrawer}
               className="lg:hidden active:scale-95 transition-transform"
-              aria-label="Abrir menú"
+              aria-label={t("openMenu")}
             >
               <Menu className="text-primary-fixed-dim" size={24} />
             </button>
@@ -505,7 +507,7 @@ export function Header() {
                 <button
                   onClick={() => setDrawerOpen(false)}
                   className="text-primary-fixed-dim transition-colors hover:text-primary-container"
-                  aria-label="Cerrar menú"
+                  aria-label={t("closeMenu")}
                 >
                   <X size={24} />
                 </button>
@@ -545,7 +547,7 @@ export function Header() {
                             : "bg-[linear-gradient(90deg,#f9d78f,#b3964b)] bg-clip-text text-transparent"
                         }`}
                       >
-                        {link.label}
+                        {t(link.labelKey)}
                       </span>
                     </>
                   );
@@ -588,7 +590,7 @@ export function Header() {
                                     aria-disabled="true"
                                     className="block cursor-default px-3 py-2 font-display text-sm tracking-[0.05em] text-primary-container/60 uppercase"
                                   >
-                                    {child.label}
+                                    {t(child.labelKey)}
                                   </span>
                                 ) : (
                                   <Link
@@ -596,7 +598,7 @@ export function Header() {
                                     onClick={() => setDrawerOpen(false)}
                                     className="block px-3 py-2 font-display text-sm tracking-[0.05em] text-primary-container uppercase transition-colors hover:text-primary"
                                   >
-                                    {child.label}
+                                    {t(child.labelKey)}
                                   </Link>
                                 )}
                               </li>
@@ -616,13 +618,13 @@ export function Header() {
                     onClick={() => setDrawerOpen(false)}
                   >
                     <CtaLink href="/cuenta" className="w-full py-4">
-                      Login
+                      {t("login")}
                     </CtaLink>
                     <CtaLink
                       href="/cuenta?modo=registro"
                       className="w-full py-4"
                     >
-                      Registrarse
+                      {t("signup")}
                     </CtaLink>
                   </div>
                 )}

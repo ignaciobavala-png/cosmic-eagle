@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { Send } from "lucide-react";
 import { subscribeNewsletter, type NewsletterState } from "./newsletter-actions";
 
@@ -10,6 +11,7 @@ import { subscribeNewsletter, type NewsletterState } from "./newsletter-actions"
  * del input, el regex del server action y el CHECK de la tabla.
  */
 export function NewsletterForm() {
+  const t = useTranslations("Newsletter");
   const [state, formAction, pending] = useActionState<NewsletterState, FormData>(
     subscribeNewsletter,
     null
@@ -24,14 +26,14 @@ export function NewsletterForm() {
           required
           maxLength={320}
           disabled={pending || state?.ok}
-          placeholder="Tu correo electrónico"
-          aria-label="Tu correo electrónico"
+          placeholder={t("placeholder")}
+          aria-label={t("placeholder")}
           className="w-full bg-transparent text-body-md text-on-surface placeholder:text-on-surface-variant/60 outline-none disabled:opacity-60"
         />
         <button
           type="submit"
           disabled={pending || state?.ok}
-          aria-label="Suscribirme"
+          aria-label={t("submit")}
           className="shrink-0 text-primary-fixed-dim transition-opacity hover:opacity-70 disabled:opacity-40"
         >
           <Send size={16} />
