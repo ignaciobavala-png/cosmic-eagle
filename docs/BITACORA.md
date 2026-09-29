@@ -2829,3 +2829,29 @@ quedan después de leer qué es y para qué existe, la última pregunta desemboc
 en "Cuando el alma está lista, el camino aparece", y el cierre sigue siendo lo
 último (pedido del 23/09). `FaqList` ganó `tone="dark"` para el fondo azul. La
 home sigue estática (`○`). El inglés queda en la entrega para cuando haya i18n.
+
+## 2026-09-29 — Traspaso de cuentas
+
+Ignacio les pasó a ellas **Supabase y Resend**. Sale de "Lo que sigue" el
+punto 2 salvo una cosa: confirmar que `contacto@cosmiceaglejourney.com`
+existe, porque es el `reply_to` de todos los correos. Para lanzar sigue
+faltando el DNS (Resend + Vercel), las 5 preguntas de pagos, los corchetes de
+los legales y una inscripción de prueba de punta a punta.
+
+## 2026-09-29 — Sprint de conexión del dominio
+
+Sofía pidió cerrar la semana con el sitio conectado y las primeras pruebas:
+fecha final **jueves 01/10**, sesión con ella el **miércoles 30/09 a las
+11:00** para entrar a Hostinger. Gantt para mostrarle en
+`~/Escritorio/cosmic-eagle-gantt-conexion.{html,pdf}` (fuera del repo).
+
+DNS verificado hoy: los NS siguen en **Cloudflare**, así que los registros se
+cargan ahí, no en la zona de Hostinger (que los acepta y no hacen nada). Se
+corrigió `docs/entregas/2026-09-23-dns-cutover/registros-dns.txt`: el A de `@`
+se **edita** (dos A reparten el tráfico con el sitio viejo) y el CNAME de `www`
+se **reemplaza**. Todo en nube gris. Se sumó un plan B (pasar los NS a
+Hostinger) con el inventario de la zona actual, incluido el DKIM de Google.
+
+El sitio viejo es una sola página: no hacen falta redirects. Después del corte
+faltan en producción `NEXT_PUBLIC_SITE_URL` y `RESEND_FROM`, y la Site URL y
+las redirect URLs de Supabase Auth.

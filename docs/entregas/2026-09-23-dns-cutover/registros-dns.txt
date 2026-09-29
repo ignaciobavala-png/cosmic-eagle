@@ -1,0 +1,155 @@
+COSMIC EAGLE JOURNEY — REGISTROS DNS A CARGAR
+Dominio: cosmiceaglejourney.com
+Fecha: 23/09/2026 (corregido 29/09/2026)
+Preparado por: Ignacio Bavala (desarrollo)
+
+===============================================================================
+LEER ANTES DE EMPEZAR
+===============================================================================
+
+DÓNDE SE CARGA (verificado el 29/09): los nameservers del dominio son de
+CLOUDFLARE (monroe.ns.cloudflare.com y steven.ns.cloudflare.com). Hostinger
+es, casi seguro, sólo el registrador. Eso quiere decir que los registros se
+cargan en el panel de Cloudflare: si se cargan en la zona DNS de Hostinger no
+tienen NINGÚN efecto, aunque el panel los acepte sin quejarse.
+
+  - Si entrando a Hostinger se ve el dominio con nameservers de Cloudflare:
+    hay que conseguir el login de Cloudflare (Sofía dijo el 03/09 que lo
+    tiene). Buscar en el correo de ellas un mail de "Cloudflare".
+  - Plan B, si nadie tiene Cloudflare: cambiar en Hostinger los nameservers a
+    los de Hostinger. ANTES hay que recrear en la zona de Hostinger todo lo
+    que hoy existe, o se cae el correo de Google Workspace (ver el
+    inventario al final de este documento). No hacerlo sin Ignacio.
+
+Este documento junta dos cambios que hay que hacer en el panel de DNS:
+
+  1. Verificar el dominio de envío de correo en Resend, para que la
+     plataforma nueva pueda mandar mails desde cosmiceaglejourney.com.
+  2. Apuntar el dominio a Vercel, para que cosmiceaglejourney.com muestre
+     el sitio nuevo en vez del sitio viejo.
+
+Los 4 registros de Resend (sección 1) son ADITIVOS: se agregan sin tocar
+nada. Los 2 de Vercel (sección 2) NO: reemplazan a dos registros que ya
+existen (ver sección 2). En particular:
+
+  - NO tocar el registro MX (correo humano de Google Workspace,
+    @cosmiceaglejourney.com). Ninguno de estos 6 registros es un MX.
+  - NO tocar el CNAME de "mail." (apunta al dominio raíz). Ninguno de estos
+    registros usa el nombre "mail.".
+  - NO delegar los nameservers a Vercel. La opción que ofrece el panel de
+    Vercel de "cambiar nameservers" NO se usa: le entregaría todo el DNS del
+    dominio a Vercel y rompería el correo de Google Workspace a menos que se
+    recreen a mano todos los registros existentes (MX, SPF, etc.). Se usa
+    solamente el registro A puntual de la sección 2.
+
+El corte real del sitio (que cosmiceaglejourney.com muestre la web nueva en
+vez de la vieja) recién pasa cuando se carga el registro A de la sección 2.
+Hasta ese momento se puede cargar todo lo demás sin ningún efecto visible.
+
+En Cloudflare: TODOS los registros de este documento van en modo
+"DNS only" (ícono de nube gris, NO nube naranja/proxied). Los CNAME de
+Resend proxeados no verifican, y los A de Vercel proxeados ponen a
+Cloudflare delante de Vercel (certificado y caché duplicados).
+
+===============================================================================
+SECCIÓN 1 — RESEND (verificación del dominio de envío de correo)
+===============================================================================
+
+Cargar estos 4 registros tal cual. Ninguno usa el nombre "mail.", así que no
+chocan con el CNAME del sitio viejo.
+
+  Tipo    Nombre                  Valor
+  ----    ----------------------  ----------------------------------------------------------------------------------------------------
+  TXT     resend._domainkey       p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC9yqKsDpTEaRtpLexeW1Ow2I7Xf8z+XMsre9RpeAx74caH+P45FdBYb7Pc4ukblNlOjaxsLFDFAEqC0OoU+Bzpf8qLtXJxikNJtP0hv7NG5EBHUB5CWSbFurdZs2YvG4Ta2xQqpbKHW/1J3wyhPaz2Pc9HhgpGFogCqSe35Z8tywIDAQAB
+  CNAME   rsend                   rsend-sae1.forge.rmta.net
+  CNAME   send                    send.forge.rmta.net
+  TXT     _dmarc                  v=DMARC1; p=none;
+
+Notas:
+  - El TXT de _dmarc es NUEVO (hoy el dominio no tiene DMARC). Si el panel
+    ya muestra un registro _dmarc existente, avisar antes de sobrescribirlo
+    — no debería haber ninguno, pero conviene confirmar.
+  - Este SPF no se fusiona con el que ya exista para el correo humano: los
+    subdominios de envío (rsend./send.) no heredan el SPF del dominio raíz,
+    así que no hay conflicto.
+  - Después de cargarlos, la verificación en el panel de Resend puede tardar
+    unos minutos a un par de horas en propagar.
+
+===============================================================================
+SECCIÓN 2 — VERCEL (apuntar el dominio al sitio nuevo)
+===============================================================================
+
+Es la opción "A/CNAME puntual" que ofrece Vercel, NO la de delegar
+nameservers (ver advertencia arriba).
+
+OJO, CORRECCIÓN DEL 29/09 — estos dos NO se agregan, se EDITAN:
+  - "@" ya tiene un registro A a 5.181.161.73 (el sitio viejo). Hay que
+    EDITAR ese registro y cambiarle el valor a 76.76.21.21. Si se agrega un
+    segundo A sin borrar el viejo, el tráfico se reparte al azar entre el
+    sitio viejo y el nuevo.
+  - "www" hoy es un CNAME a cosmiceaglejourney.com. Un nombre no puede tener
+    CNAME y A a la vez: hay que BORRAR ese CNAME y crear el A de abajo (o
+    editar el registro y cambiarle el tipo a A, si el panel lo permite).
+
+  Tipo    Nombre                    Valor
+  ----    ------------------------  --------------
+  A       @  (o cosmiceaglejourney.com, según cómo pida el nombre el panel)   76.76.21.21
+  A       www                                                                  76.76.21.21
+
+Estos valores salen directo del dashboard de Vercel (proyecto "cosmic-eagle",
+dominios cosmiceaglejourney.com y www.cosmiceaglejourney.com, agregados hoy
+23/09 para generar estos registros — quedan en estado "pendiente" hasta que
+se cargue el A).
+
+IMPORTANTE — este es el paso que corta el sitio viejo:
+  En el momento en que se carga el registro A de "@" (el apex, sin "www."),
+  cosmiceaglejourney.com deja de mostrar el sitio viejo (hoy en 5.181.161.73)
+  y empieza a mostrar el sitio nuevo. Es instantáneo en cuanto propaga el DNS
+  (minutos a un par de horas, según el TTL del registro anterior).
+
+  Recomendado: cargar primero el A de "www" y confirmar en el dashboard de
+  Vercel que quedó verde ("Valid Configuration"). Recién ahí cargar el A del
+  apex ("@"), ya en el momento elegido para el corte — no antes.
+
+Qué NO se pierde al hacer este cambio:
+  - El MX de Google Workspace sigue intacto (correo humano de ellas).
+  - El CNAME de "mail." sigue intacto (apunta al raíz, así que desde ese
+    momento muestra el sitio nuevo; se puede borrar después, sin apuro).
+  - Los 4 registros de Resend de la sección 1 no se tocan.
+
+===============================================================================
+VERIFICACIÓN DESPUÉS DE CARGAR TODO
+===============================================================================
+
+  1. Panel de Resend → Domains → cosmiceaglejourney.com: tiene que pasar a
+     "Verified" (los 3 registros de la sección 1 en verde).
+  2. Panel de Vercel → proyecto cosmic-eagle → Settings → Domains: los dos
+     dominios (cosmiceaglejourney.com y www.cosmiceaglejourney.com) tienen
+     que pasar a "Valid Configuration".
+  3. Abrir https://cosmiceaglejourney.com en el navegador (probar en
+     incógnito o con caché vacía) y confirmar que carga el sitio nuevo.
+  4. Confirmar que el correo humano (@cosmiceaglejourney.com) sigue andando
+     — mandar un mail de prueba.
+
+===============================================================================
+INVENTARIO DE LO QUE EXISTE HOY (dig, 29/09) — para el plan B
+===============================================================================
+
+  Tipo    Nombre              Valor
+  ----    ------------------  ----------------------------------------------
+  A       @                   5.181.161.73        (sitio viejo; pasa a Vercel)
+  CNAME   www                 cosmiceaglejourney.com
+  CNAME   mail                cosmiceaglejourney.com
+  CNAME   ftp                 cosmiceaglejourney.com
+  MX      @                   SMTP.GOOGLE.COM  (prioridad 1)
+  TXT     @                   v=spf1 include:_spf.google.com ~all
+  TXT     @                   google-site-verification=fMmCSs6uytgkY-cV4YWdbKLu-KVI0idb62fZ63ywOwg
+  TXT     google._domainkey   v=DKIM1; k=rsa; p=... (DKIM de Google Workspace:
+                              copiarlo COMPLETO desde el panel de Cloudflare
+                              o desde el admin de Google Workspace)
+
+  El DNS no deja listar la zona entera: si se pasa al plan B, exportar la
+  zona desde Cloudflare (DNS → Records → Export) es lo único que garantiza
+  no olvidarse de nada. Este inventario sale de probar nombres comunes.
+
+Cualquier duda antes de cargar esto, consultar a Ignacio.

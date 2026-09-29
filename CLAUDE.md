@@ -396,11 +396,10 @@ veces en el mismo archivo y el cambio se cuela donde no va.
    Es lo único que separa al sistema de correos de funcionar. **No puede ser
    `mail.`** (ya existe como CNAME al sitio viejo). El acceso a Cloudflare es el
    camino crítico: la misma llave sirve para mudar el sitio después.
-2. **Traspaso de cuentas**: Supabase pasa a Sofía (quedar como miembro con
-   permisos o se pierden el SQL, las migraciones y el MCP — el `project ref` y
-   las llaves **no** cambian en una transferencia). Resend se crea con una
-   casilla de ellas. Confirmar que `contacto@cosmiceaglejourney.com` existe: es
-   el `reply_to` de todo y Resend no tiene bandeja de entrada.
+2. **Traspaso de cuentas: hecho el 29/09** — Supabase y Resend ya son de
+   ellas (el `project ref` y las llaves no cambian en una transferencia). Queda
+   confirmar que `contacto@cosmiceaglejourney.com` existe: es el `reply_to` de
+   todo y Resend no tiene bandeja de entrada.
 3. **Las 5 preguntas de pagos** sin responder (`docs/consulta-sofia-pagos.txt`):
    cuotas, plazo, qué pasa si no paga, la tarjeta, el riel del saldo.
 4. **Los cuatro corchetes de las páginas legales** — el país define si aplica la
