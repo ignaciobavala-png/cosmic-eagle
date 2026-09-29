@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { Camera } from "lucide-react";
 import { updateAvatar, type AvatarState } from "./actions";
 
@@ -13,6 +14,7 @@ export function AvatarUpload({
   avatarUrl: string | null;
   fallbackLabel: string;
 }) {
+  const t = useTranslations("Cuenta");
   const [state, formAction, pending] = useActionState(updateAvatar, initialState);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -21,11 +23,11 @@ export function AvatarUpload({
       <label
         htmlFor="avatar"
         className="relative group cursor-pointer"
-        aria-label="Cambiar foto de perfil"
+        aria-label={t("avatar.change")}
       >
         <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 border-primary-container/45 bg-white/[0.06]">
           {avatarUrl ? (
-            <img src={avatarUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
+            <img src={avatarUrl} alt={t("avatar.alt")} className="w-full h-full object-cover" />
           ) : (
             <span className="font-display text-3xl text-primary-container">{fallbackLabel}</span>
           )}
@@ -43,7 +45,7 @@ export function AvatarUpload({
           onChange={() => formRef.current?.requestSubmit()}
         />
       </label>
-      {pending && <p className="text-xs text-white/60">Subiendo...</p>}
+      {pending && <p className="text-xs text-white/60">{t("avatar.uploading")}</p>}
       {state.error && (
         <p className="text-xs text-[#ffb4a8]" role="alert">
           {state.error}

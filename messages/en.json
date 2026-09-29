@@ -151,6 +151,114 @@
     "help": "Need help?",
     "close": "Close"
   },
+  "Cuenta": {
+    "meta": {
+      "recoverTitle": "Recover password",
+      "newPasswordTitle": "New password"
+    },
+    "errors": {
+      "expired": "The link expired or was already used. Request a new one from “Forgot your password?”.",
+      "invalid": "The link is not valid. Try requesting a new one.",
+      "passwordChanged": "Done, your password has been updated."
+    },
+    "titleLogin": "Welcome back",
+    "titleSignup": "Welcome",
+    "myAccount": "My Account",
+    "logout": "Log out",
+    "footer": {
+      "haveAccount": "Already have an account? <link>Log in</link>",
+      "noAccount": "Don't have an account? <link>Sign up</link>"
+    },
+    "login": {
+      "email": "Email",
+      "password": "Password",
+      "emailPlaceholder": "you@email.com",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "forgot": "Forgot your password?",
+      "pending": "Logging in...",
+      "submit": "Log in"
+    },
+    "signup": {
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Your first and last name",
+      "hint": "At least 8 characters.",
+      "pending": "Creating account...",
+      "submit": "Create account"
+    },
+    "recover": {
+      "eyebrow": "Recover access",
+      "title": "Get back in",
+      "subtitle": "Enter your email and we'll send you a link to create a new password.",
+      "back": "Back to log in",
+      "sentTitle": "If there is an account with that email, you'll receive a link to create a new password.",
+      "sentHint": "Check your spam folder too. The link expires in one hour and works only once.",
+      "pending": "Sending...",
+      "submit": "Send me the link"
+    },
+    "newPassword": {
+      "eyebrow": "New password",
+      "title": "Choose your password",
+      "subtitle": "You're changing the password for {email}.",
+      "password": "New password",
+      "confirm": "Repeat password",
+      "pending": "Saving...",
+      "submit": "Save password"
+    },
+    "avatar": {
+      "change": "Change profile photo",
+      "alt": "Profile photo",
+      "uploading": "Uploading..."
+    },
+    "applications": {
+      "empty": "You don't have any applications yet. Choose a trip in <link>Journeys</link> to apply.",
+      "approved": "Approved trips",
+      "mine": "My applications",
+      "trip": "Trip",
+      "tripFallback": "Trip",
+      "step": "Next step",
+      "date": "Date",
+      "status": "Status",
+      "dash": "—",
+      "waitingReview": "Waiting for review",
+      "willWrite": "We'll write to you",
+      "deposit": "Reserve with {deposit} or pay {price}",
+      "payMissing": "The payment of {price} is missing",
+      "payMissingNoTrip": "The payment is missing",
+      "balance": "The balance of {amount} is missing",
+      "balanceNoTrip": "The balance is missing",
+      "health": "Complete the health form",
+      "consent": "Sign the consent",
+      "done": "Up to date",
+      "statusLabel": {
+        "pending_review": "Under review",
+        "needs_conversation": "Let's talk",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "expired": "Expired"
+      }
+    },
+    "formErrors": {
+      "loginIncomplete": "Fill in your email and password.",
+      "emailNotConfirmed": "Confirm your email before logging in. Check your inbox.",
+      "badCredentials": "Wrong email or password.",
+      "signupIncomplete": "Fill in your name, email, and password.",
+      "shortPassword": "The password must have at least 8 characters.",
+      "userExists": "An account with that email already exists. Log in.",
+      "signupFailed": "We couldn't create the account. Please try again.",
+      "invalidEmail": "Enter a valid email.",
+      "updateIncomplete": "Fill in both fields.",
+      "mismatch": "The passwords don't match.",
+      "linkExpired": "The link expired. Request a new one from “Forgot your password?”.",
+      "samePassword": "The new password must be different from the previous one.",
+      "updateFailed": "We couldn't change the password. Please try again.",
+      "chooseImage": "Choose an image.",
+      "notImage": "The file must be an image.",
+      "tooBig": "The image can't exceed 3MB.",
+      "sessionExpired": "Session expired. Log in again.",
+      "uploadFailed": "We couldn't upload the image. Please try again."
+    }
+  },
   "Faqs": {
     "meta": {
       "title": "Frequently asked questions | Cosmic Eagle",

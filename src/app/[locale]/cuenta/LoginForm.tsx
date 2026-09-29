@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { login, type LoginState } from "./actions";
@@ -17,6 +18,7 @@ import {
 const initialState: LoginState = { error: null };
 
 export function LoginForm({ next }: { next?: string }) {
+  const t = useTranslations("Cuenta");
   const [state, formAction, pending] = useActionState(login, initialState);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -26,7 +28,7 @@ export function LoginForm({ next }: { next?: string }) {
 
       <div className={fieldWrap}>
         <label htmlFor="email" className={fieldLabel}>
-          Email
+          {t("login.email")}
         </label>
         <input
           id="email"
@@ -34,14 +36,14 @@ export function LoginForm({ next }: { next?: string }) {
           type="email"
           required
           autoComplete="email"
-          placeholder="tu@email.com"
+          placeholder={t("login.emailPlaceholder")}
           className={fieldInput}
         />
       </div>
 
       <div className={fieldWrap}>
         <label htmlFor="password" className={fieldLabel}>
-          Contraseña
+          {t("login.password")}
         </label>
         <div className="relative">
           <input
@@ -56,7 +58,7 @@ export function LoginForm({ next }: { next?: string }) {
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            aria-label={showPassword ? t("login.hidePassword") : t("login.showPassword")}
             className={fieldToggle}
           >
             {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
@@ -70,7 +72,7 @@ export function LoginForm({ next }: { next?: string }) {
         href="/cuenta/recuperar"
         className="-mt-1.5 mb-6.5 block text-right text-[12.5px] text-white/55 transition-colors duration-200 hover:text-primary-container"
       >
-        ¿Olvidaste tu contraseña?
+        {t("login.forgot")}
       </Link>
 
       {state.error && (
@@ -80,7 +82,7 @@ export function LoginForm({ next }: { next?: string }) {
       )}
 
       <button type="submit" disabled={pending} className={submitButton}>
-        {pending ? "Ingresando..." : "Ingresar"}
+        {pending ? t("login.pending") : t("login.submit")}
       </button>
     </form>
   );

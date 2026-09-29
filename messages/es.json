@@ -151,6 +151,114 @@
     "help": "¿Necesitas ayuda?",
     "close": "Cerrar"
   },
+  "Cuenta": {
+    "meta": {
+      "recoverTitle": "Recuperar contraseña",
+      "newPasswordTitle": "Nueva contraseña"
+    },
+    "errors": {
+      "expired": "El enlace venció o ya se usó. Pide uno nuevo desde “¿Olvidaste tu contraseña?”.",
+      "invalid": "El enlace no es válido. Prueba pidiendo uno nuevo.",
+      "passwordChanged": "Listo, tu contraseña quedó actualizada."
+    },
+    "titleLogin": "Hola de nuevo",
+    "titleSignup": "Bienvenido",
+    "myAccount": "Mi Cuenta",
+    "logout": "Cerrar sesión",
+    "footer": {
+      "haveAccount": "¿Ya tienes cuenta? <link>Inicia sesión</link>",
+      "noAccount": "¿No tienes cuenta? <link>Regístrate</link>"
+    },
+    "login": {
+      "email": "Email",
+      "password": "Contraseña",
+      "emailPlaceholder": "tu@email.com",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
+      "forgot": "¿Olvidaste tu contraseña?",
+      "pending": "Ingresando...",
+      "submit": "Ingresar"
+    },
+    "signup": {
+      "fullName": "Nombre completo",
+      "fullNamePlaceholder": "Tu nombre y apellido",
+      "hint": "Mínimo 8 caracteres.",
+      "pending": "Creando cuenta...",
+      "submit": "Crear cuenta"
+    },
+    "recover": {
+      "eyebrow": "Recuperar acceso",
+      "title": "Volver a entrar",
+      "subtitle": "Escribe tu email y te mandamos un enlace para crear una contraseña nueva.",
+      "back": "Volver al inicio de sesión",
+      "sentTitle": "Si hay una cuenta con ese email, te llega un enlace para crear una contraseña nueva.",
+      "sentHint": "Revisa también la carpeta de spam. El enlace vence en una hora y sirve una sola vez.",
+      "pending": "Enviando...",
+      "submit": "Enviarme el enlace"
+    },
+    "newPassword": {
+      "eyebrow": "Nueva contraseña",
+      "title": "Elige tu clave",
+      "subtitle": "Estás cambiando la contraseña de {email}.",
+      "password": "Contraseña nueva",
+      "confirm": "Repetir contraseña",
+      "pending": "Guardando...",
+      "submit": "Guardar contraseña"
+    },
+    "avatar": {
+      "change": "Cambiar foto de perfil",
+      "alt": "Foto de perfil",
+      "uploading": "Subiendo..."
+    },
+    "applications": {
+      "empty": "Todavía no tienes solicitudes. Elige un viaje en <link>Viajes</link> para postularte.",
+      "approved": "Viajes aprobados",
+      "mine": "Mis solicitudes",
+      "trip": "Viaje",
+      "tripFallback": "Viaje",
+      "step": "Paso siguiente",
+      "date": "Fecha",
+      "status": "Estado",
+      "dash": "—",
+      "waitingReview": "Esperando revisión",
+      "willWrite": "Te vamos a escribir",
+      "deposit": "Reservá con {deposit} o pagá {price}",
+      "payMissing": "Falta el pago de {price}",
+      "payMissingNoTrip": "Falta el pago",
+      "balance": "Falta el saldo de {amount}",
+      "balanceNoTrip": "Falta el saldo",
+      "health": "Completar formulario de salud",
+      "consent": "Firmar el consentimiento",
+      "done": "Al día",
+      "statusLabel": {
+        "pending_review": "En revisión",
+        "needs_conversation": "Conversemos",
+        "approved": "Aprobada",
+        "rejected": "Rechazada",
+        "expired": "Expirada"
+      }
+    },
+    "formErrors": {
+      "loginIncomplete": "Completa email y contraseña.",
+      "emailNotConfirmed": "Confirma tu email antes de iniciar sesión. Revisa tu bandeja de entrada.",
+      "badCredentials": "Email o contraseña incorrectos.",
+      "signupIncomplete": "Completa nombre, email y contraseña.",
+      "shortPassword": "La contraseña debe tener al menos 8 caracteres.",
+      "userExists": "Ya existe una cuenta con ese email. Inicia sesión.",
+      "signupFailed": "No se pudo crear la cuenta. Prueba de nuevo.",
+      "invalidEmail": "Ingresa un email válido.",
+      "updateIncomplete": "Completa los dos campos.",
+      "mismatch": "Las contraseñas no coinciden.",
+      "linkExpired": "El enlace venció. Pide uno nuevo desde “¿Olvidaste tu contraseña?”.",
+      "samePassword": "La contraseña nueva tiene que ser distinta de la anterior.",
+      "updateFailed": "No se pudo cambiar la contraseña. Prueba de nuevo.",
+      "chooseImage": "Elige una imagen.",
+      "notImage": "El archivo debe ser una imagen.",
+      "tooBig": "La imagen no puede superar los 3MB.",
+      "sessionExpired": "Sesión expirada. Vuelve a iniciar sesión.",
+      "uploadFailed": "No se pudo subir la imagen. Prueba de nuevo."
+    }
+  },
   "Faqs": {
     "meta": {
       "title": "Preguntas frecuentes | Cosmic Eagle",

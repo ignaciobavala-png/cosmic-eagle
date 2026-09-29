@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { requestPasswordReset, type RecoverState } from "./actions";
 import {
   fieldInput,
@@ -13,6 +14,7 @@ import {
 const initialState: RecoverState = { error: null, sent: false };
 
 export function RecoverForm() {
+  const t = useTranslations("Cuenta");
   const [state, formAction, pending] = useActionState(
     requestPasswordReset,
     initialState
@@ -21,14 +23,8 @@ export function RecoverForm() {
   if (state.sent) {
     return (
       <div className="rounded-lg border border-white/[0.18] bg-white/5 p-6">
-        <p className="text-white">
-          Si hay una cuenta con ese email, te llega un enlace para crear una
-          contraseña nueva.
-        </p>
-        <p className="mt-3 text-sm text-white/60">
-          Revisa también la carpeta de spam. El enlace vence en una hora y sirve
-          una sola vez.
-        </p>
+        <p className="text-white">{t("recover.sentTitle")}</p>
+        <p className="mt-3 text-sm text-white/60">{t("recover.sentHint")}</p>
       </div>
     );
   }
@@ -37,7 +33,7 @@ export function RecoverForm() {
     <form action={formAction}>
       <div className={fieldWrap}>
         <label htmlFor="recover-email" className={fieldLabel}>
-          Email
+          {t("login.email")}
         </label>
         <input
           id="recover-email"
@@ -45,7 +41,7 @@ export function RecoverForm() {
           type="email"
           required
           autoComplete="email"
-          placeholder="tu@email.com"
+          placeholder={t("login.emailPlaceholder")}
           className={fieldInput}
         />
       </div>
@@ -57,7 +53,7 @@ export function RecoverForm() {
       )}
 
       <button type="submit" disabled={pending} className={submitButton}>
-        {pending ? "Enviando..." : "Enviarme el enlace"}
+        {pending ? t("recover.pending") : t("recover.submit")}
       </button>
     </form>
   );

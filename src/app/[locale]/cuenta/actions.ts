@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteUrl } from "@/lib/site-url";
 import { revalidatePath } from "next/cache";
@@ -16,12 +17,13 @@ export async function login(
   _prevState: LoginState,
   formData: FormData
 ): Promise<LoginState> {
+  const t = await getTranslations("Cuenta");
   const email = formData.get("email");
   const password = formData.get("password");
   const next = formData.get("next");
 
   if (typeof email !== "string" || typeof password !== "string") {
-    return { error: "Completa email y contraseña." };
+    return { error: t("formErrors.loginIncomplete") };
   }
 
   const supabase = await createClient();
@@ -32,9 +34,9 @@ export async function login(
 
   if (error) {
     if (error.code === "email_not_confirmed") {
-      return { error: "Confirma tu email antes de iniciar sesión. Revisa tu bandeja de entrada." };
+      return { error: t("formErrors.emailNotConfirmed") };
     }
-    return { error: "Email o contraseña incorrectos." };
+    return { error: t("formErrors.badCredentials") };
   }
 
   revalidatePath(publicPath("/"), "layout");
@@ -56,6 +58,7 @@ export async function signup(
   _prevState: SignupState,
   formData: FormData
 ): Promise<SignupState> {
+  const t = await getTranslations("Cuenta");
   const email = formData.get("email");
   const password = formData.get("password");
   const fullName = formData.get("full_name");
@@ -67,11 +70,11 @@ export async function signup(
     typeof fullName !== "string" ||
     fullName.trim().length === 0
   ) {
-    return { error: "Completa nombre, email y contraseña." };
+    return { error: t("formErrors.signupIncomplete") };
   }
 
   if (password.length < 8) {
-    return { error: "La contraseña debe tener al menos 8 caracteres." };
+    return { error: t("formErrors.shortPassword") };
   }
 
   const supabase = await createClient();
@@ -89,9 +92,9 @@ export async function signup(
 
   if (error) {
     if (error.code === "user_already_exists") {
-      return { error: "Ya existe una cuenta con ese email. Inicia sesión." };
+      return { error: t("formErrors.userExists") };
     }
-    return { error: "No se pudo crear la cuenta. Prueba de nuevo." };
+    return { error: t("formErrors.signupFailed") };
   }
 
   revalidatePath(publicPath("/"), "layout");
@@ -110,10 +113,11 @@ export async function requestPasswordReset(
   _prevState: RecoverState,
   formData: FormData
 ): Promise<RecoverState> {
+  const t = await getTranslations("Cuenta");
   const email = formData.get("email");
 
   if (typeof email !== "string" || !email.includes("@")) {
-    return { error: "Ingresa un email válido.", sent: false };
+    return { error: t("formErrors.invalidEmail"), sent: false };
   }
 
   const supabase = await createClient();
@@ -135,19 +139,20 @@ export async function updatePassword(
   _prevState: NewPasswordState,
   formData: FormData
 ): Promise<NewPasswordState> {
+  const t = await getTranslations("Cuenta");
   const password = formData.get("password");
   const confirm = formData.get("password_confirm");
 
   if (typeof password !== "string" || typeof confirm !== "string") {
-    return { error: "Completa los dos campos." };
+    return { error: t("formErrors.updateIncomplete") };
   }
 
   if (password.length < 8) {
-    return { error: "La contraseña debe tener al menos 8 caracteres." };
+    return { error: t("formErrors.shortPassword") };
   }
 
   if (password !== confirm) {
-    return { error: "Las contraseñas no coinciden." };
+    return { error: t("formErrors.mismatch") };
   }
 
   const supabase = await createClient();
@@ -156,16 +161,16 @@ export async function updatePassword(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "El enlace venció. Pide uno nuevo desde “¿Olvidaste tu contraseña?”." };
+    return { error: t("formErrors.linkExpired") };
   }
 
   const { error } = await supabase.auth.updateUser({ password });
 
   if (error) {
     if (error.code === "same_password") {
-      return { error: "La contraseña nueva tiene que ser distinta de la anterior." };
+      return { error: t("formErrors.samePassword") };
     }
-    return { error: "No se pudo cambiar la contraseña. Prueba de nuevo." };
+    return { error: t("formErrors.updateFailed") };
   }
 
   revalidatePath(publicPath("/"), "layout");
@@ -176,18 +181,19 @@ export async function updateAvatar(
   _prevState: AvatarState,
   formData: FormData
 ): Promise<AvatarState> {
+  const t = await getTranslations("Cuenta");
   const file = formData.get("avatar");
 
   if (!(file instanceof File) || file.size === 0) {
-    return { error: "Elige una imagen." };
+    return { error: t("formErrors.chooseImage") };
   }
 
   if (!file.type.startsWith("image/")) {
-    return { error: "El archivo debe ser una imagen." };
+    return { error: t("formErrors.notImage") };
   }
 
   if (file.size > 3 * 1024 * 1024) {
-    return { error: "La imagen no puede superar los 3MB." };
+    return { error: t("formErrors.tooBig") };
   }
 
   const supabase = await createClient();
@@ -196,7 +202,7 @@ export async function updateAvatar(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "Sesión expirada. Vuelve a iniciar sesión." };
+    return { error: t("formErrors.sessionExpired") };
   }
 
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
@@ -207,7 +213,7 @@ export async function updateAvatar(
     .upload(path, file, { upsert: true, contentType: file.type });
 
   if (uploadError) {
-    return { error: "No se pudo subir la imagen. Prueba de nuevo." };
+    return { error: t("formErrors.uploadFailed") };
   }
 
   const {
