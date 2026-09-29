@@ -151,6 +151,16 @@
     "help": "Need help?",
     "close": "Close"
   },
+  "Testimonials": {
+    "prev": "Previous testimonial",
+    "next": "Next testimonial",
+    "view": "See the testimonial from {name}"
+  },
+  "NotFound": {
+    "title": "Lost Portal",
+    "body": "This dimension doesn't exist on our cosmic map. Perhaps the vibrational frequency of this path has faded into space-time.",
+    "cta": "Back to home"
+  },
   "Cuenta": {
     "meta": {
       "recoverTitle": "Recover password",

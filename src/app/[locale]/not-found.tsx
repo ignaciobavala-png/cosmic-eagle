@@ -1,8 +1,11 @@
 import { Link } from "@/i18n/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { getTranslations } from "next-intl/server";
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getTranslations("NotFound");
+
   return (
     <>
       <Header />
@@ -14,18 +17,16 @@ export default function NotFound() {
             404
           </span>
           <h1 className="font-display text-[32px] md:text-[40px] font-medium text-primary-fixed-dim -mt-8 mb-4">
-            Portal Perdido
+            {t("title")}
           </h1>
           <p className="text-on-surface-variant max-w-md mb-10 leading-relaxed">
-            Esta dimensión no existe en nuestro mapa cósmico. Quizás la
-            frecuencia vibratoria de esta ruta se ha desvanecido en el
-            espacio-tiempo.
+            {t("body")}
           </p>
           <Link
             href="/"
             className="px-8 py-4 bg-primary-container text-on-primary text-sm font-semibold tracking-[0.1em] rounded-full hover:shadow-[0_0_20px_rgba(227,195,125,0.5)] transition-all duration-300"
           >
-            Volver al Inicio
+            {t("cta")}
           </Link>
         </div>
       </main>

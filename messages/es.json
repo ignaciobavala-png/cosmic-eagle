@@ -151,6 +151,16 @@
     "help": "¿Necesitas ayuda?",
     "close": "Cerrar"
   },
+  "Testimonials": {
+    "prev": "Testimonio anterior",
+    "next": "Testimonio siguiente",
+    "view": "Ver el testimonio de {name}"
+  },
+  "NotFound": {
+    "title": "Portal Perdido",
+    "body": "Esta dimensión no existe en nuestro mapa cósmico. Quizás la frecuencia vibratoria de esta ruta se ha desvanecido en el espacio-tiempo.",
+    "cta": "Volver al Inicio"
+  },
   "Cuenta": {
     "meta": {
       "recoverTitle": "Recuperar contraseña",

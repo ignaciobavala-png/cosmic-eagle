@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Testimonial } from "@/lib/testimonials";
@@ -60,6 +61,7 @@ export function TestimonialViewer({
   /** Los puntos de abajo. Sin ellos, las flechas son el único control. */
   dots?: boolean;
 }) {
+  const tr = useTranslations("Testimonials");
   const reduced = useReducedMotion();
   const [activo, setActivo] = useState(0);
   const [pausado, setPausado] = useState(false);
@@ -137,7 +139,7 @@ export function TestimonialViewer({
               key={otro.id}
               type="button"
               onClick={() => setActivo(i)}
-              aria-label={`Ver el testimonio de ${otro.author_name}`}
+              aria-label={tr("view", { name: otro.author_name })}
               aria-current={i === activo}
               className={`h-1.5 w-1.5 rounded-full transition-[background-color,transform] duration-200 ${
                 i === activo
@@ -168,15 +170,14 @@ function Flecha({
   hacia: "anterior" | "siguiente";
   onClick: () => void;
 }) {
+  const t = useTranslations("Testimonials");
   const Icono = hacia === "anterior" ? ChevronLeft : ChevronRight;
 
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label={
-        hacia === "anterior" ? "Testimonio anterior" : "Testimonio siguiente"
-      }
+      aria-label={hacia === "anterior" ? t("prev") : t("next")}
       className="shrink-0 p-3 text-primary-container/45 transition-colors duration-300 hover:text-primary-container focus-visible:text-primary-container"
     >
       <Icono className="h-5 w-5" strokeWidth={1} aria-hidden="true" />
