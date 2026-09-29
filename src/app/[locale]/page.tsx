@@ -12,6 +12,7 @@ import { TitleRule } from "@/components/ui/TitleRule";
 import { FaqList } from "@/components/ui/FaqList";
 import { HOME_FAQS } from "@/lib/home-faqs";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 /**
  * Home según el rediseño de Julia (`HOMEPAGE.html`, ver
@@ -28,7 +29,10 @@ import { getSiteContent, isEnabled } from "@/lib/site-content";
  * que la clienta ya subió: `home.frase.*` pasa a ser la frase manifiesto grande
  * y `home.promesas.image` el fondo de la frase atmosférica.
  */
-export default async function Home() {
+export default async function Home({ params }: PageProps<"/[locale]">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Home");
   const content = await getSiteContent();
 
   return (
@@ -51,7 +55,7 @@ export default async function Home() {
             borra: lo usa el recorrido de capturas. */}
         <ImmersiveHero
           image={content("home.hero.image")}
-          imageAlt="Figura de partículas mirando hacia el cosmos"
+          imageAlt={t("heroAlt")}
           height="full"
           // Pedido de la organización, 23/09: "mucho más lento... la sensación
           // general debe ser lenta, profunda, elegante y contemplativa". A la

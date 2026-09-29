@@ -12,7 +12,7 @@ import {
   LogOut,
   Menu,
 } from "lucide-react";
-import { logout } from "@/app/cuenta/actions";
+import { logout } from "@/app/[locale]/cuenta/actions";
 
 /**
  * Las secciones, agrupadas por TAREA y no por orden de construccion, que es

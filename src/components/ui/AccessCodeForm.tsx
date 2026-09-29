@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { KeyRound } from "lucide-react";
-import { redeemAccessCode, type RedeemState } from "@/app/contenidos/actions";
+import { redeemAccessCode, type RedeemState } from "@/app/[locale]/contenidos/actions";
 import { CTA_TONES } from "./CtaLink";
 
 /**

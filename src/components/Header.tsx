@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useSignedIn } from "@/lib/use-signed-in";
 import { AnimatePresence, motion } from "framer-motion";
 import { CtaLink } from "@/components/ui/CtaLink";
+import { LocaleSwitch } from "@/components/LocaleSwitch";
 import {
   Menu,
   X,
@@ -378,6 +379,7 @@ export function Header() {
           </ul>
 
           <div className="flex shrink-0 items-center justify-end gap-4 justify-self-end">
+            <LocaleSwitch className="hidden md:flex" />
             {profile ? (
               <Link
                 href={profile.isAdmin ? "/admin" : "/cuenta"}

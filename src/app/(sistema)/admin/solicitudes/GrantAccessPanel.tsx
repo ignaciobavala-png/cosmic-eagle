@@ -3,7 +3,7 @@
 import {
   grantProgramAccess,
   revokeContentGrant,
-} from "@/app/admin/acceso/actions";
+} from "@/app/(sistema)/admin/acceso/actions";
 
 /**
  * Estado del acceso a contenidos de esta persona. **No es un formulario**: al
