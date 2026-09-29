@@ -97,6 +97,53 @@
     "tecnologia": "Human Technology",
     "testimonios": "Testimonials"
   },
+  "Nosotros": {
+    "meta": {
+      "title": "About us | Cosmic Eagle",
+      "description": "Our approach brings together ancestral and galactic knowledge, cosmic technologies, and consciousness practices to support processes of transformation, liberation, and reconnection with the soul."
+    },
+    "hero": {
+      "imageAlt": "Silhouettes of souls in particles of light",
+      "scrollHint": "Get to know us"
+    },
+    "words": [
+      "Release",
+      "Remember",
+      "Reconnect",
+      "Embody"
+    ],
+    "somos": {
+      "p1": "We are researchers and explorers passionate about consciousness, human transformation, and the nature of reality.",
+      "p2": "Our work draws on the exploration of metaphysics, ancient civilizations, spiritual philosophies, healing traditions, wellbeing practices, consciousness studies, and cosmic knowledge.",
+      "p3": "We exist for those who feel the call to go beyond personal transformation and enter a deeper evolutionary process: expanding consciousness, releasing limiting patterns, strengthening the connection with the soul, and exploring the capacities that can emerge as that connection deepens.",
+      "p4": "Through a body of knowledge in constant evolution, cosmic practices, and technologies, we offer a path toward remembering and embodying the light, the intelligence, and the potential that exist within every human being.",
+      "scrollHint": "Our purpose"
+    },
+    "purpose": {
+      "title": "Our purpose",
+      "p1": "Our purpose is to <strong>fuel human evolution</strong>, creating spaces that allow each person to transform their reality, expand their consciousness, and deepen the connection with their soul.",
+      "p2": "We accompany people at different stages of this path: from those beginning a process of deep <strong>transformation</strong>, to healers, guides, and experienced practitioners entering new stages of <strong>evolution</strong>, development, and service."
+    },
+    "quote": "Our role is not to define what someone should experience or become, but to create the conditions for their own process to unfold.",
+    "videoAlt": "A lit ceremony circle",
+    "enfoque": {
+      "title": "Our approach",
+      "p1": "This work is for people willing to go through deep processes of transformation and to release the structures that limit their evolution; for healers and practitioners seeking to open themselves to new forms of knowledge; for leaders who want to expand their capacities; and for those seeking greater clarity about the purpose and direction of their life.",
+      "p2": "For those already immersed in an evolutionary process, it also offers the possibility of accessing deeper layers of knowledge about consciousness, the soul, and human evolution."
+    },
+    "estela": {
+      "title": "Estela, founder",
+      "p1": "Estela has spent more than 25 years exploring consciousness, the mind, the soul, and human potential. Her path has been mainly experiential: a constant search to understand who we are, how we work, and how far we can evolve.",
+      "p2": "Over the years she has studied and experimented with different currents and tools, from psychology, metaphysics, and spiritual philosophies to yoga, meditation, Kundalini energy, conscious nutrition, energy practices, shamanism, plant medicine, and expanded states of consciousness.",
+      "p3": "Over time, this whole journey converged into a practice of her own to accompany processes of transformation and evolution. Her approach integrates ancestral knowledge, contemporary tools, energy practices, and what she calls cosmic knowledge: information and technologies she has been receiving and exploring through expanded states of consciousness and her connection with other dimensions and higher intelligences.",
+      "p4": "Today she accompanies people from different parts of the world in processes of releasing patterns and memories, reconnecting with the soul, expanding consciousness, spiritual awakening, and developing intuitive and energetic capacities. She also teaches and accompanies medicine men and women, therapists, and guides to deepen their own tools, expand their capacities, and take their practice to a new level."
+    },
+    "cierreAlt": "Cosmic texture",
+    "actions": {
+      "explorar": "Explore experiences",
+      "profundizar": "Go deeper"
+    }
+  },
   "Site": {
     "title": "Cosmic Eagle | Cosmic Wisdom for Human Evolution",
     "description": "Cosmic Eagle explores the deepest potential of human consciousness. Through immersive experiences, teachings, and integration practices, we reconnect with the intelligence of the soul."

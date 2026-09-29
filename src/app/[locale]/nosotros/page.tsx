@@ -12,12 +12,20 @@ import { TitleRule } from "@/components/ui/TitleRule";
 import { SymbolRow } from "@/components/ui/NosSymbols";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { IMAGES } from "@/lib/constants";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Nosotros | Cosmic Eagle",
-  description:
-    "Nuestro enfoque reúne conocimiento ancestral y galáctico, tecnologías cósmicas y prácticas de conciencia para sostener procesos de transformación, liberación y reconexión con el alma.",
-};
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/nosotros">): Promise<Metadata> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Nosotros");
+
+  return {
+    title: t("meta.title"),
+    description: t("meta.description"),
+  };
+}
 
 /**
  * /nosotros según el rediseño de Julia (`NOSOTROS.html`, ver
@@ -58,7 +66,12 @@ export const metadata: Metadata = {
  * metodología (hongos, dosis, seres de luz) que esta versión deja afuera quedó
  * guardado en docs/COPY_HUERFANO.md — no se perdió, falta decidir a dónde va.
  */
-export default async function NosotrosPage() {
+export default async function NosotrosPage({
+  params,
+}: PageProps<"/[locale]/nosotros">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Nosotros");
   const content = await getSiteContent();
   const cierreTitle = content("nosotros.cierre.title").trim();
 
@@ -68,10 +81,10 @@ export default async function NosotrosPage() {
       <main className="pt-[var(--navbar-h)]">
         <PageHero
           image={content("nosotros.hero.image")}
-          imageAlt="Siluetas de almas en partículas de luz"
+          imageAlt={t("hero.imageAlt")}
           title={renderTitle(content("nosotros.hero.title"))}
           subtitle={content("nosotros.hero.subtitle")}
-          scrollHint="Conocenos"
+          scrollHint={t("hero.scrollHint")}
           scrollTo="enfoque"
           height="full"
           overlay={isEnabled(content("nosotros.hero.overlay"))}
@@ -96,9 +109,7 @@ export default async function NosotrosPage() {
           className="relative flex w-full flex-col items-center justify-start bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile pt-[110px] pb-16 text-[#05125a] md:justify-center md:px-margin-desktop md:py-20"
         >
           <div id="nos-words-seq">
-            <WordSequence
-              words={["Liberar", "Recordar", "Reconectar", "Encarnar"]}
-            />
+            <WordSequence words={t.raw("words") as string[]} />
           </div>
           {/* Símbolo 1: se revela con su pantalla (delay 2.2s para no competir
               con la cascada de palabras) y se centra medido entre el final de
@@ -127,17 +138,18 @@ export default async function NosotrosPage() {
         <StickyStory
           id="somos"
           paragraphs={[
-            "Somos investigadores y exploradores apasionados de la conciencia, la transformación humana y la naturaleza de la realidad.",
-            "Nuestro trabajo se nutre de la exploración de la metafísica, las civilizaciones antiguas, las filosofías espirituales, las tradiciones de sanación, las prácticas de bienestar, los estudios de la conciencia y el conocimiento cósmico.",
-            "Existimos para quienes sienten el llamado de ir más allá de la transformación personal y entrar en un proceso evolutivo más profundo: expandir la conciencia, liberar patrones limitantes, fortalecer la conexión con el alma y explorar las capacidades que pueden emerger a medida que esa conexión se profundiza.",
-            <span key="cierre" className="font-semibold text-primary-container">
-              A través de un cuerpo de conocimiento en constante evolución,
-              prácticas y tecnologías cósmicas, ofrecemos un camino hacia el
-              recuerdo y la encarnación de la luz, la inteligencia y el
-              potencial que existen dentro de cada ser humano.
-            </span>,
+            t("somos.p1"),
+            t("somos.p2"),
+            t("somos.p3"),
+            t.rich("somos.p4", {
+              strong: (chunks) => (
+                <span className="font-semibold text-primary-container">
+                  {chunks}
+                </span>
+              ),
+            }),
           ]}
-          scrollHint={{ label: "Nuestro propósito", target: "#proposito" }}
+          scrollHint={{ label: t("somos.scrollHint"), target: "#proposito" }}
         />
 
         {/* Pantalla 3 — "Nuestro propósito". En mobile min-height 81vh y
@@ -169,7 +181,7 @@ export default async function NosotrosPage() {
             <div className="w-fit">
               <RevealItem y={0} duration={1} id="nos-proposito-title">
                 <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                  Nuestro propósito
+                  {t("purpose.title")}
                 </h2>
               </RevealItem>
               {/* Oro oscuro: sobre el dorado el `#f9d78f` de los otros filetes
@@ -190,19 +202,16 @@ export default async function NosotrosPage() {
             <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-justify [&_strong]:font-semibold [&_strong]:text-[#05125a]">
               <RevealItem y={14} duration={0.8} delay={0.15}>
               <p>
-                Nuestro propósito es{" "}
-                <strong>impulsar la evolución humana</strong>, creando espacios
-                que permitan a cada persona transformar su realidad, expandir
-                su conciencia y profundizar la conexión con su alma.
+                {t.rich("purpose.p1", {
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
               </p>
               </RevealItem>
               <RevealItem y={14} duration={0.8} delay={0.3} id="nos-proposito-close">
               <p>
-                Acompañamos a personas en distintas etapas de este camino:
-                desde quienes comienzan un proceso de profunda{" "}
-                <strong>transformación</strong>, hasta sanadores, guías y
-                practicantes experimentados que están entrando en nuevas
-                etapas de <strong>evolución</strong>, desarrollo y servicio.
+                {t.rich("purpose.p2", {
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
               </p>
               </RevealItem>
             </div>
@@ -241,9 +250,7 @@ export default async function NosotrosPage() {
         >
           <RevealItem y={20} duration={1}>
             <p className="mx-auto max-w-3xl font-display text-headline-md italic leading-snug md:text-headline-lg">
-              Nuestro rol no es definir lo que alguien debe experimentar o en
-              qué debe convertirse, sino crear las condiciones para que su
-              propio proceso se despliegue.
+              {t("quote")}
             </p>
           </RevealItem>
         </Reveal>
@@ -257,7 +264,7 @@ export default async function NosotrosPage() {
         <MediaStatement
           id="video"
           image={content("nosotros.proposito.image")}
-          imageAlt="Círculo de ceremonia iluminado"
+          imageAlt={t("videoAlt")}
           text={content("nosotros.frase")}
           amount={0.4}
           once={false}
@@ -337,7 +344,7 @@ export default async function NosotrosPage() {
             <div className="w-fit">
               <RevealItem y={0} duration={1} id="nos-enfoque-title">
                 <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                  Nuestro enfoque
+                  {t("enfoque.title")}
                 </h2>
               </RevealItem>
               {/* Oro oscuro, igual que en "Nuestro propósito": sobre este fondo
@@ -351,22 +358,10 @@ export default async function NosotrosPage() {
                 correcciones), donde ahora vive sola con jerarquía Nivel 1. */}
             <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-justify">
               <RevealItem y={14} duration={0.8} delay={0.15}>
-              <p>
-                Este trabajo está dirigido a personas dispuestas a atravesar
-                procesos profundos de transformación y liberar estructuras que
-                limitan su evolución; a sanadores y practicantes que buscan
-                abrirse a nuevas formas de conocimiento; a líderes que quieren
-                expandir sus capacidades; y a quienes buscan mayor claridad
-                sobre el propósito y el camino de su vida.
-              </p>
+              <p>{t("enfoque.p1")}</p>
               </RevealItem>
               <RevealItem y={14} duration={0.8} delay={0.3}>
-              <p>
-                Para quienes ya están inmersos en un proceso evolutivo, ofrece
-                también la posibilidad de acceder a capas más profundas de
-                conocimiento sobre la conciencia, el alma y la evolución
-                humana.
-              </p>
+              <p>{t("enfoque.p2")}</p>
               </RevealItem>
             </div>
           </div>
@@ -432,52 +427,23 @@ export default async function NosotrosPage() {
                     tratamiento, título en `primary-container` y cuerpo en el
                     tostado `#d0c5b4`. */}
                 <h2 className="font-display text-headline-md font-bold text-primary-container md:text-headline-lg">
-                  Estela, founder
+                  {t("estela.title")}
                 </h2>
               </RevealItem>
               <TitleRule grow className="mt-3 mb-6" />
             </div>
             <div className="space-y-6 text-body-md leading-relaxed text-justify">
               <RevealItem y={14} duration={0.8} delay={0.15}>
-                <p>
-                  Estela lleva más de 25 años explorando la conciencia, la mente,
-                  el alma y el potencial humano. Su camino ha sido principalmente
-                  experiencial: una búsqueda constante por comprender quiénes
-                  somos, cómo funcionamos y hasta dónde podemos evolucionar.
-                </p>
+                <p>{t("estela.p1")}</p>
               </RevealItem>
               <RevealItem y={14} duration={0.8} delay={0.3}>
-                <p>
-                  A lo largo de estos años ha estudiado y experimentado con
-                  distintas corrientes y herramientas, desde la psicología, la
-                  metafísica y las filosofías espirituales hasta el yoga, la
-                  meditación, la energía Kundalini, la nutrición consciente, las
-                  prácticas energéticas, el chamanismo, las plantas de poder y los
-                  estados expandidos de conciencia.
-                </p>
+                <p>{t("estela.p2")}</p>
               </RevealItem>
               <RevealItem y={14} duration={0.8} delay={0.45}>
-                <p>
-                  Con el tiempo, todo este recorrido fue convergiendo en una
-                  práctica propia para acompañar procesos de transformación y
-                  evolución. Su enfoque integra conocimiento ancestral,
-                  herramientas contemporáneas, prácticas energéticas y lo que ella
-                  llama conocimiento cósmico: información y tecnologías que ha ido
-                  recibiendo y explorando a través de estados expandidos de
-                  conciencia y de su conexión con otras dimensiones e
-                  inteligencias superiores.
-                </p>
+                <p>{t("estela.p3")}</p>
               </RevealItem>
               <RevealItem y={14} duration={0.8} delay={0.6}>
-                <p>
-                  Hoy acompaña a personas de distintas partes del mundo en
-                  procesos de liberación de patrones y memorias, reconexión con el
-                  alma, expansión de conciencia, despertar espiritual y desarrollo
-                  de capacidades intuitivas y energéticas. También enseña y
-                  acompaña a hombres y mujeres medicina, terapeutas y guías a
-                  profundizar en sus propias herramientas, expandir sus
-                  capacidades y llevar su práctica a un nuevo nivel.
-                </p>
+                <p>{t("estela.p4")}</p>
               </RevealItem>
             </div>
             {/* Frase final sacada a pedido de la organización (23/09, item 9
@@ -495,11 +461,11 @@ export default async function NosotrosPage() {
         <ClosingHero
           id="vision"
           image={content("nosotros.metodologia.image")}
-          imageAlt="Textura cósmica"
+          imageAlt={t("cierreAlt")}
           title={cierreTitle ? <CierreTitle text={cierreTitle} /> : null}
           actions={[
-            { label: "Explorar experiencias", href: "/viajes" },
-            { label: "Ir más profundo", href: "/contenidos" },
+            { label: t("actions.explorar"), href: "/viajes" },
+            { label: t("actions.profundizar"), href: "/contenidos" },
           ]}
           overlay={isEnabled(content("nosotros.metodologia.overlay"))}
         />

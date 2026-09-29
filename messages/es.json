@@ -97,6 +97,53 @@
     "tecnologia": "Tecnología Humana",
     "testimonios": "Testimonios"
   },
+  "Nosotros": {
+    "meta": {
+      "title": "Nosotros | Cosmic Eagle",
+      "description": "Nuestro enfoque reúne conocimiento ancestral y galáctico, tecnologías cósmicas y prácticas de conciencia para sostener procesos de transformación, liberación y reconexión con el alma."
+    },
+    "hero": {
+      "imageAlt": "Siluetas de almas en partículas de luz",
+      "scrollHint": "Conocenos"
+    },
+    "words": [
+      "Liberar",
+      "Recordar",
+      "Reconectar",
+      "Encarnar"
+    ],
+    "somos": {
+      "p1": "Somos investigadores y exploradores apasionados de la conciencia, la transformación humana y la naturaleza de la realidad.",
+      "p2": "Nuestro trabajo se nutre de la exploración de la metafísica, las civilizaciones antiguas, las filosofías espirituales, las tradiciones de sanación, las prácticas de bienestar, los estudios de la conciencia y el conocimiento cósmico.",
+      "p3": "Existimos para quienes sienten el llamado de ir más allá de la transformación personal y entrar en un proceso evolutivo más profundo: expandir la conciencia, liberar patrones limitantes, fortalecer la conexión con el alma y explorar las capacidades que pueden emerger a medida que esa conexión se profundiza.",
+      "p4": "A través de un cuerpo de conocimiento en constante evolución, prácticas y tecnologías cósmicas, ofrecemos un camino hacia el recuerdo y la encarnación de la luz, la inteligencia y el potencial que existen dentro de cada ser humano.",
+      "scrollHint": "Nuestro propósito"
+    },
+    "purpose": {
+      "title": "Nuestro propósito",
+      "p1": "Nuestro propósito es <strong>impulsar la evolución humana</strong>, creando espacios que permitan a cada persona transformar su realidad, expandir su conciencia y profundizar la conexión con su alma.",
+      "p2": "Acompañamos a personas en distintas etapas de este camino: desde quienes comienzan un proceso de profunda <strong>transformación</strong>, hasta sanadores, guías y practicantes experimentados que están entrando en nuevas etapas de <strong>evolución</strong>, desarrollo y servicio."
+    },
+    "quote": "Nuestro rol no es definir lo que alguien debe experimentar o en qué debe convertirse, sino crear las condiciones para que su propio proceso se despliegue.",
+    "videoAlt": "Círculo de ceremonia iluminado",
+    "enfoque": {
+      "title": "Nuestro enfoque",
+      "p1": "Este trabajo está dirigido a personas dispuestas a atravesar procesos profundos de transformación y liberar estructuras que limitan su evolución; a sanadores y practicantes que buscan abrirse a nuevas formas de conocimiento; a líderes que quieren expandir sus capacidades; y a quienes buscan mayor claridad sobre el propósito y el camino de su vida.",
+      "p2": "Para quienes ya están inmersos en un proceso evolutivo, ofrece también la posibilidad de acceder a capas más profundas de conocimiento sobre la conciencia, el alma y la evolución humana."
+    },
+    "estela": {
+      "title": "Estela, founder",
+      "p1": "Estela lleva más de 25 años explorando la conciencia, la mente, el alma y el potencial humano. Su camino ha sido principalmente experiencial: una búsqueda constante por comprender quiénes somos, cómo funcionamos y hasta dónde podemos evolucionar.",
+      "p2": "A lo largo de estos años ha estudiado y experimentado con distintas corrientes y herramientas, desde la psicología, la metafísica y las filosofías espirituales hasta el yoga, la meditación, la energía Kundalini, la nutrición consciente, las prácticas energéticas, el chamanismo, las plantas de poder y los estados expandidos de conciencia.",
+      "p3": "Con el tiempo, todo este recorrido fue convergiendo en una práctica propia para acompañar procesos de transformación y evolución. Su enfoque integra conocimiento ancestral, herramientas contemporáneas, prácticas energéticas y lo que ella llama conocimiento cósmico: información y tecnologías que ha ido recibiendo y explorando a través de estados expandidos de conciencia y de su conexión con otras dimensiones e inteligencias superiores.",
+      "p4": "Hoy acompaña a personas de distintas partes del mundo en procesos de liberación de patrones y memorias, reconexión con el alma, expansión de conciencia, despertar espiritual y desarrollo de capacidades intuitivas y energéticas. También enseña y acompaña a hombres y mujeres medicina, terapeutas y guías a profundizar en sus propias herramientas, expandir sus capacidades y llevar su práctica a un nuevo nivel."
+    },
+    "cierreAlt": "Textura cósmica",
+    "actions": {
+      "explorar": "Explorar experiencias",
+      "profundizar": "Ir más profundo"
+    }
+  },
   "Site": {
     "title": "Cosmic Eagle | Sabiduría Cósmica para la Evolución Humana",
     "description": "Cosmic Eagle explora el potencial más profundo de la conciencia humana. A través de experiencias inmersivas, enseñanzas y prácticas de integración, reconectamos con la inteligencia del alma."
