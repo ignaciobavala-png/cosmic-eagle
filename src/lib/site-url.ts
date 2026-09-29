@@ -1,6 +1,16 @@
 import { headers } from "next/headers";
 
 /**
+ * El mismo origen pero **sin consultar el request**: sirve para la metadata
+ * (`metadataBase`, hreflang, OG) que se resuelve antes de saber el host y no
+ * puede volver dinamica una pagina estatica. `getSiteUrl` sigue siendo el que
+ * decide la URL de los links de auth, que si necesitan el host real.
+ */
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://cosmic-eagle.vercel.app"
+).replace(/\/+$/, "");
+
+/**
  * Origen absoluto del sitio, para armar los links que Supabase mete adentro de
  * los mails de auth (recuperar clave, confirmar cuenta).
  *
