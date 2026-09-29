@@ -145,16 +145,16 @@ for (const ruta of ["/", "/nosotros", "/viajes", "/faqs"]) {
 }
 
 /**
- * El navbar es una banda OPACA de 84px. Sin `scroll-padding-top` cualquier
- * anclaje deja el arranque de la seccion debajo de el — y `#sesiones` y
- * `#viajes` son la navegacion principal a Experiencias.
+ * El navbar es una banda OPACA. Sin `scroll-padding-top` cualquier anclaje
+ * deja el arranque de la seccion debajo de el — y `#experiencias` y
+ * `#cartelera` son las dos secciones reales de /viajes (los viejos
+ * `#sesiones`/`#viajes` salieron con el rediseno del 24/09).
  */
 test("los anclajes no caen debajo del navbar", async ({ page }) => {
   await page.goto("/viajes");
   await page.waitForLoadState("load");
 
-  // "salud" salio de la lista el 17/09 con la seccion (ver COPY_HUERFANO §4).
-  for (const ancla of ["sesiones", "viajes"]) {
+  for (const ancla of ["experiencias", "cartelera"]) {
     await page.evaluate((id) => { location.hash = `#${id}`; }, ancla);
     await page.waitForTimeout(900);
 

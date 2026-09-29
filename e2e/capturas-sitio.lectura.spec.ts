@@ -146,22 +146,8 @@ test("recorrido por el sitio, sección por sección", async ({ page }) => {
     await irA(page, "#relato", 0.95);
     await capturar(
       page,
-      "Las cuatro palabras",
-      "Al final del recorrido las palabras se despegan del párrafo y viajan al centro. Ahí aparece el botón que abre la cartelera."
-    );
-
-    // La cartelera arranca cerrada (corrección de Julia del 02/09) y la abre el
-    // botón del relato, que vive 400vh más arriba.
-    await page.locator('#relato a[href="#calendario"]').click();
-    await page.waitForTimeout(2500);
-    // El botón despliega el panel y ademas salta hacia el, con scroll suave.
-    // Ese salto no deja la sección donde se la quiere fotografiar, asi que se
-    // vuelve a encuadrar a mano una vez que el panel terminó de abrir.
-    await irA(page, "#calendario", 0, 1200);
-    await capturar(
-      page,
-      "La cartelera de experiencias",
-      "El botón despliega el calendario: las sesiones y los viajes abiertos, en tarjetas que se mueven solas y se frenan al pasar el mouse."
+      "Las palabras clave",
+      "Al final del recorrido las palabras se despegan del párrafo y viajan al centro. Ahí queda el botón que lleva a Experiencias (la cartelera se sacó de la home el 23/09)."
     );
 
     await irA(page, "#atmosferica", 0.2);
@@ -178,20 +164,6 @@ test("recorrido por el sitio, sección por sección", async ({ page }) => {
       "Bloque de texto sobre fondo claro, con la píldora dorada que es el botón del sistema."
     );
 
-    await irA(page, "#experiencias", 0.1);
-    await capturar(
-      page,
-      "Sesiones y Viajes",
-      "El panel doble que separa los dos tipos de experiencia y lleva a cada uno."
-    );
-
-    await irA(page, "#voces", 0.1);
-    await capturar(
-      page,
-      "Voces de Luz",
-      "Los testimonios, arrastrables. Se cargan desde el panel y hoy hay once publicados."
-    );
-
     await irA(page, "#tecnologia", 0.1);
     await capturar(
       page,
@@ -200,8 +172,11 @@ test("recorrido por el sitio, sección por sección", async ({ page }) => {
     );
 
     // ─── El gate de sesión ───────────────────────────────────────────────────
+    // La cartelera ya no vive en la home: se muestra como capítulo aparte,
+    // sobre /viajes, donde está `#cartelera`.
     capitulo = "El gate de sesión";
-    await irA(page, "#calendario", 0.1, 800);
+    await abrir(page, "/viajes");
+    await irA(page, "#cartelera", 0.1, 800);
     /**
      * La pista de la cartelera lleva DOS juegos de tarjetas (es lo que hace el
      * loop sin salto), asi que la primera del DOM suele ser una copia recortada
@@ -209,13 +184,13 @@ test("recorrido por el sitio, sección por sección", async ({ page }) => {
      * pantalla, o el click cae sobre una tarjeta a medias.
      */
     const indice = await page.evaluate(() => {
-      const cards = [...document.querySelectorAll('#calendario a[href^="/viajes/"]')];
+      const cards = [...document.querySelectorAll('#cartelera a[href^="/viajes/"]')];
       return cards.findIndex((c) => {
         const r = c.getBoundingClientRect();
         return r.left > 60 && r.right < window.innerWidth - 60 && r.width > 200;
       });
     });
-    const tarjeta = page.locator('#calendario a[href^="/viajes/"]').nth(Math.max(0, indice));
+    const tarjeta = page.locator('#cartelera a[href^="/viajes/"]').nth(Math.max(0, indice));
     if (indice >= 0) {
       /**
        * Se clickea con el mouse en coordenadas, no con `locator.click()`.
@@ -277,15 +252,19 @@ test("recorrido por el sitio, sección por sección", async ({ page }) => {
       "La página a la que lleva «Experiencias» del navbar. El desplegable del menú baja directo a cada bloque."
     );
 
-    await irA(page, "#sesiones", 0.05);
+    await irA(page, "#experiencias", 0.05);
     await capturar(
       page,
-      "Sesiones Cósmicas",
-      "El bloque de las sesiones de un día, con su calendario desplegable y su banda de testimonios."
+      "Sesiones y Viajes",
+      "El bloque que separa los dos tipos de experiencia y lleva a cada uno."
     );
 
-    await irA(page, "#viajes", 0.05);
-    await capturar(page, "Viajes Cósmicos", "El mismo bloque, para los viajes de una semana.");
+    await irA(page, "#cartelera", 0.05);
+    await capturar(
+      page,
+      "La cartelera",
+      "Sesiones y viajes abiertos en tarjetas que se mueven solas y se frenan al pasar el mouse, con la banda de testimonios debajo."
+    );
 
 
     // ─── Contenidos ──────────────────────────────────────────────────────────
