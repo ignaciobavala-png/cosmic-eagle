@@ -1,3 +1,19 @@
+/**
+ * Los dos idiomas del sitio (docs/I18N.md). El tipo vive aca para que las
+ * funciones de formato no dependan de `next-intl`; el `es` por defecto mantiene
+ * funcionando a quien todavia llama sin pasar nada (el panel, los correos).
+ */
+export type FormatLocale = "es" | "en";
+
+const INTL_TAG: Record<FormatLocale, string> = {
+  es: "es-CL",
+  en: "en-US",
+};
+
+function intlTag(locale: FormatLocale = "es") {
+  return INTL_TAG[locale];
+}
+
 // Postgres `date` llega como "YYYY-MM-DD". Hay que parsearlo como UTC y
 // formatearlo en UTC: si no, el timezone local corre la fecha un dia hacia atras.
 function parseDate(iso: string) {
@@ -8,14 +24,19 @@ function parseDate(iso: string) {
  * Rango compacto para las tarjetas de viaje: "15 - 20 oct 2024".
  * Si el rango cruza de mes o de año, repite la parte que cambia.
  */
-export function formatDateRangeCompact(startDate: string, endDate: string) {
+export function formatDateRangeCompact(
+  startDate: string,
+  endDate: string,
+  locale: FormatLocale = "es"
+) {
   const start = parseDate(startDate);
   const end = parseDate(endDate);
+  const tag = intlTag(locale);
 
   const day = (d: Date) =>
-    d.toLocaleDateString("es-CL", { day: "numeric", timeZone: "UTC" });
+    d.toLocaleDateString(tag, { day: "numeric", timeZone: "UTC" });
   const monthYear = (d: Date) =>
-    d.toLocaleDateString("es-CL", {
+    d.toLocaleDateString(tag, {
       month: "short",
       year: "numeric",
       timeZone: "UTC",
@@ -33,11 +54,15 @@ export function formatDateRangeCompact(startDate: string, endDate: string) {
  * inicio del viaje, asi que se deriva sumando dias a `start_date` — el programa
  * no guarda fechas propias (ver src/lib/trip-schedule.ts).
  */
-export function formatScheduleDay(startDate: string, day: number) {
+export function formatScheduleDay(
+  startDate: string,
+  day: number,
+  locale: FormatLocale = "es"
+) {
   const date = parseDate(startDate);
   date.setUTCDate(date.getUTCDate() + day - 1);
 
-  return date.toLocaleDateString("es-CL", {
+  return date.toLocaleDateString(intlTag(locale), {
     weekday: "long",
     day: "numeric",
     timeZone: "UTC",
@@ -56,6 +81,9 @@ export function formatScheduleDay(startDate: string, day: number) {
  * Es la unica funcion que imprime un precio: antes "USD" estaba escrito a mano
  * en tres pantallas y la cuarta lo omitia a proposito.
  */
-export function formatAmount(price: number): string {
-  return `USD ${new Intl.NumberFormat("es-CL", { maximumFractionDigits: 0 }).format(price)}`;
+export function formatAmount(
+  price: number,
+  locale: FormatLocale = "es"
+): string {
+  return `USD ${new Intl.NumberFormat(intlTag(locale), { maximumFractionDigits: 0 }).format(price)}`;
 }

@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import { formatAmount } from "@/lib/format";
+import { formatAmount, type FormatLocale } from "@/lib/format";
 import { panel, panelDivider } from "@/components/forms/styles";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -48,7 +48,10 @@ type Application = {
  * docs/FLUJO_INSCRIPCION.md), así que la tabla dice el paso siguiente en vez
  * de repetir el estado.
  */
-function pendingStep(a: Application): { label: string; href?: string } {
+function pendingStep(
+  a: Application,
+  locale: FormatLocale
+): { label: string; href?: string } {
   if (a.status === "pending_review") return { label: "Esperando revisión" };
   // El paso siguiente de este estado no esta en la web: contesta Estela por
   // privado (ver el correo [2A] en docs/COMUNICACIONES.md).
@@ -61,9 +64,9 @@ function pendingStep(a: Application): { label: string; href?: string } {
   if (a.payment_status === "pending") {
     return {
       label: a.trip?.deposit_amount
-        ? `Reservá con ${formatAmount(a.trip.deposit_amount)} o pagá ${formatAmount(a.trip.price)}`
+        ? `Reservá con ${formatAmount(a.trip.deposit_amount, locale)} o pagá ${formatAmount(a.trip.price, locale)}`
         : a.trip
-          ? `Falta el pago de ${formatAmount(a.trip.price)}`
+          ? `Falta el pago de ${formatAmount(a.trip.price, locale)}`
           : "Falta el pago",
       href: `/viajes/${a.trip_id}/solicitar`,
     };
@@ -72,7 +75,10 @@ function pendingStep(a: Application): { label: string; href?: string } {
   if (a.payment_status === "deposit_paid" && !faltaSalud) {
     const saldo = a.trip ? Math.max(0, a.trip.price - a.amount_paid) : 0;
     return {
-      label: saldo > 0 ? `Falta el saldo de ${formatAmount(saldo)}` : "Falta el saldo",
+      label:
+        saldo > 0
+          ? `Falta el saldo de ${formatAmount(saldo, locale)}`
+          : "Falta el saldo",
       href: `/viajes/${a.trip_id}/solicitar`,
     };
   }
@@ -92,24 +98,33 @@ function pendingStep(a: Application): { label: string; href?: string } {
   return { label: "Al día" };
 }
 
-function formatDate(iso: string) {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("es-CL", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+function formatDate(iso: string, locale: FormatLocale) {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString(
+    locale === "en" ? "en-US" : "es-CL",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }
+  );
 }
 
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleDateString("es-CL", {
+function formatDateTime(iso: string, locale: FormatLocale) {
+  return new Date(iso).toLocaleDateString(locale === "en" ? "en-US" : "es-CL", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
 }
 
-export function MisSolicitudes({ applications }: { applications: Application[] }) {
+export function MisSolicitudes({
+  applications,
+  locale,
+}: {
+  applications: Application[];
+  locale: FormatLocale;
+}) {
   const approved = applications.filter((a) => a.status === "approved");
 
   if (applications.length === 0) {
@@ -138,8 +153,9 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
                 {a.trip && (
                   <p className="mt-1 text-sm text-white/65">
                     {a.trip.location ? `${a.trip.location} · ` : ""}
-                    {formatDate(a.trip.start_date)}
-                    {a.trip.end_date !== a.trip.start_date && ` — ${formatDate(a.trip.end_date)}`}
+                    {formatDate(a.trip.start_date, locale)}
+                    {a.trip.end_date !== a.trip.start_date &&
+                      ` — ${formatDate(a.trip.end_date, locale)}`}
                   </p>
                 )}
               </div>
@@ -173,7 +189,7 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
                   </td>
                   <td className="px-4 py-3 text-white/70">
                     {(() => {
-                      const step = pendingStep(a);
+                      const step = pendingStep(a, locale);
                       return step.href ? (
                         <Link
                           href={step.href}
@@ -187,7 +203,7 @@ export function MisSolicitudes({ applications }: { applications: Application[] }
                     })()}
                   </td>
                   <td className="px-4 py-3 text-white/70">
-                    {formatDateTime(a.created_at)}
+                    {formatDateTime(a.created_at, locale)}
                   </td>
                   <td className="px-4 py-3">
                     <span

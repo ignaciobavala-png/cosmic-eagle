@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { getActivePaymentMethods } from "@/lib/payments";
-import { formatAmount } from "@/lib/format";
+import { formatAmount, type FormatLocale } from "@/lib/format";
 import { formatTripHours } from "@/lib/trip-fields";
 import { todayUTC } from "@/lib/trip-dates";
 import {
@@ -134,9 +134,10 @@ function nextStep(
 export default async function SolicitarPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
-  const { id } = await params;
+  const { locale, id } = await params;
+  const formatLocale: FormatLocale = locale === "en" ? "en" : "es";
   const supabase = await createClient();
 
   const {
@@ -281,11 +282,14 @@ export default async function SolicitarPage({
                     <p>
                       Recibimos{" "}
                       <span className={`font-medium ${panelStrong}`}>
-                        {formatAmount(existing.amount_paid ?? 0)}
+                        {formatAmount(existing.amount_paid ?? 0, formatLocale)}
                       </span>{" "}
-                      de {formatAmount(trip.price)}. Queda un saldo de{" "}
+                      de {formatAmount(trip.price, formatLocale)}. Queda un saldo de{" "}
                       <span className={`font-medium ${panelStrong}`}>
-                        {formatAmount(trip.price - (existing.amount_paid ?? 0))}
+                        {formatAmount(
+                          trip.price - (existing.amount_paid ?? 0),
+                          formatLocale
+                        )}
                       </span>
                       , que puedes completar de una vez o en partes.
                     </p>
@@ -294,11 +298,11 @@ export default async function SolicitarPage({
                     <p>
                       Puedes reservar tu cupo con una seña de{" "}
                       <span className={`font-medium ${panelStrong}`}>
-                        {formatAmount(trip.deposit_amount)}
+                        {formatAmount(trip.deposit_amount, formatLocale)}
                       </span>{" "}
                       o pagar el total de{" "}
                       <span className={`font-medium ${panelStrong}`}>
-                        {formatAmount(trip.price)}
+                        {formatAmount(trip.price, formatLocale)}
                       </span>
                       . Si acordaste otro monto con nosotros, vale lo que
                       acordaron.
@@ -307,7 +311,7 @@ export default async function SolicitarPage({
                     <p>
                       Aporte de la experiencia:{" "}
                       <span className={`font-medium ${panelStrong}`}>
-                        {formatAmount(trip.price)}
+                        {formatAmount(trip.price, formatLocale)}
                       </span>
                       . Si acordaste una seña o un monto distinto con nosotros,
                       vale lo que acordaron.
@@ -412,7 +416,10 @@ export default async function SolicitarPage({
                 <p className="mt-6 rounded-xl border border-primary-container/30 bg-primary-container/[0.08] px-5 py-4 text-sm text-white">
                   Recibimos tu comprobante
                   {existing.payment_proof_at
-                    ? ` el ${new Date(existing.payment_proof_at).toLocaleDateString("es-CL", { day: "numeric", month: "long" })}`
+                    ? ` el ${new Date(existing.payment_proof_at).toLocaleDateString(
+                        formatLocale === "en" ? "en-US" : "es-CL",
+                        { day: "numeric", month: "long" }
+                      )}`
                     : ""}
                   . Lo estamos verificando: en cuanto lo confirmemos te avisamos
                   por mail y se te habilita el paso siguiente.

@@ -1,4 +1,5 @@
 import type { Enums } from "@/lib/supabase/types";
+import type { FormatLocale } from "@/lib/format";
 
 export type ArticleCategory = Enums<"article_category">;
 export type ArticleStatus = Enums<"article_status">;
@@ -179,12 +180,18 @@ function parseListItems(lines: string[]): ArticleListItem[] {
 }
 
 /** "12 de agosto de 2026". `null` cuando el articulo todavia no se publico. */
-export function formatArticleDate(value: string | null): string | null {
+export function formatArticleDate(
+  value: string | null,
+  locale: FormatLocale = "es"
+): string | null {
   if (!value) return null;
 
-  return new Date(value).toLocaleDateString("es-CL", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  return new Date(value).toLocaleDateString(
+    locale === "en" ? "en-US" : "es-CL",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }
+  );
 }

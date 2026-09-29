@@ -39,8 +39,10 @@ function Notice({ text, tone }: { text: string; tone: "error" | "ok" }) {
 }
 
 export default async function CuentaPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{
     next?: string;
     modo?: string;
@@ -49,6 +51,7 @@ export default async function CuentaPage({
     aviso?: string;
   }>;
 }) {
+  const { locale } = await params;
   const { next, modo, vista, error, aviso } = await searchParams;
   const content = await getSiteContent();
   const isSignup = modo === "registro";
@@ -164,7 +167,10 @@ export default async function CuentaPage({
               <Notice text={AVISO_MESSAGES[aviso]} tone="ok" />
             )}
 
-            <MisSolicitudes applications={applications} />
+            <MisSolicitudes
+              applications={applications}
+              locale={locale === "en" ? "en" : "es"}
+            />
 
             <form action={logout}>
               <button

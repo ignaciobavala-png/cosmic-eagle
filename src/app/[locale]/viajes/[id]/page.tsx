@@ -12,13 +12,17 @@ import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal, RevealItem } from "@/components/ui/Reveal";
 import { TitleRule } from "@/components/ui/TitleRule";
 import { tripPlaceholderImage } from "@/lib/constants";
-import { formatScheduleDay, formatAmount } from "@/lib/format";
+import {
+  formatScheduleDay,
+  formatAmount,
+  type FormatLocale,
+} from "@/lib/format";
 import { groupScheduleByDay, parseSchedule } from "@/lib/trip-schedule";
 import { tripTypeLabel } from "@/lib/trip-type";
 import { formatTripHours, tripCategoryLabel } from "@/lib/trip-fields";
 import { getSiteContent } from "@/lib/site-content";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = { params: Promise<{ locale: string; id: string }> };
 
 const STATUS_LABEL: Record<string, string> = {
   open: "Cupos disponibles",
@@ -36,19 +40,26 @@ const STATUS_CLASS: Record<string, string> = {
 
 // Postgres `date` llega como "YYYY-MM-DD": parsear y formatear en UTC evita que
 // el timezone local corra la fecha un dia hacia atras.
-function formatDate(iso: string) {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("es-CL", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+function formatDate(iso: string, locale: FormatLocale = "es") {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString(
+    locale === "en" ? "en-US" : "es-CL",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }
+  );
 }
 
-function formatDateRange(startDate: string, endDate: string) {
+function formatDateRange(
+  startDate: string,
+  endDate: string,
+  locale: FormatLocale = "es"
+) {
   return startDate === endDate
-    ? formatDate(startDate)
-    : `${formatDate(startDate)} — ${formatDate(endDate)}`;
+    ? formatDate(startDate, locale)
+    : `${formatDate(startDate, locale)} — ${formatDate(endDate, locale)}`;
 }
 
 function nightsLabel(startDate: string, endDate: string) {
@@ -89,7 +100,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ViajePage({ params }: Props) {
-  const { id } = await params;
+  const { locale, id } = await params;
+  const formatLocale: FormatLocale = locale === "en" ? "en" : "es";
   const trip = await getTrip(id);
 
   if (!trip) notFound();
@@ -113,7 +125,7 @@ export default async function ViajePage({ params }: Props) {
     {
       icon: CalendarDays,
       label: "Fechas",
-      value: formatDateRange(trip.start_date, trip.end_date),
+      value: formatDateRange(trip.start_date, trip.end_date, formatLocale),
     },
     {
       icon: Clock,
@@ -141,7 +153,8 @@ export default async function ViajePage({ params }: Props) {
     {
       icon: Wallet,
       label: "Aporte",
-      value: trip.price > 0 ? formatAmount(trip.price) : "A confirmar",
+      value:
+        trip.price > 0 ? formatAmount(trip.price, formatLocale) : "A confirmar",
     },
   ];
 
@@ -276,7 +289,11 @@ export default async function ViajePage({ params }: Props) {
                           <h4 className="mb-2 flex items-baseline gap-2 text-label-sm uppercase tracking-[0.12em] text-on-primary-container">
                             Día {group.day}
                             <span className="normal-case tracking-normal text-[#05125a]/70">
-                              {formatScheduleDay(trip.start_date, group.day)}
+                              {formatScheduleDay(
+                                trip.start_date,
+                                group.day,
+                                formatLocale
+                              )}
                             </span>
                           </h4>
                         )}
@@ -348,7 +365,7 @@ export default async function ViajePage({ params }: Props) {
                 {trip.price > 0 && (
                   <RevealItem y={14} duration={0.8} delay={0.15}>
                     <p className="font-display text-[2rem] font-bold text-white">
-                      {formatAmount(trip.price)}
+                      {formatAmount(trip.price, formatLocale)}
                     </p>
                     {/* La seña se anuncia acá, antes de postularse: es parte de
                         decidir si uno puede. Que exista la opción sale de
@@ -356,7 +373,8 @@ export default async function ViajePage({ params }: Props) {
                         línea no aparece. */}
                     {trip.deposit_amount && (
                       <p className="mt-1 text-sm text-white/70">
-                        o reservá tu cupo con {formatAmount(trip.deposit_amount)}
+                        o reservá tu cupo con{" "}
+                        {formatAmount(trip.deposit_amount, formatLocale)}
                       </p>
                     )}
                   </RevealItem>
