@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/redirect";
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -20,7 +20,7 @@ export default async function NuevaClavePage() {
 
   // Se llega aca con la sesion que creo el verifyOtp de /auth/confirm. Sin
   // sesion, el enlace vencio o alguien entro a la URL de prepo.
-  if (!user) redirect("/cuenta?error=enlace-vencido");
+  if (!user) return await redirect("/cuenta?error=enlace-vencido");
 
   const content = await getSiteContent();
 

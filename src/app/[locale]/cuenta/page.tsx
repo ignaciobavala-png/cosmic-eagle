@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/redirect";
 import { Header } from "@/components/Header";
 import { AuthScreen } from "@/components/ui/AuthScreen";
 import { getSiteContent } from "@/lib/site-content";
@@ -90,7 +90,7 @@ export default async function CuentaPage({
     // El admin no se postula a viajes: su "cuenta" es el panel. Se puede ver
     // igual el perfil de viajero con ?vista=viajero (link en AdminNav), y un
     // ?next= pendiente siempre gana, para no romper un flujo a medias.
-    if (data?.is_admin && vista !== "viajero") redirect(next || "/admin");
+    if (data?.is_admin && vista !== "viajero") return await redirect(next || "/admin");
 
     // La vista es lo único que el postulante puede leer de sus solicitudes: la
     // tabla base no le devuelve ninguna fila, ni las propias.

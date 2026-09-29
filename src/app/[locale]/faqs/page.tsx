@@ -19,7 +19,8 @@ export const metadata: Metadata = {
 /**
  * Se lee con el cliente sin cookies (`getFaqs`), asi que la pagina puede ser
  * estatica y revalidar cada hora. Los server actions de /admin/faqs hacen
- * `revalidatePath("/faqs")`, o una pregunta nueva tardaria hasta una hora.
+ * `revalidatePath("/[locale]/faqs", "page")`, o una pregunta nueva tardaria
+ * hasta una hora.
  */
 export const revalidate = 3600;
 

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/redirect";
 import { createClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/resend";
 import { SolicitudRecibida } from "@/emails/SolicitudRecibida";
@@ -40,7 +40,7 @@ export async function submitApplication(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/cuenta?next=/viajes/${tripId}/solicitar`);
+  if (!user) return await redirect(`/cuenta?next=/viajes/${tripId}/solicitar`);
 
   // El mismo cierre que hace la página, del lado del servidor: esconder el
   // formulario no alcanza, un server action es una URL y se le puede postear a
@@ -122,7 +122,7 @@ export async function submitApplication(
   // no sale, la solicitud ya está guardada igual — `sendEmail` no lanza nunca.
   await notifyReceived({ tripId, nombre: full_name, email });
 
-  redirect(`/viajes/${tripId}/solicitar`);
+  return await redirect(`/viajes/${tripId}/solicitar`);
 }
 
 /**
@@ -199,7 +199,7 @@ export async function uploadPaymentProof(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/cuenta?next=/viajes/${tripId}/solicitar`);
+  if (!user) return await redirect(`/cuenta?next=/viajes/${tripId}/solicitar`);
 
   const file = formData.get("proof");
 
@@ -244,6 +244,6 @@ export async function uploadPaymentProof(
     return { error: `No se pudo registrar el comprobante: ${error.message}` };
   }
 
-  revalidatePath(`/viajes/${tripId}/solicitar`);
+  revalidatePath("/[locale]/viajes/[id]/solicitar", "page");
   return { error: null };
 }

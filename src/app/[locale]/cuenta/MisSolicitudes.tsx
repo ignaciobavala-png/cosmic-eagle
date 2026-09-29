@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { formatAmount } from "@/lib/format";
 import { panel, panelDivider } from "@/components/forms/styles";
 

@@ -18,8 +18,13 @@ import {
   ChevronDown,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+// El `Link` del panel no se localiza (`/en/admin` no existe), asi que va el de
+// Next pelado. El resto de los links internos usan el de next-intl: el de
+// `next/link` pierde el `/en` al navegar y el `usePathname` de
+// `next/navigation` devuelve la ruta CON prefijo, con lo que el estado activo
+// del menu no matchearia nunca en ingles.
+import NextLink from "next/link";
+import { Link, usePathname } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
 
 const iconMap = {
@@ -82,6 +87,25 @@ export function Header() {
       subscription.unsubscribe();
     };
   }, []);
+
+  // El contenido de la cuenta es el mismo para el `Link` del viajero y para el
+  // `<a>` del panel: se arma una vez y lo usan los dos.
+  const accountContent = profile ? (
+    <>
+      {profile.avatarUrl ? (
+        <img
+          src={profile.avatarUrl}
+          alt=""
+          className="w-7 h-7 rounded-full object-cover"
+        />
+      ) : (
+        <CircleUser size={20} />
+      )}
+      <span className="font-display text-label-sm uppercase">
+        {profile.fullName?.split(" ")[0] || "Mi Cuenta"}
+      </span>
+    </>
+  ) : null;
 
   return (
     <>
@@ -381,23 +405,25 @@ export function Header() {
           <div className="flex shrink-0 items-center justify-end gap-4 justify-self-end">
             <LocaleSwitch className="hidden md:flex" />
             {profile ? (
-              <Link
-                href={profile.isAdmin ? "/admin" : "/cuenta"}
-                className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
-              >
-                {profile.avatarUrl ? (
-                  <img
-                    src={profile.avatarUrl}
-                    alt=""
-                    className="w-7 h-7 rounded-full object-cover"
-                  />
-                ) : (
-                  <CircleUser size={20} />
-                )}
-                <span className="font-display text-label-sm uppercase">
-                  {profile.fullName?.split(" ")[0] || "Mi Cuenta"}
-                </span>
-              </Link>
+              profile.isAdmin ? (
+                // El panel no vive bajo `[locale]`: este link NO se localiza
+                // (`/en/admin` no existe), asi que va el `Link` de Next y no el
+                // de next-intl. Mismo criterio que el resto de los links a
+                // /admin.
+                <NextLink
+                  href="/admin"
+                  className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
+                >
+                  {accountContent}
+                </NextLink>
+              ) : (
+                <Link
+                  href="/cuenta"
+                  className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
+                >
+                  {accountContent}
+                </Link>
+              )
             ) : (
               // El `hidden` va en el wrapper, no en el CtaLink: su base trae
               // `inline-flex` y le gana a `hidden` por orden de la hoja.

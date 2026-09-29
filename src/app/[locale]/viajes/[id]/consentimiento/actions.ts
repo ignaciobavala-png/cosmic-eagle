@@ -1,6 +1,6 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/redirect";
 import { createClient } from "@/lib/supabase/server";
 import {
   CONSENT_CONFIRMATIONS,
@@ -33,7 +33,7 @@ export async function submitConsent(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/cuenta?next=/viajes/${tripId}/consentimiento`);
+  if (!user) return await redirect(`/cuenta?next=/viajes/${tripId}/consentimiento`);
 
   // Las cuatro son obligatorias (ver el comentario de CONSENT_CONFIRMATIONS).
   const confirmations: ConsentConfirmationRecord[] = [];
@@ -70,5 +70,5 @@ export async function submitConsent(
     return { error: `No se pudo registrar la firma: ${error.message}` };
   }
 
-  redirect(`/viajes/${tripId}/solicitar`);
+  return await redirect(`/viajes/${tripId}/solicitar`);
 }

@@ -1,5 +1,6 @@
-import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { Link } from "@/i18n/navigation";
+import { notFound } from "next/navigation";
+import { redirect } from "@/i18n/redirect";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
@@ -142,7 +143,7 @@ export default async function SolicitarPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect(`/cuenta?next=/viajes/${id}/solicitar`);
+  if (!user) return await redirect(`/cuenta?next=/viajes/${id}/solicitar`);
 
   const { data: trip } = await supabase
     .from("trips")

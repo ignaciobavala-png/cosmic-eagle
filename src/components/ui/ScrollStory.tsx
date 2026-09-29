@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { CTA_TONES } from "./CtaLink";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useTransform, useReducedMotion, type MotionValue } from "framer-motion";

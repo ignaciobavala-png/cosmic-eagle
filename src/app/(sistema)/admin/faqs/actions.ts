@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isFaqPlacement } from "@/lib/faqs";
+import { publicPath } from "@/i18n/public-path";
 
 export type FaqFormState = { error: string | null };
 
@@ -12,7 +13,7 @@ export type FaqFormState = { error: string | null };
  * nueva tardaria hasta una hora en aparecer y la clienta guarda y mira enseguida.
  */
 function revalidateFaqPaths() {
-  revalidatePath("/faqs");
+  revalidatePath(publicPath("/faqs"), "page");
   revalidatePath("/admin/faqs");
 }
 

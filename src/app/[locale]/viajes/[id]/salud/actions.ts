@@ -1,6 +1,6 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/redirect";
 import { createClient } from "@/lib/supabase/server";
 
 export type HealthFormState = { error: string | null };
@@ -52,7 +52,7 @@ export async function submitHealthForm(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/cuenta?next=/viajes/${tripId}/salud`);
+  if (!user) return await redirect(`/cuenta?next=/viajes/${tripId}/salud`);
 
   const age = Number(str(formData, "age"));
   const height = str(formData, "height");
@@ -116,5 +116,5 @@ export async function submitHealthForm(
     return { error: `No se pudo enviar el formulario: ${error.message}` };
   }
 
-  redirect(`/viajes/${tripId}/solicitar`);
+  return await redirect(`/viajes/${tripId}/solicitar`);
 }

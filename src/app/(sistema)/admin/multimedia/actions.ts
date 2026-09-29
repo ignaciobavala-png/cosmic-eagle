@@ -10,6 +10,7 @@ import {
   type Slot,
 } from "@/lib/site-content";
 import { uploadTripCover } from "@/lib/trip-cover";
+import { publicPath } from "@/i18n/public-path";
 
 export type SlotState = { error: string | null };
 
@@ -35,7 +36,7 @@ function revalidateSlot(key: string) {
   updateTag(SITE_CONTENT_TAG);
 
   const group = SITE_GROUPS.find((g) => g.slots.some((s) => s.key === key));
-  if (group) revalidatePath(group.href);
+  if (group) revalidatePath(publicPath(group.href), "page");
 }
 
 /** Borra el asset anterior si vivia en nuestro bucket, para no dejar huerfanos. */
@@ -237,9 +238,9 @@ export async function saveTripCover(
   if (error) return { error: `No se pudo guardar la portada: ${error.message}` };
 
   // La portada se ve en los dos listados publicos, en el detalle y en el panel.
-  revalidatePath("/");
-  revalidatePath("/viajes");
-  revalidatePath(`/viajes/${tripId}`);
+  revalidatePath(publicPath("/"), "page");
+  revalidatePath(publicPath("/viajes"), "page");
+  revalidatePath(publicPath("/viajes/[id]"), "page");
   revalidatePath("/admin/multimedia");
 
   return { error: null };

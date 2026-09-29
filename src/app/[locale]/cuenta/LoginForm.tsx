@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { login, type LoginState } from "./actions";
 import {

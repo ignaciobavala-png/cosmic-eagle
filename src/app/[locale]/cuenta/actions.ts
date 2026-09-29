@@ -3,7 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { getSiteUrl } from "@/lib/site-url";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/redirect";
+import { publicPath } from "@/i18n/public-path";
 
 export type LoginState = { error: string | null };
 export type SignupState = { error: string | null };
@@ -36,10 +37,10 @@ export async function login(
     return { error: "Email o contraseña incorrectos." };
   }
 
-  revalidatePath("/", "layout");
+  revalidatePath(publicPath("/"), "layout");
 
   if (typeof next === "string" && next.startsWith("/")) {
-    redirect(next);
+    return await redirect(next);
   }
 
   const { data: profile } = await supabase
@@ -48,7 +49,7 @@ export async function login(
     .eq("id", data.user.id)
     .single();
 
-  redirect(profile?.is_admin ? "/admin" : "/cuenta");
+  return await redirect(profile?.is_admin ? "/admin" : "/cuenta");
 }
 
 export async function signup(
@@ -93,8 +94,8 @@ export async function signup(
     return { error: "No se pudo crear la cuenta. Prueba de nuevo." };
   }
 
-  revalidatePath("/", "layout");
-  redirect(typeof next === "string" && next.startsWith("/") ? next : "/cuenta");
+  revalidatePath(publicPath("/"), "layout");
+  return await redirect(typeof next === "string" && next.startsWith("/") ? next : "/cuenta");
 }
 
 /**
@@ -167,8 +168,8 @@ export async function updatePassword(
     return { error: "No se pudo cambiar la contraseña. Prueba de nuevo." };
   }
 
-  revalidatePath("/", "layout");
-  redirect("/cuenta?aviso=clave-cambiada");
+  revalidatePath(publicPath("/"), "layout");
+  return await redirect("/cuenta?aviso=clave-cambiada");
 }
 
 export async function updateAvatar(
@@ -218,12 +219,12 @@ export async function updateAvatar(
     .update({ avatar_url: `${publicUrl}?v=${Date.now()}` })
     .eq("id", user.id);
 
-  revalidatePath("/", "layout");
+  revalidatePath(publicPath("/"), "layout");
   return { error: null };
 }
 
 export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  revalidatePath("/cuenta");
+  revalidatePath(publicPath("/cuenta"), "page");
 }

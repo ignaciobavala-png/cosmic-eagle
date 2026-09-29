@@ -38,8 +38,9 @@ export async function redeemAccessCode(
 
   if (result === "ok") {
     // El muro y los candados se dibujan en el server: sin esto, la persona
-    // canjea y sigue viendo la biblioteca cerrada hasta recargar de más.
-    revalidatePath("/contenidos", "layout");
+    // canjea y sigue viendo la biblioteca cerrada hasta recargar de mas. El
+    // patron `[locale]` es el route file real (la URL visible no lo lleva).
+    revalidatePath("/[locale]/contenidos", "layout");
   }
 
   return { message: redeemMessage(result), ok: result === "ok" };

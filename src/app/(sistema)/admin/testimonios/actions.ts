@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isTestimonialPlacement, TESTIMONIAL_MAX_CHARS } from "@/lib/testimonials";
+import { publicPath } from "@/i18n/public-path";
 
 export type TestimonialFormState = { error: string | null };
 
@@ -13,8 +14,8 @@ export type TestimonialFormState = { error: string | null };
  * testimonio nuevo tardaria hasta una hora en aparecer.
  */
 function revalidateTestimonialPaths() {
-  revalidatePath("/");
-  revalidatePath("/viajes");
+  revalidatePath(publicPath("/"), "page");
+  revalidatePath(publicPath("/viajes"), "page");
   revalidatePath("/admin/testimonios");
 }
 

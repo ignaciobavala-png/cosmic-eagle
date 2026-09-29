@@ -8,6 +8,7 @@ import { parseSchedule, sortSchedule } from "@/lib/trip-schedule";
 import { TRIP_TYPES, isTripType, tripAdminPath, tripTypeLabel } from "@/lib/trip-type";
 import { isTripCategory } from "@/lib/trip-fields";
 import { uploadTripCover } from "@/lib/trip-cover";
+import { publicPath } from "@/i18n/public-path";
 
 export type TripFormState = { error: string | null };
 
@@ -18,11 +19,11 @@ export type TripFormState = { error: string | null };
 function revalidateTripPaths() {
   revalidatePath(TRIP_TYPES.retiro.adminPath);
   revalidatePath(TRIP_TYPES.ceremonia.adminPath);
-  revalidatePath("/viajes");
+  revalidatePath(publicPath("/viajes"), "page");
   // /calendario es ISR igual que la home: sin esto, una fecha nueva tarda
   // hasta una hora en aparecer justo en la pagina que existe para verlas.
-  revalidatePath("/calendario");
-  revalidatePath("/");
+  revalidatePath(publicPath("/calendario"), "page");
+  revalidatePath(publicPath("/"), "page");
 }
 
 /**

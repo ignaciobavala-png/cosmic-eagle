@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type MouseEvent } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ArrowLeft, Lock } from "lucide-react";
 import { ArticleBody } from "./ArticleBody";
 import { CtaLink, CTA_TONES } from "./CtaLink";
@@ -280,7 +280,7 @@ function LibraryCard({
   return (
     <Link
       href={`/contenidos/${article.slug}`}
-      onClick={(event) => {
+      onClick={(event: MouseEvent<HTMLAnchorElement>) => {
         // Ctrl/cmd/shift/click medio abren en pestaña nueva: eso es del
         // browser y no se intercepta (mismo criterio que `ExperienceGate`).
         if (

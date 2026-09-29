@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isLegalSlug, legalDocumentMeta } from "@/lib/legal";
+import { publicPath } from "@/i18n/public-path";
 
 export type LegalFormState = { error: string | null };
 
@@ -47,7 +48,7 @@ export async function updateLegalDocument(
 
   // Las dos páginas públicas son ISR de una hora: sin esto, la clienta guarda y
   // no ve el cambio.
-  revalidatePath(legalDocumentMeta(slug).href);
+  revalidatePath(publicPath(legalDocumentMeta(slug).href), "page");
   revalidatePath("/admin/legales");
   redirect("/admin/legales");
 }

@@ -1,4 +1,5 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import { redirect } from "@/i18n/redirect";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
@@ -25,7 +26,7 @@ export default async function SaludPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect(`/cuenta?next=/viajes/${id}/salud`);
+  if (!user) return await redirect(`/cuenta?next=/viajes/${id}/salud`);
 
   const { data: trip } = await supabase
     .from("trips")
@@ -49,7 +50,7 @@ export default async function SaludPage({
     app.is_first_time &&
     !app.health_form_submitted;
 
-  if (!puedeCompletar) redirect(`/viajes/${id}/solicitar`);
+  if (!puedeCompletar) return await redirect(`/viajes/${id}/solicitar`);
 
   return (
     <>

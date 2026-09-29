@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { FOOTER_COLUMNS, IMAGES } from "@/lib/constants";
 import { NewsletterForm } from "./NewsletterForm";
 import { useSignedIn } from "@/lib/use-signed-in";

@@ -1,4 +1,5 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import { redirect } from "@/i18n/redirect";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
@@ -34,7 +35,7 @@ export default async function ConsentimientoPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect(`/cuenta?next=/viajes/${id}/consentimiento`);
+  if (!user) return await redirect(`/cuenta?next=/viajes/${id}/consentimiento`);
 
   const { data: trip } = await supabase
     .from("trips")
@@ -58,9 +59,9 @@ export default async function ConsentimientoPage({
   const reservado =
     app?.id && app.status === "approved" && app.payment_status !== "pending";
 
-  if (!reservado || app.consent_submitted) redirect(`/viajes/${id}/solicitar`);
+  if (!reservado || app.consent_submitted) return await redirect(`/viajes/${id}/solicitar`);
   if (app.is_first_time && !app.health_form_submitted) {
-    redirect(`/viajes/${id}/salud`);
+    return await redirect(`/viajes/${id}/salud`);
   }
 
   const { data: profile } = await supabase

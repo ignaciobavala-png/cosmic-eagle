@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isContentAccessLevel } from "@/lib/content-access";
+import { publicPath } from "@/i18n/public-path";
 
 export type AccessFormState = { error: string | null; ok?: string };
 
@@ -12,7 +13,7 @@ export type AccessFormState = { error: string | null; ok?: string };
  * contenidos mas el panel.
  */
 function revalidateAccessPaths() {
-  revalidatePath("/contenidos");
+  revalidatePath(publicPath("/contenidos"), "page");
   revalidatePath("/admin/acceso");
 }
 

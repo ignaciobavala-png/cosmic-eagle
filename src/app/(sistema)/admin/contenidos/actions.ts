@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { publicPath } from "@/i18n/public-path";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isArticleCategory, slugify } from "@/lib/article";
@@ -23,10 +24,15 @@ function isStatus(value: unknown): value is ArticleStatus {
   return value === "draft" || value === "published";
 }
 
-/** El listado publico, el detalle y el panel muestran lo mismo. */
-function revalidateArticlePaths(slug: string) {
-  revalidatePath("/contenidos");
-  revalidatePath(`/contenidos/${slug}`);
+/**
+ * El listado publico, el detalle y el panel muestran lo mismo. El detalle va
+ * con el patron `[slug]` y no con el slug concreto: invalida todos los
+ * articulos, que es barato (son ISR) y ademas cubre la URL vieja cuando la
+ * clienta cambia la direccion.
+ */
+function revalidateArticlePaths() {
+  revalidatePath(publicPath("/contenidos"), "page");
+  revalidatePath(publicPath("/contenidos/[slug]"), "page");
   revalidatePath("/admin/contenidos");
 }
 
@@ -155,7 +161,7 @@ export async function createArticle(
 
   if (error) return { error: friendlyError(error.message, "crear") };
 
-  revalidateArticlePaths(parsed.data.slug);
+  revalidateArticlePaths();
   redirect("/admin/contenidos");
 }
 
@@ -188,11 +194,7 @@ export async function updateArticle(
 
   if (error) return { error: friendlyError(error.message, "guardar") };
 
-  // Si cambio la direccion hay que invalidar tambien la vieja, que queda 404.
-  if (current?.slug && current.slug !== parsed.data.slug) {
-    revalidatePath(`/contenidos/${current.slug}`);
-  }
-  revalidateArticlePaths(parsed.data.slug);
+  revalidateArticlePaths();
   redirect("/admin/contenidos");
 }
 
@@ -217,5 +219,5 @@ export async function deleteArticle(id: string) {
     }
   }
 
-  revalidateArticlePaths(article?.slug ?? "");
+  revalidateArticlePaths();
 }

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ARTICLE_CATEGORY_LIST } from "@/lib/article";
 import { CTA_TONES } from "./CtaLink";
 

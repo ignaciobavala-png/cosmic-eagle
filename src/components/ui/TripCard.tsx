@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ArrowUpRight } from "lucide-react";
 import { formatDateRangeCompact } from "@/lib/format";
 import { isTripType, tripTypeLabel } from "@/lib/trip-type";
