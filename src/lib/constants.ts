@@ -1,5 +1,13 @@
 import { ARTICLE_CATEGORY_LIST } from "@/lib/article";
 
+/**
+ * El boton ES/EN. Apagado hasta que el ingles este completo (etapa 5 de
+ * docs/I18N.md): la infraestructura existe y `/en` responde, pero no se publica
+ * un ingles a medias. Con `false`, `LocaleSwitch` no se renderiza en ningun
+ * lado (ni navbar ni pie del drawer mobile).
+ */
+export const SHOW_LOCALE_SWITCH = false;
+
 export const IMAGES = {
   // Logo oficial de la disenadora (PNG con alpha, 1207x433), servido desde /public
   logo: "/logo.png",

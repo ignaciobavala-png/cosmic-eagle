@@ -6,11 +6,22 @@ import { routing } from "@/i18n/routing";
 import { fontClassName } from "../fonts";
 import "../globals.css";
 
-export const metadata: Metadata = {
-  title: "Cosmic Eagle | Sabiduría Cósmica para la Evolución Humana",
-  description:
-    "Cosmic Eagle explora el potencial más profundo de la conciencia humana. A través de experiencias inmersivas, enseñanzas y prácticas de integración, reconectamos con la inteligencia del alma.",
-};
+export async function generateMetadata({
+  params,
+}: LayoutProps<"/[locale]">): Promise<Metadata> {
+  const { locale } = await params;
+
+  return {
+    title: "Cosmic Eagle | Sabiduría Cósmica para la Evolución Humana",
+    description:
+      "Cosmic Eagle explora el potencial más profundo de la conciencia humana. A través de experiencias inmersivas, enseñanzas y prácticas de integración, reconectamos con la inteligencia del alma.",
+    // Mientras el ingles no este publicado (boton apagado), `/en` no se indexa:
+    // existe para trabajarlo, no para aparecer en Google a medias.
+    ...(locale === "en"
+      ? { robots: { index: false, follow: false } }
+      : {}),
+  };
+}
 
 /** Las dos versiones se prerenderizan: es lo que mantiene la home en `○`. */
 export function generateStaticParams() {

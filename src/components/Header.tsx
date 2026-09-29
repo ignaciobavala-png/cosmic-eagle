@@ -1,7 +1,7 @@
 "use client";
 
 import { useUIStore } from "@/lib/store";
-import { IMAGES, NAV_LINKS } from "@/lib/constants";
+import { IMAGES, NAV_LINKS, SHOW_LOCALE_SWITCH } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
 import { useSignedIn } from "@/lib/use-signed-in";
 import { AnimatePresence, motion } from "framer-motion";
@@ -402,7 +402,9 @@ export function Header() {
           </ul>
 
           <div className="flex shrink-0 items-center justify-end gap-4 justify-self-end">
-            <LocaleSwitch className="hidden xl:flex" />
+            {SHOW_LOCALE_SWITCH && (
+              <LocaleSwitch className="hidden xl:flex" />
+            )}
             {profile ? (
               profile.isAdmin ? (
                 // El panel no vive bajo `[locale]`: este link NO se localiza
@@ -625,7 +627,9 @@ export function Header() {
                 {/* El selector va al pie del drawer, no en la barra: ahi no
                     entra con el menu completo (ver el comentario del
                     breakpoint, arriba). */}
-                <LocaleSwitch className="flex justify-center" />
+                {SHOW_LOCALE_SWITCH && (
+                  <LocaleSwitch className="flex justify-center" />
+                )}
               </div>
             </motion.div>
           </>
