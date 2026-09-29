@@ -9,12 +9,20 @@ import type { TripCardData } from "@/components/ui/TripCard";
 import { createPublicClient } from "@/lib/supabase/public";
 import { todayUTC } from "@/lib/trip-dates";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Calendario | Cosmic Eagle",
-  description:
-    "Todas las fechas abiertas de Sesiones Cósmicas y Viajes Cósmicos, en una sola página.",
-};
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/calendario">): Promise<Metadata> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Calendario");
+
+  return {
+    title: t("meta.title"),
+    description: t("meta.description"),
+  };
+}
 
 /**
  * Las dos carteleras ya viven en /viajes, pero ahí están **cerradas** detrás de
@@ -49,7 +57,12 @@ export const revalidate = 3600;
  */
 const NIGHT = "#020c41";
 
-export default async function CalendarioPage() {
+export default async function CalendarioPage({
+  params,
+}: PageProps<"/[locale]/calendario">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Calendario");
   const content = await getSiteContent();
 
   const supabase = createPublicClient();
@@ -81,7 +94,7 @@ export default async function CalendarioPage() {
       <main className="pt-[var(--navbar-h)]">
         <PageHero
           image={content("calendario.hero.image")}
-          imageAlt="Cielo estrellado sobre un portal de luz"
+          imageAlt={t("hero.imageAlt")}
           title={renderTitle(content("calendario.hero.title"))}
           subtitle={content("calendario.hero.subtitle")}
           height="compact"
@@ -110,19 +123,19 @@ export default async function CalendarioPage() {
                 alto de lo observado. Con 0.22 podría no dispararse nunca. */}
             <RevealItem>
               <TripCarousel
-                caption="Calendario"
-                title="Próximas Sesiones"
+                caption={t("caption")}
+                title={t("sesiones")}
                 trips={ceremonias}
-                emptyLabel="No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto."
+                emptyLabel={t("emptySesiones")}
               />
             </RevealItem>
 
             <RevealItem>
               <TripCarousel
-                caption="Calendario"
-                title="Próximos Viajes"
+                caption={t("caption")}
+                title={t("viajes")}
                 trips={retiros}
-                emptyLabel="No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
+                emptyLabel={t("emptyViajes")}
               />
             </RevealItem>
           </Reveal>

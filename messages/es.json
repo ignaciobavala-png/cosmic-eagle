@@ -144,6 +144,20 @@
       "profundizar": "Ir más profundo"
     }
   },
+  "Calendario": {
+    "meta": {
+      "title": "Calendario | Cosmic Eagle",
+      "description": "Todas las fechas abiertas de Sesiones Cósmicas y Viajes Cósmicos, en una sola página."
+    },
+    "hero": {
+      "imageAlt": "Cielo estrellado sobre un portal de luz"
+    },
+    "caption": "Calendario",
+    "sesiones": "Próximas Sesiones",
+    "viajes": "Próximos Viajes",
+    "emptySesiones": "No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto.",
+    "emptyViajes": "No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
+  },
   "Viajes": {
     "meta": {
       "title": "Experiencias | Cosmic Eagle",

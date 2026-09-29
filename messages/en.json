@@ -144,6 +144,20 @@
       "profundizar": "Go deeper"
     }
   },
+  "Calendario": {
+    "meta": {
+      "title": "Calendar | Cosmic Eagle",
+      "description": "All the open dates for Cosmic Sessions and Cosmic Journeys, on a single page."
+    },
+    "hero": {
+      "imageAlt": "Starry sky over a portal of light"
+    },
+    "caption": "Calendar",
+    "sesiones": "Upcoming Sessions",
+    "viajes": "Upcoming Journeys",
+    "emptySesiones": "There are no sessions published right now. Come back soon.",
+    "emptyViajes": "There are no journeys published right now. Come back soon."
+  },
   "Viajes": {
     "meta": {
       "title": "Experiences | Cosmic Eagle",

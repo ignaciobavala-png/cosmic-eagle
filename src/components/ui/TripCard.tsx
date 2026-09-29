@@ -1,7 +1,8 @@
 import { Link } from "@/i18n/navigation";
 import { ArrowUpRight } from "lucide-react";
-import { formatDateRangeCompact } from "@/lib/format";
-import { isTripType, tripTypeLabel } from "@/lib/trip-type";
+import { getTranslations, getLocale } from "next-intl/server";
+import { formatDateRangeCompact, type FormatLocale } from "@/lib/format";
+import { isTripType } from "@/lib/trip-type";
 import type { TripDate } from "@/lib/trip-groups";
 import { TripCover } from "./TripCover";
 
@@ -19,9 +20,9 @@ export type TripCardData = {
   type?: string | null;
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  closed: "Cupo completo",
-  completed: "Finalizado",
+const STATUS_KEY: Record<string, string> = {
+  closed: "closed",
+  completed: "completed",
 };
 
 /**
@@ -32,7 +33,7 @@ const STATUS_LABEL: Record<string, string> = {
  * La portada la resuelve `TripCover`, que es quien decide el recorte (ver
  * docs/PORTADAS.md).
  */
-export function TripCard({
+export async function TripCard({
   trip,
   tone = "dark",
   dates,
@@ -54,8 +55,16 @@ export function TripCard({
    */
   tone?: "dark" | "light";
 }) {
+  const t = await getTranslations("TripTypes");
+  const locale: FormatLocale = (await getLocale()) === "en" ? "en" : "es";
   const light = tone === "light";
   const many = (dates?.length ?? 0) > 1;
+  const tipo = isTripType(trip.type) ? t(`${trip.type}.one`) : undefined;
+  const statusLabel =
+    trip.status && STATUS_KEY[trip.status]
+      ? t(`status.${STATUS_KEY[trip.status]}`)
+      : undefined;
+  const dateLabel = many ? t("dates") : t("date");
 
   const className = light
     ? "group flex h-full flex-col overflow-hidden rounded-[16px] bg-[#fff6eb] shadow-[0_8px_24px_rgba(0,0,0,0.15)] transition-[transform,box-shadow] duration-300 hover:-translate-y-2 hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)]"
@@ -70,18 +79,18 @@ export function TripCard({
            pildora dorada y el de lugar el azul translucido con borde. */
         <>
           <TripCover tripId={trip.id} imageUrl={trip.image_url} variant="strip">
-            {trip.status && STATUS_LABEL[trip.status] && (
+            {statusLabel && (
               <span className="absolute right-3 top-3 rounded-full bg-[#05125a]/80 px-3 py-1 text-label-sm uppercase text-white backdrop-blur-md">
-                {STATUS_LABEL[trip.status]}
+                {statusLabel}
               </span>
             )}
           </TripCover>
 
           <div className="flex flex-1 flex-col p-5">
             <div className="mb-4 flex flex-wrap gap-2.5">
-              {isTripType(trip.type) && (
+              {tipo && (
                 <span className="rounded-full bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-3.5 py-1.5 font-display text-[11px] font-semibold uppercase tracking-[0.11em] text-white">
-                  {tripTypeLabel(trip.type)}
+                  {tipo}
                 </span>
               )}
               {trip.location && (
@@ -101,7 +110,7 @@ export function TripCard({
                   10px (ver la sesion del 28/08). Mismo rol de la paleta, un
                   tono mas oscuro. */}
               <span className="block font-display text-[10px] font-semibold uppercase tracking-[0.12em] text-on-primary-container">
-                {many ? "Fechas" : "Fecha"}
+                {dateLabel}
               </span>
 
               {many ? (
@@ -110,10 +119,10 @@ export function TripCard({
                     <Link
                       key={date.id}
                       href={`/viajes/${date.id}`}
-                      aria-label={`${trip.title}, ${formatDateRangeCompact(date.start_date, date.end_date)}`}
+                      aria-label={`${trip.title}, ${formatDateRangeCompact(date.start_date, date.end_date, locale)}`}
                       className="rounded-full border-2 border-[#05125a] px-3.5 py-1.5 font-display text-[15px] font-bold uppercase tracking-[0.04em] text-[#05125a] transition-colors duration-300 hover:bg-[#05125a] hover:text-white"
                     >
-                      {formatDateRangeCompact(date.start_date, date.end_date)}
+                      {formatDateRangeCompact(date.start_date, date.end_date, locale)}
                     </Link>
                   ))}
                 </div>
@@ -138,7 +147,7 @@ export function TripCard({
                       (`tone="dark"`, mas abajo) conserva la suya porque hoy
                       solo la usa `TripsSection`, que no esta en ninguna ruta. */}
                   <span className="mt-1.5 block font-display text-[21px] font-bold uppercase leading-tight tracking-[0.03em] text-[#05125a]">
-                    {formatDateRangeCompact(trip.start_date, trip.end_date)}
+                    {formatDateRangeCompact(trip.start_date, trip.end_date, locale)}
                   </span>
                 </div>
               )}
@@ -150,9 +159,9 @@ export function TripCard({
         <TripCover tripId={trip.id} imageUrl={trip.image_url} variant="card">
           <div className="absolute inset-0 bg-[#05102a]/20" />
           <div className="absolute left-4 top-4 flex flex-wrap gap-2">
-            {isTripType(trip.type) && (
+            {tipo && (
               <span className="rounded-full bg-primary-container/90 px-3 py-1 text-label-sm uppercase text-on-primary backdrop-blur-md">
-                {tripTypeLabel(trip.type)}
+                {tipo}
               </span>
             )}
             {trip.location && (
@@ -161,9 +170,9 @@ export function TripCard({
               </span>
             )}
           </div>
-          {trip.status && STATUS_LABEL[trip.status] && (
+          {statusLabel && (
             <span className="absolute right-4 top-4 rounded-full border border-outline/40 bg-[#05060a]/70 px-3 py-1 text-label-sm uppercase text-on-surface-variant backdrop-blur-md">
-              {STATUS_LABEL[trip.status]}
+              {statusLabel}
             </span>
           )}
         </TripCover>
@@ -180,7 +189,7 @@ export function TripCard({
 
           <div className="mt-6 border-t border-primary-fixed-dim/12 pt-4">
             <span className="block text-label-sm uppercase text-on-surface-variant/60">
-              {many ? "Fechas" : "Fecha"}
+              {dateLabel}
             </span>
 
             {many ? (
@@ -189,17 +198,17 @@ export function TripCard({
                   <Link
                     key={date.id}
                     href={`/viajes/${date.id}`}
-                    aria-label={`${trip.title}, ${formatDateRangeCompact(date.start_date, date.end_date)}`}
+                    aria-label={`${trip.title}, ${formatDateRangeCompact(date.start_date, date.end_date, locale)}`}
                     className="rounded-full border border-primary-container/55 px-3.5 py-1.5 text-label-sm uppercase text-primary-container transition-colors duration-300 hover:bg-primary-container hover:text-on-primary"
                   >
-                    {formatDateRangeCompact(date.start_date, date.end_date)}
+                    {formatDateRangeCompact(date.start_date, date.end_date, locale)}
                   </Link>
                 ))}
               </div>
             ) : (
               <div className="flex items-end justify-between gap-4">
                 <span className="mt-1 block text-body-md text-on-surface">
-                  {formatDateRangeCompact(trip.start_date, trip.end_date)}
+                  {formatDateRangeCompact(trip.start_date, trip.end_date, locale)}
                 </span>
                 <span
                   aria-hidden="true"
