@@ -97,7 +97,45 @@
     "tecnologia": "Human Technology",
     "testimonios": "Testimonials"
   },
+  "Site": {
+    "title": "Cosmic Eagle | Cosmic Wisdom for Human Evolution",
+    "description": "Cosmic Eagle explores the deepest potential of human consciousness. Through immersive experiences, teachings, and integration practices, we reconnect with the intelligence of the soul."
+  },
   "Home": {
-    "heroAlt": "A figure made of particles gazing into the cosmos"
+    "heroAlt": "A figure made of particles gazing into the cosmos",
+    "purpose": {
+      "title": "Our purpose",
+      "body": "Our purpose is to fuel human <gold>evolution</gold>, creating spaces that allow each person to <gold>transform</gold> their reality, expand their <gold>consciousness</gold>, and deepen the connection with their <gold>soul</gold>.",
+      "cta": "Go deeper"
+    },
+    "relato": {
+      "paragraphs": [
+        "Human beings are in constant evolution. As we expand our consciousness, we begin to discover that we are much more than our personal history, our mind, or the reality we perceive through the senses.",
+        "Our work explores this evolutionary potential and the multidimensional nature of human experience: our capacity to transform, to access deeper levels of intelligence, and to reconnect with the soul dimension.",
+        "From this perspective, human evolution becomes part of a much broader field of consciousness, opening a path toward deep knowledge, cosmic wisdom, and an expanded understanding of who and what we are."
+      ],
+      "keywords": [
+        "consciousness",
+        "evolutionary potential",
+        "soul dimension",
+        "deep knowledge",
+        "cosmic wisdom"
+      ],
+      "cta": "Explore experiences"
+    },
+    "atmosfericaAlt": "Figure in meditation with a core of golden light",
+    "contenidos": {
+      "title": "Content",
+      "body": "We share content created to accompany every stage of the path, integrate what you learn, and go deeper into your own evolutionary process.",
+      "cta": "Go deeper",
+      "imageAlt": "Portal of light"
+    },
+    "faqs": {
+      "title": "Curious about the journey?",
+      "intro": "Here are a few things you may want to know before exploring further.",
+      "more": "Explore more →"
+    },
+    "cierreAlt": "Sunrise over the horizon",
+    "cierre": "When the soul is ready,<br></br>the path appears."
   }
 }

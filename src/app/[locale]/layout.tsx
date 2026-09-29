@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { SITE_URL } from "@/lib/site-url";
 import { fontClassName } from "../fonts";
@@ -11,12 +11,13 @@ export async function generateMetadata({
   params,
 }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Site");
 
   return {
     metadataBase: new URL(SITE_URL),
-    title: "Cosmic Eagle | Sabiduría Cósmica para la Evolución Humana",
-    description:
-      "Cosmic Eagle explora el potencial más profundo de la conciencia humana. A través de experiencias inmersivas, enseñanzas y prácticas de integración, reconectamos con la inteligencia del alma.",
+    title: t("title"),
+    description: t("description"),
     // Sin `alternates` a proposito: el layout no sabe en que pagina esta, y un
     // `languages` fijo aca declaraba la HOME como alterno de todas (`/viajes`
     // decia que su version en ingles era `/en`). El hreflang correcto por pagina

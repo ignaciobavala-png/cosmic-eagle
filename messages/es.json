@@ -97,7 +97,45 @@
     "tecnologia": "Tecnología Humana",
     "testimonios": "Testimonios"
   },
+  "Site": {
+    "title": "Cosmic Eagle | Sabiduría Cósmica para la Evolución Humana",
+    "description": "Cosmic Eagle explora el potencial más profundo de la conciencia humana. A través de experiencias inmersivas, enseñanzas y prácticas de integración, reconectamos con la inteligencia del alma."
+  },
   "Home": {
-    "heroAlt": "Figura de partículas mirando hacia el cosmos"
+    "heroAlt": "Figura de partículas mirando hacia el cosmos",
+    "purpose": {
+      "title": "Nuestro propósito",
+      "body": "Nuestro propósito es impulsar la <gold>evolución</gold> humana, creando espacios que permitan a cada persona <gold>transformar</gold> su realidad, expandir su <gold>conciencia</gold> y profundizar la conexión con su <gold>alma</gold>.",
+      "cta": "Ir más profundo"
+    },
+    "relato": {
+      "paragraphs": [
+        "Los seres humanos estamos en constante evolución. A medida que expandimos nuestra conciencia, comenzamos a descubrir que somos mucho más que nuestra historia personal, nuestra mente o la realidad que percibimos a través de los sentidos.",
+        "Nuestro trabajo explora este potencial evolutivo y la naturaleza multidimensional de la experiencia humana: nuestra capacidad de transformarnos, de acceder a niveles más profundos de inteligencia y de reconectar con la dimensión del alma.",
+        "Desde esta perspectiva, la evolución humana pasa a ser parte de un campo de conciencia mucho más amplio, abriendo un camino hacia un conocimiento profundo, la sabiduría cósmica y una comprensión expandida de quiénes y qué somos."
+      ],
+      "keywords": [
+        "conciencia",
+        "potencial evolutivo",
+        "dimensión del alma",
+        "conocimiento profundo",
+        "sabiduría cósmica"
+      ],
+      "cta": "Explorar experiencias"
+    },
+    "atmosfericaAlt": "Figura en meditación con un núcleo de luz dorada",
+    "contenidos": {
+      "title": "Contenidos",
+      "body": "Compartimos contenidos creados para acompañar cada etapa del camino, integrar los aprendizajes y profundizar en el propio proceso evolutivo.",
+      "cta": "Ir más profundo",
+      "imageAlt": "Portal de luz"
+    },
+    "faqs": {
+      "title": "¿Con curiosidad por el viaje?",
+      "intro": "Aquí van algunas cosas que quizás quieras saber antes de seguir explorando.",
+      "more": "Explorar más →"
+    },
+    "cierreAlt": "Amanecer sobre el horizonte",
+    "cierre": "Cuando el alma está lista,<br></br>el camino aparece."
   }
 }

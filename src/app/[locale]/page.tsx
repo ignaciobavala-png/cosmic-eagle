@@ -154,30 +154,22 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             significan nada en la lista final. */}
         <ScrollStory
           id="relato"
-          paragraphs={[
-            "Los seres humanos estamos en constante evolución. A medida que expandimos nuestra conciencia, comenzamos a descubrir que somos mucho más que nuestra historia personal, nuestra mente o la realidad que percibimos a través de los sentidos.",
-            "Nuestro trabajo explora este potencial evolutivo y la naturaleza multidimensional de la experiencia humana: nuestra capacidad de transformarnos, de acceder a niveles más profundos de inteligencia y de reconectar con la dimensión del alma.",
-            "Desde esta perspectiva, la evolución humana pasa a ser parte de un campo de conciencia mucho más amplio, abriendo un camino hacia un conocimiento profundo, la sabiduría cósmica y una comprensión expandida de quiénes y qué somos.",
-          ]}
+          paragraphs={t.raw("relato.paragraphs") as string[]}
           // Pedido de la organizacion (25/09): las 5 palabras clave pasan a
           // ser Conciencia / Potencial evolutivo / Dimensión del alma /
           // Conocimiento profundo / Sabiduría cósmica. El `text` de cada una
           // tiene que aparecer LITERAL dentro del párrafo (ver `splitStory`
           // más abajo en `ScrollStory.tsx`), por eso el párrafo de arriba
           // perdió el "más" ("un conocimiento profundo", no "un conocimiento
-          // más profundo").
-          keywords={[
-            { text: "conciencia" },
-            { text: "potencial evolutivo" },
-            { text: "dimensión del alma" },
-            { text: "conocimiento profundo" },
-            { text: "sabiduría cósmica" },
-          ]}
+          // más profundo"). En inglés se revisó el mismo literal.
+          keywords={(t.raw("relato.keywords") as string[]).map((text) => ({
+            text,
+          }))}
           // El calendario y la cartelera de home se sacaron (pedido de la
           // organización, 23/09: "sacar del home público sesiones, viajes,
           // calendario y testimonios"). El CTA pasa a llevar directo a
           // Experiencias.
-          cta={{ label: "Explorar experiencias", href: "/viajes" }}
+          cta={{ label: t("relato.cta"), href: "/viajes" }}
         />
 
         {/* Julia pidió imagen a pantalla completa con una frase encima. La key
@@ -185,7 +177,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         <MediaStatement
           id="atmosferica"
           image={content("home.promesas.image")}
-          imageAlt="Figura en meditación con un núcleo de luz dorada"
+          imageAlt={t("atmosfericaAlt")}
           text={content("home.atmos.text")}
           veil={0.35}
           overlay={isEnabled(content("home.promesas.overlay"))}
@@ -227,7 +219,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               {/* `text-h2`: mismo tamaño que tenía en duro (34px/56px),
                   ahora nombrado en el token de globals.css. */}
               <h2 className="font-display text-h2 font-bold tracking-[0.5px] text-primary-container">
-                Nuestro propósito
+                {t("purpose.title")}
               </h2>
             </RevealItem>
             {/* Filete fino que se desvanece en las puntas (pedido de Sofia,
@@ -250,14 +242,11 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                 evolución... expandir su conciencia", que era mucho más que
                 lo que pidió. */}
             <p className="mx-auto mt-[30px] max-w-[640px] text-[16px] leading-[1.8] tracking-[0.3px] text-[#d0c5b4] md:mt-[50px] md:text-[20px] md:leading-[1.9]">
-              Nuestro propósito es impulsar la{" "}
-              <span className="text-primary-container">evolución</span>{" "}
-              humana, creando espacios que permitan a cada persona{" "}
-              <span className="text-primary-container">transformar</span> su
-              realidad, expandir su{" "}
-              <span className="text-primary-container">conciencia</span> y
-              profundizar la conexión con su{" "}
-              <span className="text-primary-container">alma</span>.
+              {t.rich("purpose.body", {
+                gold: (chunks) => (
+                  <span className="text-primary-container">{chunks}</span>
+                ),
+              })}
             </p>
             </RevealItem>
             <RevealItem y={30} duration={0.9} delay={0.75}>
@@ -265,7 +254,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                 href="/nosotros"
                 className="mt-[50px] px-7 py-3.5 text-[14px] md:mt-20 md:px-10 md:py-4"
               >
-                Ir más profundo
+                {t("purpose.cta")}
               </CtaLink>
             </RevealItem>
           </div>
@@ -334,7 +323,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                       simétrico"), así que queda un escalón debajo en el
                       sistema h1/h2/h3 en vez de igualar su tamaño. */}
                   <h2 className="mb-3.5 font-display text-h3 font-bold text-[#05125a] md:mb-3">
-                    Contenidos
+                    {t("contenidos.title")}
                   </h2>
                 </RevealItem>
                 {/* Oro oscuro y no el claro: sobre el fondo dorado el filete
@@ -355,11 +344,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                   compensado con que el slide ahora es más alto". */}
               <div className="space-y-5 text-[clamp(15px,4vw,17px)] leading-[1.8] text-[#05125a] md:max-w-[480px] md:space-y-6 md:text-[18px]">
                 <RevealItem duration={0.8} delay={0.15}>
-                  <p>
-                    Compartimos contenidos creados para acompañar cada etapa
-                    del camino, integrar los aprendizajes y profundizar en el
-                    propio proceso evolutivo.
-                  </p>
+                  <p>{t("contenidos.body")}</p>
                 </RevealItem>
               </div>
               <RevealItem duration={0.8} delay={0.6}>
@@ -376,7 +361,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                   tone="dark"
                   className="mt-10 px-7 py-3.5 text-[15px] md:px-10 md:py-4"
                 >
-                  Ir más profundo
+                  {t("contenidos.cta")}
                 </CtaLink>
               </RevealItem>
             </div>
@@ -429,7 +414,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                     horizontal. */}
                 <Image
                   src={content("home.tecnologia.image")}
-                  alt="Portal de luz"
+                  alt={t("contenidos.imageAlt")}
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
                   className="scale-x-[-1] object-cover object-top"
@@ -462,7 +447,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             <Reveal amount={0.3} stagger={0} className="text-center">
               <RevealItem y={30} duration={1.2}>
                 <h2 className="font-display text-h3 font-bold text-primary-container">
-                  ¿Con curiosidad por el viaje?
+                  {t("faqs.title")}
                 </h2>
               </RevealItem>
               {/* El ancho va en el envoltorio: `TitleRule` ya trae `w-full` y
@@ -472,8 +457,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               </div>
               <RevealItem y={30} duration={0.9} delay={0.3}>
                 <p className="mx-auto mt-6 max-w-[560px] text-[16px] leading-[1.8] text-[#d0c5b4] md:mt-8 md:text-[18px]">
-                  Aquí van algunas cosas que quizás quieras saber antes de
-                  seguir explorando.
+                  {t("faqs.intro")}
                 </p>
               </RevealItem>
             </Reveal>
@@ -489,7 +473,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                 pasa a `CtaLink`. */}
             <div className="mt-12 text-center md:mt-16">
               <span className="inline-flex items-center justify-center gap-2 rounded-full border-[1.5px] border-primary-container/70 px-7 py-3.5 font-display text-label-sm uppercase tracking-[0.038em] text-primary-container md:px-10 md:py-4">
-                Explorar más →
+                {t("faqs.more")}
               </span>
             </div>
           </div>
@@ -497,7 +481,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
         <MediaStatement
           image={content("home.cierre.image")}
-          imageAlt="Amanecer sobre el horizonte"
+          imageAlt={t("cierreAlt")}
           // Sin anclar, el recorte de `object-cover` depende del aspect
           // ratio de la pantalla de quien mira: en algunas la cabeza del
           // personaje cae bajo el texto centrado y en otras no (reporte de
@@ -513,13 +497,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           // `width="wide"` porque con el `max-w-2xl` de por defecto la
           // primera mitad ("Cuando el alma está lista,") todavía no entraba
           // en un solo renglón a este tamaño de fuente.
-          text={
-            <>
-              Cuando el alma está lista,
-              <br />
-              el camino aparece.
-            </>
-          }
+          text={t.rich("cierre", { br: () => <br /> })}
           width="wide"
           veil={0.3}
           overlay={isEnabled(content("home.cierre.overlay"))}
