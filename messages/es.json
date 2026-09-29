@@ -151,6 +151,23 @@
     "help": "¿Necesitas ayuda?",
     "close": "Cerrar"
   },
+  "Faqs": {
+    "meta": {
+      "title": "Preguntas frecuentes | Cosmic Eagle",
+      "description": "Preparación, salud, qué llevar, integración: lo que suelen preguntarnos antes de una Sesión o un Viaje Cósmico."
+    },
+    "hero": {
+      "imageAlt": "Partículas de luz sobre un cielo estrellado",
+      "scrollHint": "Leer"
+    },
+    "title": "Preguntas frecuentes",
+    "preparing": "Estamos preparando esta sección. Mientras tanto, escríbenos y te respondemos cualquier duda sobre las experiencias.",
+    "placements": {
+      "general": "Generales",
+      "sesiones": "Sesiones Cósmicas",
+      "viajes": "Viajes Cósmicos"
+    }
+  },
   "Legal": {
     "provisional": "<strong>Versión preliminar.</strong> Este texto está en revisión y puede cambiar. Si algo de lo que lees aquí no coincide con lo que te dijimos, escríbenos y lo aclaramos.",
     "updated": "Última actualización: {date}"

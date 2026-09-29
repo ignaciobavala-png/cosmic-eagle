@@ -151,6 +151,23 @@
     "help": "Need help?",
     "close": "Close"
   },
+  "Faqs": {
+    "meta": {
+      "title": "Frequently asked questions | Cosmic Eagle",
+      "description": "Preparation, health, what to bring, integration: what people often ask us before a Session or a Cosmic Journey."
+    },
+    "hero": {
+      "imageAlt": "Particles of light over a starry sky",
+      "scrollHint": "Read"
+    },
+    "title": "Frequently asked questions",
+    "preparing": "We are preparing this section. In the meantime, write to us and we'll answer any question about the experiences.",
+    "placements": {
+      "general": "General",
+      "sesiones": "Cosmic Sessions",
+      "viajes": "Cosmic Journeys"
+    }
+  },
   "Legal": {
     "provisional": "<strong>Preliminary version.</strong> This text is under review and may change. If anything you read here doesn't match what we told you, write to us and we'll clarify it.",
     "updated": "Last updated: {date}"
