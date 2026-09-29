@@ -122,12 +122,11 @@ export function Header() {
           por debajo; en el mockup es una banda solida y el contenido arranca
           abajo. Por eso cada `main` compensa con `pt-[var(--navbar-h)]`. */}
       <header className="fixed top-0 w-full z-50 bg-[linear-gradient(to_right,#05125a_0%,#0079b3_100%)]">
-        {/* La barra horizontal se muestra desde `md`. Ojo, el comentario que
-            estuvo aca decia "arranca en lg" y el codigo nunca lo cumplio: entre
-            768 y ~1150 el logo + los 3 links + el CTA no entran y el CTA se sale
-            de la pantalla (medido: con un viewport de 768 termina en el pixel
-            1081). Es previo y sigue igual — subir el breakpoint cambiaria a
-            drawer un rango entero de pantallas y eso no se decidio. */}
+        {/* La barra horizontal se muestra recien desde `xl` (1280px). Antes
+            arrancaba en `md` y entre 768 y ~1150 el logo + los 3 links + el CTA
+            no entran: "Registrarse" terminaba en x=1040 con pantalla de 1024
+            (medido el 29/09), o en x=1108 con el selector. El tramo queda a
+            cargo de la hamburguesa, que ahora cubre hasta `xl`. */}
         {/* La barra va a TODO el ancho: el `max-w-narrative` (1200px
             centrados) era un desvio nuestro — el mockup de Julia no tiene tope,
             solo `padding: 0 60px`. En una pantalla de 1920 dejaba 360px muertos
@@ -142,7 +141,7 @@ export function Header() {
             Los tracks laterales van `minmax(max-content,1fr)` y no `1fr` pelado:
             cuando el contenido no entra (ver abajo), un `1fr` se comprime por
             debajo del ancho del logo y lo aplasta a cero. */}
-        <nav className="grid grid-cols-[auto_1fr] md:grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center gap-4 px-margin-mobile md:px-margin-desktop h-14 md:h-16 w-full">
+        <nav className="grid grid-cols-[auto_1fr] xl:grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center gap-4 px-margin-mobile md:px-margin-desktop h-14 md:h-16 w-full">
           <Link href="/" className="shrink-0 justify-self-start">
             <Image
               src={IMAGES.logo}
@@ -155,7 +154,7 @@ export function Header() {
             />
           </Link>
 
-          <ul className="hidden md:flex items-center justify-center gap-2">
+          <ul className="hidden xl:flex items-center justify-center gap-2">
             {NAV_LINKS.filter((l) => l.href !== "/cuenta").map((link) => {
               const isActive = pathname.startsWith(link.href);
               // Pedido de Ignacio (25/09): si los hijos del desplegable estan
@@ -403,7 +402,7 @@ export function Header() {
           </ul>
 
           <div className="flex shrink-0 items-center justify-end gap-4 justify-self-end">
-            <LocaleSwitch className="hidden md:flex" />
+            <LocaleSwitch className="hidden xl:flex" />
             {profile ? (
               profile.isAdmin ? (
                 // El panel no vive bajo `[locale]`: este link NO se localiza
@@ -412,14 +411,14 @@ export function Header() {
                 // /admin.
                 <NextLink
                   href="/admin"
-                  className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
+                  className="hidden xl:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
                 >
                   {accountContent}
                 </NextLink>
               ) : (
                 <Link
                   href="/cuenta"
-                  className="hidden md:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
+                  className="hidden xl:inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-300"
                 >
                   {accountContent}
                 </Link>
@@ -439,7 +438,7 @@ export function Header() {
               // azul, asi que se queda en `gold`, el tono normal sobre fondo
               // oscuro; lo que lo distingue de Registrarse es que va sin
               // relleno solido, mismo contorno fino que su vecino.
-              <div className="hidden md:flex items-center gap-3">
+              <div className="hidden xl:flex items-center gap-3">
                 <CtaLink href="/cuenta" size="sm" className="whitespace-nowrap">
                   Login
                 </CtaLink>
@@ -455,7 +454,7 @@ export function Header() {
 
             <button
               onClick={toggleDrawer}
-              className="md:hidden active:scale-95 transition-transform"
+              className="xl:hidden active:scale-95 transition-transform"
               aria-label="Abrir menú"
             >
               <Menu className="text-primary-fixed-dim" size={24} />
@@ -471,7 +470,7 @@ export function Header() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[60] bg-[#02071f]/70 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-[60] bg-[#02071f]/70 backdrop-blur-sm xl:hidden"
               onClick={() => setDrawerOpen(false)}
             />
             <motion.div
@@ -486,7 +485,7 @@ export function Header() {
               // vertical para que el panel se lea como una tajada de la misma
               // banda: vertical dejaria el celeste al pie, donde el dorado de
               // los links pierde contraste.
-              className="fixed inset-y-0 left-0 z-[60] w-80 max-w-[85vw] bg-[linear-gradient(to_right,#05125a_0%,#0079b3_100%)] border-r border-primary-fixed-dim/25 shadow-2xl flex flex-col py-6 md:hidden"
+              className="fixed inset-y-0 left-0 z-[60] w-80 max-w-[85vw] bg-[linear-gradient(to_right,#05125a_0%,#0079b3_100%)] border-r border-primary-fixed-dim/25 shadow-2xl flex flex-col py-6 xl:hidden"
             >
               <div className="px-6 py-4 border-b border-primary-fixed-dim/20 flex justify-between items-center">
                 <Link href="/" onClick={() => setDrawerOpen(false)}>
@@ -606,22 +605,28 @@ export function Header() {
                 })}
               </ul>
 
-              {!profile && (
-                <div
-                  className="mt-auto flex flex-col gap-3 px-6"
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  <CtaLink href="/cuenta" className="w-full py-4">
-                    Login
-                  </CtaLink>
-                  <CtaLink
-                    href="/cuenta?modo=registro"
-                    className="w-full py-4"
+              <div className="mt-auto flex flex-col gap-4 px-6">
+                {!profile && (
+                  <div
+                    className="flex flex-col gap-3"
+                    onClick={() => setDrawerOpen(false)}
                   >
-                    Registrarse
-                  </CtaLink>
-                </div>
-              )}
+                    <CtaLink href="/cuenta" className="w-full py-4">
+                      Login
+                    </CtaLink>
+                    <CtaLink
+                      href="/cuenta?modo=registro"
+                      className="w-full py-4"
+                    >
+                      Registrarse
+                    </CtaLink>
+                  </div>
+                )}
+                {/* El selector va al pie del drawer, no en la barra: ahi no
+                    entra con el menu completo (ver el comentario del
+                    breakpoint, arriba). */}
+                <LocaleSwitch className="flex justify-center" />
+              </div>
             </motion.div>
           </>
         )}
