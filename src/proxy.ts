@@ -2,11 +2,12 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "@/i18n/routing";
 import { refreshSession } from "@/lib/supabase/proxy";
+import { maintenanceResponse } from "@/lib/maintenance";
 
 const handleI18nRouting = createMiddleware(routing);
 
 /** Lo que no es sitio publico no lleva idioma: el panel y las APIs quedan igual. */
-const SIN_IDIOMA = /^\/(admin|api)(\/|$)/;
+const SIN_IDIOMA = /^\/(admin|api|mantenimiento)(\/|$)/;
 
 /**
  * Orden: primero Supabase refresca la sesion y escribe las cookies nuevas en
@@ -15,6 +16,11 @@ const SIN_IDIOMA = /^\/(admin|api)(\/|$)/;
  * las mismas cookies se copian a la RESPUESTA para el browser.
  */
 export async function proxy(request: NextRequest) {
+  // Antes que todo: en modo "en construcción" el dominio propio no llega ni a
+  // tocar Supabase (ver src/lib/maintenance.ts).
+  const maintenance = maintenanceResponse(request);
+  if (maintenance) return maintenance;
+
   const cookies = await refreshSession(request);
 
   const response = SIN_IDIOMA.test(request.nextUrl.pathname)

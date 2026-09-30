@@ -2947,3 +2947,26 @@ la cuenta de Ignacio.
 
 Pendiente: SMTP de Supabase por Resend, rotar la key (acceso completo y pegada
 en el chat), confirmar `contacto@`, prueba de registro, `www` → apex.
+
+## 2026-09-30 — Pantalla "en construcción" en el dominio propio
+
+El dominio ya responde pero las pruebas no pasaron: con `MAINTENANCE_MODE=on`
+(Vercel, Production) lo público de `cosmiceaglejourney.com` y `www` muestra
+`/mantenimiento` — logo animado + "Evolucionando hacia nuestra mejor versión"
+sobre el degradé azul recto. `cosmic-eagle.vercel.app` sigue entero para probar;
+`/admin`, `/api` y `/auth` pasan siempre. `?preview=<MAINTENANCE_BYPASS>` deja
+una cookie de 30 días para ver el sitio en el dominio (hace falta para los links
+de los correos). Apagarlo: borrar `MAINTENANCE_MODE` y redeployar.
+
+- El `LOGO ANIMADO.mov` es QuickTime Animation **ARGB**: ya trae transparencia,
+  el negro es el reproductor. Se recortó al logo y se pasó a **WebP animado con
+  alfa** (`public/img/logo-animado.webp`, 1,7 MB): anda en Safari y arranca sin
+  políticas de autoplay, cosa que un WebM con alfa no garantiza. El original
+  quedó en `cosmic-eagle-material/entregas/2026-09-30-logo-animado/` (25 MB, fuera
+  del repo).
+- `/mantenimiento` vive en `(sistema)` y entra en `SIN_IDIOMA` del proxy: si no,
+  next-intl lo reescribe a `/es/mantenimiento` y da 404.
+
+Verificado con `next start` + header `Host`: dominio y `www` → pantalla, `/admin`
+y `/api` pasan, token → 307 con cookie, cookie buena → sitio, cookie mala →
+pantalla, `vercel.app` → sitio. Capturas a 390 y 1440 sin scroll horizontal.
