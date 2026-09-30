@@ -19,12 +19,18 @@ function revalidateTestimonialPaths() {
   revalidatePath("/admin/testimonios");
 }
 
+/** Un campo opcional del form: vacío o sólo espacios se guarda como `null`. */
+function optional(value: FormDataEntryValue | null): string | null {
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
 function parseForm(formData: FormData) {
   const placement = formData.get("placement");
   const quote = formData.get("quote");
   const authorName = formData.get("author_name");
   const authorLocation = formData.get("author_location");
   const sortOrder = formData.get("sort_order");
+  const quoteEn = optional(formData.get("quote_en"));
 
   if (
     !isTestimonialPlacement(placement) ||
@@ -50,6 +56,13 @@ function parseForm(formData: FormData) {
     } as const;
   }
 
+  if (quoteEn && quoteEn.length > TESTIMONIAL_MAX_CHARS) {
+    return {
+      error: `El testimonio en inglés no puede pasar de ${TESTIMONIAL_MAX_CHARS} caracteres (tiene ${quoteEn.length}).`,
+      data: null,
+    } as const;
+  }
+
   const parsedOrder = Number(sortOrder);
 
   return {
@@ -58,10 +71,11 @@ function parseForm(formData: FormData) {
       placement,
       quote: quote.trim(),
       author_name: authorName.trim(),
-      author_location:
-        typeof authorLocation === "string" && authorLocation.trim()
-          ? authorLocation.trim()
-          : null,
+      author_location: optional(authorLocation),
+      quote_en: quoteEn,
+      author_location_en: optional(formData.get("author_location_en")),
+      body: optional(formData.get("body")),
+      body_en: optional(formData.get("body_en")),
       // El orden es opcional en el form; sin numero valido va al final.
       sort_order: Number.isFinite(parsedOrder) ? parsedOrder : 0,
       is_published: formData.get("is_published") === "on",

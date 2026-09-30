@@ -738,36 +738,48 @@ export type Database = {
       testimonials: {
         Row: {
           author_location: string | null
+          author_location_en: string | null
+          body: string | null
+          body_en: string | null
           author_name: string
           created_at: string
           id: string
           is_published: boolean
           placement: Database["public"]["Enums"]["testimonial_placement"]
           quote: string
+          quote_en: string | null
           sort_order: number
           updated_at: string
           updated_by: string | null
         }
         Insert: {
           author_location?: string | null
+          author_location_en?: string | null
+          body?: string | null
+          body_en?: string | null
           author_name: string
           created_at?: string
           id?: string
           is_published?: boolean
           placement: Database["public"]["Enums"]["testimonial_placement"]
           quote: string
+          quote_en?: string | null
           sort_order?: number
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
           author_location?: string | null
+          author_location_en?: string | null
+          body?: string | null
+          body_en?: string | null
           author_name?: string
           created_at?: string
           id?: string
           is_published?: boolean
           placement?: Database["public"]["Enums"]["testimonial_placement"]
           quote?: string
+          quote_en?: string | null
           sort_order?: number
           updated_at?: string
           updated_by?: string | null

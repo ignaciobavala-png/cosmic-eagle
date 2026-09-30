@@ -2855,3 +2855,37 @@ Hostinger) con el inventario de la zona actual, incluido el DKIM de Google.
 El sitio viejo es una sola página: no hacen falta redirects. Después del corte
 faltan en producción `NEXT_PUBLIC_SITE_URL` y `RESEND_FROM`, y la Site URL y
 las redirect URLs de Supabase Auth.
+
+## 2026-09-29 — Etapa 2 del inglés mergeada
+
+`i18n/etapa-2` entró a `main` (`c739084`) con verificación liviana, a pedido
+de Ignacio para mostrar el avance: build con las páginas estáticas intactas,
+`e2e:lectura` 40/40, y el texto en castellano idéntico a producción en seis
+páginas. Quedaron sin hacer el test propio del inglés, la lista de lo que
+sigue en castellano en `/en`, las capturas y el handoff de la etapa. Se
+borraron las ramas `i18n/etapa-2` y (a mano) `spike/i18n`.
+
+## 2026-09-29 — Testimonios de "Nuestros Sanadores", en dos idiomas
+
+Sofía mandó por WhatsApp los testimonios de los healers: cinco relatos
+(Amando Veracruz, Elvira, Irene, Margarita, Vicky) de 3.000 a 6.300
+caracteres, en castellano e inglés. La carpeta de Drive se llamaba
+"TESTIMONIOS VIAJER@S" por error. Copia en
+`docs/entregas/2026-09-29-testimonios-sanadores/`.
+
+- **Dónde:** desde la cartelera única del 23/09, `/viajes` tiene una sola
+  banda, que mostraba el juego de "viajes" (el mismo de la home, repetido).
+  Ahora muestra el de `sesiones`, titulada "Nuestros Sanadores" / "Our
+  Healers". El juego de "viajes" sigue en la base sin mostrarse.
+- **Cómo:** la tarjeta sigue con `quote` (tope 250) y suma "Leer testimonio
+  completo", que abre `body` en un `<dialog>` nativo. Las citas son frases
+  literales de cada relato; las de Elvira y Margarita se cambiaron por otras
+  más cortas porque a 360px el `line-clamp-6` las cortaba. Sofía puede
+  cambiarlas desde el panel.
+- **Inglés:** migración `20260930030000_testimonials_i18n_body` con
+  `quote_en`, `author_location_en`, `body`, `body_en` (nulables, **dentro de
+  los grants de columna**). Es el primer contenido de la base con inglés, un
+  adelanto de la etapa 3 con el patrón de `docs/I18N.md` §6: sin `quote_en`
+  el testimonio entero cae al castellano con `lang="es"`.
+- Se borraron los cuatro Lorem ipsum. El relato de Margarita trae una pregunta
+  de entrevista en el medio; quedó como vino.

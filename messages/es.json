@@ -154,7 +154,9 @@
   "Testimonials": {
     "prev": "Testimonio anterior",
     "next": "Testimonio siguiente",
-    "view": "Ver el testimonio de {name}"
+    "view": "Ver el testimonio de {name}",
+    "readMore": "Leer testimonio completo",
+    "close": "Cerrar"
   },
   "NotFound": {
     "title": "Portal Perdido",
@@ -357,7 +359,7 @@
       "body": "Experiencias para <strong>profundizar en tu proceso de transformación</strong>, expandir la conciencia y conectar con el alma. En sesiones de un día o retiros de varios días."
     },
     "testimonials": {
-      "title": "Nuestros Viajeros",
+      "title": "Nuestros Sanadores",
       "label": "Voces de quienes ya hicieron el camino"
     },
     "cierre": {

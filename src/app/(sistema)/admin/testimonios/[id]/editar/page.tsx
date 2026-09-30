@@ -13,7 +13,9 @@ export default async function EditarTestimonioPage({
   const supabase = await createClient();
   const { data: testimonial } = await supabase
     .from("testimonials")
-    .select("id, placement, quote, author_name, author_location, sort_order, is_published")
+    .select(
+      "id, placement, quote, author_name, author_location, quote_en, author_location_en, body, body_en, sort_order, is_published"
+    )
     .eq("id", id)
     .maybeSingle();
 

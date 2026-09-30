@@ -154,7 +154,9 @@
   "Testimonials": {
     "prev": "Previous testimonial",
     "next": "Next testimonial",
-    "view": "See the testimonial from {name}"
+    "view": "See the testimonial from {name}",
+    "readMore": "Read the full testimonial",
+    "close": "Close"
   },
   "NotFound": {
     "title": "Lost Portal",
@@ -357,7 +359,7 @@
       "body": "Experiences to <strong>go deeper into your process of transformation</strong>, expand consciousness, and connect with the soul. In one-day sessions or multi-day journeys."
     },
     "testimonials": {
-      "title": "Our Travelers",
+      "title": "Our Healers",
       "label": "Voices of those who have already walked the path"
     },
     "cierre": {

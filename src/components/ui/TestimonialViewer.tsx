@@ -2,8 +2,8 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type { Testimonial } from "@/lib/testimonials";
 
 /** Cada cuánto pasa al siguiente testimonio, donde el pase automático está. */
@@ -39,6 +39,11 @@ const INTERVALO_MS = 3000;
  *   Un cambio de contenido cada 3s es movimiento aunque no haya transición.
  * - **Las flechas van FUERA del texto, no encima**, así no tapan nada ni
  *   necesitan un fondo propio para despegarse del testimonio.
+ *
+ * Un testimonio con `body` (el relato completo, 29/09: los de los sanadores
+ * miden de 3.000 a 6.000 caracteres) suma "Leer testimonio completo", que lo
+ * abre en un `<dialog>` nativo: foco, Esc y fondo inerte vienen del browser.
+ * La cita de la tarjeta sigue siendo `quote`, con su tope de 250.
  */
 export function TestimonialViewer({
   testimonials,
@@ -65,6 +70,7 @@ export function TestimonialViewer({
   const reduced = useReducedMotion();
   const [activo, setActivo] = useState(0);
   const [pausado, setPausado] = useState(false);
+  const dialogo = useRef<HTMLDialogElement>(null);
 
   const total = testimonials.length;
 
@@ -79,6 +85,7 @@ export function TestimonialViewer({
   if (total === 0) return null;
 
   const t = testimonials[Math.min(activo, total - 1)];
+  const lang = t.lang === "es" ? "es" : undefined;
 
   return (
     <div
@@ -105,6 +112,7 @@ export function TestimonialViewer({
           <AnimatePresence mode="wait" initial={false}>
             <motion.figure
               key={t.id}
+              lang={lang}
               initial={reduced ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={reduced ? { opacity: 1 } : { opacity: 0, y: -12 }}
@@ -120,6 +128,15 @@ export function TestimonialViewer({
                 {t.author_name}
                 {t.author_location && ` — ${t.author_location}`}
               </figcaption>
+              {t.body && (
+                <button
+                  type="button"
+                  onClick={() => dialogo.current?.showModal()}
+                  className="mt-4 text-[12px] tracking-normal text-primary/75 underline decoration-primary/30 underline-offset-4 transition-colors duration-300 hover:text-primary hover:decoration-primary/70 sm:text-[13px]"
+                >
+                  {tr("readMore")}
+                </button>
+              )}
             </motion.figure>
           </AnimatePresence>
         </div>
@@ -131,6 +148,45 @@ export function TestimonialViewer({
           />
         )}
       </div>
+
+      {t.body && (
+        <dialog
+          ref={dialogo}
+          lang={lang}
+          aria-label={t.author_name}
+          // Click en el fondo (fuera de la caja) cierra, como el resto de los
+          // modales del sitio.
+          onClick={(e) => {
+            if (e.target === e.currentTarget) e.currentTarget.close();
+          }}
+          className="m-auto max-h-[85svh] w-[calc(100%-2rem)] max-w-[680px] overflow-y-auto rounded-[1.625rem] bg-[linear-gradient(150deg,#0079b3_0%,#0a1a6e_45%,#05125a_100%)] p-0 text-left shadow-[0_30px_80px_rgba(0,0,0,0.45)] backdrop:bg-black/50"
+        >
+          <div className="relative px-6 pb-10 pt-14 sm:px-10">
+            <button
+              type="button"
+              onClick={() => dialogo.current?.close()}
+              aria-label={tr("close")}
+              className="absolute right-5 top-5 p-2 text-primary-container/70 transition-colors hover:text-primary-container"
+            >
+              <X className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
+            </button>
+            <p className="font-display text-[26px] leading-tight text-primary-container sm:text-[30px]">
+              {t.author_name}
+            </p>
+            {t.author_location && (
+              <p className="mt-1 text-[13px] text-primary/70">{t.author_location}</p>
+            )}
+            <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-primary sm:text-[16px]">
+              {t.body
+                .split(/\n+/)
+                .filter((p) => p.trim())
+                .map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+            </div>
+          </div>
+        </dialog>
+      )}
 
       {dots && total > 1 && (
         <div className="mt-5 flex items-center justify-center gap-2">

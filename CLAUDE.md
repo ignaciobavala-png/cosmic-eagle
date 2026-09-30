@@ -453,8 +453,7 @@ veces en el mismo archivo y el cambio se cuela donde no va.
 - El destino de "Contacta soporte" y de los links apagados del footer.
 - Copy de la clienta sin lugar en `docs/COPY_HUERFANO.md`.
 
-**Deuda anotada**: los cuatro testimonios de "Nuestros Sanadores" en producción
-son **Lorem ipsum**; `Collapsible` dice que renderiza siempre para el SEO pero
+**Deuda anotada**: `Collapsible` dice que renderiza siempre para el SEO pero
 monta recién al abrir; quedan componentes sin uso de los rediseños anteriores
 (`PortalsSection`, `AboutSection`, `EbookSection`, `TripsSection`, `QuoteBand`,
 `HumanitySection`, `GoldDivider`, `FeatureBlock`, `DocumentCard`, `CallBand`,

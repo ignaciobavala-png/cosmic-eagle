@@ -91,9 +91,10 @@ export default async function ViajesPage({
   const trips = (data ?? []) as TripCardData[];
 
   // Después del listado va una sola banda de testimonios: el documento §5 pide
-  // "solamente una selección breve". Se usa el juego de "viajes", que es el más
-  // completo; el de "sesiones" hoy está cargado con nombres de prueba.
-  const testimonios = await getTestimonials("viajes");
+  // "solamente una selección breve". Desde el 29/09 es la de "Nuestros
+  // Sanadores" (placement `sesiones`), con los relatos que mandó Sofía; el
+  // juego de "viajes" repetía el de la home y quedó sin mostrarse.
+  const testimonios = await getTestimonials("sesiones", locale);
 
   return (
     <>
