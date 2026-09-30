@@ -2970,3 +2970,22 @@ de los correos). Apagarlo: borrar `MAINTENANCE_MODE` y redeployar.
 Verificado con `next start` + header `Host`: dominio y `www` → pantalla, `/admin`
 y `/api` pasan, token → 307 con cookie, cookie buena → sitio, cookie mala →
 pantalla, `vercel.app` → sitio. Capturas a 390 y 1440 sin scroll horizontal.
+
+## 2026-09-30 — Recuperar contraseña: SMTP de Resend y plantilla
+
+En el dashboard de Supabase: SMTP propio (`smtp.resend.com:465`, usuario
+`resend`, una API key de *Sending access* sólo para esto, remitente
+`hola@cosmiceaglejourney.com`) y la plantilla **Reset Password** en castellano
+con `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=recovery` (no el
+`ConfirmationURL` por defecto, que falla si el mail se abre en otro
+dispositivo). Redirect URLs: el dominio, `www` y `cosmic-eagle.vercel.app`.
+
+Probado por Ignacio: el mail llega y el link abre `/cuenta/nueva-clave`.
+Observó que el link **deja la sesión abierta sin poner contraseña**: es el
+flujo estándar (tener el link = tener el mail) y se decidió no cambiarlo. La
+alternativa, si algún día se quiere, es que `/auth/confirm` guarde el
+`token_hash` en una cookie httpOnly y el `verifyOtp` corra recién al guardar la
+contraseña.
+
+Mientras esté `MAINTENANCE_MODE`, el link lleva al dominio (`NEXT_PUBLIC_SITE_URL`)
+y `/cuenta/nueva-clave` queda detrás de la pantalla: hace falta el `?preview=`.

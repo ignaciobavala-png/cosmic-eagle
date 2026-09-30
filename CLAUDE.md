@@ -38,8 +38,9 @@ y scripts), `proxy` (refresco de sesión, `proxy.ts` en la raíz).
 **Auth.** Login + registro en `/cuenta` (sin confirmación por mail: el gate real
 es la aprobación manual del admin — el toggle "Confirm email" del dashboard de
 Supabase tiene que seguir **desactivado**). Recuperación de contraseña en
-`/cuenta/recuperar` → `/auth/confirm` → `/cuenta/nueva-clave`, **sin plantillas
-configuradas todavía** (`docs/AUTH_EMAIL.md`).
+`/cuenta/recuperar` → `/auth/confirm` → `/cuenta/nueva-clave`, con SMTP de
+Resend y plantilla en castellano desde el 30/09 (`docs/AUTH_EMAIL.md`). El link
+del mail abre sesión (es el flujo estándar de Supabase; se evaluó y se dejó así).
 
 **El embudo de inscripción, en dos etapas** (`docs/FLUJO_INSCRIPCION.md`):
 
@@ -397,10 +398,12 @@ veces en el mismo archivo y el cambio se cuela donde no va.
 
 **Bloqueado por afuera, en orden de urgencia:**
 
-1. **Dominio y correo: hechos el 30/09** (bitácora). Quedan: el **SMTP de
-   Supabase por Resend** (recuperar contraseña sigue sin mandar mail), **rotar
-   la `RESEND_API_KEY`** (la cargada tiene acceso completo y se pegó en un chat:
-   va una de *Sending access*) y una prueba de registro de punta a punta.
+1. **Dominio y correo: hechos el 30/09** (bitácora), incluido el SMTP de
+   Supabase por Resend y la plantilla de reset con `token_hash`: recuperar la
+   contraseña ya manda mail. Quedan: **rotar la `RESEND_API_KEY` de Vercel**
+   (tiene acceso completo y se pegó en un chat: va una de *Sending access*) y
+   una prueba de registro de punta a punta. Mientras esté la pantalla de
+   mantenimiento se prueba en `cosmic-eagle.vercel.app`.
 2. **Traspaso de cuentas: hecho el 29/09** — Supabase y Resend ya son de
    ellas (el `project ref` y las llaves no cambian en una transferencia). Queda
    confirmar que `contacto@cosmiceaglejourney.com` existe: es el `reply_to` de
