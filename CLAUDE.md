@@ -400,9 +400,10 @@ veces en el mismo archivo y el cambio se cuela donde no va.
 
 1. **Dominio y correo: hechos el 30/09** (bitácora), incluido el SMTP de
    Supabase por Resend y la plantilla de reset con `token_hash`: recuperar la
-   contraseña ya manda mail. Quedan: **rotar la `RESEND_API_KEY` de Vercel**
-   (tiene acceso completo y se pegó en un chat: va una de *Sending access*) y
-   una prueba de registro de punta a punta. Mientras esté la pantalla de
+   contraseña ya manda mail. Quedan: probar guardar la contraseña nueva, confirmar que existe
+   `contacto@cosmiceaglejourney.com` y una inscripción de punta a punta antes de
+   sacar la pantalla. La `RESEND_API_KEY` de Vercel tiene acceso completo y se
+   decidió no rotarla (30/09). Mientras esté la pantalla de
    mantenimiento se prueba en `cosmic-eagle.vercel.app`.
 2. **Traspaso de cuentas: hecho el 29/09** — Supabase y Resend ya son de
    ellas (el `project ref` y las llaves no cambian en una transferencia). Queda
