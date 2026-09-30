@@ -72,7 +72,7 @@ export default async function NosotrosPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Nosotros");
-  const content = await getSiteContent();
+  const content = await getSiteContent(locale);
   const cierreTitle = content("nosotros.cierre.title").trim();
 
   return (

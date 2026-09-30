@@ -13,7 +13,9 @@ export default async function EditarFaqPage({
   const supabase = await createClient();
   const { data: faq } = await supabase
     .from("faqs")
-    .select("id, placement, question, answer, sort_order, is_published")
+    .select(
+      "id, placement, question, answer, question_en, answer_en, sort_order, is_published"
+    )
     .eq("id", id)
     .maybeSingle();
 

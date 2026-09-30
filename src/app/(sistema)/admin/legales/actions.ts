@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isLegalSlug, legalDocumentMeta } from "@/lib/legal";
 import { publicPath } from "@/i18n/public-path";
+import { optionalEnglish } from "@/components/admin/EnglishFields";
 
 export type LegalFormState = { error: string | null };
 
@@ -39,6 +40,8 @@ export async function updateLegalDocument(
     .update({
       title: title.trim(),
       body: body.trim(),
+      title_en: optionalEnglish(formData, "title_en"),
+      body_en: optionalEnglish(formData, "body_en"),
       is_provisional: formData.get("is_provisional") === "on",
     })
     .eq("slug", slug);

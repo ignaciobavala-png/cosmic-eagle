@@ -51,8 +51,8 @@ export default async function FaqsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Faqs");
-  const content = await getSiteContent();
-  const faqs = await getFaqs();
+  const content = await getSiteContent(locale);
+  const faqs = await getFaqs(locale);
 
   const blocks = FAQ_PLACEMENTS.filter((p) => faqs[p.value].length > 0);
 

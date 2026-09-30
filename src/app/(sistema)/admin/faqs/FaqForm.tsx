@@ -3,12 +3,15 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { FAQ_PLACEMENTS } from "@/lib/faqs";
+import { EnglishFields } from "@/components/admin/EnglishFields";
 import type { FaqFormState } from "./actions";
 
 type Values = {
   placement: string;
   question: string;
   answer: string;
+  question_en: string | null;
+  answer_en: string | null;
   sort_order: number;
   is_published: boolean;
 };
@@ -85,6 +88,14 @@ export function FaqForm({
           negritas: se muestra tal cual lo escribas.
         </p>
       </div>
+
+      <EnglishFields
+        fieldClassName={FIELD}
+        fields={[
+          { name: "question_en", label: "Question", value: values?.question_en },
+          { name: "answer_en", label: "Answer", value: values?.answer_en, rows: 8 },
+        ]}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 sm:items-end">
         <div>

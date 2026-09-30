@@ -5,7 +5,12 @@ import { LegalPage, legalMetadata } from "@/components/ui/LegalPage";
  * ruta al guardar. */
 export const revalidate = 3600;
 
-export const generateMetadata = () => legalMetadata("terminos");
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/terminos">) {
+  const { locale } = await params;
+  return legalMetadata("terminos", locale);
+}
 
 export default async function TerminosPage({
   params,

@@ -5,7 +5,7 @@ import { Check, ImageUp, RotateCcw } from "lucide-react";
 import { compressImage } from "@/lib/compress-image";
 import { compressVideo, MAX_DURATION_SECONDS } from "@/lib/compress-video";
 import { isVideoUrl } from "@/lib/media";
-import { isEnabled, type Slot } from "@/lib/site-content";
+import { isEnabled, isTranslatable, type Slot } from "@/lib/site-content";
 import { resetSlot, saveSlot, type SlotState } from "./actions";
 
 const INITIAL: SlotState = { error: null };
@@ -14,19 +14,23 @@ export function SlotEditor({
   slot,
   value,
   edited,
+  valueEn,
 }: {
   slot: Slot;
   /** Valor que se esta mostrando hoy en el sitio (override o el del repo). */
   value: string;
   /** true si hay override cargado: sin esto no se sabe que se puede restaurar. */
   edited: boolean;
+  /** La versión en inglés (fila `<key>.en`), vacía si no se cargó. */
+  valueEn: string;
 }) {
   const [state, save, saving] = useActionState(saveSlot, INITIAL);
   const [resetState, reset, resetting] = useActionState(resetSlot, INITIAL);
+  const [enState, saveEn, savingEn] = useActionState(saveSlot, INITIAL);
 
   const isImage = slot.type === "image";
   const isBoolean = slot.type === "boolean";
-  const error = state.error ?? resetState.error;
+  const error = state.error ?? resetState.error ?? enState.error;
 
   return (
     <div className="border-t border-outline-variant/30 px-5 py-5 first:border-t-0 md:px-6">
@@ -64,6 +68,19 @@ export function SlotEditor({
         )}
       </form>
 
+      {isTranslatable(slot) && (
+        <form action={saveEn} className="mt-3">
+          <input type="hidden" name="key" value={slot.key} />
+          <input type="hidden" name="lang" value="en" />
+          <p className="mb-1.5 text-xs text-on-surface-variant">
+            <span className="font-medium text-on-surface">English</span> — lo
+            que se ve en la versión en inglés del sitio. Vacío, ahí aparece el
+            texto en castellano.
+          </p>
+          <TextField slot={slot} value={valueEn} saving={savingEn} allowEmpty />
+        </form>
+      )}
+
       {error && <p className="mt-2 text-xs text-error">{error}</p>}
     </div>
   );
@@ -92,10 +109,13 @@ function TextField({
   slot,
   value,
   saving,
+  allowEmpty = false,
 }: {
   slot: Slot;
   value: string;
   saving: boolean;
+  /** El inglés se puede vaciar: borrarlo es volver al castellano. */
+  allowEmpty?: boolean;
 }) {
   const [draft, setDraft] = useState(value);
   const [lastValue, setLastValue] = useState(value);
@@ -108,7 +128,7 @@ function TextField({
     setDraft(value);
   }
 
-  const dirty = draft.trim() !== value.trim();
+  const dirty = draft.trim() !== value.trim() && (allowEmpty || !!draft.trim());
 
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-end">

@@ -11,6 +11,7 @@ import {
 } from "@/lib/article";
 import { CONTENT_ACCESS_LEVELS } from "@/lib/content-access";
 import type { Tables } from "@/lib/supabase/types";
+import { EnglishFields } from "@/components/admin/EnglishFields";
 import type { ArticleFormState } from "./actions";
 
 const STATUS_OPTIONS = [
@@ -235,6 +236,16 @@ export function ArticleForm({
           subtítulo.
         </p>
       </div>
+
+      <EnglishFields
+        fieldClassName={`${inputClass} w-full`}
+        hint="Lo que se ve en la versión en inglés del sitio. Un campo vacío aparece en castellano; el texto sigue las mismas reglas que el de arriba."
+        fields={[
+          { name: "title_en", label: "Title", value: article?.title_en },
+          { name: "excerpt_en", label: "Excerpt", value: article?.excerpt_en, rows: 2 },
+          { name: "body_en", label: "Text", value: article?.body_en, rows: 12 },
+        ]}
+      />
 
       {state.error && <p className="text-sm text-error">{state.error}</p>}
 

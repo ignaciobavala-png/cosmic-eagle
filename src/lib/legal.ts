@@ -61,20 +61,26 @@ export function legalDocumentMeta(slug: LegalSlug) {
  * la clienta guarda y no ve el cambio hasta dentro de una hora.
  */
 export async function getLegalDocument(
-  slug: LegalSlug
+  slug: LegalSlug,
+  locale = "es"
 ): Promise<LegalDocument | null> {
   const { data } = await createPublicClient()
     .from("legal_documents")
-    .select("slug, title, body, is_provisional, updated_at")
+    .select("slug, title, body, title_en, body_en, is_provisional, updated_at")
     .eq("slug", slug)
     .maybeSingle();
 
   if (!data) return null;
 
+  // En inglés manda el cuerpo: sin `body_en` el documento entero queda en
+  // castellano, título incluido. Un título en inglés sobre un texto legal en
+  // castellano prometería algo que la página no tiene.
+  const en = locale === "en" && !!data.body_en?.trim();
+
   return {
     slug: data.slug,
-    title: data.title,
-    body: data.body,
+    title: en ? data.title_en?.trim() || data.title : data.title,
+    body: en ? data.body_en! : data.body,
     isProvisional: data.is_provisional,
     updatedAt: data.updated_at,
   };

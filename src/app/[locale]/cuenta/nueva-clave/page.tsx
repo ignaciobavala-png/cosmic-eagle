@@ -36,7 +36,7 @@ export default async function NuevaClavePage({
   // sesion, el enlace vencio o alguien entro a la URL de prepo.
   if (!user) return await redirect("/cuenta?error=enlace-vencido");
 
-  const content = await getSiteContent();
+  const content = await getSiteContent(locale);
 
   return (
     <>

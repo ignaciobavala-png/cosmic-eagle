@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Trash2 } from "lucide-react";
+import { EnglishFields } from "@/components/admin/EnglishFields";
 import type { PaymentMethodState } from "./actions";
 import { deletePaymentMethod } from "./actions";
 
@@ -9,6 +10,9 @@ type Values = {
   label: string;
   audience: string | null;
   instructions: string;
+  label_en: string | null;
+  audience_en: string | null;
+  instructions_en: string | null;
   currency: string | null;
   link_url: string | null;
   sort_order: number;
@@ -89,6 +93,21 @@ export function PaymentMethodForm({
             en el concepto.
           </p>
         </div>
+
+        <EnglishFields
+          fieldClassName={FIELD}
+          hint="Lo que ve quien se inscribe desde la versión en inglés del sitio. Un campo vacío aparece en castellano."
+          fields={[
+            { name: "label_en", label: "Payment method name", value: values?.label_en },
+            { name: "audience_en", label: "Who it's for", value: values?.audience_en },
+            {
+              name: "instructions_en",
+              label: "Instructions and details",
+              value: values?.instructions_en,
+              rows: 7,
+            },
+          ]}
+        />
 
         <div className="grid gap-5 sm:grid-cols-3">
           <div>

@@ -2889,3 +2889,34 @@ caracteres, en castellano e inglés. La carpeta de Drive se llamaba
   el testimonio entero cae al castellano con `lang="es"`.
 - Se borraron los cuatro Lorem ipsum. El relato de Margarita trae una pregunta
   de entrevista en el medio; quedó como vino.
+
+## 2026-09-30 — Etapa 3 del inglés: casillas EN en el panel
+
+Pregunta de Ignacio: ¿el panel permite cargar cada frase en los dos idiomas?
+No: sólo `testimonials` (29/09). Ahora sí, con el patrón de `docs/I18N.md` §6
+(columna `_en` nulable, vacía = cae al castellano):
+
+- Migración `20260930140000_content_i18n_en_columns`: `_en` en `trips` (título,
+  descripción, tipo de lugar, qué incluye, condiciones, llegadas, qué llevar),
+  `articles` (título, bajada, texto), `faqs` (pregunta, respuesta),
+  `legal_documents` (título, texto) y `payment_methods` (nombre, a quién,
+  instrucciones). Grants de columna en `articles`, `faqs` y `legal_documents`
+  (la trampa del revoke); `articles_public` suma `title_en`/`excerpt_en` al final.
+- `site_content` sin migración: el inglés de un slot de texto es la fila
+  `<key>.en`. `/admin/multimedia` muestra una casilla "English" debajo de cada
+  texto; vaciarla la borra. **Sin `upsert`**: el grant sólo deja actualizar
+  `value` y el ON CONFLICT reescribe la key.
+- El programa de un viaje: `activity_en` dentro de cada item del jsonb, con una
+  segunda línea por actividad en el editor.
+- Lectura: `src/lib/localized.ts` (`localized`, `localizeRow`). `localizeRow`
+  **descarta las `_en`** después de elegir: sin eso el idioma que no se muestra
+  viajaba en el payload de los Client Components (`TripCarousel`).
+- FAQs y legales caen **enteros** al castellano si falta una mitad (pregunta sin
+  respuesta, título sin cuerpo): mismo criterio que los testimonios.
+- Los correos siguen en castellano (etapa 6), incluidos los medios de pago del
+  correo de aprobación.
+
+Verificado: build con ●/ƒ igual que antes; datos de prueba en las 6 fuentes y
+curl a `/en/*` y `/*` (inglés sólo en `/en`, castellano intacto, FAQ a medias
+cae al castellano); escrituras como admin `authenticated` en una transacción
+revertida. Los datos de prueba se borraron. **No se corrió `e2e:lectura`.**

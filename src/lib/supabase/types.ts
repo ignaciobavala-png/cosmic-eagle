@@ -215,45 +215,54 @@ export type Database = {
         Row: {
           access_level: Database["public"]["Enums"]["content_access_level"]
           body: string
+          body_en: string | null
           category: Database["public"]["Enums"]["article_category"]
           cover_url: string | null
           created_at: string
           excerpt: string | null
+          excerpt_en: string | null
           id: string
           published_at: string | null
           slug: string
           status: Database["public"]["Enums"]["article_status"]
           title: string
+          title_en: string | null
           updated_at: string
           updated_by: string | null
         }
         Insert: {
           access_level?: Database["public"]["Enums"]["content_access_level"]
           body: string
+          body_en?: string | null
           category?: Database["public"]["Enums"]["article_category"]
           cover_url?: string | null
           created_at?: string
           excerpt?: string | null
+          excerpt_en?: string | null
           id?: string
           published_at?: string | null
           slug: string
           status?: Database["public"]["Enums"]["article_status"]
           title: string
+          title_en?: string | null
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
           access_level?: Database["public"]["Enums"]["content_access_level"]
           body?: string
+          body_en?: string | null
           category?: Database["public"]["Enums"]["article_category"]
           cover_url?: string | null
           created_at?: string
           excerpt?: string | null
+          excerpt_en?: string | null
           id?: string
           published_at?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["article_status"]
           title?: string
+          title_en?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -381,36 +390,42 @@ export type Database = {
       faqs: {
         Row: {
           answer: string
+          answer_en: string | null
           created_at: string
           group_label: string | null
           id: string
           is_published: boolean
           placement: Database["public"]["Enums"]["faq_placement"]
           question: string
+          question_en: string | null
           sort_order: number
           updated_at: string
           updated_by: string | null
         }
         Insert: {
           answer: string
+          answer_en?: string | null
           created_at?: string
           group_label?: string | null
           id?: string
           is_published?: boolean
           placement: Database["public"]["Enums"]["faq_placement"]
           question: string
+          question_en?: string | null
           sort_order?: number
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
           answer?: string
+          answer_en?: string | null
           created_at?: string
           group_label?: string | null
           id?: string
           is_published?: boolean
           placement?: Database["public"]["Enums"]["faq_placement"]
           question?: string
+          question_en?: string | null
           sort_order?: number
           updated_at?: string
           updated_by?: string | null
@@ -525,25 +540,31 @@ export type Database = {
       legal_documents: {
         Row: {
           body: string
+          body_en: string | null
           is_provisional: boolean
           slug: string
           title: string
+          title_en: string | null
           updated_at: string
           updated_by: string | null
         }
         Insert: {
           body: string
+          body_en?: string | null
           is_provisional?: boolean
           slug: string
           title: string
+          title_en?: string | null
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
           body?: string
+          body_en?: string | null
           is_provisional?: boolean
           slug?: string
           title?: string
+          title_en?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -570,11 +591,14 @@ export type Database = {
       payment_methods: {
         Row: {
           audience: string | null
+          audience_en: string | null
           currency: string | null
           id: string
           instructions: string
+          instructions_en: string | null
           is_active: boolean
           label: string
+          label_en: string | null
           link_url: string | null
           sort_order: number
           updated_at: string
@@ -582,11 +606,14 @@ export type Database = {
         }
         Insert: {
           audience?: string | null
+          audience_en?: string | null
           currency?: string | null
           id?: string
           instructions: string
+          instructions_en?: string | null
           is_active?: boolean
           label: string
+          label_en?: string | null
           link_url?: string | null
           sort_order?: number
           updated_at?: string
@@ -594,11 +621,14 @@ export type Database = {
         }
         Update: {
           audience?: string | null
+          audience_en?: string | null
           currency?: string | null
           id?: string
           instructions?: string
+          instructions_en?: string | null
           is_active?: boolean
           label?: string
+          label_en?: string | null
           link_url?: string | null
           sort_order?: number
           updated_at?: string
@@ -792,18 +822,23 @@ export type Database = {
           address: string | null
           area: string | null
           arrival_notes: string | null
+          arrival_notes_en: string | null
           category: Database["public"]["Enums"]["trip_category"]
           city: string
           country: string
           end_time: string | null
           includes: string | null
+          includes_en: string | null
           map_url: string | null
           packing_list: string | null
+          packing_list_en: string | null
           start_time: string | null
           venue_type: string | null
+          venue_type_en: string | null
           created_at: string
           deposit_amount: number | null
           description: string | null
+          description_en: string | null
           end_date: string
           id: string
           image_url: string | null
@@ -814,7 +849,9 @@ export type Database = {
           start_date: string
           status: Database["public"]["Enums"]["trip_status"]
           terms: string | null
+          terms_en: string | null
           title: string
+          title_en: string | null
           type: Database["public"]["Enums"]["trip_type"]
         }
         Insert: {
@@ -822,18 +859,23 @@ export type Database = {
           address?: string | null
           area?: string | null
           arrival_notes?: string | null
+          arrival_notes_en?: string | null
           category?: Database["public"]["Enums"]["trip_category"]
           city: string
           country: string
           end_time?: string | null
           includes?: string | null
+          includes_en?: string | null
           map_url?: string | null
           packing_list?: string | null
+          packing_list_en?: string | null
           start_time?: string | null
           venue_type?: string | null
+          venue_type_en?: string | null
           created_at?: string
           deposit_amount?: number | null
           description?: string | null
+          description_en?: string | null
           end_date: string
           id?: string
           image_url?: string | null
@@ -844,7 +886,9 @@ export type Database = {
           start_date: string
           status?: Database["public"]["Enums"]["trip_status"]
           terms?: string | null
+          terms_en?: string | null
           title: string
+          title_en?: string | null
           type?: Database["public"]["Enums"]["trip_type"]
         }
         Update: {
@@ -852,18 +896,23 @@ export type Database = {
           address?: string | null
           area?: string | null
           arrival_notes?: string | null
+          arrival_notes_en?: string | null
           category?: Database["public"]["Enums"]["trip_category"]
           city?: string
           country?: string
           end_time?: string | null
           includes?: string | null
+          includes_en?: string | null
           map_url?: string | null
           packing_list?: string | null
+          packing_list_en?: string | null
           start_time?: string | null
           venue_type?: string | null
+          venue_type_en?: string | null
           created_at?: string
           deposit_amount?: number | null
           description?: string | null
+          description_en?: string | null
           end_date?: string
           id?: string
           image_url?: string | null
@@ -874,7 +923,9 @@ export type Database = {
           start_date?: string
           status?: Database["public"]["Enums"]["trip_status"]
           terms?: string | null
+          terms_en?: string | null
           title?: string
+          title_en?: string | null
           type?: Database["public"]["Enums"]["trip_type"]
         }
         Relationships: []
@@ -887,10 +938,12 @@ export type Database = {
           category: Database["public"]["Enums"]["article_category"] | null
           cover_url: string | null
           excerpt: string | null
+          excerpt_en: string | null
           id: string | null
           published_at: string | null
           slug: string | null
           title: string | null
+          title_en: string | null
         }
         Relationships: []
       }

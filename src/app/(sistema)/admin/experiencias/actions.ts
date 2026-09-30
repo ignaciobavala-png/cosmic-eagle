@@ -171,6 +171,14 @@ function parseTripForm(formData: FormData) {
       terms: typeof terms === "string" && terms.trim() ? terms.trim() : null,
       payment_url: paymentUrlValue,
       schedule,
+      // La versión en inglés: todo opcional, vacío = cae al castellano.
+      title_en: optionalText(formData, "title_en"),
+      description_en: optionalText(formData, "description_en"),
+      venue_type_en: optionalText(formData, "venue_type_en"),
+      includes_en: optionalText(formData, "includes_en"),
+      arrival_notes_en: optionalText(formData, "arrival_notes_en"),
+      packing_list_en: optionalText(formData, "packing_list_en"),
+      terms_en: optionalText(formData, "terms_en"),
     },
   } as const;
 }

@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isArticleCategory, slugify } from "@/lib/article";
 import { isContentAccessLevel } from "@/lib/content-access";
 import type { ArticleStatus } from "@/lib/article";
+import { optionalEnglish } from "@/components/admin/EnglishFields";
 
 export type ArticleFormState = { error: string | null };
 
@@ -75,6 +76,9 @@ function parseArticleForm(formData: FormData) {
       category,
       status,
       access_level: accessLevel,
+      title_en: optionalEnglish(formData, "title_en"),
+      excerpt_en: optionalEnglish(formData, "excerpt_en"),
+      body_en: optionalEnglish(formData, "body_en"),
     },
   } as const;
 }

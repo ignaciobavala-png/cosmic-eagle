@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { EnglishFields } from "@/components/admin/EnglishFields";
 import { updateLegalDocument, type LegalFormState } from "./actions";
 
 /**
@@ -14,12 +15,16 @@ export function LegalForm({
   href,
   title,
   body,
+  titleEn,
+  bodyEn,
   isProvisional,
 }: {
   slug: string;
   href: string;
   title: string;
   body: string;
+  titleEn: string | null;
+  bodyEn: string | null;
   isProvisional: boolean;
 }) {
   const [state, formAction, pending] = useActionState<LegalFormState, FormData>(
@@ -69,6 +74,15 @@ export function LegalForm({
           punteo, escribilo entre <code>**</code>.
         </p>
       </div>
+
+      <EnglishFields
+        fieldClassName="w-full rounded-2xl border border-primary-fixed-dim/30 bg-black/20 px-4 py-3 text-body-md text-on-surface"
+        hint="La versión en inglés de la página, con las mismas reglas de escritura. Sin el texto en inglés, la página en inglés muestra el documento entero en castellano. Un texto legal en inglés lo tiene que aprobar quien aprueba el castellano."
+        fields={[
+          { name: "title_en", label: "Page title", value: titleEn, maxLength: 120 },
+          { name: "body_en", label: "Document text", value: bodyEn, rows: 20 },
+        ]}
+      />
 
       <label className="flex items-start gap-3 rounded-2xl border border-primary-fixed-dim/25 px-4 py-3">
         <input

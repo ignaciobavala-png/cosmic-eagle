@@ -540,6 +540,60 @@ export function TripForm({
 
       </Section>
 
+      <details className="border-t border-outline-variant/60 pt-5">
+        <summary className={`${legendClass} cursor-pointer list-none`}>
+          English {"\u2014"} la versión en inglés del sitio
+        </summary>
+        {/* Plegado por lo mismo que "Antes de llegar": nada acá es obligatorio.
+            Cada campo vacío cae al castellano en /en (docs/I18N.md §6). */}
+        <div className="flex flex-col gap-4 pt-4">
+          <p className={hintClass}>
+            Opcional, campo por campo: lo que quede vacío se ve en castellano
+            en la versión en inglés. Las actividades del programa tienen su
+            línea en inglés arriba, en el programa.
+          </p>
+
+          <EnField name="title_en" label="Title" value={trip?.title_en} />
+          <EnField
+            name="description_en"
+            label="Description"
+            value={trip?.description_en}
+            multiline
+          />
+          <EnField
+            name="venue_type_en"
+            label="Type of venue"
+            value={trip?.venue_type_en}
+          />
+          {tripHasIncludes(type) && (
+            <EnField
+              name="includes_en"
+              label="What's included"
+              value={trip?.includes_en}
+              multiline
+            />
+          )}
+          <EnField
+            name="arrival_notes_en"
+            label="Arrivals and departures"
+            value={trip?.arrival_notes_en}
+            multiline
+          />
+          <EnField
+            name="packing_list_en"
+            label="What to bring"
+            value={trip?.packing_list_en}
+            multiline
+          />
+          <EnField
+            name="terms_en"
+            label="Terms of this experience"
+            value={trip?.terms_en}
+            multiline
+          />
+        </div>
+      </details>
+
       {state.error && (
         <p className="text-error text-sm" role="alert">
           {state.error}
@@ -556,5 +610,45 @@ export function TripForm({
         {pending ? "Guardando..." : trip ? "Guardar cambios" : "Crear viaje"}
       </button>
     </form>
+  );
+}
+
+/** Un campo de la versión en inglés: opcional, vacío = cae al castellano. */
+function EnField({
+  name,
+  label,
+  value,
+  multiline = false,
+}: {
+  name: string;
+  label: string;
+  value: string | null | undefined;
+  multiline?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={name} className={labelClass}>
+        {label}
+      </label>
+      {multiline ? (
+        <textarea
+          id={name}
+          name={name}
+          lang="en"
+          rows={3}
+          defaultValue={value ?? ""}
+          className={inputClass}
+        />
+      ) : (
+        <input
+          id={name}
+          name={name}
+          type="text"
+          lang="en"
+          defaultValue={value ?? ""}
+          className={inputClass}
+        />
+      )}
+    </div>
   );
 }

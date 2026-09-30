@@ -10,6 +10,7 @@ import { ArticleBody } from "@/components/ui/ArticleBody";
 import { CreamSection } from "@/components/ui/CreamSection";
 import { LibraryNav } from "@/components/ui/LibraryNav";
 import { createClient } from "@/lib/supabase/server";
+import { localizeRow } from "@/lib/localized";
 import { AccessCodeForm } from "@/components/ui/AccessCodeForm";
 import {
   formatArticleDate,
@@ -24,15 +25,17 @@ import type { FormatLocale } from "@/lib/format";
  * completa con lo demás publicado. Son las fichas de `articles_public`: no
  * hace falta el cuerpo.
  */
-async function getOthers(slug: string, category: string) {
+async function getOthers(slug: string, category: string, locale: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("articles_public")
-    .select("slug, title, category, published_at")
+    .select("slug, title, title_en, category, published_at")
     .neq("slug", slug)
     .order("published_at", { ascending: false, nullsFirst: false });
 
-  const rows = (data ?? []).filter((row) => row.slug && row.title);
+  const rows = (data ?? [])
+    .filter((row) => row.slug && row.title)
+    .map((row) => localizeRow(row, locale, ["title"]));
   const same = rows.filter((row) => row.category === category);
   const rest = rows.filter((row) => row.category !== category);
 
@@ -48,15 +51,17 @@ async function getOthers(slug: string, category: string) {
  * dejaria a la persona sin saber que ese contenido existe ni como pedirlo, y
  * ademas sacaria del buscador la ficha, que si es publica.
  */
-async function getTeaser(slug: string) {
+async function getTeaser(slug: string, locale: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("articles_public")
-    .select("title, excerpt, cover_url, category, published_at, access_level")
+    .select(
+      "title, title_en, excerpt, excerpt_en, cover_url, category, published_at, access_level"
+    )
     .eq("slug", slug)
     .maybeSingle();
 
-  return data;
+  return data && localizeRow(data, locale, ["title", "excerpt"]);
 }
 
 /**
@@ -65,15 +70,15 @@ async function getTeaser(slug: string) {
  * alcanza. **El texto nunca llega al browser en ese caso** — no se filtra acá,
  * no sale de la base.
  */
-async function getArticle(slug: string) {
+async function getArticle(slug: string, locale: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("articles")
-    .select("title, excerpt, body, cover_url, category, published_at")
+    .select("title, excerpt, body, body_en, cover_url, category, published_at")
     .eq("slug", slug)
     .maybeSingle();
 
-  return data;
+  return data && localizeRow(data, locale, ["body"]);
 }
 
 export async function generateMetadata({
@@ -86,7 +91,7 @@ export async function generateMetadata({
   const t = await getTranslations("Contenidos");
   // La ficha (no el cuerpo): un contenido cerrado tiene titulo y descripcion
   // publicos, y su pagina existe.
-  const teaser = await getTeaser(slug);
+  const teaser = await getTeaser(slug, locale);
 
   if (!teaser) return { title: t("meta.notFound") };
 
@@ -113,8 +118,8 @@ export default async function ContenidoPage({
   const t = await getTranslations("Contenidos");
   const tCat = await getTranslations("ArticleCategories");
   const [teaser, article] = await Promise.all([
-    getTeaser(slug),
-    getArticle(slug),
+    getTeaser(slug, rawLocale),
+    getArticle(slug, rawLocale),
   ]);
 
   // Sin ficha publica no hay contenido: ni existe ni esta publicado.
@@ -126,7 +131,7 @@ export default async function ContenidoPage({
 
   const blocks = article ? parseArticleBody(article.body) : [];
   const date = formatArticleDate(teaser.published_at, locale);
-  const others = await getOthers(slug, teaser.category!);
+  const others = await getOthers(slug, teaser.category!, rawLocale);
 
   return (
     <>

@@ -519,16 +519,38 @@ const readOverrides = unstable_cache(
   { tags: [SITE_CONTENT_TAG] }
 );
 
+/**
+ * El inglés de un slot de texto vive en la fila hermana `<key>.en`, sin
+ * migración (docs/I18N.md §6). Sólo los `text` y `multiline`: una imagen o un
+ * tilde son los mismos en los dos idiomas.
+ */
+export const EN_SUFFIX = ".en";
+
+export function isTranslatable(slot: Slot): boolean {
+  return slot.type === "text" || slot.type === "multiline";
+}
+
+const TRANSLATABLE = new Set(
+  SITE_SLOTS.filter(isTranslatable).map((slot) => slot.key)
+);
+
 export type SiteContent = (key: SlotKey) => string;
 
 /**
  * Devuelve el lector de contenido: `content("home.hero.title")` da el override
  * si existe y el valor del repo si no.
+ *
+ * En inglés, un slot de texto usa `<key>.en` si está cargado y si no cae al
+ * castellano (el override o el del repo): la página nunca sale vacía.
  */
-export async function getSiteContent(): Promise<SiteContent> {
+export async function getSiteContent(locale = "es"): Promise<SiteContent> {
   const overrides = await readOverrides();
 
-  return (key) => overrides[key] ?? FALLBACKS.get(key) ?? "";
+  return (key) => {
+    const es = overrides[key] ?? FALLBACKS.get(key) ?? "";
+    if (locale !== "en" || !TRANSLATABLE.has(key)) return es;
+    return overrides[key + EN_SUFFIX]?.trim() ? overrides[key + EN_SUFFIX] : es;
+  };
 }
 
 /** Igual que `getSiteContent` pero expone tambien que slots estan editados. */

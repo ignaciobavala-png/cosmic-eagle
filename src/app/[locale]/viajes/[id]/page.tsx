@@ -17,7 +17,12 @@ import {
   formatAmount,
   type FormatLocale,
 } from "@/lib/format";
-import { groupScheduleByDay, parseSchedule } from "@/lib/trip-schedule";
+import {
+  groupScheduleByDay,
+  localizeSchedule,
+  parseSchedule,
+} from "@/lib/trip-schedule";
+import { localizeRow } from "@/lib/localized";
 import { isTripType } from "@/lib/trip-type";
 import { formatTripTime, isTripCategory } from "@/lib/trip-fields";
 import { getSiteContent } from "@/lib/site-content";
@@ -64,26 +69,34 @@ function nightsCount(startDate: string, endDate: string) {
   return Math.round(ms / 86_400_000) + 1;
 }
 
-async function getTrip(id: string) {
+async function getTrip(id: string, locale: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("trips")
     .select(
-      "id, title, description, location, start_date, end_date, capacity, price, deposit_amount, status, image_url, type, schedule, terms, category, start_time, end_time, venue_type, includes"
+      "id, title, title_en, description, description_en, location, start_date, end_date, capacity, price, deposit_amount, status, image_url, type, schedule, terms, terms_en, category, start_time, end_time, venue_type, venue_type_en, includes, includes_en"
     )
     .eq("id", id)
     .single();
 
   // Los borradores son visibles por RLS pero no deben tener pagina publica.
   if (!data || data.status === "draft") return null;
-  return data;
+
+  // En /en cada campo usa su `_en` si está cargado (docs/I18N.md §6).
+  return localizeRow(data, locale, [
+    "title",
+    "description",
+    "terms",
+    "venue_type",
+    "includes",
+  ]);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, id } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("ViajeDetalle");
-  const trip = await getTrip(id);
+  const trip = await getTrip(id, locale);
 
   if (!trip) return { title: t("meta.notFound") };
 
@@ -101,7 +114,7 @@ export default async function ViajePage({ params }: Props) {
   const formatLocale: FormatLocale = locale === "en" ? "en" : "es";
   const t = await getTranslations("ViajeDetalle");
   const tTrip = await getTranslations("TripTypes");
-  const trip = await getTrip(id);
+  const trip = await getTrip(id, locale);
 
   if (!trip) notFound();
 
@@ -112,7 +125,9 @@ export default async function ViajePage({ params }: Props) {
 
   const solicitarHref = `/viajes/${trip.id}/solicitar`;
   const isOpen = trip.status === "open";
-  const schedule = groupScheduleByDay(parseSchedule(trip.schedule));
+  const schedule = groupScheduleByDay(
+    localizeSchedule(parseSchedule(trip.schedule), locale)
+  );
   const hourFrom = formatTripTime(trip.start_time);
   const hourTo = formatTripTime(trip.end_time);
   const hours =
@@ -123,7 +138,7 @@ export default async function ViajePage({ params }: Props) {
     isTripCategory(trip.category) && trip.category !== "mixto"
       ? tTrip(`category.${trip.category}`)
       : null;
-  const content = await getSiteContent();
+  const content = await getSiteContent(locale);
   // Una sola politica para todas las experiencias (decision del 03/09): vive en
   // /admin/multimedia y no en `trips`. Vacia = la seccion no se dibuja.
   const cancelacion = content("condiciones.cancelacion").trim();

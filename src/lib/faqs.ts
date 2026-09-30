@@ -62,10 +62,12 @@ export function faqPlacementLabel(value: FaqPlacement) {
  * Devuelve el mapa completo aunque un juego venga vacio; quien llama decide
  * si dibuja el bloque, igual que con los testimonios.
  */
-export async function getFaqs(): Promise<Record<FaqPlacement, Faq[]>> {
+export async function getFaqs(
+  locale = "es"
+): Promise<Record<FaqPlacement, Faq[]>> {
   const { data } = await createPublicClient()
     .from("faqs")
-    .select("id, question, answer, placement")
+    .select("id, question, answer, question_en, answer_en, placement")
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
 
@@ -76,10 +78,14 @@ export async function getFaqs(): Promise<Record<FaqPlacement, Faq[]>> {
   };
 
   for (const row of data ?? []) {
+    // En inglés, la pregunta y la respuesta van juntas: con sólo una de las
+    // dos traducida el par quedaría en dos idiomas, así que cae entero al
+    // castellano (mismo criterio que los testimonios).
+    const en = locale === "en" && !!row.question_en?.trim() && !!row.answer_en?.trim();
     grouped[row.placement].push({
       id: row.id,
-      question: row.question,
-      answer: row.answer,
+      question: en ? row.question_en! : row.question,
+      answer: en ? row.answer_en! : row.answer,
     });
   }
 

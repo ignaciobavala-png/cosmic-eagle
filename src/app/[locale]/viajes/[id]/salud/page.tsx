@@ -6,6 +6,7 @@ import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { funnelSurface } from "@/components/forms/styles";
 import { HealthForm } from "./HealthForm";
+import { localizeRow } from "@/lib/localized";
 
 /**
  * Etapa 2 del flujo: el formulario de salud extenso.
@@ -17,9 +18,9 @@ import { HealthForm } from "./HealthForm";
 export default async function SaludPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
-  const { id } = await params;
+  const { locale, id } = await params;
   const supabase = await createClient();
 
   const {
@@ -28,13 +29,14 @@ export default async function SaludPage({
 
   if (!user) return await redirect(`/cuenta?next=/viajes/${id}/salud`);
 
-  const { data: trip } = await supabase
+  const { data: tripRow } = await supabase
     .from("trips")
-    .select("id, title, location")
+    .select("id, title, title_en, location")
     .eq("id", id)
     .single();
 
-  if (!trip) notFound();
+  if (!tripRow) notFound();
+  const trip = localizeRow(tripRow, locale, ["title"]);
 
   const { data: applications } = await supabase
     .from("my_applications")

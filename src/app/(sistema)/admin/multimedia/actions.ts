@@ -3,10 +3,12 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import {
+  EN_SUFFIX,
   SITE_CONTENT_TAG,
   SITE_GROUPS,
   SITE_SLOTS,
   isSlotKey,
+  isTranslatable,
   type Slot,
 } from "@/lib/site-content";
 import { uploadTripCover } from "@/lib/trip-cover";
@@ -76,6 +78,12 @@ export async function saveSlot(
   if (!slot) return { error: "Ese contenido no existe." };
 
   const supabase = await createClient();
+
+  if (formData.get("lang") === "en") {
+    if (!isTranslatable(slot)) return { error: "Este contenido no tiene versión en inglés." };
+    return saveEnglish(supabase, key, formData.get("value"));
+  }
+
   const previous = await currentValue(supabase, key);
 
   let value: string;
@@ -169,6 +177,35 @@ export async function saveSlot(
   }
 
   if (slot.type === "image") await removeStored(supabase, previous);
+
+  revalidateSlot(key);
+  return { error: null };
+}
+
+/**
+ * El inglés de un slot de texto: la fila hermana `<key>.en`. Vacío la borra, y
+ * la versión en inglés del sitio vuelve a mostrar el castellano — no hay un
+ * "original" en inglés al que volver.
+ */
+async function saveEnglish(
+  supabase: SupabaseClient,
+  key: string,
+  raw: FormDataEntryValue | null
+): Promise<SlotState> {
+  const enKey = key + EN_SUFFIX;
+  const value = typeof raw === "string" ? raw.trim() : "";
+
+  // Nada de `upsert`: el grant de columna deja actualizar sólo `value`, y el
+  // ON CONFLICT de PostgREST reescribe también la key.
+  const previous = await currentValue(supabase, enKey);
+
+  const { error } = !value
+    ? await supabase.from("site_content").delete().eq("key", enKey)
+    : previous !== undefined
+      ? await supabase.from("site_content").update({ value }).eq("key", enKey)
+      : await supabase.from("site_content").insert({ key: enKey, value });
+
+  if (error) return { error: `No se pudo guardar: ${error.message}` };
 
   revalidateSlot(key);
   return { error: null };

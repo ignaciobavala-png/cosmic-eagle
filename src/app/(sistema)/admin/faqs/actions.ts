@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isFaqPlacement } from "@/lib/faqs";
 import { publicPath } from "@/i18n/public-path";
+import { optionalEnglish } from "@/components/admin/EnglishFields";
 
 export type FaqFormState = { error: string | null };
 
@@ -41,6 +42,8 @@ function parseForm(formData: FormData) {
       placement,
       question: question.trim(),
       answer: answer.trim(),
+      question_en: optionalEnglish(formData, "question_en"),
+      answer_en: optionalEnglish(formData, "answer_en"),
       // El orden es opcional en el form; sin numero valido va al final.
       sort_order: Number.isFinite(parsedOrder) ? parsedOrder : 0,
       is_published: formData.get("is_published") === "on",

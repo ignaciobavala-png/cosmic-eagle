@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { ChevronDown, ExternalLink } from "lucide-react";
-import { SITE_GROUPS, SITE_SLOTS, getSiteOverrides } from "@/lib/site-content";
+import {
+  EN_SUFFIX,
+  SITE_GROUPS,
+  SITE_SLOTS,
+  getSiteOverrides,
+} from "@/lib/site-content";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateRangeCompact } from "@/lib/format";
 import { tripTypeLabel } from "@/lib/trip-type";
@@ -127,6 +132,7 @@ export default async function AdminMultimediaPage() {
                   slot={slot}
                   value={overrides[slot.key] ?? slot.fallback}
                   edited={Boolean(overrides[slot.key])}
+                  valueEn={overrides[slot.key + EN_SUFFIX] ?? ""}
                 />
               ))}
             </Accordion>

@@ -42,6 +42,10 @@ function parse(formData: FormData) {
       // lista de datos (titular, IBAN, BIC) y se renderizan con `whitespace-pre-line`.
       instructions: instructions.trim(),
       audience: text("audience"),
+      // La versión en inglés, opcional: vacía = el postulante en /en ve el castellano.
+      label_en: text("label_en"),
+      audience_en: text("audience_en"),
+      instructions_en: text("instructions_en"),
       currency: text("currency"),
       link_url: text("link_url"),
       sort_order: Number.isFinite(parsedOrder) ? parsedOrder : 0,

@@ -12,6 +12,7 @@ import { MisSolicitudes } from "./MisSolicitudes";
 import { AvatarUpload } from "./AvatarUpload";
 import { funnelSurface } from "@/components/forms/styles";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { localizeRow } from "@/lib/localized";
 
 // Avisos que llegan por querystring desde /auth/confirm y desde updatePassword.
 // Guardan la clave del mensaje, no el texto: el idioma lo pone `t`.
@@ -56,7 +57,7 @@ export default async function CuentaPage({
   setRequestLocale(locale);
   const t = await getTranslations("Cuenta");
   const { next, modo, vista, error, aviso } = await searchParams;
-  const content = await getSiteContent();
+  const content = await getSiteContent(locale);
   const isSignup = modo === "registro";
   const supabase = await createClient();
   const {
@@ -136,11 +137,13 @@ export default async function CuentaPage({
       tripIds.length > 0
         ? await supabase
             .from("trips")
-            .select("id, title, location, start_date, end_date, price, deposit_amount")
+            .select("id, title, title_en, location, start_date, end_date, price, deposit_amount")
             .in("id", tripIds)
         : { data: [] };
 
-    const tripsById = new Map((trips ?? []).map((t) => [t.id, t]));
+    const tripsById = new Map(
+      (trips ?? []).map((t) => [t.id, localizeRow(t, locale, ["title"])])
+    );
 
     applications = raw
       .map((a) => ({ ...a, trip: tripsById.get(a.trip_id) ?? null }))

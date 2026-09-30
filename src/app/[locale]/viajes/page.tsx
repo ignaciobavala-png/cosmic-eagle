@@ -11,6 +11,7 @@ import { TestimonialsBand } from "@/components/ui/TestimonialsBand";
 import { createClient } from "@/lib/supabase/server";
 import { todayUTC } from "@/lib/trip-dates";
 import type { TripCardData } from "@/components/ui/TripCard";
+import { localizeRow } from "@/lib/localized";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { getTestimonials } from "@/lib/testimonials";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -73,7 +74,7 @@ export default async function ViajesPage({
   const t = await getTranslations("Viajes");
   const { tipo } = await searchParams;
   const initialFilter = tipo === "ceremonia" || tipo === "retiro" ? tipo : "todas";
-  const content = await getSiteContent();
+  const content = await getSiteContent(locale);
 
   const supabase = await createClient();
   // Ademas de los borradores se descarta lo que ya termino (`end_date` y no
@@ -82,13 +83,15 @@ export default async function ViajesPage({
   const { data } = await supabase
     .from("trips")
     .select(
-      "id, title, description, location, start_date, end_date, status, image_url, type"
+      "id, title, title_en, description, description_en, location, start_date, end_date, status, image_url, type"
     )
     .in("status", ["open", "closed"])
     .gte("end_date", todayUTC())
     .order("start_date", { ascending: true });
 
-  const trips = (data ?? []) as TripCardData[];
+  const trips: TripCardData[] = (data ?? []).map((trip) =>
+    localizeRow(trip, locale, ["title", "description"])
+  );
 
   // Después del listado va una sola banda de testimonios: el documento §5 pide
   // "solamente una selección breve". Desde el 29/09 es la de "Nuestros

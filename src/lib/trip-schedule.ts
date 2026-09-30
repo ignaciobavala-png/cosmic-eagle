@@ -15,7 +15,17 @@ import type { Json } from "@/lib/supabase/types";
  * `time` puede venir vacio cuando hay `day`: en un retiro hay jornadas que son
  * "Integracion" a secas, sin horario. Lo que nunca puede faltar es `activity`.
  */
-export type ScheduleItem = { day: number | null; time: string; activity: string };
+export type ScheduleItem = {
+  day: number | null;
+  time: string;
+  activity: string;
+  /**
+   * La actividad en inglés, opcional (docs/I18N.md §6). Vive dentro del mismo
+   * item del jsonb y no en una columna aparte: así no hay dos programas que se
+   * desfasen cuando se agrega o se borra una fila.
+   */
+  activity_en?: string;
+};
 
 /** Tope de jornadas. Corta valores absurdos sin limitar ningun viaje real. */
 const MAX_DAY = 60;
@@ -40,7 +50,7 @@ export function parseSchedule(value: Json | null | undefined): ScheduleItem[] {
 
   return value.flatMap((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return [];
-    const { day, time, activity } = item as Record<string, unknown>;
+    const { day, time, activity, activity_en } = item as Record<string, unknown>;
 
     if (typeof activity !== "string" || !activity.trim()) return [];
 
@@ -50,7 +60,16 @@ export function parseSchedule(value: Json | null | undefined): ScheduleItem[] {
     // Una fila sin jornada ni hora no se puede ubicar en ningun lado.
     if (parsedDay === null && !parsedTime) return [];
 
-    return [{ day: parsedDay, time: parsedTime, activity: activity.trim() }];
+    const parsedEn = typeof activity_en === "string" ? activity_en.trim() : "";
+
+    return [
+      {
+        day: parsedDay,
+        time: parsedTime,
+        activity: activity.trim(),
+        ...(parsedEn && { activity_en: parsedEn }),
+      },
+    ];
   });
 }
 
@@ -85,4 +104,15 @@ export function groupScheduleByDay(items: ScheduleItem[]): ScheduleDay[] {
   }
 
   return groups;
+}
+
+/** En inglés, cada fila usa `activity_en` si la tiene; si no, el castellano. */
+export function localizeSchedule(
+  items: ScheduleItem[],
+  locale: string
+): ScheduleItem[] {
+  if (locale !== "en") return items;
+  return items.map((item) =>
+    item.activity_en ? { ...item, activity: item.activity_en } : item
+  );
 }

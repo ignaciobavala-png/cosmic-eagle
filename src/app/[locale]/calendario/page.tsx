@@ -6,6 +6,7 @@ import { PageHero, renderTitle } from "@/components/ui/PageHero";
 import { TripCarousel } from "@/components/ui/TripCarousel";
 import { Reveal, RevealItem } from "@/components/ui/Reveal";
 import type { TripCardData } from "@/components/ui/TripCard";
+import { localizeRow } from "@/lib/localized";
 import { createPublicClient } from "@/lib/supabase/public";
 import { todayUTC } from "@/lib/trip-dates";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
@@ -63,7 +64,7 @@ export default async function CalendarioPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Calendario");
-  const content = await getSiteContent();
+  const content = await getSiteContent(locale);
 
   const supabase = createPublicClient();
   // Mismo filtro que /viajes: la policy `trips_select_public` deja leer TODOS
@@ -78,13 +79,15 @@ export default async function CalendarioPage({
   const { data } = await supabase
     .from("trips")
     .select(
-      "id, title, description, location, start_date, end_date, status, image_url, type"
+      "id, title, title_en, description, description_en, location, start_date, end_date, status, image_url, type"
     )
     .in("status", ["open", "closed"])
     .gte("end_date", todayUTC())
     .order("start_date", { ascending: true });
 
-  const trips = (data ?? []) as TripCardData[];
+  const trips: TripCardData[] = (data ?? []).map((trip) =>
+    localizeRow(trip, locale, ["title", "description"])
+  );
   const ceremonias = trips.filter((t) => t.type === "ceremonia");
   const retiros = trips.filter((t) => t.type === "retiro");
 

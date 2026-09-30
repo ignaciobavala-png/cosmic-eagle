@@ -11,6 +11,7 @@ import {
   CONSENT_SECTIONS,
 } from "@/lib/consent";
 import { ConsentForm } from "./ConsentForm";
+import { localizeRow } from "@/lib/localized";
 
 /**
  * El consentimiento informado, el paso que faltaba del embudo.
@@ -26,9 +27,9 @@ import { ConsentForm } from "./ConsentForm";
 export default async function ConsentimientoPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
-  const { id } = await params;
+  const { locale, id } = await params;
   const supabase = await createClient();
 
   const {
@@ -37,13 +38,14 @@ export default async function ConsentimientoPage({
 
   if (!user) return await redirect(`/cuenta?next=/viajes/${id}/consentimiento`);
 
-  const { data: trip } = await supabase
+  const { data: tripRow } = await supabase
     .from("trips")
-    .select("id, title, location")
+    .select("id, title, title_en, location")
     .eq("id", id)
     .single();
 
-  if (!trip) notFound();
+  if (!tripRow) notFound();
+  const trip = localizeRow(tripRow, locale, ["title"]);
 
   const { data: applications } = await supabase
     .from("my_applications")

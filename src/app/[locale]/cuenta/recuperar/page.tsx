@@ -26,7 +26,7 @@ export default async function RecuperarPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Cuenta");
-  const content = await getSiteContent();
+  const content = await getSiteContent(locale);
 
   return (
     <>

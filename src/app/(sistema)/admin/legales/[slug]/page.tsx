@@ -16,7 +16,7 @@ export default async function EditarLegalPage({
   const supabase = await createClient();
   const { data } = await supabase
     .from("legal_documents")
-    .select("slug, title, body, is_provisional")
+    .select("slug, title, body, title_en, body_en, is_provisional")
     .eq("slug", slug)
     .maybeSingle();
 
@@ -45,6 +45,8 @@ export default async function EditarLegalPage({
           href={meta.href}
           title={data.title}
           body={data.body}
+          titleEn={data.title_en}
+          bodyEn={data.body_en}
           isProvisional={data.is_provisional}
         />
       </div>

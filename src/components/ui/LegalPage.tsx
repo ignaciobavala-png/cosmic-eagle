@@ -25,8 +25,11 @@ import { getLegalDocument, legalDocumentMeta, type LegalSlug } from "@/lib/legal
  * completa, y acá eso obligaría a scrollear una pantalla entera para empezar a
  * leer un documento que se consulta para buscar un dato puntual.
  */
-export async function legalMetadata(slug: LegalSlug): Promise<Metadata> {
-  const doc = await getLegalDocument(slug);
+export async function legalMetadata(
+  slug: LegalSlug,
+  locale = "es"
+): Promise<Metadata> {
+  const doc = await getLegalDocument(slug, locale);
   const meta = legalDocumentMeta(slug);
 
   return {
@@ -43,7 +46,7 @@ export async function LegalPage({
   locale: FormatLocale;
 }) {
   const t = await getTranslations({ locale, namespace: "Legal" });
-  const doc = await getLegalDocument(slug);
+  const doc = await getLegalDocument(slug, locale);
 
   // La fila la siembra la migración, así que esto sólo pasa si alguien la borró
   // a mano en la base: el panel no puede.

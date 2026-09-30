@@ -105,14 +105,25 @@ export function ScheduleEditor({
               onChange={(e) => update(i, { time: e.target.value })}
               className={`${inputClass} w-32 shrink-0`}
             />
-            <input
-              type="text"
-              aria-label={`Actividad ${i + 1}`}
-              placeholder={byDay ? "Sesión Cósmica" : "Llegada al lugar"}
-              value={row.activity}
-              onChange={(e) => update(i, { activity: e.target.value })}
-              className={`${inputClass} min-w-0 flex-1`}
-            />
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <input
+                type="text"
+                aria-label={`Actividad ${i + 1}`}
+                placeholder={byDay ? "Sesión Cósmica" : "Llegada al lugar"}
+                value={row.activity}
+                onChange={(e) => update(i, { activity: e.target.value })}
+                className={`${inputClass} w-full`}
+              />
+              <input
+                type="text"
+                lang="en"
+                aria-label={`Actividad ${i + 1} en inglés`}
+                placeholder="English (opcional)"
+                value={row.activity_en ?? ""}
+                onChange={(e) => update(i, { activity_en: e.target.value })}
+                className={`${inputClass} w-full text-sm`}
+              />
+            </div>
             <button
               type="button"
               onClick={() => remove(i)}
@@ -136,8 +147,8 @@ export function ScheduleEditor({
 
       <p className="text-xs text-on-surface-variant/70">
         {byDay
-          ? "Se agrupa por jornada y se ordena por hora al guardar. La hora es opcional. Sin actividades, la sección no aparece."
-          : "Se muestra ordenado por hora en la página del viaje. Sin horarios, la sección no aparece."}
+          ? "Se agrupa por jornada y se ordena por hora al guardar. La hora es opcional. Sin actividades, la sección no aparece. La línea de abajo es la versión en inglés: vacía, en inglés se ve el castellano."
+          : "Se muestra ordenado por hora en la página del viaje. Sin horarios, la sección no aparece. La línea de abajo es la versión en inglés: vacía, en inglés se ve el castellano."}
       </p>
     </div>
   );

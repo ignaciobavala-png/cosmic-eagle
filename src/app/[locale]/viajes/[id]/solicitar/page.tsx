@@ -19,6 +19,7 @@ import {
 } from "@/components/forms/styles";
 import { ScreeningForm } from "./ScreeningForm";
 import { PaymentProofUpload } from "./PaymentProofUpload";
+import { localizeRow } from "@/lib/localized";
 
 type Step = { title: string; body: string; cta?: { href: string; label: string } };
 
@@ -146,15 +147,16 @@ export default async function SolicitarPage({
 
   if (!user) return await redirect(`/cuenta?next=/viajes/${id}/solicitar`);
 
-  const { data: trip } = await supabase
+  const { data: tripRow } = await supabase
     .from("trips")
     .select(
-      "id, title, location, start_date, end_date, status, price, deposit_amount, payment_url, start_time, end_time, address, map_url, arrival_notes, packing_list"
+      "id, title, title_en, location, start_date, end_date, status, price, deposit_amount, payment_url, start_time, end_time, address, map_url, arrival_notes, arrival_notes_en, packing_list, packing_list_en"
     )
     .eq("id", id)
     .single();
 
-  if (!trip) notFound();
+  if (!tripRow) notFound();
+  const trip = localizeRow(tripRow, locale, ["title", "arrival_notes", "packing_list"]);
 
   // La solicitud propia se lee por la vista: la tabla base no le devuelve
   // ninguna fila al postulante, ni siquiera las suyas.
@@ -200,7 +202,7 @@ export default async function SolicitarPage({
     existing.status === "approved" &&
     (existing.payment_status === "pending" ||
       existing.payment_status === "deposit_paid");
-  const paymentMethods = enPago ? await getActivePaymentMethods() : [];
+  const paymentMethods = enPago ? await getActivePaymentMethods(locale) : [];
 
   // La logistica se muestra recien con el cupo pagado, y no antes: la direccion
   // exacta no es publica (por eso tampoco sale en /viajes/[id]) y "que llevar"

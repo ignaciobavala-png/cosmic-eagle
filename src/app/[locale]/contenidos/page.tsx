@@ -9,6 +9,7 @@ import {
   type LibraryArticle,
 } from "@/components/ui/ContentLibrary";
 import { createClient } from "@/lib/supabase/server";
+import { localized } from "@/lib/localized";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 import {
   ARTICLE_CATEGORY_LIST,
@@ -63,7 +64,7 @@ export default async function ContenidosPage({
   // Una categoria desconocida cae en el listado completo en vez de 404: es un
   // filtro, no una ruta (mismo criterio que `?tipo=` en /viajes).
   const active = isArticleCategory(categoria) ? categoria : null;
-  const content = await getSiteContent();
+  const content = await getSiteContent(locale);
 
   const supabase = await createClient();
 
@@ -71,7 +72,7 @@ export default async function ContenidosPage({
     supabase
       .from("articles_public")
       .select(
-        "slug, title, excerpt, cover_url, category, published_at, access_level"
+        "slug, title, title_en, excerpt, excerpt_en, cover_url, category, published_at, access_level"
       )
       .order("published_at", { ascending: false, nullsFirst: false }),
     viewerContentLevel(supabase),
@@ -81,10 +82,11 @@ export default async function ContenidosPage({
   // `body` a propósito.
   const { data: readable } = await supabase
     .from("articles")
-    .select("slug, body");
+    .select("slug, body, body_en");
 
+  // En /en cada campo usa su `_en` si está cargado (docs/I18N.md §6).
   const bodyBySlug = new Map(
-    (readable ?? []).map((row) => [row.slug, row.body])
+    (readable ?? []).map((row) => [row.slug, localized(locale, row.body, row.body_en)])
   );
 
   const articles: LibraryArticle[] = (metas ?? []).map((meta) => {
@@ -94,8 +96,8 @@ export default async function ContenidosPage({
 
     return {
       slug,
-      title: meta.title!,
-      excerpt: meta.excerpt,
+      title: localized(locale, meta.title!, meta.title_en),
+      excerpt: localized(locale, meta.excerpt, meta.excerpt_en),
       cover_url: meta.cover_url,
       category: meta.category!,
       published_at: meta.published_at,
