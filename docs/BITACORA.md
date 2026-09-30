@@ -2863,7 +2863,7 @@ de Ignacio para mostrar el avance: build con las páginas estáticas intactas,
 `e2e:lectura` 40/40, y el texto en castellano idéntico a producción en seis
 páginas. Quedaron sin hacer el test propio del inglés, la lista de lo que
 sigue en castellano en `/en`, las capturas y el handoff de la etapa. Se
-borraron las ramas `i18n/etapa-2` y (a mano) `spike/i18n`.
+borró la rama `i18n/etapa-2`; `spike/i18n` sigue (ya está entera en `main`, se puede borrar).
 
 ## 2026-09-29 — Testimonios de "Nuestros Sanadores", en dos idiomas
 
