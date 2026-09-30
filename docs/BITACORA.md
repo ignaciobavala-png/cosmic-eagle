@@ -2920,3 +2920,30 @@ Verificado: build con ●/ƒ igual que antes; datos de prueba en las 6 fuentes y
 curl a `/en/*` y `/*` (inglés sólo en `/en`, castellano intacto, FAQ a medias
 cae al castellano); escrituras como admin `authenticated` en una transacción
 revertida. Los datos de prueba se borraron. **No se corrió `e2e:lectura`.**
+
+## 2026-09-30 — El dominio conectado: sitio, correo y Resend
+
+El Cloudflare que tenía el DNS era de un tercero y nadie tenía la cuenta. El
+registrador es **Hostgator** (no Hostinger, como decían notas anteriores), y
+desde ahí se pasó el dominio a su zona ("Sin alojamiento, apenas Zona de DNS").
+Mudar el registrador a Vercel se descartó: tarda días y el dominio quedaría en
+la cuenta de Ignacio.
+
+- **La trampa:** Hostgator cambia los NS en el acto y crea la zona con **su** MX
+  y su A. Propagó en minutos y el correo de Google Workspace de ellas estuvo
+  apuntando al servidor de Hostgator unos 10 minutos, hasta aplicar el preset
+  "Gmail" del panel. El inventario de la zona vieja se había sacado antes con
+  `dig`, y con eso se recrearon `google-site-verification` y `google._domainkey`.
+- Sitio: A `@` → `76.76.21.21`, CNAME `www` → `cname.vercel-dns.com`. Vercel no
+  emitió el certificado solo (la skill `vercel-dominio-cert-sin-emitir`, tercera
+  vez): `vercel certs issue cosmiceaglejourney.com www.cosmiceaglejourney.com`.
+- Resend: los 4 registros (DKIM, `send`, `rsend`, `_dmarc`) → **verified**. Es el
+  apex, no el `envios.` que decía `docs/EMAIL.md`.
+- Vercel (Production): `RESEND_API_KEY` nueva de la cuenta de ellas,
+  `RESEND_FROM=Cosmic Eagle <hola@cosmiceaglejourney.com>`,
+  `NEXT_PUBLIC_SITE_URL=https://cosmiceaglejourney.com`, redeploy.
+- Supabase Auth: Site URL y redirect URLs (apex y `www`) en el dominio.
+- Prueba: mail por Resend a Ignacio → *delivered*, llegó a la bandeja.
+
+Pendiente: SMTP de Supabase por Resend, rotar la key (acceso completo y pegada
+en el chat), confirmar `contacto@`, prueba de registro, `www` → apex.

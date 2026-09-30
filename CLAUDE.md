@@ -20,10 +20,14 @@ el estado y las reglas vigentes; la bitácora es el porqué de cada decisión. L
 sesiones nuevas se anotan allá, al pie. Si algo de acá se contradice con la
 bitácora, gana este archivo (es el más nuevo).
 
-## Estado actual (2026-09-15)
+## Estado actual (2026-09-30)
 
-En producción: `https://cosmic-eagle.vercel.app` (proyecto `cosmic-eagle`, org
-`ethoslogs-projects`, auto-deploy en cada push a `main`). `main` es la única rama.
+En producción: **`https://cosmiceaglejourney.com`** desde el 30/09 (y `www`; el
+`cosmic-eagle.vercel.app` sigue vivo). Proyecto `cosmic-eagle`, org
+`ethoslogs-projects`, auto-deploy en cada push a `main`. `main` es la única rama.
+**El DNS vive en Hostgator** (registrador + zona, NS `dns3`/`dns4.hostgator.com.br`):
+de esa zona dependen el sitio, Resend **y el correo de Google Workspace de
+ellas**. La cuenta de Hostgator no se cancela.
 
 **Backend.** Supabase `hwayqsgwoaznfqofsyly`, schema completo aplicado via
 migraciones (`supabase/migrations/`), RLS en las 15 tablas y en `storage.objects`.
@@ -62,9 +66,10 @@ por SMTP, los de la *app* salen por el SDK de Resend (`docs/EMAIL.md`). Vamos
 **11 de las 15 comunicaciones** del embudo de Sofía (`docs/COMUNICACIONES.md`).
 Los disparados por botón salen de un server action; los que dispara el calendario
 los manda el cron de `/api/cron/emails` (13:00 UTC), con `scheduled_email_log`
-como registro de "no remandar". **No sale ni un correo hasta verificar el dominio
-en Resend** — sin `RESEND_API_KEY`, `sendEmail` loguea y devuelve
-`not_configured` sin fallar y sin dejar fila.
+como registro de "no remandar". **Los correos salen de verdad desde el 30/09**:
+dominio `cosmiceaglejourney.com` verificado en Resend (el apex, no `envios.`),
+remitente `hola@cosmiceaglejourney.com`. Sin `RESEND_API_KEY`, `sendEmail`
+loguea y devuelve `not_configured` sin fallar y sin dejar fila.
 
 **Panel de admin** (`/admin`, protegido por `profiles.is_admin`): dashboard, CRUD
 de experiencias, solicitudes (revisión + pago a mano), CRM, contenidos, FAQs,
@@ -392,10 +397,10 @@ veces en el mismo archivo y el cambio se cuela donde no va.
 
 **Bloqueado por afuera, en orden de urgencia:**
 
-1. **El DNS de Resend** — verificar un subdominio de `cosmiceaglejourney.com`.
-   Es lo único que separa al sistema de correos de funcionar. **No puede ser
-   `mail.`** (ya existe como CNAME al sitio viejo). El acceso a Cloudflare es el
-   camino crítico: la misma llave sirve para mudar el sitio después.
+1. **Dominio y correo: hechos el 30/09** (bitácora). Quedan: el **SMTP de
+   Supabase por Resend** (recuperar contraseña sigue sin mandar mail), **rotar
+   la `RESEND_API_KEY`** (la cargada tiene acceso completo y se pegó en un chat:
+   va una de *Sending access*) y una prueba de registro de punta a punta.
 2. **Traspaso de cuentas: hecho el 29/09** — Supabase y Resend ya son de
    ellas (el `project ref` y las llaves no cambian en una transferencia). Queda
    confirmar que `contacto@cosmiceaglejourney.com` existe: es el `reply_to` de
