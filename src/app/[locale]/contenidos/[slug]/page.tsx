@@ -11,12 +11,12 @@ import { CreamSection } from "@/components/ui/CreamSection";
 import { LibraryNav } from "@/components/ui/LibraryNav";
 import { createClient } from "@/lib/supabase/server";
 import { AccessCodeForm } from "@/components/ui/AccessCodeForm";
-import { CONTENT_WALL_COPY } from "@/lib/content-access";
 import {
-  articleCategoryLabel,
   formatArticleDate,
   parseArticleBody,
 } from "@/lib/article";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import type { FormatLocale } from "@/lib/format";
 
 /**
  * Los "otros contenidos" que van debajo del recuadro de lectura (pedido de la
@@ -79,13 +79,16 @@ async function getArticle(slug: string) {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Contenidos");
   // La ficha (no el cuerpo): un contenido cerrado tiene titulo y descripcion
   // publicos, y su pagina existe.
-  const teaser = await getTeaser((await params).slug);
+  const teaser = await getTeaser(slug);
 
-  if (!teaser) return { title: "Contenido no encontrado | Cosmic Eagle" };
+  if (!teaser) return { title: t("meta.notFound") };
 
   return {
     title: `${teaser.title} | Cosmic Eagle`,
@@ -102,9 +105,13 @@ export async function generateMetadata({
 export default async function ContenidoPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { slug } = await params;
+  const { locale: rawLocale, slug } = await params;
+  setRequestLocale(rawLocale);
+  const locale: FormatLocale = rawLocale === "en" ? "en" : "es";
+  const t = await getTranslations("Contenidos");
+  const tCat = await getTranslations("ArticleCategories");
   const [teaser, article] = await Promise.all([
     getTeaser(slug),
     getArticle(slug),
@@ -118,7 +125,7 @@ export default async function ContenidoPage({
   const locked = !article;
 
   const blocks = article ? parseArticleBody(article.body) : [];
-  const date = formatArticleDate(teaser.published_at);
+  const date = formatArticleDate(teaser.published_at, locale);
   const others = await getOthers(slug, teaser.category!);
 
   return (
@@ -155,12 +162,12 @@ export default async function ContenidoPage({
               className="inline-flex items-center gap-2 text-label-sm uppercase text-on-primary-container transition-colors hover:text-[#05125a]"
             >
               <ArrowLeft size={15} />
-              Contenidos
+              {t("library.backToLibrary")}
             </Link>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <span className="rounded-full border border-on-primary-container/40 px-3 py-1 text-label-sm uppercase text-on-primary-container">
-                {articleCategoryLabel(teaser.category!)}
+                {tCat(teaser.category!)}
               </span>
               {date && (
                 <span className="text-label-sm uppercase text-on-primary-container">
@@ -186,7 +193,7 @@ export default async function ContenidoPage({
                     className="mx-auto text-on-primary-container"
                   />
                   <p className="mt-4 text-body-lg text-[#05125a]">
-                    {CONTENT_WALL_COPY}
+                    {t("library.wall")}
                   </p>
                   <AccessCodeForm tone="light" />
                   <p className="mt-6 text-body-md text-[#05125a]">
@@ -194,7 +201,7 @@ export default async function ContenidoPage({
                       href="/viajes"
                       className="text-on-primary-container underline underline-offset-4"
                     >
-                      Ver las próximas experiencias
+                      {t("library.nextExperiences")}
                     </Link>
                   </p>
                 </div>
@@ -211,7 +218,7 @@ export default async function ContenidoPage({
             {others.length > 0 && (
               <section className="mt-14">
                 <h2 className="text-label-sm uppercase text-[#05125a]/70">
-                  Otros contenidos disponibles
+                  {t("library.others")}
                 </h2>
                 <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {others.map((other) => (
@@ -222,7 +229,7 @@ export default async function ContenidoPage({
                       >
                         <span className="min-w-0">
                           <span className="block text-[11px] uppercase tracking-[0.12em] text-on-primary-container">
-                            {articleCategoryLabel(other.category!)}
+                            {tCat(other.category!)}
                           </span>
                           <span className="mt-0.5 block truncate font-display text-body-lg text-[#05125a]">
                             {other.title}

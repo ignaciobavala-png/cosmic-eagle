@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Eye, EyeOff } from "lucide-react";
 import { updatePassword, type NewPasswordState } from "./actions";
 import {
@@ -16,6 +17,7 @@ import {
 const initialState: NewPasswordState = { error: null };
 
 export function NewPasswordForm() {
+  const t = useTranslations("Cuenta");
   const [state, formAction, pending] = useActionState(
     updatePassword,
     initialState
@@ -26,7 +28,7 @@ export function NewPasswordForm() {
     <form action={formAction}>
       <div className={fieldWrap}>
         <label htmlFor="new-password" className={fieldLabel}>
-          Contraseña nueva
+          {t("newPassword.password")}
         </label>
         <div className="relative">
           <input
@@ -42,7 +44,7 @@ export function NewPasswordForm() {
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            aria-label={showPassword ? t("login.hidePassword") : t("login.showPassword")}
             className={fieldToggle}
           >
             {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
@@ -52,7 +54,7 @@ export function NewPasswordForm() {
 
       <div className="mb-9">
         <label htmlFor="new-password-confirm" className={fieldLabel}>
-          Repetir contraseña
+          {t("newPassword.confirm")}
         </label>
         <input
           id="new-password-confirm"
@@ -73,7 +75,7 @@ export function NewPasswordForm() {
       )}
 
       <button type="submit" disabled={pending} className={submitButton}>
-        {pending ? "Guardando..." : "Guardar contraseña"}
+        {pending ? t("newPassword.pending") : t("newPassword.submit")}
       </button>
     </form>
   );

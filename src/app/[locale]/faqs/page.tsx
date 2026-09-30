@@ -9,12 +9,20 @@ import { TitleRule } from "@/components/ui/TitleRule";
 import { FaqList } from "@/components/ui/FaqList";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { getFaqs, FAQ_PLACEMENTS } from "@/lib/faqs";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Preguntas frecuentes | Cosmic Eagle",
-  description:
-    "Preparación, salud, qué llevar, integración: lo que suelen preguntarnos antes de una Sesión o un Viaje Cósmico.",
-};
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/faqs">): Promise<Metadata> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Faqs");
+
+  return {
+    title: t("meta.title"),
+    description: t("meta.description"),
+  };
+}
 
 /**
  * Se lee con el cliente sin cookies (`getFaqs`), asi que la pagina puede ser
@@ -37,7 +45,12 @@ export const revalidate = 3600;
  * No hace falta filtrar despublicadas acá: la policy `faqs_select_published` no
  * las deja salir de la base.
  */
-export default async function FaqsPage() {
+export default async function FaqsPage({
+  params,
+}: PageProps<"/[locale]/faqs">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Faqs");
   const content = await getSiteContent();
   const faqs = await getFaqs();
 
@@ -49,10 +62,10 @@ export default async function FaqsPage() {
       <main className="pt-[var(--navbar-h)]">
         <PageHero
           image={content("faqs.hero.image")}
-          imageAlt="Partículas de luz sobre un cielo estrellado"
+          imageAlt={t("hero.imageAlt")}
           title={content("faqs.hero.title")}
           subtitle={content("faqs.hero.subtitle")}
-          scrollHint="Leer"
+          scrollHint={t("hero.scrollHint")}
           scrollTo="preguntas"
           overlay={isEnabled(content("faqs.hero.overlay"))}
           fadeTo={CREAM_HEX}
@@ -77,13 +90,12 @@ export default async function FaqsPage() {
                     columna. */}
                 <div className="w-fit">
                   <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                    Preguntas frecuentes
+                    {t("title")}
                   </h2>
                   <TitleRule className="mt-3 mb-7" />
                 </div>
                 <p className="text-body-md leading-relaxed text-[#05125a]">
-                  Estamos preparando esta sección. Mientras tanto, escríbenos y
-                  te respondemos cualquier duda sobre las experiencias.
+                  {t("preparing")}
                 </p>
               </Reveal>
             ) : (
@@ -96,7 +108,7 @@ export default async function FaqsPage() {
                   <Reveal amount={0.22} once={false}>
                     <div className="w-fit">
                       <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-                        {placement.label}
+                        {t(`placements.${placement.value}`)}
                       </h2>
                       <TitleRule className="mt-3 mb-7" />
                     </div>

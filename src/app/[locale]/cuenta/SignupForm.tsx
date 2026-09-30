@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Eye, EyeOff } from "lucide-react";
 import { signup, type SignupState } from "./actions";
 import {
@@ -17,6 +18,7 @@ import {
 const initialState: SignupState = { error: null };
 
 export function SignupForm({ next }: { next?: string }) {
+  const t = useTranslations("Cuenta");
   const [state, formAction, pending] = useActionState(signup, initialState);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -26,7 +28,7 @@ export function SignupForm({ next }: { next?: string }) {
 
       <div className={fieldWrap}>
         <label htmlFor="full_name" className={fieldLabel}>
-          Nombre completo
+          {t("signup.fullName")}
         </label>
         <input
           id="full_name"
@@ -34,14 +36,14 @@ export function SignupForm({ next }: { next?: string }) {
           type="text"
           required
           autoComplete="name"
-          placeholder="Tu nombre y apellido"
+          placeholder={t("signup.fullNamePlaceholder")}
           className={fieldInput}
         />
       </div>
 
       <div className={fieldWrap}>
         <label htmlFor="signup-email" className={fieldLabel}>
-          Email
+          {t("login.email")}
         </label>
         <input
           id="signup-email"
@@ -49,14 +51,14 @@ export function SignupForm({ next }: { next?: string }) {
           type="email"
           required
           autoComplete="email"
-          placeholder="tu@email.com"
+          placeholder={t("login.emailPlaceholder")}
           className={fieldInput}
         />
       </div>
 
       <div className="mb-9">
         <label htmlFor="signup-password" className={fieldLabel}>
-          Contraseña
+          {t("login.password")}
         </label>
         <div className="relative">
           <input
@@ -72,13 +74,13 @@ export function SignupForm({ next }: { next?: string }) {
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            aria-label={showPassword ? t("login.hidePassword") : t("login.showPassword")}
             className={fieldToggle}
           >
             {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
           </button>
         </div>
-        <p className={fieldHint}>Mínimo 8 caracteres.</p>
+        <p className={fieldHint}>{t("signup.hint")}</p>
       </div>
 
       {state.error && (
@@ -88,7 +90,7 @@ export function SignupForm({ next }: { next?: string }) {
       )}
 
       <button type="submit" disabled={pending} className={submitButton}>
-        {pending ? "Creando cuenta..." : "Crear cuenta"}
+        {pending ? t("signup.pending") : t("signup.submit")}
       </button>
     </form>
   );

@@ -6,13 +6,27 @@ import { AuthScreen } from "@/components/ui/AuthScreen";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteContent } from "@/lib/site-content";
 import { NewPasswordForm } from "../NewPasswordForm";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Nueva contraseña",
-  robots: { index: false },
-};
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/cuenta/nueva-clave">): Promise<Metadata> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Cuenta");
 
-export default async function NuevaClavePage() {
+  return {
+    title: t("meta.newPasswordTitle"),
+    robots: { index: false },
+  };
+}
+
+export default async function NuevaClavePage({
+  params,
+}: PageProps<"/[locale]/cuenta/nueva-clave">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Cuenta");
   const supabase = await createClient();
   const {
     data: { user },
@@ -30,9 +44,9 @@ export default async function NuevaClavePage() {
       <main className="pt-[var(--navbar-h)]">
         <AuthScreen
           image={content("cuenta.acceso.image")}
-          eyebrow="Nueva contraseña"
-          title="Elige tu clave"
-          subtitle={`Estás cambiando la contraseña de ${user.email}.`}
+          eyebrow={t("newPassword.eyebrow")}
+          title={t("newPassword.title")}
+          subtitle={t("newPassword.subtitle", { email: user.email ?? "" })}
         >
           <NewPasswordForm />
         </AuthScreen>

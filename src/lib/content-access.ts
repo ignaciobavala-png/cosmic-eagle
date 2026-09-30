@@ -74,31 +74,15 @@ export function canRead(
 }
 
 /**
- * El copy del muro es de la clienta (docs/BIBLIOTECA.md §1.4), literal. No se
- * reescribe sin consultar.
+ * Los resultados que devuelve `public.redeem_access_code`.
+ *
+ * El copy (el muro y los mensajes del canje) vive en `messages/*.json`
+ * (namespace `Contenidos`), desde la etapa 2 de i18n: el castellano es el mismo
+ * de antes, palabra por palabra.
  */
-export const CONTENT_WALL_COPY =
-  "Estos contenidos se entregan a quienes participan del programa evolutivo. Para acceder, es necesario completar el formulario de postulación y participar de una primera experiencia.";
-
-/** Los resultados que devuelve `public.redeem_access_code`. */
 export type RedeemResult =
   | "ok"
   | "invalido"
   | "vencido"
   | "agotado"
   | "sin_sesion";
-
-export function redeemMessage(result: RedeemResult): string {
-  switch (result) {
-    case "ok":
-      return "Listo: tu cuenta quedó habilitada.";
-    case "vencido":
-      return "Ese código ya venció. Escríbenos y te damos uno nuevo.";
-    case "agotado":
-      return "Ese código ya se usó todas las veces disponibles.";
-    case "sin_sesion":
-      return "Inicia sesión para canjear el código.";
-    default:
-      return "No encontramos ese código. Revisa que esté bien escrito.";
-  }
-}

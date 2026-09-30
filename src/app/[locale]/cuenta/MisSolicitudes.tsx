@@ -1,14 +1,7 @@
 import { Link } from "@/i18n/navigation";
+import { getTranslations } from "next-intl/server";
 import { formatAmount, type FormatLocale } from "@/lib/format";
 import { panel, panelDivider } from "@/components/forms/styles";
-
-const STATUS_LABEL: Record<string, string> = {
-  pending_review: "En revisión",
-  needs_conversation: "Conversemos",
-  approved: "Aprobada",
-  rejected: "Rechazada",
-  expired: "Expirada",
-};
 
 // Sobre el azul del embudo los tokens de superficie no se ven: las píldoras de
 // estado van con los colores literales de la paleta de Julia, igual que el
@@ -48,54 +41,66 @@ type Application = {
  * docs/FLUJO_INSCRIPCION.md), así que la tabla dice el paso siguiente en vez
  * de repetir el estado.
  */
-function pendingStep(
-  a: Application,
-  locale: FormatLocale
-): { label: string; href?: string } {
-  if (a.status === "pending_review") return { label: "Esperando revisión" };
+/** El paso siguiente, como clave de mensaje + los valores de la ICU. */
+type PendingStep = {
+  key: string;
+  values?: Record<string, string>;
+  href?: string;
+};
+
+function pendingStep(a: Application, locale: FormatLocale): PendingStep {
+  if (a.status === "pending_review") return { key: "applications.waitingReview" };
   // El paso siguiente de este estado no esta en la web: contesta Estela por
   // privado (ver el correo [2A] en docs/COMUNICACIONES.md).
-  if (a.status === "needs_conversation") return { label: "Te vamos a escribir" };
-  if (a.status !== "approved") return { label: "—" };
+  if (a.status === "needs_conversation") return { key: "applications.willWrite" };
+  if (a.status !== "approved") return { key: "applications.dash" };
   // Desde el 03/09 la tabla si lee el viaje (precio y seña), asi que el paso
   // siguiente puede decir cuanto: "USD 900" y "faltan USD 450" en vez de "falta
   // el pago" a secas. Es lo que promete "tu espacio personal" en seis de los
   // correos de docs/COMUNICACIONES.md.
   if (a.payment_status === "pending") {
-    return {
-      label: a.trip?.deposit_amount
-        ? `Reservá con ${formatAmount(a.trip.deposit_amount, locale)} o pagá ${formatAmount(a.trip.price, locale)}`
-        : a.trip
-          ? `Falta el pago de ${formatAmount(a.trip.price, locale)}`
-          : "Falta el pago",
-      href: `/viajes/${a.trip_id}/solicitar`,
-    };
+    return a.trip?.deposit_amount
+      ? {
+          key: "applications.deposit",
+          values: {
+            deposit: formatAmount(a.trip.deposit_amount, locale),
+            price: formatAmount(a.trip.price, locale),
+          },
+          href: `/viajes/${a.trip_id}/solicitar`,
+        }
+      : a.trip
+        ? {
+            key: "applications.payMissing",
+            values: { price: formatAmount(a.trip.price, locale) },
+            href: `/viajes/${a.trip_id}/solicitar`,
+          }
+        : { key: "applications.payMissingNoTrip", href: `/viajes/${a.trip_id}/solicitar` };
   }
   const faltaSalud = a.is_first_time && !a.health_form_submitted;
   if (a.payment_status === "deposit_paid" && !faltaSalud) {
     const saldo = a.trip ? Math.max(0, a.trip.price - a.amount_paid) : 0;
-    return {
-      label:
-        saldo > 0
-          ? `Falta el saldo de ${formatAmount(saldo, locale)}`
-          : "Falta el saldo",
-      href: `/viajes/${a.trip_id}/solicitar`,
-    };
+    return saldo > 0
+      ? {
+          key: "applications.balance",
+          values: { amount: formatAmount(saldo, locale) },
+          href: `/viajes/${a.trip_id}/solicitar`,
+        }
+      : { key: "applications.balanceNoTrip", href: `/viajes/${a.trip_id}/solicitar` };
   }
   if (faltaSalud) {
     return {
-      label: "Completar formulario de salud",
+      key: "applications.health",
       href: `/viajes/${a.trip_id}/solicitar`,
     };
   }
   // El consentimiento es el ultimo paso del embudo, despues del de salud.
   if (!a.consent_submitted) {
     return {
-      label: "Firmar el consentimiento",
+      key: "applications.consent",
       href: `/viajes/${a.trip_id}/consentimiento`,
     };
   }
-  return { label: "Al día" };
+  return { key: "applications.done" };
 }
 
 function formatDate(iso: string, locale: FormatLocale) {
@@ -118,23 +123,26 @@ function formatDateTime(iso: string, locale: FormatLocale) {
   });
 }
 
-export function MisSolicitudes({
+export async function MisSolicitudes({
   applications,
   locale,
 }: {
   applications: Application[];
   locale: FormatLocale;
 }) {
+  const t = await getTranslations("Cuenta");
   const approved = applications.filter((a) => a.status === "approved");
 
   if (applications.length === 0) {
     return (
       <p className="max-w-md text-center text-white/70">
-        Todavía no tienes solicitudes. Elige un viaje en{" "}
-        <Link href="/viajes" className="text-primary-container underline">
-          Viajes
-        </Link>{" "}
-        para postularte.
+        {t.rich("applications.empty", {
+          link: (chunks) => (
+            <Link href="/viajes" className="text-primary-container underline">
+              {chunks}
+            </Link>
+          ),
+        })}
       </p>
     );
   }
@@ -144,12 +152,14 @@ export function MisSolicitudes({
       {approved.length > 0 && (
         <section>
           <h2 className="mb-3 font-display text-lg font-bold text-primary-container">
-            Viajes aprobados
+            {t("applications.approved")}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {approved.map((a) => (
               <div key={a.id} className={`p-4 ${panel}`}>
-                <p className="font-medium text-white">{a.trip?.title ?? "Viaje"}</p>
+                <p className="font-medium text-white">
+                  {a.trip?.title ?? t("applications.tripFallback")}
+                </p>
                 {a.trip && (
                   <p className="mt-1 text-sm text-white/65">
                     {a.trip.location ? `${a.trip.location} · ` : ""}
@@ -166,16 +176,16 @@ export function MisSolicitudes({
 
       <section>
         <h2 className="mb-3 font-display text-lg font-bold text-primary-container">
-          Mis solicitudes
+          {t("applications.mine")}
         </h2>
         <div className={`overflow-x-auto ${panel}`}>
           <table className="w-full min-w-[34rem] text-sm">
             <thead>
               <tr className={`border-b text-left text-white/55 ${panelDivider}`}>
-                <th className="px-4 py-3 font-medium">Viaje</th>
-                <th className="px-4 py-3 font-medium">Paso siguiente</th>
-                <th className="px-4 py-3 font-medium">Fecha</th>
-                <th className="px-4 py-3 font-medium">Estado</th>
+                <th className="px-4 py-3 font-medium">{t("applications.trip")}</th>
+                <th className="px-4 py-3 font-medium">{t("applications.step")}</th>
+                <th className="px-4 py-3 font-medium">{t("applications.date")}</th>
+                <th className="px-4 py-3 font-medium">{t("applications.status")}</th>
               </tr>
             </thead>
             <tbody>
@@ -190,15 +200,16 @@ export function MisSolicitudes({
                   <td className="px-4 py-3 text-white/70">
                     {(() => {
                       const step = pendingStep(a, locale);
+                      const label = t(step.key, step.values);
                       return step.href ? (
                         <Link
                           href={step.href}
                           className="text-primary-container underline"
                         >
-                          {step.label}
+                          {label}
                         </Link>
                       ) : (
-                        step.label
+                        label
                       );
                     })()}
                   </td>
@@ -209,7 +220,11 @@ export function MisSolicitudes({
                     <span
                       className={`px-2.5 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest border ${STATUS_CLASS[a.status] ?? ""}`}
                     >
-                      {STATUS_LABEL[a.status] ?? a.status}
+                      {["pending_review", "needs_conversation", "approved", "rejected", "expired"].includes(
+                        a.status
+                      )
+                        ? t(`applications.statusLabel.${a.status}`)
+                        : a.status}
                     </span>
                   </td>
                 </tr>

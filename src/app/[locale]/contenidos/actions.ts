@@ -1,11 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import {
-  redeemMessage,
-  type RedeemResult,
-} from "@/lib/content-access";
+import type { RedeemResult } from "@/lib/content-access";
 
 export type RedeemState = { message: string | null; ok: boolean };
 
@@ -19,10 +17,11 @@ export async function redeemAccessCode(
   _state: RedeemState,
   formData: FormData
 ): Promise<RedeemState> {
+  const t = await getTranslations("Contenidos");
   const code = formData.get("code");
 
   if (typeof code !== "string" || !code.trim()) {
-    return { message: "Escribí el código.", ok: false };
+    return { message: t("library.redeemEmpty"), ok: false };
   }
 
   const supabase = await createClient();
@@ -31,7 +30,7 @@ export async function redeemAccessCode(
   });
 
   if (error) {
-    return { message: "No se pudo canjear el código. Probá de nuevo.", ok: false };
+    return { message: t("library.redeemError"), ok: false };
   }
 
   const result = (data ?? "invalido") as RedeemResult;
@@ -43,5 +42,5 @@ export async function redeemAccessCode(
     revalidatePath("/[locale]/contenidos", "layout");
   }
 
-  return { message: redeemMessage(result), ok: result === "ok" };
+  return { message: t(`library.redeem.${result}`), ok: result === "ok" };
 }

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal } from "@/components/ui/Reveal";
 import { TripCard } from "@/components/ui/TripCard";
@@ -22,7 +23,8 @@ export async function TripsSection({
   type: Enums<"trip_type">;
   subtitle: string;
 }) {
-  const tripType = TRIP_TYPES.find((t) => t.value === type)!;
+  const t = await getTranslations("TripTypes");
+  const tripType = TRIP_TYPES.find((item) => item.value === type)!;
 
   const supabase = await createClient();
   const { data: trips } = await supabase
@@ -48,7 +50,7 @@ export async function TripsSection({
         <div className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
             <h2 className="font-display text-headline-md sm:text-headline-lg text-on-surface">
-              {tripType.upcoming}
+              {t(`${type}.upcoming`)}
             </h2>
             <p className="mt-2 text-body-md text-on-surface-variant">
               {subtitle}
@@ -58,7 +60,7 @@ export async function TripsSection({
             href={`/viajes?tipo=${tripType.slug}`}
             className="px-6 py-2"
           >
-            Ver {tripType.label.toLowerCase()}
+            {t("view", { tipo: t(`${type}.plural`).toLowerCase() })}
           </CtaLink>
         </div>
 

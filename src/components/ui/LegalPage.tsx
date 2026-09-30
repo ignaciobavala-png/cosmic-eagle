@@ -5,7 +5,9 @@ import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { ArticleBody } from "@/components/ui/ArticleBody";
 import { Reveal } from "@/components/ui/Reveal";
+import { getTranslations } from "next-intl/server";
 import { parseArticleBody, formatArticleDate } from "@/lib/article";
+import type { FormatLocale } from "@/lib/format";
 import { CreamSection } from "./CreamSection";
 import { TitleRule } from "./TitleRule";
 import { getLegalDocument, legalDocumentMeta, type LegalSlug } from "@/lib/legal";
@@ -33,7 +35,14 @@ export async function legalMetadata(slug: LegalSlug): Promise<Metadata> {
   };
 }
 
-export async function LegalPage({ slug }: { slug: LegalSlug }) {
+export async function LegalPage({
+  slug,
+  locale,
+}: {
+  slug: LegalSlug;
+  locale: FormatLocale;
+}) {
+  const t = await getTranslations({ locale, namespace: "Legal" });
   const doc = await getLegalDocument(slug);
 
   // La fila la siembra la migración, así que esto sólo pasa si alguien la borró
@@ -67,11 +76,11 @@ export async function LegalPage({ slug }: { slug: LegalSlug }) {
 
           {doc.isProvisional && (
             <p className="mt-8 rounded-2xl border border-[#f9d78f] border-l-2 bg-[#fff6eb] px-5 py-4 text-body-md leading-relaxed text-[#05125a]">
-              <strong className="text-[#05125a]">
-                Versión preliminar.
-              </strong>{" "}
-              Este texto está en revisión y puede cambiar. Si algo de lo que lees
-              aquí no coincide con lo que te dijimos, escríbenos y lo aclaramos.
+              {t.rich("provisional", {
+                strong: (chunks) => (
+                  <strong className="text-[#05125a]">{chunks}</strong>
+                ),
+              })}
             </p>
           )}
 
@@ -80,7 +89,9 @@ export async function LegalPage({ slug }: { slug: LegalSlug }) {
           </div>
 
           <p className="mt-14 border-t border-[#f9d78f] pt-6 text-label-sm uppercase tracking-wider text-on-primary-container">
-            Última actualización: {formatArticleDate(doc.updatedAt)}
+            {t("updated", {
+              date: formatArticleDate(doc.updatedAt, locale) ?? "",
+            })}
           </p>
         </article>
         </CreamSection>

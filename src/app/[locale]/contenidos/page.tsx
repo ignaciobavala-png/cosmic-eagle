@@ -18,12 +18,20 @@ import {
 import { canRead } from "@/lib/content-access";
 import { viewerContentLevel } from "@/lib/content-access-server";
 import { IMAGES } from "@/lib/constants";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Contenidos | Cosmic Eagle",
-  description:
-    "Preparación e integración, salud, evolución, tecnología humana y testimonios: la biblioteca de contenidos de Cosmic Eagle.",
-};
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/contenidos">): Promise<Metadata> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Contenidos");
+
+  return {
+    title: t("meta.title"),
+    description: t("meta.description"),
+  };
+}
 
 /**
  * Biblioteca de contenidos, rediseñada según el pedido de la organización del
@@ -44,10 +52,13 @@ export const metadata: Metadata = {
  * página).
  */
 export default async function ContenidosPage({
+  params,
   searchParams,
-}: {
-  searchParams: Promise<{ categoria?: string }>;
-}) {
+}: PageProps<"/[locale]/contenidos">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Contenidos");
+  const tCat = await getTranslations("ArticleCategories");
   const { categoria } = await searchParams;
   // Una categoria desconocida cae en el listado completo en vez de 404: es un
   // filtro, no una ruta (mismo criterio que `?tipo=` en /viajes).
@@ -95,7 +106,7 @@ export default async function ContenidosPage({
 
   const categories = ARTICLE_CATEGORY_LIST.map((category) => ({
     value: category.value,
-    label: category.label,
+    label: tCat(category.value),
   }));
 
   return (
@@ -106,7 +117,7 @@ export default async function ContenidosPage({
           image={content("contenidos.hero.image")}
           title={content("contenidos.hero.title")}
           subtitle={content("contenidos.hero.subtitle")}
-          scrollHint="Ver la biblioteca"
+          scrollHint={t("hero.scrollHint")}
           scrollTo="biblioteca"
           overlay={isEnabled(content("contenidos.hero.overlay"))}
           hardEdge

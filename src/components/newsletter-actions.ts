@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 
 export type NewsletterState = { ok: boolean; message: string } | null;
@@ -20,12 +21,13 @@ export async function subscribeNewsletter(
   _prev: NewsletterState,
   formData: FormData
 ): Promise<NewsletterState> {
+  const t = await getTranslations("Newsletter");
   const email = String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
 
   if (!EMAIL_RE.test(email) || email.length > 320) {
-    return { ok: false, message: "Revisa el correo, no parece válido." };
+    return { ok: false, message: t("invalid") };
   }
 
   const supabase = await createClient();
@@ -35,8 +37,8 @@ export async function subscribeNewsletter(
 
   // 23505 = unique_violation: ya estaba suscripto.
   if (error && error.code !== "23505") {
-    return { ok: false, message: "No pudimos registrarte. Prueba de nuevo." };
+    return { ok: false, message: t("error") };
   }
 
-  return { ok: true, message: "Listo, te vamos a escribir." };
+  return { ok: true, message: t("ok") };
 }

@@ -1,16 +1,14 @@
 "use client";
 
 import { useMemo, useState, type MouseEvent } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft, Lock } from "lucide-react";
 import { ArticleBody } from "./ArticleBody";
 import { CtaLink, CTA_TONES } from "./CtaLink";
-import {
-  articleCategoryLabel,
-  formatArticleDate,
-  type ArticleBlock,
-} from "@/lib/article";
+import { formatArticleDate, type ArticleBlock } from "@/lib/article";
+import type { FormatLocale } from "@/lib/format";
 
 /**
  * La biblioteca de /contenidos como experiencia de un solo espacio.
@@ -64,6 +62,9 @@ export function ContentLibrary({
   /** Viene de `?categoria=` para que los links del navbar caigan en el tema. */
   initialCategory: string | null;
 }) {
+  const t = useTranslations("Contenidos");
+  const tCat = useTranslations("ArticleCategories");
+  const locale = (useLocale() === "en" ? "en" : "es") as FormatLocale;
   const firstCategory = categories[0]?.value ?? "";
   const [active, setActive] = useState(
     initialCategory && categories.some((c) => c.value === initialCategory)
@@ -82,7 +83,7 @@ export function ContentLibrary({
     : null;
 
   const activeLabel =
-    categories.find((c) => c.value === active)?.label ?? "Biblioteca";
+    categories.find((c) => c.value === active)?.label ?? t("library.fallback");
 
   /**
    * "Otros contenidos": primero los del mismo tema, y si no alcanzan se
@@ -131,7 +132,7 @@ export function ContentLibrary({
           El envoltorio de la sección NO puede tener `overflow-hidden` o el
           sticky no se pega. */}
       <nav
-        aria-label="Temas de la biblioteca"
+        aria-label={t("library.ariaNav")}
         className="sticky top-[var(--navbar-h)] z-30 mx-auto w-full max-w-3xl rounded-2xl border border-[#b3964b]/40 bg-[#fff6eb]/95 px-3 py-3 shadow-[0_10px_30px_-16px_rgba(5,18,90,0.55)] backdrop-blur-sm sm:px-4"
       >
         <ul className="flex flex-nowrap justify-start gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] md:flex-wrap md:justify-center md:overflow-visible [&::-webkit-scrollbar]:hidden">
@@ -168,7 +169,7 @@ export function ContentLibrary({
 
         {inCategory.length === 0 ? (
           <p className="mx-auto max-w-md text-center text-body-md text-[#05125a]">
-            Todavía no hay contenidos publicados en esta categoría.
+            {t("library.empty")}
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -186,21 +187,21 @@ export function ContentLibrary({
       {openArticle && (
         <section
           id="lector"
-          aria-label="Lectura"
+          aria-label={t("library.readerAria")}
           className="mt-16 scroll-mt-[calc(var(--navbar-h)+5rem)]"
         >
           <div className="mx-auto max-w-3xl rounded-2xl border border-[#b3964b]/50 bg-[#fff6eb] p-5 shadow-[0_18px_50px_-24px_rgba(5,18,90,0.45)] sm:p-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="min-w-0">
                 <span className="rounded-full border border-on-primary-container/40 px-3 py-1 text-label-sm uppercase text-on-primary-container">
-                  {articleCategoryLabel(openArticle.category)}
+                  {tCat(openArticle.category)}
                 </span>
                 <h3 className="mt-4 font-display text-headline-md font-bold text-[#05125a] text-balance">
                   {openArticle.title}
                 </h3>
                 {formatArticleDate(openArticle.published_at) && (
                   <p className="mt-2 text-label-sm uppercase text-on-primary-container">
-                    {formatArticleDate(openArticle.published_at)}
+                    {formatArticleDate(openArticle.published_at, locale)}
                   </p>
                 )}
               </div>
@@ -210,7 +211,7 @@ export function ContentLibrary({
                 className="inline-flex shrink-0 items-center gap-2 text-label-sm uppercase text-on-primary-container transition-colors hover:text-[#05125a]"
               >
                 <ArrowLeft size={15} aria-hidden="true" />
-                Volver
+                {t("library.back")}
               </button>
             </div>
 
@@ -228,15 +229,14 @@ export function ContentLibrary({
                     className="mx-auto text-on-primary-container"
                   />
                   <p className="mx-auto mt-4 max-w-md text-body-md text-[#05125a]">
-                    Este contenido requiere un nivel de acceso que tu cuenta
-                    todavía no alcanza.
+                    {t("library.locked")}
                   </p>
                   <div className="mt-6 flex justify-center">
                     <CtaLink
                       href={`/contenidos/${openArticle.slug}`}
                       tone="dark"
                     >
-                      Ver cómo acceder
+                      {t("library.viewAccess")}
                     </CtaLink>
                   </div>
                 </div>
@@ -247,7 +247,7 @@ export function ContentLibrary({
           {others.length > 0 && (
             <div className="mx-auto mt-12 max-w-3xl">
               <h4 className="text-label-sm uppercase text-[#05125a]/70">
-                Otros contenidos disponibles
+                {t("library.others")}
               </h4>
               <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {others.map((other) => (
@@ -277,6 +277,9 @@ function LibraryCard({
   article: LibraryArticle;
   onOpen: (slug: string) => void;
 }) {
+  const t = useTranslations("Contenidos");
+  const tCat = useTranslations("ArticleCategories");
+  const locale = (useLocale() === "en" ? "en" : "es") as FormatLocale;
   return (
     <Link
       href={`/contenidos/${article.slug}`}
@@ -312,12 +315,12 @@ function LibraryCard({
         )}
         <div className="absolute inset-0 bg-[#05102a]/20" />
         <span className="absolute left-4 top-4 rounded-full bg-[#f9d78f] px-3 py-1 text-label-sm uppercase text-[#05125a]">
-          {articleCategoryLabel(article.category)}
+          {tCat(article.category)}
         </span>
         {article.locked && (
           <span className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-[#05125a]/85 px-3 py-1 text-label-sm uppercase text-[#f9d78f]">
             <Lock size={12} aria-hidden="true" />
-            Del programa
+            {t("library.program")}
           </span>
         )}
       </div>
@@ -333,12 +336,12 @@ function LibraryCard({
         )}
         <div className="mt-auto border-t border-[#f9d78f]/70 pt-4">
           <span className="block text-label-sm uppercase text-on-primary-container">
-            {article.locked ? "Contenido" : "Publicado"}
+            {article.locked ? t("library.statusLocked") : t("library.statusPublished")}
           </span>
           <span className="mt-1 block text-body-md text-[#05125a]">
             {article.locked
-              ? "Requiere acceso"
-              : (formatArticleDate(article.published_at) ?? "—")}
+              ? t("library.requiresAccess")
+              : (formatArticleDate(article.published_at, locale) ?? "—")}
           </span>
         </div>
       </div>
@@ -354,6 +357,7 @@ function RelatedCard({
   article: LibraryArticle;
   onOpen: (slug: string) => void;
 }) {
+  const tCat = useTranslations("ArticleCategories");
   const className =
     "flex h-full items-center justify-between gap-4 rounded-xl border border-[#f9d78f] bg-[#fff6eb] px-4 py-3 text-left transition-colors hover:border-on-primary-container/50";
 
@@ -361,7 +365,7 @@ function RelatedCard({
     <>
       <span className="min-w-0">
         <span className="block text-[11px] uppercase tracking-[0.12em] text-on-primary-container">
-          {articleCategoryLabel(article.category)}
+          {tCat(article.category)}
         </span>
         <span className="mt-0.5 block truncate font-display text-body-lg text-[#05125a]">
           {article.title}

@@ -11,16 +11,17 @@ import { logout } from "./actions";
 import { MisSolicitudes } from "./MisSolicitudes";
 import { AvatarUpload } from "./AvatarUpload";
 import { funnelSurface } from "@/components/forms/styles";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 // Avisos que llegan por querystring desde /auth/confirm y desde updatePassword.
-const ERROR_MESSAGES: Record<string, string> = {
-  "enlace-vencido":
-    "El enlace venció o ya se usó. Pide uno nuevo desde “¿Olvidaste tu contraseña?”.",
-  "enlace-invalido": "El enlace no es válido. Prueba pidiendo uno nuevo.",
+// Guardan la clave del mensaje, no el texto: el idioma lo pone `t`.
+const ERROR_KEYS: Record<string, string> = {
+  "enlace-vencido": "errors.expired",
+  "enlace-invalido": "errors.invalid",
 };
 
-const AVISO_MESSAGES: Record<string, string> = {
-  "clave-cambiada": "Listo, tu contraseña quedó actualizada.",
+const AVISO_KEYS: Record<string, string> = {
+  "clave-cambiada": "errors.passwordChanged",
 };
 
 function Notice({ text, tone }: { text: string; tone: "error" | "ok" }) {
@@ -52,6 +53,8 @@ export default async function CuentaPage({
   }>;
 }) {
   const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Cuenta");
   const { next, modo, vista, error, aviso } = await searchParams;
   const content = await getSiteContent();
   const isSignup = modo === "registro";
@@ -158,13 +161,13 @@ export default async function CuentaPage({
             />
             <div className="text-center">
               <h1 className="font-display text-[clamp(1.75rem,3.4vw,2.25rem)] font-bold text-white">
-                {profile?.full_name?.trim() || "Mi Cuenta"}
+                {profile?.full_name?.trim() || t("myAccount")}
               </h1>
               <p className="mt-1 text-sm text-white/65">{user.email}</p>
             </div>
 
-            {aviso && AVISO_MESSAGES[aviso] && (
-              <Notice text={AVISO_MESSAGES[aviso]} tone="ok" />
+            {aviso && AVISO_KEYS[aviso] && (
+              <Notice text={t(AVISO_KEYS[aviso])} tone="ok" />
             )}
 
             <MisSolicitudes
@@ -177,7 +180,7 @@ export default async function CuentaPage({
                 type="submit"
                 className="mt-2 text-sm text-white/60 underline transition-colors hover:text-primary-container"
               >
-                Cerrar sesión
+                {t("logout")}
               </button>
             </form>
           </div>
@@ -189,15 +192,14 @@ export default async function CuentaPage({
             // accion). Las otras dos pantallas de acceso (recuperar y
             // nueva-clave) conservan el suyo porque ahi es instruccion, no
             // una etiqueta.
-            title={isSignup ? "Bienvenido" : "Hola de nuevo"}
+            title={isSignup ? t("titleSignup") : t("titleLogin")}
             notice={
-              error && ERROR_MESSAGES[error] ? (
-                <Notice text={ERROR_MESSAGES[error]} tone="error" />
+              error && ERROR_KEYS[error] ? (
+                <Notice text={t(ERROR_KEYS[error])} tone="error" />
               ) : null
             }
-            footer={
-              <>
-                {isSignup ? "¿Ya tienes cuenta? " : "¿No tienes cuenta? "}
+            footer={t.rich(isSignup ? "footer.haveAccount" : "footer.noAccount", {
+              link: (chunks) => (
                 <a
                   href={`/cuenta${isSignup ? "" : "?modo=registro"}${
                     next
@@ -206,10 +208,10 @@ export default async function CuentaPage({
                   }`}
                   className="text-primary-container underline"
                 >
-                  {isSignup ? "Inicia sesión" : "Regístrate"}
+                  {chunks}
                 </a>
-              </>
-            }
+              ),
+            })}
           >
             {isSignup ? <SignupForm next={next} /> : <LoginForm next={next} />}
           </AuthScreen>

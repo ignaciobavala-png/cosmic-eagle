@@ -5,13 +5,27 @@ import { Footer } from "@/components/Footer";
 import { AuthScreen } from "@/components/ui/AuthScreen";
 import { getSiteContent } from "@/lib/site-content";
 import { RecoverForm } from "../RecoverForm";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Recuperar contraseña",
-  robots: { index: false },
-};
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/cuenta/recuperar">): Promise<Metadata> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Cuenta");
 
-export default async function RecuperarPage() {
+  return {
+    title: t("meta.recoverTitle"),
+    robots: { index: false },
+  };
+}
+
+export default async function RecuperarPage({
+  params,
+}: PageProps<"/[locale]/cuenta/recuperar">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Cuenta");
   const content = await getSiteContent();
 
   return (
@@ -20,12 +34,12 @@ export default async function RecuperarPage() {
       <main className="pt-[var(--navbar-h)]">
         <AuthScreen
           image={content("cuenta.acceso.image")}
-          eyebrow="Recuperar acceso"
-          title="Volver a entrar"
-          subtitle="Escribe tu email y te mandamos un enlace para crear una contraseña nueva."
+          eyebrow={t("recover.eyebrow")}
+          title={t("recover.title")}
+          subtitle={t("recover.subtitle")}
           footer={
             <Link href="/cuenta" className="text-primary-container underline">
-              Volver al inicio de sesión
+              {t("recover.back")}
             </Link>
           }
         >

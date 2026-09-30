@@ -2,7 +2,478 @@
   "LocaleSwitch": {
     "label": "Idioma"
   },
+  "Header": {
+    "nav": {
+      "nosotros": "Nosotros",
+      "experiencias": "Experiencias",
+      "contenidos": "Contenidos",
+      "miCuenta": "Mi Cuenta"
+    },
+    "nosotros": {
+      "quienesSomos": "Quiénes somos",
+      "proposito": "Nuestro propósito",
+      "enfoque": "Nuestro enfoque",
+      "founder": "Founder"
+    },
+    "tipo": {
+      "retiro": "Viajes",
+      "ceremonia": "Sesiones"
+    },
+    "experiencias": {
+      "calendario": "Calendario"
+    },
+    "categoria": {
+      "preparacion": "Preparación & Integración",
+      "salud": "Salud & Bienestar",
+      "evolucion": "Evolución & Conciencia",
+      "tecnologia": "Tecnología Humana",
+      "testimonios": "Testimonios"
+    },
+    "accountFallback": "Mi Cuenta",
+    "login": "Login",
+    "signup": "Registrarse",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
+  },
+  "Footer": {
+    "columns": {
+      "explorar": "Explorar",
+      "legal": "Legal"
+    },
+    "links": {
+      "nosotros": "Nosotros",
+      "experiencias": "Experiencias",
+      "contenidos": "Contenidos",
+      "preguntasFrecuentes": "Preguntas frecuentes",
+      "privacidad": "Privacidad",
+      "contacto": "Contacto"
+    },
+    "newsletter": {
+      "title": "Sintoniza",
+      "copy": "Enterate de las novedades antes que nadie."
+    },
+    "comingSoon": "Próximamente",
+    "copyright": "© 2026 Cosmic Eagle Journey"
+  },
+  "Newsletter": {
+    "placeholder": "Tu correo electrónico",
+    "submit": "Suscribirme",
+    "invalid": "Revisa el correo, no parece válido.",
+    "error": "No pudimos registrarte. Prueba de nuevo.",
+    "ok": "Listo, te vamos a escribir."
+  },
+  "BackToTop": {
+    "label": "Volver arriba"
+  },
+  "TripTypes": {
+    "retiro": {
+      "one": "Viaje",
+      "plural": "Viajes",
+      "upcoming": "Próximos Viajes"
+    },
+    "ceremonia": {
+      "one": "Sesión",
+      "plural": "Sesiones",
+      "upcoming": "Próximas Sesiones"
+    },
+    "view": "Ver {tipo}",
+    "category": {
+      "mujeres": "Solo mujeres",
+      "hombres": "Solo hombres",
+      "avanzados": "Avanzados"
+    },
+    "status": {
+      "open": "Cupos disponibles",
+      "closed": "Cupo completo",
+      "completed": "Finalizado"
+    },
+    "date": "Fecha",
+    "dates": "Fechas"
+  },
+  "ArticleCategories": {
+    "preparacion": "Preparación & Integración",
+    "salud": "Salud & Bienestar",
+    "evolucion": "Evolución & Conciencia",
+    "tecnologia": "Tecnología Humana",
+    "testimonios": "Testimonios"
+  },
+  "Nosotros": {
+    "meta": {
+      "title": "Nosotros | Cosmic Eagle",
+      "description": "Nuestro enfoque reúne conocimiento ancestral y galáctico, tecnologías cósmicas y prácticas de conciencia para sostener procesos de transformación, liberación y reconexión con el alma."
+    },
+    "hero": {
+      "imageAlt": "Siluetas de almas en partículas de luz",
+      "scrollHint": "Conocenos"
+    },
+    "words": [
+      "Liberar",
+      "Recordar",
+      "Reconectar",
+      "Encarnar"
+    ],
+    "somos": {
+      "p1": "Somos investigadores y exploradores apasionados de la conciencia, la transformación humana y la naturaleza de la realidad.",
+      "p2": "Nuestro trabajo se nutre de la exploración de la metafísica, las civilizaciones antiguas, las filosofías espirituales, las tradiciones de sanación, las prácticas de bienestar, los estudios de la conciencia y el conocimiento cósmico.",
+      "p3": "Existimos para quienes sienten el llamado de ir más allá de la transformación personal y entrar en un proceso evolutivo más profundo: expandir la conciencia, liberar patrones limitantes, fortalecer la conexión con el alma y explorar las capacidades que pueden emerger a medida que esa conexión se profundiza.",
+      "p4": "A través de un cuerpo de conocimiento en constante evolución, prácticas y tecnologías cósmicas, ofrecemos un camino hacia el recuerdo y la encarnación de la luz, la inteligencia y el potencial que existen dentro de cada ser humano.",
+      "scrollHint": "Nuestro propósito"
+    },
+    "purpose": {
+      "title": "Nuestro propósito",
+      "p1": "Nuestro propósito es <strong>impulsar la evolución humana</strong>, creando espacios que permitan a cada persona transformar su realidad, expandir su conciencia y profundizar la conexión con su alma.",
+      "p2": "Acompañamos a personas en distintas etapas de este camino: desde quienes comienzan un proceso de profunda <strong>transformación</strong>, hasta sanadores, guías y practicantes experimentados que están entrando en nuevas etapas de <strong>evolución</strong>, desarrollo y servicio."
+    },
+    "quote": "Nuestro rol no es definir lo que alguien debe experimentar o en qué debe convertirse, sino crear las condiciones para que su propio proceso se despliegue.",
+    "videoAlt": "Círculo de ceremonia iluminado",
+    "enfoque": {
+      "title": "Nuestro enfoque",
+      "p1": "Este trabajo está dirigido a personas dispuestas a atravesar procesos profundos de transformación y liberar estructuras que limitan su evolución; a sanadores y practicantes que buscan abrirse a nuevas formas de conocimiento; a líderes que quieren expandir sus capacidades; y a quienes buscan mayor claridad sobre el propósito y el camino de su vida.",
+      "p2": "Para quienes ya están inmersos en un proceso evolutivo, ofrece también la posibilidad de acceder a capas más profundas de conocimiento sobre la conciencia, el alma y la evolución humana."
+    },
+    "estela": {
+      "title": "Estela, founder",
+      "p1": "Estela lleva más de 25 años explorando la conciencia, la mente, el alma y el potencial humano. Su camino ha sido principalmente experiencial: una búsqueda constante por comprender quiénes somos, cómo funcionamos y hasta dónde podemos evolucionar.",
+      "p2": "A lo largo de estos años ha estudiado y experimentado con distintas corrientes y herramientas, desde la psicología, la metafísica y las filosofías espirituales hasta el yoga, la meditación, la energía Kundalini, la nutrición consciente, las prácticas energéticas, el chamanismo, las plantas de poder y los estados expandidos de conciencia.",
+      "p3": "Con el tiempo, todo este recorrido fue convergiendo en una práctica propia para acompañar procesos de transformación y evolución. Su enfoque integra conocimiento ancestral, herramientas contemporáneas, prácticas energéticas y lo que ella llama conocimiento cósmico: información y tecnologías que ha ido recibiendo y explorando a través de estados expandidos de conciencia y de su conexión con otras dimensiones e inteligencias superiores.",
+      "p4": "Hoy acompaña a personas de distintas partes del mundo en procesos de liberación de patrones y memorias, reconexión con el alma, expansión de conciencia, despertar espiritual y desarrollo de capacidades intuitivas y energéticas. También enseña y acompaña a hombres y mujeres medicina, terapeutas y guías a profundizar en sus propias herramientas, expandir sus capacidades y llevar su práctica a un nuevo nivel."
+    },
+    "cierreAlt": "Textura cósmica",
+    "actions": {
+      "explorar": "Explorar experiencias",
+      "profundizar": "Ir más profundo"
+    }
+  },
+  "GateModal": {
+    "title": "¿Quieres seguir explorando?",
+    "login": "Inicia sesión",
+    "signup": "Crear cuenta",
+    "help": "¿Necesitas ayuda?",
+    "close": "Cerrar"
+  },
+  "Testimonials": {
+    "prev": "Testimonio anterior",
+    "next": "Testimonio siguiente",
+    "view": "Ver el testimonio de {name}"
+  },
+  "NotFound": {
+    "title": "Portal Perdido",
+    "body": "Esta dimensión no existe en nuestro mapa cósmico. Quizás la frecuencia vibratoria de esta ruta se ha desvanecido en el espacio-tiempo.",
+    "cta": "Volver al Inicio"
+  },
+  "Cuenta": {
+    "meta": {
+      "recoverTitle": "Recuperar contraseña",
+      "newPasswordTitle": "Nueva contraseña"
+    },
+    "errors": {
+      "expired": "El enlace venció o ya se usó. Pide uno nuevo desde “¿Olvidaste tu contraseña?”.",
+      "invalid": "El enlace no es válido. Prueba pidiendo uno nuevo.",
+      "passwordChanged": "Listo, tu contraseña quedó actualizada."
+    },
+    "titleLogin": "Hola de nuevo",
+    "titleSignup": "Bienvenido",
+    "myAccount": "Mi Cuenta",
+    "logout": "Cerrar sesión",
+    "footer": {
+      "haveAccount": "¿Ya tienes cuenta? <link>Inicia sesión</link>",
+      "noAccount": "¿No tienes cuenta? <link>Regístrate</link>"
+    },
+    "login": {
+      "email": "Email",
+      "password": "Contraseña",
+      "emailPlaceholder": "tu@email.com",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
+      "forgot": "¿Olvidaste tu contraseña?",
+      "pending": "Ingresando...",
+      "submit": "Ingresar"
+    },
+    "signup": {
+      "fullName": "Nombre completo",
+      "fullNamePlaceholder": "Tu nombre y apellido",
+      "hint": "Mínimo 8 caracteres.",
+      "pending": "Creando cuenta...",
+      "submit": "Crear cuenta"
+    },
+    "recover": {
+      "eyebrow": "Recuperar acceso",
+      "title": "Volver a entrar",
+      "subtitle": "Escribe tu email y te mandamos un enlace para crear una contraseña nueva.",
+      "back": "Volver al inicio de sesión",
+      "sentTitle": "Si hay una cuenta con ese email, te llega un enlace para crear una contraseña nueva.",
+      "sentHint": "Revisa también la carpeta de spam. El enlace vence en una hora y sirve una sola vez.",
+      "pending": "Enviando...",
+      "submit": "Enviarme el enlace"
+    },
+    "newPassword": {
+      "eyebrow": "Nueva contraseña",
+      "title": "Elige tu clave",
+      "subtitle": "Estás cambiando la contraseña de {email}.",
+      "password": "Contraseña nueva",
+      "confirm": "Repetir contraseña",
+      "pending": "Guardando...",
+      "submit": "Guardar contraseña"
+    },
+    "avatar": {
+      "change": "Cambiar foto de perfil",
+      "alt": "Foto de perfil",
+      "uploading": "Subiendo..."
+    },
+    "applications": {
+      "empty": "Todavía no tienes solicitudes. Elige un viaje en <link>Viajes</link> para postularte.",
+      "approved": "Viajes aprobados",
+      "mine": "Mis solicitudes",
+      "trip": "Viaje",
+      "tripFallback": "Viaje",
+      "step": "Paso siguiente",
+      "date": "Fecha",
+      "status": "Estado",
+      "dash": "—",
+      "waitingReview": "Esperando revisión",
+      "willWrite": "Te vamos a escribir",
+      "deposit": "Reservá con {deposit} o pagá {price}",
+      "payMissing": "Falta el pago de {price}",
+      "payMissingNoTrip": "Falta el pago",
+      "balance": "Falta el saldo de {amount}",
+      "balanceNoTrip": "Falta el saldo",
+      "health": "Completar formulario de salud",
+      "consent": "Firmar el consentimiento",
+      "done": "Al día",
+      "statusLabel": {
+        "pending_review": "En revisión",
+        "needs_conversation": "Conversemos",
+        "approved": "Aprobada",
+        "rejected": "Rechazada",
+        "expired": "Expirada"
+      }
+    },
+    "formErrors": {
+      "loginIncomplete": "Completa email y contraseña.",
+      "emailNotConfirmed": "Confirma tu email antes de iniciar sesión. Revisa tu bandeja de entrada.",
+      "badCredentials": "Email o contraseña incorrectos.",
+      "signupIncomplete": "Completa nombre, email y contraseña.",
+      "shortPassword": "La contraseña debe tener al menos 8 caracteres.",
+      "userExists": "Ya existe una cuenta con ese email. Inicia sesión.",
+      "signupFailed": "No se pudo crear la cuenta. Prueba de nuevo.",
+      "invalidEmail": "Ingresa un email válido.",
+      "updateIncomplete": "Completa los dos campos.",
+      "mismatch": "Las contraseñas no coinciden.",
+      "linkExpired": "El enlace venció. Pide uno nuevo desde “¿Olvidaste tu contraseña?”.",
+      "samePassword": "La contraseña nueva tiene que ser distinta de la anterior.",
+      "updateFailed": "No se pudo cambiar la contraseña. Prueba de nuevo.",
+      "chooseImage": "Elige una imagen.",
+      "notImage": "El archivo debe ser una imagen.",
+      "tooBig": "La imagen no puede superar los 3MB.",
+      "sessionExpired": "Sesión expirada. Vuelve a iniciar sesión.",
+      "uploadFailed": "No se pudo subir la imagen. Prueba de nuevo."
+    }
+  },
+  "Faqs": {
+    "meta": {
+      "title": "Preguntas frecuentes | Cosmic Eagle",
+      "description": "Preparación, salud, qué llevar, integración: lo que suelen preguntarnos antes de una Sesión o un Viaje Cósmico."
+    },
+    "hero": {
+      "imageAlt": "Partículas de luz sobre un cielo estrellado",
+      "scrollHint": "Leer"
+    },
+    "title": "Preguntas frecuentes",
+    "preparing": "Estamos preparando esta sección. Mientras tanto, escríbenos y te respondemos cualquier duda sobre las experiencias.",
+    "placements": {
+      "general": "Generales",
+      "sesiones": "Sesiones Cósmicas",
+      "viajes": "Viajes Cósmicos"
+    }
+  },
+  "Legal": {
+    "provisional": "<strong>Versión preliminar.</strong> Este texto está en revisión y puede cambiar. Si algo de lo que lees aquí no coincide con lo que te dijimos, escríbenos y lo aclaramos.",
+    "updated": "Última actualización: {date}"
+  },
+  "Contenidos": {
+    "meta": {
+      "title": "Contenidos | Cosmic Eagle",
+      "description": "Preparación e integración, salud, evolución, tecnología humana y testimonios: la biblioteca de contenidos de Cosmic Eagle.",
+      "notFound": "Contenido no encontrado | Cosmic Eagle"
+    },
+    "hero": {
+      "scrollHint": "Ver la biblioteca"
+    },
+    "library": {
+      "ariaNav": "Temas de la biblioteca",
+      "fallback": "Biblioteca",
+      "empty": "Todavía no hay contenidos publicados en esta categoría.",
+      "readerAria": "Lectura",
+      "back": "Volver",
+      "locked": "Este contenido requiere un nivel de acceso que tu cuenta todavía no alcanza.",
+      "viewAccess": "Ver cómo acceder",
+      "others": "Otros contenidos disponibles",
+      "program": "Del programa",
+      "statusLocked": "Contenido",
+      "statusPublished": "Publicado",
+      "requiresAccess": "Requiere acceso",
+      "wall": "Estos contenidos se entregan a quienes participan del programa evolutivo. Para acceder, es necesario completar el formulario de postulación y participar de una primera experiencia.",
+      "nextExperiences": "Ver las próximas experiencias",
+      "accessLabel": "¿Tienes un código de acceso?",
+      "redeeming": "Canjeando…",
+      "redeemSubmit": "Entrar",
+      "redeemEmpty": "Escribí el código.",
+      "redeemError": "No se pudo canjear el código. Probá de nuevo.",
+      "redeem": {
+        "ok": "Listo: tu cuenta quedó habilitada.",
+        "vencido": "Ese código ya venció. Escríbenos y te damos uno nuevo.",
+        "agotado": "Ese código ya se usó todas las veces disponibles.",
+        "sin_sesion": "Inicia sesión para canjear el código.",
+        "invalido": "No encontramos ese código. Revisa que esté bien escrito."
+      }
+    }
+  },
+  "Calendario": {
+    "meta": {
+      "title": "Calendario | Cosmic Eagle",
+      "description": "Todas las fechas abiertas de Sesiones Cósmicas y Viajes Cósmicos, en una sola página."
+    },
+    "hero": {
+      "imageAlt": "Cielo estrellado sobre un portal de luz"
+    },
+    "caption": "Calendario",
+    "sesiones": "Próximas Sesiones",
+    "viajes": "Próximos Viajes",
+    "emptySesiones": "No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto.",
+    "emptyViajes": "No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
+  },
+  "Viajes": {
+    "meta": {
+      "title": "Experiencias | Cosmic Eagle",
+      "description": "Sesiones de un día y retiros de varios días en portales sagrados. Fechas e inscripción."
+    },
+    "hero": {
+      "imageAlt": "Portal de luz sobre un cielo estrellado",
+      "title": "Portales de Transformación",
+      "scrollHint": "Explorar"
+    },
+    "about": {
+      "imageAlt": "Círculo de ceremonia iluminado",
+      "body": "Experiencias para <strong>profundizar en tu proceso de transformación</strong>, expandir la conciencia y conectar con el alma. En sesiones de un día o retiros de varios días."
+    },
+    "testimonials": {
+      "title": "Nuestros Viajeros",
+      "label": "Voces de quienes ya hicieron el camino"
+    },
+    "cierre": {
+      "imageAlt": "Amanecer sobre un paisaje sagrado",
+      "text": "Un viaje hacia adentro.<br></br>Un recuerdo de nuestra naturaleza más profunda.<br></br>Una activación de la luz que habita en nosotros."
+    },
+    "filter": {
+      "groupLabel": "Filtrar experiencias",
+      "todas": "Todas",
+      "sesiones": "Sesiones",
+      "retiros": "Retiros",
+      "badgeCeremonia": "Sesión",
+      "badgeRetiro": "Retiro"
+    },
+    "empty": {
+      "sesiones": "No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto.",
+      "retiros": "No hay retiros publicados por el momento. Vuelve a visitarnos pronto.",
+      "todas": "No hay experiencias publicadas por el momento. Vuelve a visitarnos pronto."
+    },
+    "card": {
+      "date": "Fecha",
+      "view": "Ver experiencia"
+    }
+  },
+  "ViajeDetalle": {
+    "meta": {
+      "notFound": "Viaje no encontrado"
+    },
+    "hero": {
+      "scrollHint": "Ver la experiencia",
+      "portadaAlt": "Portada de {title}",
+      "postularme": "Postularme",
+      "loginPostularme": "Iniciar sesión y postularme"
+    },
+    "detail": {
+      "title": "Sobre esta experiencia",
+      "empty": "Pronto vamos a compartir más detalles sobre esta experiencia. Escríbenos si quieres saber más."
+    },
+    "fields": {
+      "fechas": "Fechas",
+      "duracion": "Duración",
+      "horario": "Horario",
+      "lugar": "Lugar",
+      "cupo": "Cupo",
+      "dirigidoA": "Dirigido a",
+      "aporte": "Aporte"
+    },
+    "capacity": "{count, plural, one {# persona} other {# personas}}",
+    "nights": "{count, plural, one {1 día} other {# días}}",
+    "priceConfirm": "A confirmar",
+    "hours": {
+      "range": "{from} a {to}",
+      "until": "hasta {to}"
+    },
+    "program": {
+      "title": "Programa",
+      "day": "Día {day}"
+    },
+    "includes": {
+      "title": "Qué incluye"
+    },
+    "postulate": {
+      "title": "Postularte a esta experiencia",
+      "deposit": "o reservá tu cupo con {amount}",
+      "body": "La participación se define a través de una solicitud con unas preguntas de salud. Nuestro equipo la revisa y te responde.",
+      "submit": "Completar solicitud",
+      "loginSubmit": "Iniciar sesión y postularme",
+      "needAccount": "Necesitás una cuenta para postularte. <link>Crear cuenta</link>"
+    },
+    "closed": {
+      "completed": "Esta experiencia ya finalizó",
+      "closed": "Inscripciones cerradas",
+      "body": "Mira el resto del calendario para encontrar la próxima fecha disponible.",
+      "cta": "Ver otras experiencias"
+    },
+    "cancellations": "Cancelaciones"
+  },
+  "Site": {
+    "title": "Cosmic Eagle | Sabiduría Cósmica para la Evolución Humana",
+    "description": "Cosmic Eagle explora el potencial más profundo de la conciencia humana. A través de experiencias inmersivas, enseñanzas y prácticas de integración, reconectamos con la inteligencia del alma."
+  },
   "Home": {
-    "heroAlt": "Figura de partículas mirando hacia el cosmos"
+    "heroAlt": "Figura de partículas mirando hacia el cosmos",
+    "purpose": {
+      "title": "Nuestro propósito",
+      "body": "Nuestro propósito es impulsar la <gold>evolución</gold> humana, creando espacios que permitan a cada persona <gold>transformar</gold> su realidad, expandir su <gold>conciencia</gold> y profundizar la conexión con su <gold>alma</gold>.",
+      "cta": "Ir más profundo"
+    },
+    "relato": {
+      "paragraphs": [
+        "Los seres humanos estamos en constante evolución. A medida que expandimos nuestra conciencia, comenzamos a descubrir que somos mucho más que nuestra historia personal, nuestra mente o la realidad que percibimos a través de los sentidos.",
+        "Nuestro trabajo explora este potencial evolutivo y la naturaleza multidimensional de la experiencia humana: nuestra capacidad de transformarnos, de acceder a niveles más profundos de inteligencia y de reconectar con la dimensión del alma.",
+        "Desde esta perspectiva, la evolución humana pasa a ser parte de un campo de conciencia mucho más amplio, abriendo un camino hacia un conocimiento profundo, la sabiduría cósmica y una comprensión expandida de quiénes y qué somos."
+      ],
+      "keywords": [
+        "conciencia",
+        "potencial evolutivo",
+        "dimensión del alma",
+        "conocimiento profundo",
+        "sabiduría cósmica"
+      ],
+      "cta": "Explorar experiencias"
+    },
+    "atmosfericaAlt": "Figura en meditación con un núcleo de luz dorada",
+    "contenidos": {
+      "title": "Contenidos",
+      "body": "Compartimos contenidos creados para acompañar cada etapa del camino, integrar los aprendizajes y profundizar en el propio proceso evolutivo.",
+      "cta": "Ir más profundo",
+      "imageAlt": "Portal de luz"
+    },
+    "faqs": {
+      "title": "¿Con curiosidad por el viaje?",
+      "intro": "Aquí van algunas cosas que quizás quieras saber antes de seguir explorando.",
+      "more": "Explorar más →"
+    },
+    "cierreAlt": "Amanecer sobre el horizonte",
+    "cierre": "Cuando el alma está lista,<br></br>el camino aparece."
   }
 }

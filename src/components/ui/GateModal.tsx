@@ -1,6 +1,7 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
@@ -33,6 +34,7 @@ export function GateModal({
   onClose: () => void;
   next?: string;
 }) {
+  const t = useTranslations("GateModal");
   const reduced = useReducedMotion();
   const card = useRef<HTMLDivElement>(null);
 
@@ -116,7 +118,7 @@ export function GateModal({
             <button
               type="button"
               onClick={onClose}
-              aria-label="Cerrar"
+              aria-label={t("close")}
               className="absolute right-6 top-6 flex h-9 w-9 items-center justify-center text-2xl leading-none text-[#0079b3] transition-[color,transform,text-shadow] duration-300 hover:scale-110 hover:text-[#4db8e8] hover:[text-shadow:0_0_14px_rgba(0,121,179,0.95),0_0_28px_rgba(0,121,179,0.65)] active:scale-110 active:text-[#4db8e8]"
             >
               <span aria-hidden="true">✕</span>
@@ -126,7 +128,7 @@ export function GateModal({
               id="gate-title"
               className="font-display text-[clamp(1.625rem,5vw,2.125rem)] font-bold leading-[1.25] text-primary-container"
             >
-              ¿Quieres seguir explorando?
+              {t("title")}
             </h2>
 
             {/* El parrafo "Para explorar los detalles de esta experiencia
@@ -139,14 +141,14 @@ export function GateModal({
                 className={GATE_BTN}
                 onClick={onClose}
               >
-                Inicia sesión
+                {t("login")}
               </Link>
               <Link
                 href={`/cuenta?modo=registro${query}`}
                 className={GATE_BTN}
                 onClick={onClose}
               >
-                Crear cuenta
+                {t("signup")}
               </Link>
             </div>
 
@@ -159,7 +161,7 @@ export function GateModal({
               href={`mailto:${SOPORTE_EMAIL}`}
               className="mt-7 inline-block text-[13px] normal-case tracking-normal text-primary/75 underline decoration-primary/30 underline-offset-4 transition-colors duration-300 hover:text-primary hover:decoration-primary/70"
             >
-              ¿Necesitas ayuda?
+              {t("help")}
             </a>
           </motion.div>
         </motion.div>
