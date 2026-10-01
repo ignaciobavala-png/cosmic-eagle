@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { ArticleBody } from "@/components/ui/ArticleBody";
 import { Reveal } from "@/components/ui/Reveal";
 import { getTranslations } from "next-intl/server";
@@ -100,7 +99,6 @@ export async function LegalPage({
         </CreamSection>
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }

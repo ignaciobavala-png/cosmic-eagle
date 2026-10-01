@@ -2989,3 +2989,24 @@ contraseña.
 
 Mientras esté `MAINTENANCE_MODE`, el link lleva al dominio (`NEXT_PUBLIC_SITE_URL`)
 y `/cuenta/nueva-clave` queda detrás de la pantalla: hace falta el `?preview=`.
+
+## 2026-10-01 — Relato de la home en mobile, sin "Volver arriba", fondo nuevo en /nosotros
+
+Tres pedidos de Ignacio:
+
+- **"En mobile los tres párrafos del relato aparecen fijos"**. No era el ancho:
+  a 390x844 sin preferencias el tercero ya entraba después de los dos fijos. Era
+  **`prefers-reduced-motion`**: muchos teléfonos traen "quitar animaciones"
+  prendido y `ScrollStory` cae en su rama plana, que mostraba los tres de una.
+  Ahí el tercero ahora entra con un fundido **sólo de opacidad** (`whileInView`,
+  80% visible), sin desplazamiento. Lección: cuando algo "sólo pasa en el
+  teléfono", medir también con `reducedMotion: "reduce"`.
+- **Fuera el botón flotante "Volver arriba"** (`BackToTop`), en todas las
+  páginas y los dos anchos. Se borró el componente y su clave de mensajes. El
+  `pb-[88px]` de "Nuestro enfoque" que le hacía lugar se dejó como está.
+- **Banner de la figura acostada de /nosotros: otra foto en mobile.**
+  `MediaStatement` suma `imageMobile` (con `imagePositionMobile` encuadrando
+  ésa); la foto es un fijo de layout, `public/img/nosotros-video-mobile.webp`,
+  original en `docs/entregas/2026-10-01-fondo-nosotros-mobile/`. Encuadre al 78%
+  comparado contra 65 y 90. Si la clienta cambia el slot, el teléfono sigue
+  mostrando esta. Escritorio no cambia.

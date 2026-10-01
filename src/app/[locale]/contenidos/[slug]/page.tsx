@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Lock } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { ArticleBody } from "@/components/ui/ArticleBody";
 import { CreamSection } from "@/components/ui/CreamSection";
 import { LibraryNav } from "@/components/ui/LibraryNav";
@@ -250,7 +249,6 @@ export default async function ContenidoPage({
         </CreamSection>
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }

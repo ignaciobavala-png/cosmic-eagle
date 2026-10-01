@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { PageHero } from "@/components/ui/PageHero";
 import { CreamSection, CREAM_HEX } from "@/components/ui/CreamSection";
 import { Reveal } from "@/components/ui/Reveal";
@@ -122,7 +121,6 @@ export default async function FaqsPage({
         </CreamSection>
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }

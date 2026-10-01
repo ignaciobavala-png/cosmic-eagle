@@ -3,7 +3,6 @@ import { Header } from "@/components/Header";
 import { AuthScreen } from "@/components/ui/AuthScreen";
 import { getSiteContent } from "@/lib/site-content";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { LoginForm } from "./LoginForm";
 import { SignupForm } from "./SignupForm";
@@ -221,7 +220,6 @@ export default async function CuentaPage({
         )}
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }

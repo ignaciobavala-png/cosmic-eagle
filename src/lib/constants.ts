@@ -47,6 +47,10 @@ export const IMAGES = {
   // porque es simetrico, que es lo que pide una decoracion que va a los dos
   // costados de la columna.
   simboloCaliz: "/img/simbolo-caliz.webp",
+  // El banner de la figura acostada de /nosotros, SOLO en mobile (pedido de
+  // Ignacio, 01/10): la foto del slot no tiene recorte vertical que sirva.
+  // Original en docs/entregas/2026-10-01-fondo-nosotros-mobile/.
+  nosotrosVideoMobile: "/img/nosotros-video-mobile.webp",
   // Rediseno de la home (docs/HOME_REDISENO.md). Los degrades de "La humanidad",
   // la banda dorada y el fondo del footer NO estan aca: se hacen en CSS.
   homeHero: "/img/home/hero.webp",

@@ -233,9 +233,26 @@ export function ScrollStory({
         id={id}
         className="w-full bg-[linear-gradient(to_bottom,#011360_0%,#020c41_100%)] px-margin-mobile py-24 md:px-margin-desktop"
       >
+        {/* Los fijos entran de una y el resto con un fundido SOLO de
+            opacidad al llegar a la pantalla (pedido de Ignacio, 01/10: en el
+            telefono "aparecen fijos los tres, no 2 y luego el tercero"). Era
+            esta rama: muchos telefonos traen "quitar animaciones" prendido y
+            caian aca. Medido a 390x844: sin la preferencia el tercero ya
+            entraba despues; con ella salian los tres en opacidad 1. Un
+            fundido sin desplazamiento no es el movimiento que la preferencia
+            pide evitar. */}
         <div className="mx-auto max-w-[820px] space-y-6">
           {story.paragraphs.map((pieces, i) => (
-            <p key={i} className={PARAGRAPH_CLASS}>
+            <motion.p
+              key={i}
+              className={PARAGRAPH_CLASS}
+              {...(i >= FIXED_PARAGRAPHS && {
+                initial: { opacity: 0 },
+                whileInView: { opacity: 1 },
+                viewport: { once: true, amount: 0.8 },
+                transition: { duration: 1.2, delay: 0.3 },
+              })}
+            >
               {pieces.map((piece, j) =>
                 piece.keyword ? (
                   <span key={j} className={KEYWORD_CLASS}>
@@ -245,7 +262,7 @@ export function ScrollStory({
                   <span key={j}>{piece.text}</span>
                 )
               )}
-            </p>
+            </motion.p>
           ))}
           <div className="pt-14">
             <StoryCta {...cta} />

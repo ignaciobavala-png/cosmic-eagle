@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { redirect } from "@/i18n/redirect";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { funnelSurface } from "@/components/forms/styles";
 import { HealthForm } from "./HealthForm";
@@ -73,7 +72,6 @@ export default async function SaludPage({
         </div>
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }

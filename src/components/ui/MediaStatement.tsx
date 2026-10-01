@@ -18,6 +18,7 @@ import { ScrollHintButton } from "./ScrollHintButton";
  */
 export function MediaStatement({
   image,
+  imageMobile,
   imageAlt = "",
   text,
   children,
@@ -40,6 +41,13 @@ export function MediaStatement({
   offsetClassName = "",
 }: {
   image: string;
+  /**
+   * Otra imagen para mobile, en vez de recortar la misma. Va cuando la foto
+   * de escritorio no tiene un recorte vertical que funcione (el banner de
+   * /nosotros, 01/10). `imagePositionMobile` encuadra esta, no la de
+   * escritorio.
+   */
+  imageMobile?: string;
   imageAlt?: string;
   /** Frase suelta, centrada y en serif. Es el uso corriente del bloque.
    * Acepta nodo (no sólo string) para poder forzar un `<br/>` cuando
@@ -174,11 +182,30 @@ export function MediaStatement({
       {/* El `object-cover` se escribe aca y no se delega al default de
           `BackgroundMedia`: la prop REEMPLAZA su `className`, asi que si se
           pasa solo la posicion se pierde el recorte. */}
-      <BackgroundMedia
-        src={image}
-        alt={imageAlt}
-        className={`object-cover${imagePosition ? ` ${imagePosition}` : ""}${imagePositionMobile ? ` ${imagePositionMobile}` : ""}`}
-      />
+      {imageMobile ? (
+        <>
+          <div className="absolute inset-0 max-md:hidden">
+            <BackgroundMedia
+              src={image}
+              alt={imageAlt}
+              className={`object-cover${imagePosition ? ` ${imagePosition}` : ""}`}
+            />
+          </div>
+          <div className="absolute inset-0 md:hidden">
+            <BackgroundMedia
+              src={imageMobile}
+              alt={imageAlt}
+              className={`object-cover${imagePositionMobile ? ` ${imagePositionMobile}` : ""}`}
+            />
+          </div>
+        </>
+      ) : (
+        <BackgroundMedia
+          src={image}
+          alt={imageAlt}
+          className={`object-cover${imagePosition ? ` ${imagePosition}` : ""}${imagePositionMobile ? ` ${imagePositionMobile}` : ""}`}
+        />
+      )}
       {overlay && (
         <>
           <div

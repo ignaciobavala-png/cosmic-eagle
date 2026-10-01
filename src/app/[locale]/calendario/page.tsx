@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { PageHero, renderTitle } from "@/components/ui/PageHero";
 import { TripCarousel } from "@/components/ui/TripCarousel";
 import { Reveal, RevealItem } from "@/components/ui/Reveal";
@@ -145,7 +144,6 @@ export default async function CalendarioPage({
         </section>
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }

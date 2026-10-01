@@ -62,9 +62,6 @@
     "error": "No pudimos registrarte. Prueba de nuevo.",
     "ok": "Listo, te vamos a escribir."
   },
-  "BackToTop": {
-    "label": "Volver arriba"
-  },
   "TripTypes": {
     "retiro": {
       "one": "Viaje",

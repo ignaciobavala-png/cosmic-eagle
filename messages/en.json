@@ -62,9 +62,6 @@
     "error": "We couldn't sign you up. Please try again.",
     "ok": "Done, we'll be in touch."
   },
-  "BackToTop": {
-    "label": "Back to top"
-  },
   "TripTypes": {
     "retiro": {
       "one": "Journey",

@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { ImmersiveHero } from "@/components/ui/ImmersiveHero";
 import { ScrollStory } from "@/components/ui/ScrollStory";
 import { MediaStatement } from "@/components/ui/MediaStatement";
@@ -518,7 +517,6 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         />
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }

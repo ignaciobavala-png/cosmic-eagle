@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { CalendarDays, Clock, MapPin, Users, Wallet } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { PageHero } from "@/components/ui/PageHero";
 import { CreamSection, CREAM_HEX } from "@/components/ui/CreamSection";
@@ -492,7 +491,6 @@ export default async function ViajePage({ params }: Props) {
         </Reveal>
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }

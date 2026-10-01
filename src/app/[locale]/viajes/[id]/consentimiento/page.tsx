@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { redirect } from "@/i18n/redirect";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { funnelSurface, panel, panelBody, panelTitle } from "@/components/forms/styles";
 import {
@@ -129,7 +128,6 @@ export default async function ConsentimientoPage({
         </div>
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }

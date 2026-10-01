@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { PageHero } from "@/components/ui/PageHero";
 import { CreamSection, GOLD } from "@/components/ui/CreamSection";
 import {
@@ -163,7 +162,6 @@ export default async function ContenidosPage({
         </CreamSection>
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }

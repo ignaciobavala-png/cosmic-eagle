@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { redirect } from "@/i18n/redirect";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { createClient } from "@/lib/supabase/server";
 import { getActivePaymentMethods } from "@/lib/payments";
 import { formatAmount, type FormatLocale } from "@/lib/format";
@@ -469,7 +468,6 @@ export default async function SolicitarPage({
         </div>
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }

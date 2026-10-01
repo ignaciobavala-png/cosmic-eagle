@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { PageHero, renderTitle } from "@/components/ui/PageHero";
 import { WordSequence } from "@/components/ui/WordSequence";
 import { MediaStatement } from "@/components/ui/MediaStatement";
@@ -279,7 +278,13 @@ export default async function NosotrosPage({
           // que cuenta la imagen, y las piernas quedan afuera a proposito
           // (pedido de Ignacio, 16/09). Medido sobre el asset real (1456x816)
           // comparando cuatro posiciones a 390x844.
-          imagePositionMobile="max-md:object-[68%_center]"
+          //
+          // Desde el 01/10 mobile ni siquiera recorta esa foto: lleva otra
+          // (pedido de Ignacio), un fijo de layout en public/img. Si la
+          // clienta cambia el slot, en el telefono se sigue viendo esta. El
+          // anillo de luz esta en el tercio derecho, de ahi el foco.
+          imageMobile={IMAGES.nosotrosVideoMobile}
+          imagePositionMobile="object-[78%_center]"
         />
 
         {/* Pantalla 5 — "Nuestro enfoque", la última de contenido antes del
@@ -375,7 +380,9 @@ export default async function NosotrosPage({
               `fixed` y cae justo sobre la esquina derecha del cierre en
               italica. Medido a 390x844 con la seccion apoyada en el pie de la
               pantalla: con los 35px del mockup el boton le tapa 47px a la
-              ultima linea, con 88px quedan 6px de aire. */}
+              ultima linea, con 88px quedan 6px de aire. El boton se saco del
+              sitio el 01/10 (pedido de Ignacio); el padding se deja como
+              estaba para no mover la pantalla. */}
         </Reveal>
 
         {/* Pantalla 6 — "Estela, founder", la ultima de contenido. Copy de la
@@ -471,7 +478,6 @@ export default async function NosotrosPage({
         />
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }

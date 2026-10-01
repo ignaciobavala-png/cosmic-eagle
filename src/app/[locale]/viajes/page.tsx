@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { BackToTop } from "@/components/BackToTop";
 import { PageHero } from "@/components/ui/PageHero";
 import { MediaStatement } from "@/components/ui/MediaStatement";
 import { CreamSection, GOLD } from "@/components/ui/CreamSection";
@@ -181,7 +180,6 @@ export default async function ViajesPage({
         </MediaStatement>
       </main>
       <Footer />
-      <BackToTop />
     </>
   );
 }
