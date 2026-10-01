@@ -3010,3 +3010,30 @@ Tres pedidos de Ignacio:
   original en `docs/entregas/2026-10-01-fondo-nosotros-mobile/`. Encuadre al 78%
   comparado contra 65 y 90. Si la clienta cambia el slot, el teléfono sigue
   mostrando esta. Escritorio no cambia.
+
+## 2026-10-01 — Traducción inicial al inglés del contenido de la base
+
+La clienta no quiere cargar el inglés a mano. Se tradujo de una vez todo lo que
+había (traducción de Claude) en dos migraciones aplicadas por MCP:
+`20261001120000_content_i18n_en_initial` (multimedia, experiencias con su
+programa, medios de pago y las 29 FAQs) y `20261001120100_articles_i18n_en_initial`
+(los 8 artículos).
+
+- **Nunca pisa**: cada valor es `coalesce(nullif(x_en, ''), ...)` y los slots van
+  con `on conflict do nothing`. Se puede volver a correr sin tocar lo corregido.
+- Se busca por el texto en castellano, no por id (títulos y FAQs repetidos).
+- **Multimedia**: también los slots que nunca se editaron (su castellano sale del
+  `fallback` del repo); sin fila `.en` salían en castellano en /en.
+- **Medios de pago**: el inglés se arma con `replace()` de las etiquetas sobre el
+  texto de la base, para no copiar IBAN, RUT y cuentas al repo.
+- **Legales afuera** a propósito: corchetes sin definir y datos de salud. En /en
+  siguen en castellano hasta que alguien los revise.
+- Términos fijados contra `messages/en.json`: Cosmic Session, Cosmic Journey,
+  retreat, application, health form.
+
+Trampa de la verificación: `.next/cache/fetch-cache` **sobrevive al `pnpm
+build`** y servía un `home.frase.left.en` de una prueba vieja ("ZZTEST"). Hubo
+que borrarlo para ver la base real.
+
+Falta: que Sofía lea el inglés (sobre todo FAQs de salud y dosis) y la parte 2,
+traducir solo al guardar en el panel.
