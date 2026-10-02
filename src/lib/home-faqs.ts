@@ -3,7 +3,7 @@ import type { Faq } from "./faqs";
 /**
  * Las preguntas frecuentes de la home. Texto LITERAL de la entrega del 28/09
  * (`docs/entregas/2026-09-28-faqs-home/`), que trae también la versión en
- * inglés para cuando llegue i18n.
+ * inglés (`HOME_FAQS_EN`, al pie).
  *
  * Van fijas en el código y NO en la tabla `faqs`: no son editables (decisión
  * de Ignacio, 28/09), y son otro juego que las de /faqs —aquellas son de
@@ -75,3 +75,74 @@ export const HOME_FAQS: Faq[] = [
       "La mayoría de las personas llega a Cosmic Eagle Journey por recomendación personal o a través de alguien que ya conoce nuestro trabajo.\n\nAlgunos aspectos de lo que hacemos requieren contexto y por eso se comparten dentro de nuestro espacio privado.\n\nSi has sido invitado a explorar más, puedes entrar para conocer más sobre nuestro enfoque, nuestras experiencias, el proceso de preparación y los próximos viajes.",
   },
 ];
+
+/**
+ * La versión en inglés, literal de la misma entrega (viene en el mismo .docx,
+ * después de la castellana). Mismos `id` y mismo orden que `HOME_FAQS`.
+ */
+export const HOME_FAQS_EN: Faq[] = [
+  {
+    id: "que-es",
+    question: "What is Cosmic Eagle Journey?",
+    answer:
+      "Cosmic Eagle Journey creates immersive experiences for personal transformation and conscious evolution.\n\nOur work brings together years of experience, different practices and traditions, and a deep exploration of human consciousness and the potential that exists within each of us.",
+  },
+  {
+    id: "que-lo-hace-diferente",
+    question: "What makes this work different?",
+    answer:
+      "Our approach goes beyond a single practice or methodology.\n\nWe work with the human being as a multidimensional system — body, mind, emotions, energy and soul — creating experiences designed to help people access deeper layers of themselves and move forward in their evolutionary process.",
+  },
+  {
+    id: "evolucion-humana",
+    question: "What do you mean by human evolution?",
+    answer:
+      "For us, evolution is not about becoming someone else. It is about progressively releasing what limits us and gaining greater access to our own consciousness, inner resources and potential.\n\nIt is a process of becoming more aware of who we are, how we live and what we are capable of becoming.",
+  },
+  {
+    id: "para-quien-es",
+    question: "Who is this work for?",
+    answer:
+      "Our experiences are for people who feel ready to explore themselves more deeply, release what no longer serves them and expand into new possibilities.\n\nYou don't need previous experience, but curiosity, openness and personal responsibility are essential.",
+  },
+  {
+    id: "para-quien-no-es",
+    question: "Who is this work not for?",
+    answer:
+      "This work is not for everyone.\n\nIt may not be appropriate for people looking for a quick fix, a purely recreational experience, or someone else to provide all the answers.\n\nOur experiences require openness, personal responsibility and a genuine willingness to engage with your own process. Certain physical or mental health conditions may also make participation unsuitable. For this reason, everyone completes a screening process before joining an experience.",
+  },
+  {
+    id: "camino-espiritual",
+    question: "Do I need to have a spiritual background?",
+    answer:
+      "No.\n\nPeople arrive from many different backgrounds, cultures and belief systems. You don't need to believe in anything in particular.\n\nWe invite you to approach the experience with an open mind and allow your own experience to inform your understanding.",
+  },
+  {
+    id: "es-terapia",
+    question: "Is this therapy?",
+    answer:
+      "No. Cosmic Eagle Journey is not a substitute for medical care, psychotherapy or psychiatric treatment.\n\nOur work is focused on consciousness, personal exploration and human evolution and, when appropriate, can exist alongside other forms of professional support.",
+  },
+  {
+    id: "es-seguro",
+    question: "Is the work safe?",
+    answer:
+      "Care, responsibility and respect for each person's individual process are fundamental to everything we do.\n\nBefore participating, each person goes through a preparation and screening process so we can understand their individual circumstances and determine whether an experience is appropriate for them.",
+  },
+  {
+    id: "que-esperar",
+    question: "What can I expect to experience?",
+    answer:
+      "Every journey is different.\n\nPeople may encounter emotional, psychological, energetic or spiritual dimensions of themselves. Rather than promising a particular outcome, we create the conditions for each person to explore what is meaningful and relevant to their own process.",
+  },
+  {
+    id: "saber-mas",
+    question: "How can I learn more?",
+    answer:
+      "Most people arrive at Cosmic Eagle Journey through personal referrals or through someone already familiar with our work.\n\nSome aspects of what we do require context and are therefore shared within our private space.\n\nIf you have been invited to explore further, you can enter to discover more about our approach, experiences, preparation process and upcoming journeys.",
+  },
+];
+
+export function getHomeFaqs(locale: string): Faq[] {
+  return locale === "en" ? HOME_FAQS_EN : HOME_FAQS;
+}

@@ -9,7 +9,7 @@ import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
 import { TitleRule } from "@/components/ui/TitleRule";
 import { FaqList } from "@/components/ui/FaqList";
-import { HOME_FAQS } from "@/lib/home-faqs";
+import { getHomeFaqs } from "@/lib/home-faqs";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
@@ -462,7 +462,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             </Reveal>
 
             <div className="mt-12 md:mt-16">
-              <FaqList faqs={HOME_FAQS} tone="dark" />
+              <FaqList faqs={getHomeFaqs(locale)} tone="dark" />
             </div>
 
             {/* "Explorar más" todavía no lleva a ningún lado (28/09): el
