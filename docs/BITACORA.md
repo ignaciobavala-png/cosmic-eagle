@@ -3037,3 +3037,23 @@ que borrarlo para ver la base real.
 
 Falta: que Sofía lea el inglés (sobre todo FAQs de salud y dosis) y la parte 2,
 traducir solo al guardar en el panel.
+
+## 2026-10-02 — Preguntas de la home en inglés, relato fijo en mobile y auditoría del /en
+
+- **Preguntas de la home en inglés** (`10ec969`): estaban fijas en
+  `src/lib/home-faqs.ts` y la traducción de la base no las alcanzó. Van literal
+  de la entrega del 28/09 (`HOME_FAQS_EN`, mismo `.docx`); el botón en inglés
+  pasa a "Explore further →", como dice la entrega.
+- **Auditoría del /en** contra producción: el sitio público está completo. Falta
+  lo de siempre: los legales (afuera a propósito) y la **etapa 4**, el embudo
+  (`solicitar/`, `salud/`, `consentimiento/`, sin `getTranslations`) y los
+  correos. Los 22 testimonios sin inglés son de los juegos `home` y `viajes`,
+  que hoy no se muestran en ninguna página.
+- Otra vez la caché del `next dev` local mostró frases de `site_content` en
+  castellano que en producción ya salían en inglés: comparar contra producción
+  antes de dar algo por faltante.
+- **Relato de la home: en mobile los tres párrafos arrancan fijos** (`c94b396`,
+  pedido de la organización; da vuelta el del 01/10). Va con `max-md:opacity-100!`
+  sobre el `opacity` inline de Framer, no con `matchMedia`: el HTML del servidor
+  ya sale encendido y no parpadea. La subida de 22px pasa a los tres, porque sin
+  ella el tercero quedaba pegado al segundo al llegar. Escritorio no cambia.
