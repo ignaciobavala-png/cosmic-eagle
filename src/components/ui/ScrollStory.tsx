@@ -240,12 +240,15 @@ export function ScrollStory({
             caian aca. Medido a 390x844: sin la preferencia el tercero ya
             entraba despues; con ella salian los tres en opacidad 1. Un
             fundido sin desplazamiento no es el movimiento que la preferencia
-            pide evitar. */}
+            pide evitar. El 02/10 se dio vuelta el pedido: en mobile los tres
+            fijos (`MOBILE_FIXED`); el fundido queda sólo en escritorio. */}
         <div className="mx-auto max-w-[820px] space-y-6">
           {story.paragraphs.map((pieces, i) => (
             <motion.p
               key={i}
-              className={PARAGRAPH_CLASS}
+              className={
+                i >= FIXED_PARAGRAPHS ? `${PARAGRAPH_CLASS} ${MOBILE_FIXED}` : PARAGRAPH_CLASS
+              }
               {...(i >= FIXED_PARAGRAPHS && {
                 initial: { opacity: 0 },
                 whileInView: { opacity: 1 },
@@ -563,6 +566,19 @@ function StoryCta({ label, href }: Cta) {
  */
 const FIXED_PARAGRAPHS = 2;
 
+/**
+ * **En mobile arrancan fijos TODOS** (pedido de la organización, 02/10: "en
+ * mobile quieren que los tres arranquen fijos"). Escritorio sigue con dos fijos
+ * y el resto destilado.
+ *
+ * Va por CSS y no por un `matchMedia` en JS: el servidor no sabe el ancho, así
+ * que el HTML saldría con el tercero en opacidad 0 y se encendería recién al
+ * hidratar —un parpadeo justo en la pantalla de arranque—. El `!` gana sobre el
+ * `opacity` inline que escribe Framer, que es lo único que lo apaga. El corte es
+ * el mismo `max-md:` de las bandas de la home (globals.css, "snap-bands").
+ */
+const MOBILE_FIXED = "max-md:opacity-100!";
+
 function StoryParagraph({
   children,
   progress,
@@ -587,8 +603,12 @@ function StoryParagraph({
 
   return (
     <motion.p
-      style={fixed ? { opacity, y } : { opacity }}
-      className={PARAGRAPH_CLASS}
+      // El `y` va en todos: en mobile el tercero también arranca fijo y sin
+      // la subida quedaba 22px más cerca del segundo mientras los otros dos
+      // todavía estaban bajando. En escritorio no se ve —la subida termina en
+      // el 6% del progreso, cuando el tercero recién empieza a encenderse—.
+      style={{ opacity, y }}
+      className={fixed ? PARAGRAPH_CLASS : `${PARAGRAPH_CLASS} ${MOBILE_FIXED}`}
     >
       {children}
     </motion.p>
