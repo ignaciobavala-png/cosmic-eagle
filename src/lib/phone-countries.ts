@@ -57,3 +57,20 @@ export const DEFAULT_PHONE_COUNTRY = "AR";
 export function dialCodeFor(iso2: string): string | null {
   return PHONE_COUNTRIES.find((c) => c.iso2 === iso2)?.dial ?? null;
 }
+
+/**
+ * La inversa de lo que arma el server action: de `+56 9 1234 5678` vuelve a
+ * país + número, para precargar el `PhoneInput` al editar el perfil. Prueba
+ * los códigos más largos primero (`+598` antes que `+5`). Si el código no está
+ * en la lista, devuelve el país por defecto y el teléfono entero como número.
+ */
+export function splitPhone(phone: string | null): { country: string; number: string } {
+  if (!phone) return { country: DEFAULT_PHONE_COUNTRY, number: "" };
+  const match = /^\+(\d+)\s+(.*)$/.exec(phone.trim());
+  if (match) {
+    const byLength = [...PHONE_COUNTRIES].sort((a, b) => b.dial.length - a.dial.length);
+    const country = byLength.find((c) => match[1] === c.dial);
+    if (country) return { country: country.iso2, number: match[2] };
+  }
+  return { country: DEFAULT_PHONE_COUNTRY, number: phone };
+}

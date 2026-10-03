@@ -268,7 +268,7 @@ export default async function ViajePage({ params }: Props) {
 
             <RevealItem y={14} duration={0.8} delay={0.15}>
               {trip.description ? (
-                <div className="space-y-5 text-body-md leading-relaxed text-[#05125a] text-justify">
+                <div className="space-y-5 text-body-md leading-relaxed text-[#05125a] text-left">
                   {trip.description
                     .split("\n")
                     .filter(Boolean)

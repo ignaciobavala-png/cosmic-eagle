@@ -3057,3 +3057,44 @@ traducir solo al guardar en el panel.
   sobre el `opacity` inline de Framer, no con `matchMedia`: el HTML del servidor
   ya sale encendido y no parpadea. La subida de 22px pasa a los tres, porque sin
   ella el tercero quedaba pegado al segundo al llegar. Escritorio no cambia.
+
+## 2026-10-03 — Correcciones de la organización: revisión en móvil
+
+Entrega en `docs/entregas/2026-10-03-correcciones-mobile/` (docx + 6 capturas).
+Decisiones de Ignacio sobre las 4 preguntas del docx: perfil **opción A** (sin
+ficha médica), menú de Contenidos **desplegable**, "Sesiones y Retiros" con
+etiquetas SESIÓN/RETIRO, y las cuatro palabras de /nosotros juntas y sin
+símbolos.
+
+- **/viajes**: entrada corta (título + párrafo + cartelera), sin hero ni imagen
+  detrás del párrafo. Filtros mostraban `VIAJES.FILTER.CEREMONIA`: el código
+  usaba el valor del enum como clave de mensaje (`FILTER_KEY`). Botón
+  `CtaLink tone="goldSolid"` (excepción pedida a "no hay botones rellenos").
+  Fecha y etiquetas de tarjeta en Montserrat (los números de estilo antiguo de
+  Goudy se leían más chicos). "Testimonios" a secas; cierre sin cursiva.
+- **Renombre**: `retiro` se muestra "Retiro" (era "Viaje") en sitio, panel y
+  `trip-type.ts`; navbar y footer dicen "Sesiones y Retiros". Rutas iguales.
+- **/calendario** sin hero; `TripCarousel` con bordes rectos y, en mobile,
+  tarjetas apiladas (variantes `max-md:`), sin carrusel.
+- **Contenidos**: `CategoryMenu` (píldoras en escritorio, desplegable en
+  mobile) para la biblioteca y la ficha. Fuera el título y la etiqueta que
+  repetían la categoría. Faltaba la clave `Contenidos.library.backToLibrary`
+  (se veía el código crudo en producción).
+- **/nosotros**: fuera los dos `SymbolRow`, el hint de `StickyStory` (era el
+  "Nuestro propósito" dorado encima del párrafo) y todo `text-justify` del
+  sitio. `StickyStory` en mobile pasa a alto natural con
+  `max-md:opacity-100!` / `transform-none!` (los párrafos quedaban bajo el
+  navbar); en escritorio la pantalla fija arranca debajo del navbar.
+- **/cuenta**: perfil personal en `profiles` (migración
+  `profile_personal_fields`, con su `grant update` por columna).
+  `capitalizeName` al registrarse, al guardar y al mostrar.
+- **`PhoneInput` estaba roto en mobile** (el `w-full` de `inputClass` le ganaba
+  al `w-[6.5rem]`): el número quedaba fuera de pantalla. Ahora el ancho lo pone
+  un envoltorio. Afectaba también al filtro corto.
+- **Recuperar contraseña**: con `MAINTENANCE_MODE=on`, `getSiteUrl` ignora
+  `NEXT_PUBLIC_SITE_URL` y el link vuelve al host que lo pidió. Plantilla del
+  mail nueva en `supabase/templates/recovery.html` — **hay que pegarla a mano**
+  en el dashboard.
+
+Sin correr e2e (pedido de Ignacio): pueden fallar los que buscan "Nuestros
+Sanadores" o "Viajes".

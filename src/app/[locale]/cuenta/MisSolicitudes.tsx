@@ -135,15 +135,20 @@ export async function MisSolicitudes({
 
   if (applications.length === 0) {
     return (
-      <p className="max-w-md text-center text-white/70">
-        {t.rich("applications.empty", {
-          link: (chunks) => (
-            <Link href="/viajes" className="text-primary-container underline">
-              {chunks}
-            </Link>
-          ),
-        })}
-      </p>
+      <section>
+        <h2 className="mb-3 font-display text-lg font-bold text-primary-container">
+          {t("applications.mine")}
+        </h2>
+        <p className="text-white/70">
+          {t.rich("applications.empty", {
+            link: (chunks) => (
+              <Link href="/viajes" className="text-primary-container underline">
+                {chunks}
+              </Link>
+            ),
+          })}
+        </p>
+      </section>
     );
   }
 

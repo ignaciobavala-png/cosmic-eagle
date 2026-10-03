@@ -19,7 +19,7 @@ import { Link } from "@/i18n/navigation";
  * no el orden en que se escriben (la trampa que ya salio cuatro veces en este
  * proyecto), asi que esto se decide adentro del componente.
  */
-export type CtaTone = "gold" | "dark";
+export type CtaTone = "gold" | "dark" | "goldSolid";
 
 /**
  * Contorno, color y hover del boton, en un solo lugar. Lo exporta porque
@@ -46,6 +46,15 @@ export const CTA_TONES: Record<CtaTone, string> = {
   // y la escala. Tampoco sirve rellenarlo de blanco: el mismo boton vive sobre
   // la franja crema, donde un relleno claro no se ve.
   dark: "border-[#05125a]/70 text-[#05125a] hover:border-[#05125a] hover:shadow-[0_0_28px_rgba(255,246,235,0.85)]",
+  // Oro relleno, para la tarjeta crema de la cartelera de /viajes. Es la
+  // excepción a "no hay más botones rellenados" (15/09), pedida por la
+  // organización el 03/10 (§2.4): el `gold` de contorno sobre crema quedaba
+  // "apagado" —el oro claro sobre fondo claro casi no se lee— y lo querían
+  // "en dorado sólido". Es el mismo degradé de la píldora de tipo de la
+  // tarjeta, con el texto en el azul del sistema (5:1 contra el extremo
+  // oscuro del degradé).
+  goldSolid:
+    "border-[#b3964b] bg-[linear-gradient(135deg,#f9d78f,#b3964b)] font-semibold text-[#05125a] hover:shadow-[0_0_28px_rgba(249,215,143,0.75)]",
 };
 
 /**

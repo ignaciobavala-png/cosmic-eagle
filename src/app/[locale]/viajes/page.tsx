@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { PageHero } from "@/components/ui/PageHero";
 import { MediaStatement } from "@/components/ui/MediaStatement";
 import { CreamSection, GOLD } from "@/components/ui/CreamSection";
 import { ExperienceFilter } from "@/components/ui/ExperienceFilter";
@@ -11,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 import { todayUTC } from "@/lib/trip-dates";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { localizeRow } from "@/lib/localized";
-import { getSiteContent, isEnabled } from "@/lib/site-content";
+import { getSiteContent } from "@/lib/site-content";
 import { getTestimonials } from "@/lib/testimonials";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
@@ -102,39 +101,30 @@ export default async function ViajesPage({
     <>
       <Header />
       <main className="pt-[var(--navbar-h)]">
-        <PageHero
-          image={content("viajes.hero.image")}
-          imageAlt={t("hero.imageAlt")}
-          title={t("hero.title")}
-          scrollHint={t("hero.scrollHint")}
-          scrollTo="experiencias"
-          height="full"
-          overlay={isEnabled(content("viajes.hero.overlay"))}
-        />
-
-        {/* Julia pidió video de fondo; va la imagen hasta que llegue.
-            Texto acortado a pedido de la organización (23/09): "reducir al
-            mínimo los textos explicativos y dar protagonismo a las
-            experiencias disponibles". Las tres párrafos largos quedan en
-            docs/COPY_HUERFANO.md. */}
-        <MediaStatement
+        {/* Entrada corta (correcciones de la organización del 03/10, §2.2 de
+            `docs/entregas/2026-10-03-correcciones-mobile/`): al entrar tienen
+            que verse de inmediato el título, el párrafo y enseguida las
+            opciones. Se fueron el hero a pantalla completa y la imagen detrás
+            del párrafo, que en el teléfono dejaban el texto flotando en medio
+            de una pantalla casi vacía. Los slots `viajes.hero.*` y
+            `viajes.about.*` quedan registrados (las keys no se renombran) pero
+            sin uso. El texto va alineado a la izquierda dentro de una caja
+            centrada: justificado abría huecos entre palabras en mobile. */}
+        <section
           id="experiencias"
-          image={content("viajes.about.image")}
-          imageAlt={t("about.imageAlt")}
-          width="prose"
-          veil={0.68}
-          amount={0.22}
-          once={false}
-          y={24}
-          duration={0.9}
-          overlay={isEnabled(content("viajes.about.overlay"))}
+          className="mx-auto w-full max-w-narrative px-gutter pb-4 pt-12 md:pb-8 md:pt-20"
         >
-          <p className="text-body-md leading-relaxed text-primary text-justify md:text-body-lg [&_strong]:font-semibold [&_strong]:text-primary-container">
-            {t.rich("about.body", {
-              strong: (chunks) => <strong>{chunks}</strong>,
-            })}
-          </p>
-        </MediaStatement>
+          <div className="mx-auto max-w-2xl">
+            <h1 className="text-center font-display text-h2 text-primary-container">
+              {t("hero.title")}
+            </h1>
+            <p className="mt-5 text-left text-body-md leading-relaxed text-primary md:text-body-lg [&_strong]:font-semibold [&_strong]:text-primary-container">
+              {t.rich("about.body", {
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
+            </p>
+          </div>
+        </section>
 
         {/* La cartelera es la sección principal (documento §4): va pegada a la
             intro, siempre abierta y con las fechas al frente. El `reveal` de
@@ -160,7 +150,6 @@ export default async function ViajesPage({
 
           <TestimonialsBand
             title={t("testimonials.title")}
-            label={t("testimonials.label")}
             testimonials={testimonios}
           />
         </CreamSection>
@@ -173,11 +162,15 @@ export default async function ViajesPage({
           imageAlt={t("cierre.imageAlt")}
           height={600}
           mobileFull
-        >
-          <p className="text-balance text-center font-display text-[20px] italic leading-snug text-primary-container md:text-[28px]">
-            {t.rich("cierre.text", { br: () => <br /> })}
-          </p>
-        </MediaStatement>
+          // Sin cursiva (correcciones del 03/10, §2.9): la frase sigue el
+          // lenguaje de las frases sobre imagen de la home —`text-h2`, oro
+          // `primary-container`, recta—, que es la regla de "todas las frases
+          // sobre imagen con la misma estética".
+          text={t.rich("cierre.text", { br: () => <br /> })}
+          width="wide"
+          textClassName="text-h2"
+          textColorClassName="text-primary-container"
+        />
       </main>
       <Footer />
     </>

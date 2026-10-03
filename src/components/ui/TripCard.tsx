@@ -89,12 +89,12 @@ export async function TripCard({
           <div className="flex flex-1 flex-col p-5">
             <div className="mb-4 flex flex-wrap gap-2.5">
               {tipo && (
-                <span className="rounded-full bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-3.5 py-1.5 font-display text-[11px] font-semibold uppercase tracking-[0.11em] text-white">
+                <span className="rounded-full bg-[linear-gradient(135deg,#f9d78f,#b3964b)] whitespace-nowrap px-3.5 py-1.5 font-body text-[10.5px] font-semibold uppercase tracking-[0.08em] text-white">
                   {tipo}
                 </span>
               )}
               {trip.location && (
-                <span className="rounded-full border border-[#0079b3]/40 bg-[linear-gradient(135deg,rgba(0,121,179,0.2),rgba(5,18,90,0.2))] px-3.5 py-1.5 font-display text-[11px] font-semibold uppercase tracking-[0.11em] text-[#05125a]">
+                <span className="rounded-full border border-[#0079b3]/40 bg-[linear-gradient(135deg,rgba(0,121,179,0.2),rgba(5,18,90,0.2))] whitespace-nowrap px-3.5 py-1.5 font-body text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#05125a]">
                   {trip.location}
                 </span>
               )}
@@ -120,7 +120,7 @@ export async function TripCard({
                       key={date.id}
                       href={`/viajes/${date.id}`}
                       aria-label={`${trip.title}, ${formatDateRangeCompact(date.start_date, date.end_date, locale)}`}
-                      className="rounded-full border-2 border-[#05125a] px-3.5 py-1.5 font-display text-[15px] font-bold uppercase tracking-[0.04em] text-[#05125a] transition-colors duration-300 hover:bg-[#05125a] hover:text-white"
+                      className="rounded-full border-2 border-[#05125a] px-3.5 py-1.5 font-body text-[13px] font-semibold uppercase tracking-[0.02em] text-[#05125a] transition-colors duration-300 hover:bg-[#05125a] hover:text-white"
                     >
                       {formatDateRangeCompact(date.start_date, date.end_date, locale)}
                     </Link>
@@ -146,7 +146,7 @@ export async function TripCard({
                       navegacion: lo que se va es un adorno. La version oscura
                       (`tone="dark"`, mas abajo) conserva la suya porque hoy
                       solo la usa `TripsSection`, que no esta en ninguna ruta. */}
-                  <span className="mt-1.5 block font-display text-[21px] font-bold uppercase leading-tight tracking-[0.03em] text-[#05125a]">
+                  <span className="mt-1.5 block font-body text-[19px] font-semibold uppercase leading-tight tracking-[0.02em] text-[#05125a]">
                     {formatDateRangeCompact(trip.start_date, trip.end_date, locale)}
                   </span>
                 </div>

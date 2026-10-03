@@ -140,32 +140,51 @@ export function YesNoQuestion({
  * (`phone_country` / `phone_number`) — el server action es quien arma el
  * `+<dial> <número>` final, así el mapa ISO2 → código no se duplica acá.
  */
-export function PhoneInput({ required }: { required?: boolean }) {
-  const [country, setCountry] = useState(DEFAULT_PHONE_COUNTRY);
+export function PhoneInput({
+  required,
+  defaultCountry = DEFAULT_PHONE_COUNTRY,
+  defaultNumber,
+}: {
+  required?: boolean;
+  /** Para editar un teléfono ya guardado (perfil de /cuenta): ver `splitPhone`. */
+  defaultCountry?: string;
+  defaultNumber?: string;
+}) {
+  const [country, setCountry] = useState(defaultCountry);
 
+  // Cada campo va envuelto y el ancho lo pone el envoltorio: `inputClass`
+  // trae `w-full`, y pasarle al lado un `w-[6.5rem]` no sirve —entre dos
+  // utilidades de ancho decide el orden de la hoja, no el del `className`—.
+  // Así el selector ocupaba todo el renglón y el número quedaba afuera de la
+  // pantalla en mobile (encontrado el 03/10 armando el perfil de /cuenta).
   return (
     <div className="flex gap-2">
-      <select
-        name="phone_country"
-        value={country}
-        onChange={(e) => setCountry(e.target.value)}
-        aria-label="País"
-        className={`${inputClass} w-[6.5rem] shrink-0`}
-      >
-        {PHONE_COUNTRIES.map((c) => (
-          <option key={c.iso2} value={c.iso2}>
-            {countryFlag(c.iso2)} +{c.dial}
-          </option>
-        ))}
-      </select>
-      <input
-        name="phone_number"
-        type="tel"
-        inputMode="tel"
-        required={required}
-        placeholder="11 2345 6789"
-        className={`${inputClass} flex-1`}
-      />
+      <div className="w-[6.5rem] shrink-0">
+        <select
+          name="phone_country"
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          aria-label="País"
+          className={inputClass}
+        >
+          {PHONE_COUNTRIES.map((c) => (
+            <option key={c.iso2} value={c.iso2}>
+              {countryFlag(c.iso2)} +{c.dial}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="min-w-0 flex-1">
+        <input
+          name="phone_number"
+          type="tel"
+          inputMode="tel"
+          required={required}
+          defaultValue={defaultNumber}
+          placeholder="11 2345 6789"
+          className={inputClass}
+        />
+      </div>
     </div>
   );
 }

@@ -6,7 +6,8 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft, Lock } from "lucide-react";
 import { ArticleBody } from "./ArticleBody";
-import { CtaLink, CTA_TONES } from "./CtaLink";
+import { CtaLink } from "./CtaLink";
+import { CategoryMenu } from "./CategoryMenu";
 import { formatArticleDate, type ArticleBlock } from "@/lib/article";
 import type { FormatLocale } from "@/lib/format";
 
@@ -48,9 +49,6 @@ export type LibraryArticle = {
 };
 
 export type LibraryCategory = { value: string; label: string };
-
-const CHIP =
-  "inline-flex items-center whitespace-nowrap rounded-full border-[1.5px] px-4 py-2 text-label-sm uppercase transition-[color,background-color,border-color,box-shadow,transform] duration-[250ms] md:px-5";
 
 export function ContentLibrary({
   categories,
@@ -135,37 +133,19 @@ export function ContentLibrary({
         aria-label={t("library.ariaNav")}
         className="sticky top-[var(--navbar-h)] z-30 mx-auto w-full max-w-3xl rounded-2xl border border-[#b3964b]/40 bg-[#fff6eb]/95 px-3 py-3 shadow-[0_10px_30px_-16px_rgba(5,18,90,0.55)] backdrop-blur-sm sm:px-4"
       >
-        <ul className="flex flex-nowrap justify-start gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] md:flex-wrap md:justify-center md:overflow-visible [&::-webkit-scrollbar]:hidden">
-          {categories.map((category) => {
-            const isActive = active === category.value;
-            return (
-              <li key={category.value}>
-                <button
-                  type="button"
-                  onClick={() => chooseCategory(category.value)}
-                  aria-pressed={isActive}
-                  className={`${CHIP} ${
-                    isActive
-                      ? "border-[#05125a] bg-[#05125a] text-[#fff6eb]"
-                      : `hover:scale-[1.04] ${CTA_TONES.dark}`
-                  }`}
-                >
-                  {category.label}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <CategoryMenu
+          items={categories}
+          active={active}
+          onChoose={chooseCategory}
+        />
       </nav>
 
-      <div className="mt-12">
-        <h2 className="text-center font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
-          {activeLabel}
-        </h2>
-        <div
-          aria-hidden="true"
-          className="mx-auto mb-10 mt-3 h-px w-24 bg-[linear-gradient(to_right,transparent,#b3964b_50%,transparent)]"
-        />
+      <div className="mt-10">
+        {/* El tema activo ya no se repite como título visible ni como
+            etiqueta en cada tarjeta (correcciones del 03/10, §4.1: la misma
+            palabra salía tres veces en una pantalla). El menú ya lo dice; el
+            encabezado queda para los lectores de pantalla. */}
+        <h2 className="sr-only">{activeLabel}</h2>
 
         {inCategory.length === 0 ? (
           <p className="mx-auto max-w-md text-center text-body-md text-[#05125a]">
@@ -278,7 +258,6 @@ function LibraryCard({
   onOpen: (slug: string) => void;
 }) {
   const t = useTranslations("Contenidos");
-  const tCat = useTranslations("ArticleCategories");
   const locale = (useLocale() === "en" ? "en" : "es") as FormatLocale;
   return (
     <Link
@@ -314,9 +293,6 @@ function LibraryCard({
           <div className="absolute inset-0 bg-gradient-to-br from-[#0a2a52] to-[#05060a]" />
         )}
         <div className="absolute inset-0 bg-[#05102a]/20" />
-        <span className="absolute left-4 top-4 rounded-full bg-[#f9d78f] px-3 py-1 text-label-sm uppercase text-[#05125a]">
-          {tCat(article.category)}
-        </span>
         {article.locked && (
           <span className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-[#05125a]/85 px-3 py-1 text-label-sm uppercase text-[#f9d78f]">
             <Lock size={12} aria-hidden="true" />

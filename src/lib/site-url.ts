@@ -23,7 +23,15 @@ export const SITE_URL = (
  * URLs) o Supabase la ignora y manda al Site URL. Ver docs/AUTH_EMAIL.md.
  */
 export async function getSiteUrl(): Promise<string> {
-  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  // Con la pantalla de mantenimiento prendida el override se ignora: el
+  // dominio muestra "Evolucionando hacia nuestra mejor versión" y el link de
+  // recuperar la clave caía ahí, en una `/cuenta/nueva-clave` que nadie podía
+  // ver (correcciones de la organización, 03/10, §6.1 y §6.2). Así el link
+  // vuelve al host desde donde se pidió —`cosmic-eagle.vercel.app`, que está
+  // en la lista blanca de Redirect URLs—. Al apagar el mantenimiento vuelve
+  // solo al dominio.
+  const explicit =
+    process.env.MAINTENANCE_MODE === "on" ? undefined : process.env.NEXT_PUBLIC_SITE_URL;
   if (explicit) return explicit.replace(/\/+$/, "");
 
   const h = await headers();

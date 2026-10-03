@@ -5,7 +5,7 @@
   "Header": {
     "nav": {
       "nosotros": "About us",
-      "experiencias": "Experiences",
+      "experiencias": "Sessions & Retreats",
       "contenidos": "Content",
       "miCuenta": "My Account"
     },
@@ -16,7 +16,7 @@
       "founder": "Founder"
     },
     "tipo": {
-      "retiro": "Journeys",
+      "retiro": "Retreats",
       "ceremonia": "Sessions"
     },
     "experiencias": {
@@ -42,7 +42,7 @@
     },
     "links": {
       "nosotros": "About us",
-      "experiencias": "Experiences",
+      "experiencias": "Sessions & Retreats",
       "contenidos": "Content",
       "preguntasFrecuentes": "Frequently asked questions",
       "privacidad": "Privacy",
@@ -64,9 +64,9 @@
   },
   "TripTypes": {
     "retiro": {
-      "one": "Journey",
-      "plural": "Journeys",
-      "upcoming": "Upcoming Journeys"
+      "one": "Retreat",
+      "plural": "Retreats",
+      "upcoming": "Upcoming Retreats"
     },
     "ceremonia": {
       "one": "Session",
@@ -200,8 +200,8 @@
       "title": "Get back in",
       "subtitle": "Enter your email and we'll send you a link to create a new password.",
       "back": "Back to log in",
-      "sentTitle": "If there is an account with that email, you'll receive a link to create a new password.",
-      "sentHint": "Check your spam folder too. The link expires in one hour and works only once.",
+      "sentTitle": "If there's an account with that email, a link is on its way.",
+      "sentHint": "Check your spam folder. It expires in one hour.",
       "pending": "Sending...",
       "submit": "Send me the link"
     },
@@ -220,7 +220,7 @@
       "uploading": "Uploading..."
     },
     "applications": {
-      "empty": "You don't have any applications yet. Choose a trip in <link>Journeys</link> to apply.",
+      "empty": "You don't have any applications yet. Choose an experience in <link>Sessions & Retreats</link> to apply.",
       "approved": "Approved trips",
       "mine": "My applications",
       "trip": "Trip",
@@ -266,6 +266,41 @@
       "tooBig": "The image can't exceed 3MB.",
       "sessionExpired": "Session expired. Log in again.",
       "uploadFailed": "We couldn't upload the image. Please try again."
+    },
+    "profile": {
+      "title": "Your profile",
+      "completeTitle": "Complete your profile",
+      "intro": "This helps us get to know you before any experience. You fill it in once and can change it whenever you like.",
+      "fullName": "Full name",
+      "phone": "Phone",
+      "profession": "Profession or occupation",
+      "social": "Social media or website",
+      "optional": "(optional)",
+      "socialPlaceholder": "@username or link",
+      "prior": "Previous experiences with medicine",
+      "priorPlaceholder": "Which ones, when and how it went. If you never took part, say so.",
+      "practices": "Spiritual practices",
+      "practicesPlaceholder": "Meditation, yoga, breathwork, others.",
+      "referral": {
+        "label": "How did you find us?",
+        "choose": "Choose an option",
+        "referido": "A recommendation from someone",
+        "instagram": "Instagram",
+        "redes": "Another social network",
+        "busqueda": "Internet search",
+        "otro": "Other"
+      },
+      "referredBy": "Who recommended us?",
+      "submit": "Save profile",
+      "pending": "Saving...",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "saved": "Done, your profile was saved.",
+      "errors": {
+        "incomplete": "Some details are missing: check the required fields.",
+        "referredBy": "Write the name of the person who recommended us.",
+        "failed": "We couldn't save your profile. Please try again."
+      }
     }
   },
   "Faqs": {
@@ -324,40 +359,40 @@
         "agotado": "That code has already been used all the available times.",
         "sin_sesion": "Log in to redeem the code.",
         "invalido": "We couldn't find that code. Check that it's spelled correctly."
-      }
+      },
+      "backToLibrary": "Back to the library"
     }
   },
   "Calendario": {
     "meta": {
       "title": "Calendar | Cosmic Eagle",
-      "description": "All the open dates for Cosmic Sessions and Cosmic Journeys, on a single page."
+      "description": "All the open dates for Sessions and Retreats, on a single page."
     },
     "hero": {
       "imageAlt": "Starry sky over a portal of light"
     },
     "caption": "Calendar",
     "sesiones": "Upcoming Sessions",
-    "viajes": "Upcoming Journeys",
+    "viajes": "Upcoming Retreats",
     "emptySesiones": "There are no sessions published right now. Come back soon.",
-    "emptyViajes": "There are no journeys published right now. Come back soon."
+    "emptyViajes": "There are no retreats published right now. Come back soon."
   },
   "Viajes": {
     "meta": {
-      "title": "Experiences | Cosmic Eagle",
-      "description": "One-day sessions and multi-day journeys in sacred portals. Dates and registration."
+      "title": "Sessions & Retreats | Cosmic Eagle",
+      "description": "One-day sessions and multi-day retreats in sacred portals. Dates and registration."
     },
     "hero": {
       "imageAlt": "A portal of light over a starry sky",
-      "title": "Portals of Transformation",
+      "title": "Sessions & Retreats",
       "scrollHint": "Explore"
     },
     "about": {
       "imageAlt": "A lit ceremony circle",
-      "body": "Experiences to <strong>go deeper into your process of transformation</strong>, expand consciousness, and connect with the soul. In one-day sessions or multi-day journeys."
+      "body": "Experiences to <strong>go deeper into your process of transformation</strong>, expand consciousness, and connect with the soul. In one-day sessions or multi-day retreats."
     },
     "testimonials": {
-      "title": "Our Healers",
-      "label": "Voices of those who have already walked the path"
+      "title": "Testimonials"
     },
     "cierre": {
       "imageAlt": "Sunrise over a sacred landscape",

@@ -23,13 +23,16 @@ import { TripCover } from "./TripCover";
  * memoria, así que cambiar de filtro es instantáneo y la página conserva la
  * consulta y el estado que ya tenía.
  *
+ * **Fecha y etiquetas en Montserrat** (correcciones del 03/10, §2.5 y §2.7):
+ * en Sorts Mill Goudy los números son de estilo antiguo y "3 OCT 2026" se leía
+ * con el número y el año más chicos que el mes; y la ubicación, más ancha en la
+ * serif, se partía en dos renglones dentro de la píldora. Lo mismo en
+ * `TripCard tone="light"`, que es la misma ficha en las carteleras.
+ *
  * **Las etiquetas salen de la base, no del render.** El enum sigue siendo
  * `ceremonia` / `retiro`; lo que cambia es el nombre de cara a la gente. Acá se
  * usa el vocabulario del documento de la organización —"Sesión" y "Retiro"—,
- * que es el pedido literal. `src/lib/trip-type.ts` hoy mapea `retiro` a
- * "Viaje": esa discrepancia es una decisión de copy pendiente (ver el reporte),
- * y no se toca ese archivo para no cambiar el navbar, el panel ni /calendario
- * en la misma pasada.
+ * el mismo que `src/lib/trip-type.ts` desde el 03/10.
  */
 // `ceremonia`/`retiro` son el valor del enum, no la etiqueta: el badge sale de
 // `Viajes.filter.badgeCeremonia` / `badgeRetiro`.
@@ -47,6 +50,16 @@ const STATUS_KEY: Record<string, string> = {
 type FilterValue = "todas" | "ceremonia" | "retiro";
 
 const FILTERS: FilterValue[] = ["todas", "ceremonia", "retiro"];
+
+// El filtro guarda el valor del enum (es lo que va a `?tipo=`), pero las claves
+// de `Viajes.filter` y `Viajes.empty` están por su nombre de cara a la gente.
+// Sin este mapa la página mostraba la clave cruda, "VIAJES.FILTER.CEREMONIA"
+// (correcciones del 03/10, §2.3).
+const FILTER_KEY: Record<FilterValue, "todas" | "sesiones" | "retiros"> = {
+  todas: "todas",
+  ceremonia: "sesiones",
+  retiro: "retiros",
+};
 
 const CHIP =
   "inline-flex items-center rounded-full border-[1.5px] px-5 py-2 text-label-sm uppercase transition-[color,background-color,border-color,box-shadow,transform] duration-[250ms]";
@@ -78,7 +91,7 @@ export function ExperienceFilter({
     window.history.replaceState(null, "", url.toString());
   }
 
-  const emptyLabel = t(`empty.${filter}`);
+  const emptyLabel = t(`empty.${FILTER_KEY[filter]}`);
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -101,7 +114,7 @@ export function ExperienceFilter({
                   : `hover:scale-[1.04] ${CTA_TONES.dark}`
               }`}
             >
-              {t(`filter.${option}`)}
+              {t(`filter.${FILTER_KEY[option]}`)}
             </button>
           );
         })}
@@ -153,12 +166,12 @@ function ExperienceCard({ trip }: { trip: TripCardData }) {
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-4 flex flex-wrap gap-2.5">
           {tipo && (
-            <span className="rounded-full bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-3.5 py-1.5 font-display text-[11px] font-semibold uppercase tracking-[0.11em] text-white">
+            <span className="rounded-full bg-[linear-gradient(135deg,#f9d78f,#b3964b)] whitespace-nowrap px-3.5 py-1.5 font-body text-[10.5px] font-semibold uppercase tracking-[0.08em] text-white">
               {tipo}
             </span>
           )}
           {trip.location && (
-            <span className="rounded-full border border-[#0079b3]/40 bg-[linear-gradient(135deg,rgba(0,121,179,0.2),rgba(5,18,90,0.2))] px-3.5 py-1.5 font-display text-[11px] font-semibold uppercase tracking-[0.11em] text-[#05125a]">
+            <span className="rounded-full border border-[#0079b3]/40 bg-[linear-gradient(135deg,rgba(0,121,179,0.2),rgba(5,18,90,0.2))] whitespace-nowrap px-3.5 py-1.5 font-body text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#05125a]">
               {trip.location}
             </span>
           )}
@@ -172,7 +185,7 @@ function ExperienceCard({ trip }: { trip: TripCardData }) {
           <span className="block font-display text-[10px] font-semibold uppercase tracking-[0.12em] text-on-primary-container">
             {t("card.date")}
           </span>
-          <span className="mt-1.5 block font-display text-[21px] font-bold uppercase leading-tight tracking-[0.03em] text-[#05125a]">
+          <span className="mt-1.5 block font-body text-[19px] font-semibold uppercase leading-tight tracking-[0.02em] text-[#05125a]">
             {formatDateRangeCompact(trip.start_date, trip.end_date, locale)}
           </span>
         </div>
@@ -182,7 +195,9 @@ function ExperienceCard({ trip }: { trip: TripCardData }) {
               ver la experiencia y/o inscribirse" sin dar el texto exacto.
               "Ver experiencia" es un placeholder hasta que la organización lo
               confirme. */}
-          <CtaLink href={`/viajes/${trip.id}`}>{t("card.view")}</CtaLink>
+          <CtaLink href={`/viajes/${trip.id}`} tone="goldSolid">
+            {t("card.view")}
+          </CtaLink>
         </div>
       </div>
     </article>

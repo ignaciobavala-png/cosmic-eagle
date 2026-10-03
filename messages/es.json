@@ -5,7 +5,7 @@
   "Header": {
     "nav": {
       "nosotros": "Nosotros",
-      "experiencias": "Experiencias",
+      "experiencias": "Sesiones y Retiros",
       "contenidos": "Contenidos",
       "miCuenta": "Mi Cuenta"
     },
@@ -16,7 +16,7 @@
       "founder": "Founder"
     },
     "tipo": {
-      "retiro": "Viajes",
+      "retiro": "Retiros",
       "ceremonia": "Sesiones"
     },
     "experiencias": {
@@ -42,7 +42,7 @@
     },
     "links": {
       "nosotros": "Nosotros",
-      "experiencias": "Experiencias",
+      "experiencias": "Sesiones y Retiros",
       "contenidos": "Contenidos",
       "preguntasFrecuentes": "Preguntas frecuentes",
       "privacidad": "Privacidad",
@@ -64,9 +64,9 @@
   },
   "TripTypes": {
     "retiro": {
-      "one": "Viaje",
-      "plural": "Viajes",
-      "upcoming": "Próximos Viajes"
+      "one": "Retiro",
+      "plural": "Retiros",
+      "upcoming": "Próximos Retiros"
     },
     "ceremonia": {
       "one": "Sesión",
@@ -200,8 +200,8 @@
       "title": "Volver a entrar",
       "subtitle": "Escribe tu email y te mandamos un enlace para crear una contraseña nueva.",
       "back": "Volver al inicio de sesión",
-      "sentTitle": "Si hay una cuenta con ese email, te llega un enlace para crear una contraseña nueva.",
-      "sentHint": "Revisa también la carpeta de spam. El enlace vence en una hora y sirve una sola vez.",
+      "sentTitle": "Si hay una cuenta con ese email, te llega un enlace.",
+      "sentHint": "Revisa el spam. Vence en una hora.",
       "pending": "Enviando...",
       "submit": "Enviarme el enlace"
     },
@@ -220,7 +220,7 @@
       "uploading": "Subiendo..."
     },
     "applications": {
-      "empty": "Todavía no tienes solicitudes. Elige un viaje en <link>Viajes</link> para postularte.",
+      "empty": "Todavía no tienes solicitudes. Elige una experiencia en <link>Sesiones y Retiros</link> para postularte.",
       "approved": "Viajes aprobados",
       "mine": "Mis solicitudes",
       "trip": "Viaje",
@@ -266,6 +266,41 @@
       "tooBig": "La imagen no puede superar los 3MB.",
       "sessionExpired": "Sesión expirada. Vuelve a iniciar sesión.",
       "uploadFailed": "No se pudo subir la imagen. Prueba de nuevo."
+    },
+    "profile": {
+      "title": "Tu perfil",
+      "completeTitle": "Completa tu perfil",
+      "intro": "Con estos datos te conocemos antes de cualquier experiencia. Los completas una vez y los puedes cambiar cuando quieras.",
+      "fullName": "Nombre completo",
+      "phone": "Teléfono",
+      "profession": "Profesión u oficio",
+      "social": "Red social o sitio web",
+      "optional": "(opcional)",
+      "socialPlaceholder": "@usuario o enlace",
+      "prior": "Experiencias previas con medicina",
+      "priorPlaceholder": "Cuáles, cuándo y cómo fue. Si nunca participaste, escríbelo.",
+      "practices": "Prácticas espirituales",
+      "practicesPlaceholder": "Meditación, yoga, respiración, otras.",
+      "referral": {
+        "label": "¿Cómo llegaste a nosotros?",
+        "choose": "Elige una opción",
+        "referido": "Me lo recomendó alguien",
+        "instagram": "Instagram",
+        "redes": "Otra red social",
+        "busqueda": "Búsqueda en internet",
+        "otro": "Otro"
+      },
+      "referredBy": "¿Quién te recomendó?",
+      "submit": "Guardar perfil",
+      "pending": "Guardando...",
+      "cancel": "Cancelar",
+      "edit": "Editar",
+      "saved": "Listo, tu perfil quedó guardado.",
+      "errors": {
+        "incomplete": "Faltan datos: revisa los campos obligatorios.",
+        "referredBy": "Escribe el nombre de quien te recomendó.",
+        "failed": "No pudimos guardar tu perfil. Prueba de nuevo."
+      }
     }
   },
   "Faqs": {
@@ -324,31 +359,32 @@
         "agotado": "Ese código ya se usó todas las veces disponibles.",
         "sin_sesion": "Inicia sesión para canjear el código.",
         "invalido": "No encontramos ese código. Revisa que esté bien escrito."
-      }
+      },
+      "backToLibrary": "Volver a la biblioteca"
     }
   },
   "Calendario": {
     "meta": {
       "title": "Calendario | Cosmic Eagle",
-      "description": "Todas las fechas abiertas de Sesiones Cósmicas y Viajes Cósmicos, en una sola página."
+      "description": "Todas las fechas abiertas de Sesiones y Retiros, en una sola página."
     },
     "hero": {
       "imageAlt": "Cielo estrellado sobre un portal de luz"
     },
     "caption": "Calendario",
     "sesiones": "Próximas Sesiones",
-    "viajes": "Próximos Viajes",
+    "viajes": "Próximos Retiros",
     "emptySesiones": "No hay sesiones publicadas por el momento. Vuelve a visitarnos pronto.",
-    "emptyViajes": "No hay viajes publicados por el momento. Vuelve a visitarnos pronto."
+    "emptyViajes": "No hay retiros publicados por el momento. Vuelve a visitarnos pronto."
   },
   "Viajes": {
     "meta": {
-      "title": "Experiencias | Cosmic Eagle",
+      "title": "Sesiones y Retiros | Cosmic Eagle",
       "description": "Sesiones de un día y retiros de varios días en portales sagrados. Fechas e inscripción."
     },
     "hero": {
       "imageAlt": "Portal de luz sobre un cielo estrellado",
-      "title": "Portales de Transformación",
+      "title": "Sesiones y Retiros",
       "scrollHint": "Explorar"
     },
     "about": {
@@ -356,8 +392,7 @@
       "body": "Experiencias para <strong>profundizar en tu proceso de transformación</strong>, expandir la conciencia y conectar con el alma. En sesiones de un día o retiros de varios días."
     },
     "testimonials": {
-      "title": "Nuestros Sanadores",
-      "label": "Voces de quienes ya hicieron el camino"
+      "title": "Testimonios"
     },
     "cierre": {
       "imageAlt": "Amanecer sobre un paisaje sagrado",

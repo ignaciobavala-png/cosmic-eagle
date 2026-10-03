@@ -14,17 +14,21 @@ export type TripType = Enums<"trip_type">;
  * "Sesiones" y "Retiros" a "Viajes", en el sitio y en el panel. Renombrar el
  * enum obligaria a una migracion y a tocar cada query; la etiqueta es lo que se
  * lee, y vive aca.
+ *
+ * Y el 03/10 "Viajes" volvio a "Retiros": la organizacion usa "viaje cosmico"
+ * para otra cosa y la seccion paso a llamarse "Sesiones y Retiros". La ruta
+ * del panel (`/admin/viajes`) y la publica (`/viajes`) no cambian.
  */
 export const TRIP_TYPES = {
   retiro: {
     value: "retiro",
-    label: "Viaje",
-    plural: "Viajes",
+    label: "Retiro",
+    plural: "Retiros",
     adminPath: "/admin/viajes",
-    newLabel: "Nuevo viaje",
-    newTitle: "Nuevo viaje",
-    editTitle: "Editar viaje",
-    emptyHint: "No hay viajes creados todavía.",
+    newLabel: "Nuevo retiro",
+    newTitle: "Nuevo retiro",
+    editTitle: "Editar retiro",
+    emptyHint: "No hay retiros creados todavía.",
   },
   ceremonia: {
     value: "ceremonia",

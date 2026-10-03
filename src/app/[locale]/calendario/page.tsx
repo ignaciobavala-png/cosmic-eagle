@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { PageHero, renderTitle } from "@/components/ui/PageHero";
 import { TripCarousel } from "@/components/ui/TripCarousel";
 import { Reveal, RevealItem } from "@/components/ui/Reveal";
 import type { TripCardData } from "@/components/ui/TripCard";
 import { localizeRow } from "@/lib/localized";
 import { createPublicClient } from "@/lib/supabase/public";
 import { todayUTC } from "@/lib/trip-dates";
-import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 export async function generateMetadata({
@@ -33,9 +31,8 @@ export async function generateMetadata({
  *
  * De ahí las tres decisiones que la separan de /viajes:
  *
- * - **El hero es `compact`**, poco menos de media pantalla. Con el banner
- *   normal (82svh) la primera tarjeta queda debajo del pliegue y la página no
- *   cumpliría lo único que vino a hacer.
+ * - **No tiene hero** (desde el 03/10; antes era uno `compact`): la página
+ *   arranca directo con la primera cartelera.
  * - **Los carruseles van abiertos**, sin `Collapsible`.
  * - **Sin testimonios, sin salud, sin relato**: eso está en /viajes, y el
  *   cierre de acá es justamente un link hacia allá para quien quiera leerlo.
@@ -63,7 +60,6 @@ export default async function CalendarioPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Calendario");
-  const content = await getSiteContent(locale);
 
   const supabase = createPublicClient();
   // Mismo filtro que /viajes: la policy `trips_select_public` deja leer TODOS
@@ -94,27 +90,17 @@ export default async function CalendarioPage({
     <>
       <Header />
       <main className="pt-[var(--navbar-h)]">
-        <PageHero
-          image={content("calendario.hero.image")}
-          imageAlt={t("hero.imageAlt")}
-          title={renderTitle(content("calendario.hero.title"))}
-          subtitle={content("calendario.hero.subtitle")}
-          height="compact"
-          overlay={isEnabled(content("calendario.hero.overlay"))}
-          // Abajo arranca una banda opaca, así que el pie del banner se funde a
-          // ESE azul y no a transparente: la máscara del `banner` deja ver el
-          // degradé del `body`, que acá no se ve nunca. Es el mismo criterio de
-          // /faqs con el crema.
-          fadeTo={NIGHT}
-        />
-
+        {/* Sin hero desde el 03/10 (correcciones de la organización, §3.1):
+            la esfera ocupaba media pantalla antes de cualquier contenido y la
+            página tiene que arrancar directo con las sesiones y los retiros.
+            Los slots `calendario.hero.*` quedan registrados, sin uso. */}
         {/* El fondo va como clase y no interpolando `NIGHT`: Tailwind escanea
             literales en el código fuente, así que `bg-[${...}]` no generaría
             regla. El literal de `fadeTo` sí puede ser la constante porque va
             por `style`. */}
         <section id="fechas" className="w-full bg-[#020c41]">
           <Reveal
-            className="flex flex-col gap-16 py-20 md:gap-20"
+            className="flex flex-col gap-16 pb-16 pt-0 md:gap-20 md:py-16"
             amount={0.12}
             once={false}
             stagger={0.15}

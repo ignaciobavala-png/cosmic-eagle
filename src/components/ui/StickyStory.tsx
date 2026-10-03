@@ -55,9 +55,17 @@ export function StickyStory({
     <section
       id={id}
       ref={ref}
-      className="relative w-full bg-[linear-gradient(180deg,#05125a_0%,#0079b3_100%)] h-[260vh] md:h-[280vh]"
+      // En mobile no hay pantalla fija (correcciones de la organización,
+      // 03/10, §1.1): los cuatro párrafos casi llenan un teléfono y, centrados
+      // en una caja de `100svh` pegada a `top-0`, los primeros renglones
+      // quedaban debajo del navbar, cortados a media línea. Ahí la sección
+      // pasa a alto natural y los párrafos salen encendidos con `!` sobre el
+      // `opacity`/`transform` inline de Framer —el mismo recurso que el relato
+      // de la home (c94b396)—, así el HTML del servidor ya sale bien y no
+      // parpadea. En escritorio la pantalla fija arranca DEBAJO del navbar.
+      className="relative w-full bg-[linear-gradient(180deg,#05125a_0%,#0079b3_100%)] h-[260vh] md:h-[280vh] max-md:h-auto"
     >
-      <div className="sticky top-0 relative flex h-[100svh] items-center justify-center overflow-hidden px-margin-mobile md:px-margin-desktop">
+      <div className="sticky top-[var(--navbar-h)] relative flex h-[calc(100svh-var(--navbar-h))] items-center justify-center overflow-hidden px-margin-mobile md:px-margin-desktop max-md:static max-md:h-auto max-md:py-16">
         <div className="max-w-3xl space-y-6 text-body-md text-primary md:text-body-lg">
           {paragraphs.map((paragraph, i) => (
             <StoryParagraph
@@ -113,6 +121,8 @@ function StoryParagraph({
   const y = useTransform(progress, [start, end], [30, 0]);
 
   return (
-    <motion.p style={{ opacity, y }}>{children}</motion.p>
+    <motion.p style={{ opacity, y }} className="max-md:opacity-100! max-md:transform-none!">
+      {children}
+    </motion.p>
   );
 }

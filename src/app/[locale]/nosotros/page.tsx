@@ -8,7 +8,6 @@ import { StickyStory } from "@/components/ui/StickyStory";
 import { ClosingHero } from "@/components/ui/ClosingHero";
 import { Reveal, RevealItem } from "@/components/ui/Reveal";
 import { TitleRule } from "@/components/ui/TitleRule";
-import { SymbolRow } from "@/components/ui/NosSymbols";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 import { IMAGES } from "@/lib/constants";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -90,10 +89,10 @@ export default async function NosotrosPage({
           hardEdge
         />
 
-        {/* Pantalla 1 — las cuatro palabras. En mobile el copy queda arriba con
-            aire fijo (mockup 2/9: `justify-start`, padding-top 110px, sin alto
-            minimo) y el simbolo lo sigue en flujo; en desktop la fila se centra
-            verticalmente y el simbolo viaja absoluto medido.
+        {/* Pantalla 1 — las cuatro palabras, juntas y sin símbolos desde el
+            03/10 (correcciones de la organización, §1.5): tienen que leerse
+            como un recorrido completo, no como pantallas sueltas. Se fue el
+            `SymbolRow` que las seguía y el aire fijo de 110px de mobile.
 
             **El fondo es la banda dorada y no el crema del sitio**, pedido de
             Sofia del 15/09 sobre la prueba de /contenidos. Es la unica pantalla
@@ -105,30 +104,11 @@ export default async function NosotrosPage({
           // Pedido de la organización (23/09): el recuadro dorado "tiene
           // demasiado peso visual y ocupa demasiado espacio". Baja de una
           // pantalla completa (`100svh`) a un alto acotado por el contenido.
-          className="relative flex w-full flex-col items-center justify-start bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile pt-[110px] pb-16 text-[#05125a] md:justify-center md:px-margin-desktop md:py-20"
+          className="relative flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile py-14 text-[#05125a] md:px-margin-desktop md:py-20"
         >
           <div id="nos-words-seq">
             <WordSequence words={t.raw("words") as string[]} />
           </div>
-          {/* Símbolo 1: se revela con su pantalla (delay 2.2s para no competir
-              con la cascada de palabras) y se centra medido entre el final de
-              las palabras y el título de la pantalla siguiente. */}
-          <SymbolRow
-            variant={1}
-            id="nos-symbol-row-1"
-            aboveId="nos-words-seq"
-            // **`belowId` es la SECCION siguiente, no un texto.** Con el orden
-            // del 09/09 ya no hay dos pantallas crema seguidas: abajo empieza el
-            // relato, que es azul. Anclarlo a un texto de ahi dejaria el simbolo
-            // dorado a caballo del borde; contra el `top` de la seccion queda
-            // centrado en el aire que sobra de SU pantalla, que es donde se ve.
-            belowId="somos"
-            minGap={95}
-            maxGap={95}
-            amount={0.4}
-            delay={2.2}
-            onGold
-          />
         </section>
 
         {/* Copy actualizado a pedido de la organización (23/09, "edición
@@ -148,7 +128,6 @@ export default async function NosotrosPage({
               ),
             }),
           ]}
-          scrollHint={{ label: t("somos.scrollHint"), target: "#proposito" }}
         />
 
         {/* Pantalla 3 — "Nuestro propósito". En mobile min-height 81vh y
@@ -165,7 +144,7 @@ export default async function NosotrosPage({
           amount={0.25}
           once={false}
           stagger={0}
-          className="relative flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile py-[35px] text-[#05125a] min-h-[81svh] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
+          className="relative flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile py-14 text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:py-[100px]"
         >
           {/* `md:mb-[219px]`: el colchon que centra el CONJUNTO texto+simbolo y
               no solo el texto. El simbolo es `absolute`, asi que no pesa en el
@@ -173,7 +152,7 @@ export default async function NosotrosPage({
               el simbolo se iba al piso (medido el 17/09 en 1440x900: 322px de
               aire arriba contra 112 abajo). Mide `desktopGap` (121) + el alto
               del simbolo 2 (98) — si cambia cualquiera de los dos, cambia aca. */}
-          <div className="mx-auto max-w-3xl md:mb-[219px]">
+          <div className="mx-auto max-w-3xl">
             {/* `w-fit`: el filete mide el ancho del titulo y no el de la
                 columna. El `id` del `RevealItem` no se mueve: lo usan las
                 mediciones de centrado de esta pagina. */}
@@ -198,7 +177,7 @@ export default async function NosotrosPage({
                 caia a 4,44:1, abajo del minimo. */}
             {/* Texto reemplazado a pedido de la organización (23/09): declara
                 para qué existe Cosmic Eagle Journey, mismo copy que la home. */}
-            <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-justify [&_strong]:font-semibold [&_strong]:text-[#05125a]">
+            <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-left [&_strong]:font-semibold [&_strong]:text-[#05125a]">
               <RevealItem y={14} duration={0.8} delay={0.15}>
               <p>
                 {t.rich("purpose.p1", {
@@ -215,25 +194,9 @@ export default async function NosotrosPage({
               </RevealItem>
             </div>
           </div>
-          {/* Símbolo 2: cierra "Nuestro propósito", contra el borde del bloque de
-              imagen que sigue. Usa su propio observer (umbral 0.6) y no el de la
-              pantalla. Mismo criterio que el símbolo 1 con el `belowId`. */}
-          <SymbolRow
-            variant={2}
-            id="nos-symbol-row-2"
-            aboveId="nos-proposito-close"
-            belowId="video"
-            minGap={32}
-            maxGap={121}
-            desktopGap={121}
-            amount={0.6}
-            delay={0.3}
-            onGold
-          />
-          {/* Esta pantalla NO lleva boton de continuar, a diferencia del resto
-              del recorrido: el `SymbolRow` de arriba se ancla al pie del bloque
-              y el boton le caia encima. Pedido de la clienta, 10/09 — se saca
-              el boton, no el simbolo. El paso a `#video` queda solo por scroll. */}
+          {/* Sin el símbolo de las dos lunas desde el 03/10 (§1.4: "se ve
+              raro y se superpone con la caja de abajo"), y sin el colchón de
+              219px que le reservaba lugar. Tampoco lleva botón de continuar. */}
         </Reveal>
 
         {/* Frase destacada nueva (pedido de la organización, 23/09):
@@ -248,7 +211,7 @@ export default async function NosotrosPage({
           className="flex w-full items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile py-16 text-center text-[#05125a] md:px-margin-desktop md:py-24"
         >
           <RevealItem y={20} duration={1}>
-            <p className="mx-auto max-w-3xl font-display text-headline-md italic leading-snug md:text-headline-lg">
+            <p className="mx-auto max-w-3xl font-display text-headline-md leading-snug md:text-headline-lg">
               {t("quote")}
             </p>
           </RevealItem>
@@ -283,6 +246,11 @@ export default async function NosotrosPage({
           // (pedido de Ignacio), un fijo de layout en public/img. Si la
           // clienta cambia el slot, en el telefono se sigue viendo esta. El
           // anillo de luz esta en el tercio derecho, de ahi el foco.
+          // Misma estética que las frases sobre imagen de la home (regla
+          // general de las correcciones del 03/10): `text-h2` en el oro
+          // `primary-container`, recta.
+          textClassName="text-h2"
+          textColorClassName="text-primary-container"
           imageMobile={IMAGES.nosotrosVideoMobile}
           imagePositionMobile="object-[78%_center]"
         />
@@ -361,7 +329,7 @@ export default async function NosotrosPage({
                 trabajo. La frase itálica que cerraba esta pantalla se movió
                 después de "Nuestro propósito" (item 5 del doc de
                 correcciones), donde ahora vive sola con jerarquía Nivel 1. */}
-            <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-justify">
+            <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-left">
               <RevealItem y={14} duration={0.8} delay={0.15}>
               <p>{t("enfoque.p1")}</p>
               </RevealItem>
@@ -439,7 +407,7 @@ export default async function NosotrosPage({
               </RevealItem>
               <TitleRule grow className="mt-3 mb-6" />
             </div>
-            <div className="space-y-6 text-body-md leading-relaxed text-justify">
+            <div className="space-y-6 text-body-md leading-relaxed text-left">
               <RevealItem y={14} duration={0.8} delay={0.15}>
                 <p>{t("estela.p1")}</p>
               </RevealItem>

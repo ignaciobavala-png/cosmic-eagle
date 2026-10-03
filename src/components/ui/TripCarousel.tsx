@@ -18,6 +18,13 @@ import { TripCard, type TripCardData } from "./TripCard";
  * 02/09. En mobile no: ahi la fila se arrastra con el dedo, y una animacion en
  * curso pelea con el scroll tactil.
  *
+ * **En mobile no hay carrusel: las tarjetas van apiladas** (correcciones de
+ * la organización del 03/10, §2.6 y §3.3). La tarjeta siguiente asomándose
+ * cortada en el borde se leía como un error, no como un carrusel. Va con
+ * variantes `max-md:` adentro del componente, que en la hoja salen después de
+ * las utilidades base y ganan sin pelear el orden. Y el panel va con bordes
+ * rectos (§3.2), ya no `rounded-[20px]`.
+ *
  * Los bordes se desvanecen contra el dorado con una `mask-image` horizontal
  * (transparente en el 8% de cada punta): es el efecto de fundido que pide el
  * diseno, y sale gratis porque el panel de atras ya es el degrade.
@@ -48,7 +55,7 @@ export function TripCarousel({
   const canLoop = groups.length >= 4;
 
   return (
-    <div className="rounded-[20px] bg-[linear-gradient(135deg,#7a6329_0%,#f9d78f_30%,#fbe9c0_50%,#b3964b_75%,#6b551f_100%)] px-5 py-11">
+    <div className="bg-[linear-gradient(135deg,#7a6329_0%,#f9d78f_30%,#fbe9c0_50%,#b3964b_75%,#6b551f_100%)] px-5 py-11">
       <p className="text-center text-[12px] uppercase tracking-[0.167em] text-[#05125a]/70">
         {caption}
       </p>
@@ -68,15 +75,15 @@ export function TripCarousel({
         // `-mx-5 px-5` para que la primera y la ultima tarjeta no queden
         // pegadas al borde del panel cuando la fila esta arrastrada al extremo.
         <ExperienceGate>
-        <div className="marquee-track -mx-5 overflow-x-auto px-5 pb-3 [mask-image:linear-gradient(to_right,transparent_0%,#000_8%,#000_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_8%,#000_92%,transparent_100%)] [scrollbar-width:none] md:overflow-hidden [&::-webkit-scrollbar]:hidden">
+        <div className="marquee-track -mx-5 overflow-x-auto px-5 pb-3 [mask-image:linear-gradient(to_right,transparent_0%,#000_8%,#000_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_8%,#000_92%,transparent_100%)] [scrollbar-width:none] max-md:mx-0 max-md:overflow-visible max-md:px-0 max-md:[mask-image:none] max-md:[-webkit-mask-image:none] md:overflow-hidden [&::-webkit-scrollbar]:hidden">
           {/* El separador va como `mr` de cada tarjeta y NO como `gap` de la
               pista: con `gap`, el recorrido de `-50%` cae medio separador
               corrido del arranque del segundo juego y el loop pega un saltito
               en cada vuelta. Con el margen adentro de cada item el ancho es
               exactamente `2n * (tarjeta + separador)` y `-50%` cierra justo. */}
-          <div className={`flex w-max ${canLoop ? "animate-marquee" : ""}`}>
+          <div className={`flex w-max max-md:w-full max-md:flex-col max-md:gap-[22px] ${canLoop ? "animate-marquee" : ""}`}>
             {groups.map((group) => (
-              <div key={group.key} className="mr-[22px] w-[17rem] shrink-0 sm:w-[20rem]">
+              <div key={group.key} className="mr-[22px] w-[17rem] shrink-0 sm:w-[20rem] max-md:mr-0 max-md:w-full">
                 <TripCard trip={group.trip} tone="light" dates={group.dates} />
               </div>
             ))}

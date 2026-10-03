@@ -33,7 +33,9 @@ export function TestimonialsBand({
   testimonials,
 }: {
   title: string;
-  label: string;
+  /** Bajada bajo el título. Desde el 03/10 /viajes no la usa: la
+   *  organización pidió que el título diga sólo "Testimonios". */
+  label?: string;
   testimonials: Testimonial[];
 }) {
   if (testimonials.length === 0) return null;
@@ -44,9 +46,13 @@ export function TestimonialsBand({
           /viajes, que es la unica pagina donde vive esta banda. */}
       <Reveal amount={0.22} once={false} className="mx-auto max-w-5xl">
         <h3 className="font-display text-headline-md text-primary">{title}</h3>
-        <p className="mb-9 mt-2 text-label-sm uppercase text-primary-container">
-          {label}
-        </p>
+        {label ? (
+          <p className="mb-9 mt-2 text-label-sm uppercase text-primary-container">
+            {label}
+          </p>
+        ) : (
+          <div className="mb-9" />
+        )}
 
         {/* Mas bajo que en la home: alla el bloque es el protagonista de una
             pantalla entera y aca cierra una seccion que ya viene larga. */}

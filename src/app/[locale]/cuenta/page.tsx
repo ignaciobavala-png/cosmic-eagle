@@ -9,6 +9,8 @@ import { SignupForm } from "./SignupForm";
 import { logout } from "./actions";
 import { MisSolicitudes } from "./MisSolicitudes";
 import { AvatarUpload } from "./AvatarUpload";
+import { ProfileCard, type ProfileData } from "./ProfileCard";
+import { capitalizeName } from "@/lib/person-name";
 import { funnelSurface } from "@/components/forms/styles";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { localizeRow } from "@/lib/localized";
@@ -83,12 +85,14 @@ export default async function CuentaPage({
     } | null;
   }[] = [];
 
-  let profile: { full_name: string | null; avatar_url: string | null } | null = null;
+  let profile: (ProfileData & { avatar_url: string | null }) | null = null;
 
   if (user) {
     const { data } = await supabase
       .from("profiles")
-      .select("full_name, avatar_url, is_admin")
+      .select(
+        "full_name, avatar_url, is_admin, phone, profession, social_url, prior_experience, spiritual_practices, referral_source, referred_by, profile_completed_at"
+      )
       .eq("id", user.id)
       .single();
     profile = data;
@@ -156,21 +160,32 @@ export default async function CuentaPage({
           pone `AuthScreen`, que trae su propio degradé. */}
       <main className={`pt-[var(--navbar-h)] ${user ? funnelSurface : ""}`}>
         {user ? (
-          <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-5 py-16">
-            <AvatarUpload
-              avatarUrl={profile?.avatar_url ?? null}
-              fallbackLabel={(profile?.full_name?.trim()?.[0] ?? user.email?.[0] ?? "?").toUpperCase()}
-            />
-            <div className="text-center">
-              <h1 className="font-display text-[clamp(1.75rem,3.4vw,2.25rem)] font-bold text-white">
-                {profile?.full_name?.trim() || t("myAccount")}
-              </h1>
-              <p className="mt-1 text-sm text-white/65">{user.email}</p>
+          // Rearmada el 03/10 (correcciones de la organización, §5.1): la
+          // cabecera centrada con el nombre y el correo ocupaba la primera
+          // pantalla y "no servía de mucho". Ahora es una fila compacta y lo
+          // primero que sigue es el perfil personal.
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 py-10 md:py-14">
+            <div className="flex items-center gap-5">
+              <AvatarUpload
+                avatarUrl={profile?.avatar_url ?? null}
+                fallbackLabel={(profile?.full_name?.trim()?.[0] ?? user.email?.[0] ?? "?").toUpperCase()}
+              />
+              <div className="min-w-0">
+                {/* El nombre sale capitalizado aunque se haya tipeado en
+                    minúscula (§5.2: "Elisa ibañez"). Las cuentas nuevas ya
+                    se guardan así; esto cubre las anteriores. */}
+                <h1 className="font-display text-[clamp(1.6rem,3.4vw,2.1rem)] leading-tight text-white">
+                  {profile?.full_name?.trim() ? capitalizeName(profile.full_name) : t("myAccount")}
+                </h1>
+                <p className="mt-1 truncate text-sm text-white/65">{user.email}</p>
+              </div>
             </div>
 
             {aviso && AVISO_KEYS[aviso] && (
               <Notice text={t(AVISO_KEYS[aviso])} tone="ok" />
             )}
+
+            {profile && <ProfileCard profile={profile} />}
 
             <MisSolicitudes
               applications={applications}
@@ -180,7 +195,7 @@ export default async function CuentaPage({
             <form action={logout}>
               <button
                 type="submit"
-                className="mt-2 text-sm text-white/60 underline transition-colors hover:text-primary-container"
+                className="mt-2 w-full text-center text-sm text-white/60 underline transition-colors hover:text-primary-container"
               >
                 {t("logout")}
               </button>

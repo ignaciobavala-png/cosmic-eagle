@@ -6,12 +6,16 @@ import { getSiteUrl } from "@/lib/site-url";
 import { revalidatePath } from "next/cache";
 import { redirect } from "@/i18n/redirect";
 import { publicPath } from "@/i18n/public-path";
+import { dialCodeFor } from "@/lib/phone-countries";
+import { capitalizeName } from "@/lib/person-name";
+import { REFERRAL_SOURCES } from "./profile-fields";
 
 export type LoginState = { error: string | null };
 export type SignupState = { error: string | null };
 export type AvatarState = { error: string | null };
 export type RecoverState = { error: string | null; sent: boolean };
 export type NewPasswordState = { error: string | null };
+export type ProfileState = { error: string | null; saved: boolean };
 
 export async function login(
   _prevState: LoginState,
@@ -82,7 +86,7 @@ export async function signup(
     email,
     password,
     options: {
-      data: { full_name: fullName.trim() },
+      data: { full_name: capitalizeName(fullName) },
       // Hoy la confirmacion por mail esta apagada a proposito (el gate real es
       // la aprobacion manual del admin), asi que este link no se manda. Se deja
       // igual para que prenderla en el dashboard sea un toggle y no un deploy.
@@ -227,6 +231,81 @@ export async function updateAvatar(
 
   revalidatePath(publicPath("/"), "layout");
   return { error: null };
+}
+
+/**
+ * El perfil personal de /cuenta (correcciones de la organización, 03/10,
+ * §5.1, opción A): lo estable de la persona. La salud no pasa por acá.
+ *
+ * Escribe sólo las columnas que `profiles` tiene otorgadas a `authenticated`
+ * (ver la migración `profile_personal_fields`); la RLS acota a la fila propia.
+ */
+export async function updateProfile(
+  _prevState: ProfileState,
+  formData: FormData
+): Promise<ProfileState> {
+  const t = await getTranslations("Cuenta");
+  const text = (key: string) => {
+    const value = formData.get(key);
+    return typeof value === "string" ? value.trim() : "";
+  };
+
+  const fullName = text("full_name");
+  const phoneNumber = text("phone_number");
+  const dial = dialCodeFor(text("phone_country"));
+  const profession = text("profession");
+  const socialUrl = text("social_url");
+  const priorExperience = text("prior_experience");
+  const spiritualPractices = text("spiritual_practices");
+  const referralSource = text("referral_source");
+  const referredBy = text("referred_by");
+
+  if (
+    !fullName ||
+    !phoneNumber ||
+    !dial ||
+    !profession ||
+    !priorExperience ||
+    !spiritualPractices ||
+    !(REFERRAL_SOURCES as readonly string[]).includes(referralSource)
+  ) {
+    return { error: t("profile.errors.incomplete"), saved: false };
+  }
+
+  if (referralSource === "referido" && !referredBy) {
+    return { error: t("profile.errors.referredBy"), saved: false };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: t("formErrors.sessionExpired"), saved: false };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      full_name: capitalizeName(fullName),
+      phone: `+${dial} ${phoneNumber}`,
+      profession,
+      social_url: socialUrl || null,
+      prior_experience: priorExperience,
+      spiritual_practices: spiritualPractices,
+      referral_source: referralSource,
+      referred_by: referralSource === "referido" ? referredBy : null,
+      profile_completed_at: new Date().toISOString(),
+    })
+    .eq("id", user.id);
+
+  if (error) {
+    return { error: t("profile.errors.failed"), saved: false };
+  }
+
+  revalidatePath(publicPath("/cuenta"), "page");
+  return { error: null, saved: true };
 }
 
 export async function logout() {

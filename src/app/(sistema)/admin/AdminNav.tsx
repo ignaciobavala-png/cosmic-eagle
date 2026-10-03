@@ -45,7 +45,7 @@ const GROUPS: { title: string; links: NavLink[] }[] = [
     title: "Experiencias",
     links: [
       { href: "/admin/sesiones", label: "Sesiones" },
-      { href: "/admin/viajes", label: "Viajes" },
+      { href: "/admin/viajes", label: "Retiros" },
     ],
   },
   {
