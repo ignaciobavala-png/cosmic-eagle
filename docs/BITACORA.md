@@ -3093,8 +3093,10 @@ símbolos.
   un envoltorio. Afectaba también al filtro corto.
 - **Recuperar contraseña**: con `MAINTENANCE_MODE=on`, `getSiteUrl` ignora
   `NEXT_PUBLIC_SITE_URL` y el link vuelve al host que lo pidió. Plantilla del
-  mail nueva en `supabase/templates/recovery.html` — **hay que pegarla a mano**
-  en el dashboard.
+  mail nueva en `supabase/templates/recovery.html`. Ignacio la pegó en el
+  dashboard el mismo día y agregó `https://cosmic-eagle.vercel.app/auth/confirm`
+  a las Redirect URLs (sin eso Supabase cae a la Site URL, que está en
+  mantenimiento). Falta probar el flujo completo y guardar la clave nueva.
 
 Sin correr e2e (pedido de Ignacio): pueden fallar los que buscan "Nuestros
 Sanadores" o "Viajes".
