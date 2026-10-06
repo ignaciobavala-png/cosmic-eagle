@@ -3,9 +3,10 @@ import type { Faq } from "@/lib/faqs";
 /**
  * Colores de la lista segun el fondo donde cae. `light` es la franja crema de
  * /faqs; `dark` es el azul de la home (28/09), donde el azul del texto y el oro
- * oscuro de la cruz no se verian: ahi va el blanco calido para la pregunta, el
- * mismo beige del cuerpo de "Nuestro proposito" para la respuesta y el oro
- * claro (`primary-container`, el de texto sobre azul) para la cruz.
+ * oscuro de la cruz no se verian. Ahi va todo en el oro claro del manual de
+ * marca (`primary-container`, #f9d78f): el manual no tiene blanco y sobre azul
+ * escribe siempre en ese oro (06/10, antes era blanco calido + beige). La
+ * pregunta se distingue de la respuesta por el peso, no por el color.
  */
 const TONES = {
   light: {
@@ -16,8 +17,8 @@ const TONES = {
   },
   dark: {
     list: "divide-primary-container/20 border-primary-container/20",
-    question: "text-primary",
-    answer: "text-[#d0c5b4]",
+    question: "text-primary-container",
+    answer: "text-primary-container",
     cross: "bg-primary-container",
   },
 } as const;

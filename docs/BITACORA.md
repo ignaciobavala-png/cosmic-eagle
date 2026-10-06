@@ -3100,3 +3100,17 @@ símbolos.
 
 Sin correr e2e (pedido de Ignacio): pueden fallar los que buscan "Nuestros
 Sanadores" o "Viajes".
+
+## 2026-10-06 — Preguntas de la home en el oro del manual
+
+Ignacio volvió a pasar el docx del 03/10 (mismo archivo, mismo hash que el de
+`docs/entregas/2026-10-03-correcciones-mobile/`) y marcó que las preguntas de
+la home seguían en blanco. **El manual no tiene blanco**: la paleta son dos
+oros (`#F9D78F`, `#B3964B`) y dos azules (`#0079B3`, `#05125A`), y en todos los
+ejemplos sobre azul el texto va en `#F9D78F`. El tono `dark` de `FaqList`
+pasa de `primary` + beige `#d0c5b4` a `primary-container` para la pregunta y la
+respuesta (las separa el peso), y la intro de la sección, igual. Medido a 390px:
+los tres salen en `rgb(249, 215, 143)`.
+
+Queda en `#d0c5b4` el párrafo de "Nuestro propósito" de la home (`page.tsx`
+~243), que el pedido no menciona.

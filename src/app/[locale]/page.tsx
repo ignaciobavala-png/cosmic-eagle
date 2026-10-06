@@ -455,7 +455,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                 <TitleRule tone="gold" align="center" grow />
               </div>
               <RevealItem y={30} duration={0.9} delay={0.3}>
-                <p className="mx-auto mt-6 max-w-[560px] text-[16px] leading-[1.8] text-[#d0c5b4] md:mt-8 md:text-[18px]">
+                <p className="mx-auto mt-6 max-w-[560px] text-[16px] leading-[1.8] text-primary-container md:mt-8 md:text-[18px]">
                   {t("faqs.intro")}
                 </p>
               </RevealItem>
