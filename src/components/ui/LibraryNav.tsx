@@ -23,7 +23,7 @@ export async function LibraryNav({ active }: { active: string }) {
   return (
     <nav
       aria-label={t("library.ariaNav")}
-      className="sticky top-[var(--navbar-h)] z-30 mx-auto w-full max-w-3xl rounded-2xl border border-[#b3964b]/40 bg-[#fff6eb]/95 px-3 py-3 shadow-[0_10px_30px_-16px_rgba(5,18,90,0.55)] backdrop-blur-sm sm:px-4"
+      className="sticky top-[var(--navbar-h)] z-30 mx-auto w-full max-w-3xl py-3 md:rounded-2xl md:border md:border-[#b3964b]/40 md:bg-[#fff6eb]/95 md:px-4 md:shadow-[0_10px_30px_-16px_rgba(5,18,90,0.55)] md:backdrop-blur-sm"
     >
       <CategoryMenu
         active={active}
