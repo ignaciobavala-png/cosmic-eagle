@@ -158,10 +158,12 @@ export default async function NosotrosPage({
                 mediciones de centrado de esta pagina. */}
             {/* Título centrado y en `text-h2`, como todos (regla de Sofía del
                 06/10), y el filete AZUL como el título: el filete toma el color
-                del texto. Antes era el oro oscuro. */}
+                del texto. Antes era el oro oscuro. "PROPÓSITO" a secas y en
+                mayúscula, como en la home: el párrafo arranca con "Nuestro
+                propósito es..." (07/10). */}
             <div className="mx-auto w-fit text-center">
               <RevealItem y={0} duration={1} id="nos-proposito-title">
-                <h2 className="font-display text-h2 font-bold text-[#05125a]">
+                <h2 className="font-display text-h2 font-bold uppercase text-[#05125a]">
                   {t("purpose.title")}
                 </h2>
               </RevealItem>

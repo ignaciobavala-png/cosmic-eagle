@@ -2,7 +2,7 @@
 
 import { Link } from "@/i18n/navigation";
 import { CTA_TONES } from "./CtaLink";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useTransform, useReducedMotion, type MotionValue } from "framer-motion";
 import { useSectionProgress } from "@/lib/use-section-progress";
 import { useSignedIn } from "@/lib/use-signed-in";
@@ -11,8 +11,11 @@ import { COLLAPSIBLE_TOGGLE } from "./Collapsible";
 type Cta = { label: string; href: string };
 
 /**
- * Una frase resaltada. `text` es como aparece DENTRO del parrafo, literal: la
- * caja la decide la clienta al escribir el parrafo.
+ * Una frase resaltada. `text` es como aparece DENTRO del parrafo y tambien en
+ * el bloque final: la frase viaja del parrafo al centro, asi que si cambiara de
+ * caja a mitad de camino se veria el salto. Por eso es UN solo string y tampoco
+ * lleva `capitalize`: la regla de CSS pondria "Dimension Del Alma", con el
+ * articulo en mayuscula. La caja la decide la clienta al escribir el parrafo.
  */
 export type StoryKeyword = { text: string };
 
@@ -21,23 +24,28 @@ export type StoryKeyword = { text: string };
  * pantalla, en **tres momentos** (pedido de Sofía, 06/10: "más directo, sin
  * tanto degradé"):
  *
- * 1. **Los tres párrafos**, enteros y juntos.
+ * 1. **Los tres párrafos**, enteros y juntos desde el arranque.
  * 2. **Sólo las palabras clave**: el texto blanco se apaga de una vez y las
  *    frases resaltadas se quedan en su lugar dentro del párrafo.
- * 3. **El cierre**: los tres párrafos vuelven juntos, de una —no de a uno—, y
- *    entra el botón.
+ * 3. **Las palabras se reúnen en el centro** y quedan unificadas en un solo
+ *    bloque; después entra el botón.
  *
- * Hasta el 06/10 era el motor de cuatro fases del mockup de Julia: párrafos
- * que entraban de a uno, el blanco apagándose por tramos y las palabras
- * viajando al centro con un degradé de tres colores. Eso se fue entero (con el
- * `KEYWORD_HANDOFF` y la medición en vivo de offsets que lo sostenían; están en
- * la historia de git si alguna vez vuelve).
+ * Lo que cambió el 06/10 respecto del motor de cuatro fases del mockup de
+ * Julia: los párrafos ya no entran de a uno, el blanco se apaga entero y no
+ * por tramos (que era el "degradé" que molestaba), y las palabras llegan en el
+ * oro plano del sitio, sin el degradé de tres colores. El viaje al centro se
+ * queda. **Ojo**: el 07/10 se lo sacó por error leyendo "párrafo unificado"
+ * como "los párrafos vuelven juntos" y Ignacio lo marcó roto; el bloque
+ * unificado son las palabras clave.
  *
  * Criterios que no hay que "simplificar":
  *
- * - Todo se anima con `opacity` y `transform`, que resuelve el compositor.
+ * - Todo se anima con `opacity` y `transform`, que resuelve el compositor. Nada
+ *   de animar alturas ni tamaños de fuente.
  * - El texto está SIEMPRE en el HTML (sólo cambia su opacidad), así que la
  *   página se indexa y se lee con lector de pantalla aunque nunca se scrollee.
+ *   El bloque de palabras que viaja al centro es `aria-hidden`: repite frases
+ *   que ya están en los párrafos.
  * - Con `prefers-reduced-motion` el bloque se aplana: párrafos y botón
  *   visibles, sin tramo de scroll de más.
  *
@@ -46,11 +54,67 @@ export type StoryKeyword = { text: string };
  */
 
 /** Límites de los momentos, en el progreso 0 → 1 del scroll dentro de la sección. */
-const DIM_START = 0.3; // fin del momento 1: el blanco empieza a apagarse
-const DIM_END = 0.4; // momento 2: sólo las palabras clave
-const BACK_START = 0.62; // el blanco vuelve...
-const BACK_END = 0.72; // ...entero y de una: momento 3
+const DIM_START = 0.22; // fin del momento 1: el blanco empieza a apagarse
+const DIM_END = 0.32; // momento 2: sólo las palabras clave, en su lugar
+const TRAVEL_START = 0.42; // momento 3: las palabras salen hacia el centro...
+const TRAVEL_END = 0.68; // ...y llegan, unificadas
 const CTA_TRIGGER = 0.74; // umbral del botón (no es scrubbing: entra y sale entero)
+
+/**
+ * El relevo entre la frase del párrafo y su copia que viaja: lo que tarda la
+ * copia en encenderse y la original en apagarse. Es el mismo tramo para las
+ * dos, así que en cualquier punto se lee UNA sola vez (corrección del 09/09:
+ * con las dos encendidas la frase se leía dos veces, corrida).
+ */
+const KEYWORD_HANDOFF = 0.04;
+
+type Offset = { x: number; y: number };
+
+/**
+ * De donde sale cada palabra: la distancia entre el lugar que ocupa dentro del
+ * parrafo y el lugar donde la espera el bloque final. **Se mide en vivo y no es
+ * una constante** (correccion de Julia del 04/09).
+ *
+ * Tres cosas que no hay que "simplificar":
+ *
+ * - **Se remide en cada frame de scroll mientras el viaje todavia no arranco.**
+ *   El contenido vive dentro de un `sticky`, y un sticky recien esta en su
+ *   posicion final cuando el scroll lo pego al techo: medir una sola vez al
+ *   montar da coordenadas de cuando la seccion estaba abajo de la pantalla.
+ * - **El destino se calcula con `offsetLeft`/`offsetTop`, no con
+ *   `getBoundingClientRect`.** El rect de la palabra del bloque ya viene movido
+ *   por el transform de la medicion anterior, asi que medirlo con rect se
+ *   realimenta; los offsets de layout son la posicion natural. Su contenedor si
+ *   va con rect: es quien aporta la posicion en pantalla.
+ * - **Se mide contra el destino real, no contra el centro de la pantalla**:
+ *   cada palabra aterriza en su lugar dentro del bloque.
+ */
+function measureOffsets(
+  sources: (HTMLElement | null)[],
+  targets: (HTMLElement | null)[],
+  frame: HTMLElement | null,
+  previous: Offset[]
+): Offset[] {
+  if (!frame) return previous;
+  const box = frame.getBoundingClientRect();
+
+  return sources.map((source, i) => {
+    const target = targets[i];
+    if (!source || !target) return previous[i] ?? { x: 0, y: 0 };
+
+    const from = source.getBoundingClientRect();
+    return {
+      x:
+        from.left +
+        from.width / 2 -
+        (box.left + target.offsetLeft + target.offsetWidth / 2),
+      y:
+        from.top +
+        from.height / 2 -
+        (box.top + target.offsetTop + target.offsetHeight / 2),
+    };
+  });
+}
 
 export function ScrollStory({
   paragraphs,
@@ -67,33 +131,76 @@ export function ScrollStory({
   const { ref, progress } = useSectionProgress(!reduced);
   const story = useMemo(() => splitStory(paragraphs, keywords), [paragraphs, keywords]);
 
-  // El texto blanco: encendido, apagado del todo, encendido otra vez. Las
-  // palabras clave no pasan por acá: quedan fijas en 1 los tres momentos.
-  const textOpacity = useTransform(
+  const sources = useRef<(HTMLElement | null)[]>([]);
+  const targets = useRef<(HTMLElement | null)[]>([]);
+  const frame = useRef<HTMLDivElement>(null);
+  const offsets = useRef<Offset[]>([]);
+
+  const measure = useCallback(() => {
+    offsets.current = measureOffsets(
+      sources.current,
+      targets.current,
+      frame.current,
+      offsets.current
+    );
+  }, []);
+
+  /**
+   * Los tres momentos en que hay que medir: después de `load` + doble rAF (que
+   * las fuentes ya asentaron el layout), en cada `resize` (una frase cambia de
+   * renglón entre anchos) y en cada frame de scroll antes del viaje (ver
+   * `measureOffsets`).
+   */
+  useEffect(() => {
+    if (reduced) return;
+
+    let alive = true;
+    const run = () =>
+      requestAnimationFrame(() => requestAnimationFrame(() => alive && measure()));
+
+    if (document.readyState === "complete") run();
+    else window.addEventListener("load", run, { once: true });
+
+    let timer: ReturnType<typeof setTimeout>;
+    const onResize = () => {
+      clearTimeout(timer);
+      timer = setTimeout(measure, 150);
+    };
+    window.addEventListener("resize", onResize);
+
+    const stop = progress.on("change", (v) => {
+      if (v < TRAVEL_START) measure();
+    });
+
+    return () => {
+      alive = false;
+      window.removeEventListener("load", run);
+      window.removeEventListener("resize", onResize);
+      clearTimeout(timer);
+      stop();
+    };
+  }, [measure, progress, reduced]);
+
+  // Momento 2: el texto blanco se apaga entero y de una. Las palabras clave no
+  // pasan por acá: se quedan encendidas en su lugar hasta el relevo.
+  const textOpacity = useTransform(progress, [DIM_START, DIM_END], [1, 0]);
+  // Momento 3: el relevo y el viaje.
+  const sourceOpacity = useTransform(
     progress,
-    [DIM_START, DIM_END, BACK_START, BACK_END],
-    [1, 0, 0, 1]
+    [TRAVEL_START, TRAVEL_START + KEYWORD_HANDOFF],
+    [1, 0]
   );
+  const wordsOpacity = useTransform(
+    progress,
+    [TRAVEL_START, TRAVEL_START + KEYWORD_HANDOFF],
+    [0, 1]
+  );
+  const travel = useTransform(progress, [TRAVEL_START, TRAVEL_END], [0, 1]);
   // El gesto de entrada de los párrafos, el mismo de `RevealItem`: sin esto el
   // bloque se sentía "caído", como puesto de siempre (Ignacio, 24/09).
   const y = useTransform(progress, [0, 0.06], [22, 0]);
 
   const ctaVisible = useThreshold(progress, CTA_TRIGGER, !reduced);
-
-  const renderPieces = (pieces: Piece[], animated: boolean) =>
-    pieces.map((piece, j) =>
-      piece.keyword ? (
-        <span key={j} className={KEYWORD_CLASS}>
-          {piece.text}
-        </span>
-      ) : animated ? (
-        <motion.span key={j} style={{ opacity: textOpacity }}>
-          {piece.text}
-        </motion.span>
-      ) : (
-        <span key={j}>{piece.text}</span>
-      )
-    );
 
   if (reduced) {
     return (
@@ -104,7 +211,15 @@ export function ScrollStory({
         <div className="mx-auto max-w-[820px] space-y-6">
           {story.map((pieces, i) => (
             <p key={i} className={PARAGRAPH_CLASS}>
-              {renderPieces(pieces, false)}
+              {pieces.map((piece, j) =>
+                piece.keyword ? (
+                  <span key={j} className={KEYWORD_CLASS}>
+                    {piece.text}
+                  </span>
+                ) : (
+                  <span key={j}>{piece.text}</span>
+                )
+              )}
             </p>
           ))}
           <div className="pt-14">
@@ -119,39 +234,124 @@ export function ScrollStory({
     <section
       id={id}
       ref={ref}
-      className="relative h-[300vh] w-full bg-[linear-gradient(to_bottom,#011360_0%,#020c41_100%)]"
+      className="relative h-[350vh] w-full bg-[linear-gradient(to_bottom,#011360_0%,#020c41_100%)]"
     >
       {/* El `pt` compensa el navbar: el sticky se pega al techo de la pantalla,
           que es justo donde está la banda opaca. `items-start` y no centrado:
           con el texto centrado en su propia pantalla quedaba otro tramo de aire
           justo donde termina el manifiesto (Ignacio, 24/09; organización,
           25/09). */}
-      <div className="sticky top-0 flex h-[100svh] flex-col items-center overflow-hidden pt-[var(--navbar-h)] md:pt-[calc(var(--navbar-h)+3vh)]">
+      <div className="sticky top-0 flex h-[100svh] items-start overflow-hidden pt-[var(--navbar-h)] md:pt-[calc(var(--navbar-h)+3vh)]">
         <motion.div style={{ y }} className="relative z-[3] mx-auto max-w-[820px] px-[6vw]">
           {story.map((pieces, i) => (
             <p key={i} className={PARAGRAPH_CLASS}>
-              {renderPieces(pieces, true)}
+              {pieces.map((piece, j) =>
+                piece.keyword ? (
+                  <motion.span
+                    key={j}
+                    ref={(el) => {
+                      sources.current[piece.index] = el;
+                    }}
+                    style={{ opacity: sourceOpacity }}
+                    className={KEYWORD_CLASS}
+                  >
+                    {piece.text}
+                  </motion.span>
+                ) : (
+                  <motion.span key={j} style={{ opacity: textOpacity }}>
+                    {piece.text}
+                  </motion.span>
+                )
+              )}
             </p>
           ))}
         </motion.div>
 
-        {/* El botón ocupa su lugar desde el arranque —sólo cambia de
-            opacidad—, así el texto no salta cuando entra. */}
-        <motion.div
-          initial={false}
-          animate={
-            ctaVisible
-              ? { opacity: 1, y: 0, scale: 1 }
-              : { opacity: 0, y: 20, scale: 0.85 }
-          }
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="relative z-[3] mt-[clamp(16px,4vh,48px)] text-center"
-          style={{ pointerEvents: ctaVisible ? "auto" : "none" }}
-        >
-          <StoryCta {...cta} />
-        </motion.div>
+        {/* Las palabras y el botón viven en UN solo bloque centrado, apilado
+            sobre el texto: así el conjunto queda con el mismo aire arriba y
+            abajo una vez que el botón entra. El botón ocupa su lugar desde el
+            arranque —sólo cambia de opacidad—, por eso el bloque no se mueve. */}
+        <div className="pointer-events-none absolute inset-0 z-[3] flex flex-col items-center justify-center gap-[59px] px-[6vw] md:gap-10">
+          {/* `relative` no es decoracion: `offsetLeft`/`offsetTop` se miden
+              contra el ancestro POSICIONADO mas cercano, y sin esto las
+              palabras salian de un punto que no existe. */}
+          <motion.div
+            ref={frame}
+            aria-hidden="true"
+            style={{ opacity: wordsOpacity }}
+            className="relative text-center"
+          >
+            {keywords.map((word, i) => (
+              <TravellingKeyword
+                key={word.text}
+                travel={travel}
+                offsets={offsets}
+                index={i}
+                register={(el) => {
+                  targets.current[i] = el;
+                }}
+              >
+                {word.text}
+              </TravellingKeyword>
+            ))}
+          </motion.div>
+
+          <motion.div
+            initial={false}
+            animate={
+              ctaVisible
+                ? { opacity: 1, y: 0, scale: 1 }
+                : { opacity: 0, y: 20, scale: 0.85 }
+            }
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="text-center"
+            style={{ pointerEvents: ctaVisible ? "auto" : "none" }}
+          >
+            <StoryCta {...cta} />
+          </motion.div>
+        </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * La palabra viaja desde su lugar en el párrafo hasta su renglón del bloque
+ * final, creciendo de 0,6 a 1.
+ *
+ * **El offset se lee del ref dentro de la funcion de transformacion**, no se
+ * cierra sobre un valor: asi cada frame usa la ultima medicion. Mientras
+ * `travel` vale 0 la palabra esta en opacidad 0, asi que no importa que el
+ * valor no se recalcule hasta que el viaje arranca.
+ *
+ * Oro plano (`primary-container`), el mismo de la frase en el párrafo: el
+ * degradé de tres colores que llevaba se fue con el pedido de Sofía del 06/10.
+ */
+function TravellingKeyword({
+  children,
+  travel,
+  offsets,
+  index,
+  register,
+}: {
+  children: React.ReactNode;
+  travel: MotionValue<number>;
+  offsets: React.RefObject<Offset[]>;
+  index: number;
+  register: (el: HTMLElement | null) => void;
+}) {
+  const x = useTransform(travel, (t) => (offsets.current[index]?.x ?? 0) * (1 - t));
+  const y = useTransform(travel, (t) => (offsets.current[index]?.y ?? 0) * (1 - t));
+  const scale = useTransform(travel, [0, 1], [0.6, 1]);
+
+  return (
+    <motion.span
+      ref={register}
+      style={{ x, y, scale }}
+      className="block font-display text-[32px] font-semibold leading-[47px] text-primary-container"
+    >
+      {children}
+    </motion.span>
   );
 }
 
@@ -295,7 +495,9 @@ function StoryCta({ label, href }: Cta) {
   );
 }
 
-type Piece = { keyword: boolean; text: string };
+type Piece =
+  | { keyword: true; text: string; index: number }
+  | { keyword: false; text: string };
 
 /**
  * Parte los párrafos en texto común y frases clave. Sólo se marca la
@@ -321,7 +523,11 @@ function splitStory(paragraphs: readonly string[], keywords: readonly StoryKeywo
 
       if (isKeyword) {
         seen.add(key);
-        pieces.push({ keyword: true, text: part });
+        pieces.push({
+          keyword: true,
+          text: part,
+          index: keywords.findIndex((k) => k.text.toLowerCase() === key),
+        });
         continue;
       }
 

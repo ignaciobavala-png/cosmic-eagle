@@ -3174,3 +3174,11 @@ Verificado con capturas a 390x844 y 1440x900 contra `next start`.
 
 Quedó afuera: el Propósito de /nosotros sigue titulado "Nuestro propósito"
 aunque el párrafo arranca igual (el pedido fue sobre la home).
+
+**Corrección del mismo día.** El tercer momento del relato no era que los
+párrafos volvieran: son **las palabras clave que se reúnen en el centro**,
+unificadas en un bloque. Se recuperó el viaje (medición en vivo de offsets y
+relevo de 0,04), en el oro plano y sin el degradé de tres colores; el blanco se
+sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
+"PROPÓSITO", como en la home. Subido sin probar, a pedido de Ignacio: lo revisa
+él en producción.
