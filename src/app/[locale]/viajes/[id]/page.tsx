@@ -263,7 +263,7 @@ export default async function ViajePage({ params }: Props) {
                   {t("detail.title")}
                 </h2>
               </RevealItem>
-              <TitleRule grow className="mt-3 mb-7" />
+              <TitleRule tone="blue" grow className="mt-3 mb-7" />
             </div>
 
             <RevealItem y={14} duration={0.8} delay={0.15}>
@@ -314,7 +314,7 @@ export default async function ViajePage({ params }: Props) {
                     <h3 className="font-display text-headline-md font-bold text-[#05125a]">
                       {t("program.title")}
                     </h3>
-                    <TitleRule className="mt-3 mb-7" />
+                    <TitleRule tone="blue" className="mt-3 mb-7" />
                   </div>
                   <div className="flex flex-col gap-6">
                     {schedule.map((group) => (
@@ -363,7 +363,7 @@ export default async function ViajePage({ params }: Props) {
                     <h3 className="font-display text-headline-md font-bold text-[#05125a]">
                       {t("includes.title")}
                     </h3>
-                    <TitleRule className="mt-3 mb-7" />
+                    <TitleRule tone="blue" className="mt-3 mb-7" />
                   </div>
                   <p className="whitespace-pre-line text-body-md leading-relaxed text-[#05125a]">
                     {trip.includes}

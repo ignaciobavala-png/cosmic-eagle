@@ -21,6 +21,10 @@ export function LoginForm({ next }: { next?: string }) {
   const t = useTranslations("Cuenta");
   const [state, formAction, pending] = useActionState(login, initialState);
   const [showPassword, setShowPassword] = useState(false);
+  // El mail va controlado: React 19 vacía el formulario después de cada
+  // action, también cuando vuelve con error, y con la contraseña mal se perdía
+  // el mail (Sofía, 06/10). La contraseña sí se vacía, que es lo esperable.
+  const [email, setEmail] = useState("");
 
   return (
     <form action={formAction}>
@@ -36,6 +40,8 @@ export function LoginForm({ next }: { next?: string }) {
           type="email"
           required
           autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder={t("login.emailPlaceholder")}
           className={fieldInput}
         />

@@ -206,14 +206,9 @@ export const SITE_GROUPS = [
         type: "boolean",
         fallback: "true",
       },
-      {
-        key: "nosotros.frase",
-        label: "Frase sobre la imagen",
-        help: "La frase corta que aparece sola, centrada sobre la foto a pantalla completa.",
-        type: "text",
-        fallback:
-          "El viaje comienza cuando dejamos de buscar afuera lo que siempre estuvo adentro.",
-      },
+      // `nosotros.frase` y `nosotros.proposito.overlay` se fueron del panel el
+      // 06/10: sobre esa imagen va ahora fija la frase "Nuestro rol no es
+      // definir..." (pedido de Sofía). Las filas quedan en la base.
       // Las dos keys de abajo son las de los bloques "Evolución Consciente" y
       // "Metodología", que el rediseño de Julia elimina. Se REUSAN a proposito,
       // con la misma key y otra etiqueta: asi la foto que la clienta ya subio
@@ -228,13 +223,6 @@ export const SITE_GROUPS = [
         ratio: "16/9",
         maxPx: 1920,
         video: true,
-      },
-      {
-        key: "nosotros.proposito.overlay",
-        label: "Mostrar la frase sobre esa imagen",
-        help: "Si lo destildas, ese banner queda solo con la imagen, sin la frase encima.",
-        type: "boolean",
-        fallback: "true",
       },
       {
         key: "nosotros.metodologia.image",

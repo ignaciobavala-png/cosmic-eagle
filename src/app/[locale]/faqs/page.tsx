@@ -91,7 +91,7 @@ export default async function FaqsPage({
                   <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
                     {t("title")}
                   </h2>
-                  <TitleRule className="mt-3 mb-7" />
+                  <TitleRule tone="blue" className="mt-3 mb-7" />
                 </div>
                 <p className="text-body-md leading-relaxed text-[#05125a]">
                   {t("preparing")}
@@ -109,7 +109,7 @@ export default async function FaqsPage({
                       <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
                         {t(`placements.${placement.value}`)}
                       </h2>
-                      <TitleRule className="mt-3 mb-7" />
+                      <TitleRule tone="blue" className="mt-3 mb-7" />
                     </div>
                   </Reveal>
 

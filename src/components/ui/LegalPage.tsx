@@ -72,7 +72,7 @@ export async function LegalPage({
               <h1 className="font-display text-headline-lg font-bold text-[#05125a] md:text-display-lg">
                 {doc.title}
               </h1>
-              <TitleRule className="mt-5" />
+              <TitleRule tone="blue" className="mt-5" />
             </div>
           </Reveal>
 

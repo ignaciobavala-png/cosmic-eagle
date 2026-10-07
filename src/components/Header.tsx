@@ -632,7 +632,7 @@ export function Header() {
                     entra con el menu completo (ver el comentario del
                     breakpoint, arriba). */}
                 {SHOW_LOCALE_SWITCH && (
-                  <LocaleSwitch className="flex justify-center" />
+                  <LocaleSwitch className="flex justify-center" large />
                 )}
               </div>
             </motion.div>

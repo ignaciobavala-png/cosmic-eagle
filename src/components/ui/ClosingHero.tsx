@@ -3,8 +3,8 @@ import { CtaLink } from "./CtaLink";
 import { Reveal } from "./Reveal";
 
 /**
- * Cierre a pantalla completa: imagen atenuada sobre azul, titulo en mayusculas
- * y hasta dos botones.
+ * Cierre a pantalla completa: imagen atenuada sobre azul, titulo y hasta dos
+ * botones.
  *
  * Es el `.nos-cierre` del rediseño, y reemplaza al remate centrado con estrella
  * (`ClosingSection`, P5) en las paginas que Julia rehizo. La imagen va al 40%
@@ -55,10 +55,12 @@ export function ClosingHero({
           className="relative z-10 px-7 md:px-margin-desktop"
         >
           {title && (
-            /* `clamp(1.5rem,5vw,3rem)`, el del mockup: en mobile el titulo
-               tiene que entrar en DOS lineas y con la escala anterior se pasaba.
-               `text-balance` reparte el corte entre las dos. */
-            <h2 className="font-display text-[clamp(1.5rem,5vw,3rem)] font-bold uppercase leading-[1.3] text-primary-container text-balance">
+            /* Con el mismo trato que las otras frases sobre imagen del sitio
+               (`MediaStatement`: `text-h2`, oro `primary-container`, recta y
+               sin negrita). Era mayúscula en negrita a `clamp(1.5rem,5vw,3rem)`
+               y Sofía la veía "desalineada en estilo" (06/10).
+               `text-balance` reparte el corte entre las líneas. */
+            <h2 className="font-display text-h2 text-primary-container text-balance">
               {title}
             </h2>
           )}

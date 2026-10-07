@@ -5,7 +5,7 @@
   "Header": {
     "nav": {
       "nosotros": "Nosotros",
-      "experiencias": "Sesiones y Retiros",
+      "experiencias": "Experiencias",
       "contenidos": "Contenidos",
       "miCuenta": "Mi Cuenta"
     },
@@ -42,7 +42,7 @@
     },
     "links": {
       "nosotros": "Nosotros",
-      "experiencias": "Sesiones y Retiros",
+      "experiencias": "Experiencias",
       "contenidos": "Contenidos",
       "preguntasFrecuentes": "Preguntas frecuentes",
       "privacidad": "Privacidad",
@@ -121,12 +121,12 @@
       "p1": "Nuestro propósito es <strong>impulsar la evolución humana</strong>, creando espacios que permitan a cada persona transformar su realidad, expandir su conciencia y profundizar la conexión con su alma.",
       "p2": "Acompañamos a personas en distintas etapas de este camino: desde quienes comienzan un proceso de profunda <strong>transformación</strong>, hasta sanadores, guías y practicantes experimentados que están entrando en nuevas etapas de <strong>evolución</strong>, desarrollo y servicio."
     },
-    "quote": "Nuestro rol no es definir lo que alguien debe experimentar o en qué debe convertirse, sino crear las condiciones para que su propio proceso se despliegue.",
+    "quote": "Nuestro rol no es definir lo que alguien debe experimentar o en qué debe convertirse, sino crear las condiciones para que su propio proceso se despliegue",
     "videoAlt": "Círculo de ceremonia iluminado",
     "enfoque": {
       "title": "Nuestro enfoque",
-      "p1": "Este trabajo está dirigido a personas dispuestas a atravesar procesos profundos de transformación y liberar estructuras que limitan su evolución; a sanadores y practicantes que buscan abrirse a nuevas formas de conocimiento; a líderes que quieren expandir sus capacidades; y a quienes buscan mayor claridad sobre el propósito y el camino de su vida.",
-      "p2": "Para quienes ya están inmersos en un proceso evolutivo, ofrece también la posibilidad de acceder a capas más profundas de conocimiento sobre la conciencia, el alma y la evolución humana."
+      "p1": "Este trabajo está dirigido a personas dispuestas a atravesar procesos profundos de transformación y <strong>liberar estructuras</strong> que limitan su evolución; a sanadores y practicantes que buscan abrirse a nuevas formas de conocimiento; a líderes que quieren <strong>expandir sus capacidades</strong>; y a quienes buscan mayor claridad sobre el propósito y el camino de su vida.",
+      "p2": "Para quienes ya están inmersos en un proceso evolutivo, ofrece también la posibilidad de acceder a <strong>capas más profundas de conocimiento</strong> sobre la conciencia, el alma y la evolución humana."
     },
     "estela": {
       "title": "Estela, founder",
@@ -137,8 +137,8 @@
     },
     "cierreAlt": "Textura cósmica",
     "actions": {
-      "explorar": "Explorar experiencias",
-      "profundizar": "Ir más profundo"
+      "explorar": "Experiencias",
+      "profundizar": "Contenidos"
     }
   },
   "GateModal": {
@@ -170,7 +170,7 @@
       "invalid": "El enlace no es válido. Prueba pidiendo uno nuevo.",
       "passwordChanged": "Listo, tu contraseña quedó actualizada."
     },
-    "titleLogin": "Hola de nuevo",
+    "titleLogin": "Bienvenido",
     "titleSignup": "Bienvenido",
     "myAccount": "Mi Cuenta",
     "logout": "Cerrar sesión",
@@ -476,7 +476,7 @@
   "Home": {
     "heroAlt": "Figura de partículas mirando hacia el cosmos",
     "purpose": {
-      "title": "Nuestro propósito",
+      "title": "Propósito",
       "body": "Nuestro propósito es impulsar la <gold>evolución</gold> humana, creando espacios que permitan a cada persona <gold>transformar</gold> su realidad, expandir su <gold>conciencia</gold> y profundizar la conexión con su <gold>alma</gold>.",
       "cta": "Ir más profundo"
     },
@@ -505,9 +505,9 @@
     "faqs": {
       "title": "¿Con curiosidad por el viaje?",
       "intro": "Aquí van algunas cosas que quizás quieras saber antes de seguir explorando.",
-      "more": "Explorar más →"
+      "more": "Explorar más"
     },
     "cierreAlt": "Amanecer sobre el horizonte",
-    "cierre": "Cuando el alma está lista,<br></br>el camino aparece."
+    "cierre": "Cuando el alma está lista,<br></br>el camino aparece"
   }
 }

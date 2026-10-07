@@ -8,15 +8,20 @@ import type { Faq } from "@/lib/faqs";
  * escribe siempre en ese oro (06/10, antes era blanco calido + beige). La
  * pregunta se distingue de la respuesta por el peso, no por el color.
  */
+/**
+ * Las divisorias son el filete fino del resto del sitio (`TitleRule`): 1px con
+ * las puntas desvanecidas, del color del texto (pedido de Sofía, 06/10). Hasta
+ * ahí eran un `border` pleno al 15-20%, que se leía como otra línea distinta.
+ */
 const TONES = {
   light: {
-    list: "divide-[#05125a]/15 border-[#05125a]/15",
+    rule: "bg-[linear-gradient(to_right,transparent_0%,#05125a_50%,transparent_100%)]",
     question: "text-[#05125a]",
     answer: "text-[#05125a]",
     cross: "bg-[#755c21]",
   },
   dark: {
-    list: "divide-primary-container/20 border-primary-container/20",
+    rule: "bg-[linear-gradient(to_right,transparent_0%,var(--color-primary-container)_50%,transparent_100%)]",
     question: "text-primary-container",
     answer: "text-primary-container",
     cross: "bg-primary-container",
@@ -46,9 +51,10 @@ export function FaqList({
   const t = TONES[tone];
 
   return (
-    <ul className={`divide-y border-y ${t.list}`}>
+    <ul>
       {faqs.map((faq) => (
         <li key={faq.id}>
+          <div aria-hidden="true" className={`h-px w-full ${t.rule}`} />
           <details className="group">
             <summary
               className={`flex cursor-pointer list-none items-start justify-between gap-4 py-5 text-body-md font-medium marker:content-none ${t.question}`}
@@ -78,6 +84,7 @@ export function FaqList({
           </details>
         </li>
       ))}
+      <li aria-hidden="true" className={`h-px w-full ${t.rule}`} />
     </ul>
   );
 }

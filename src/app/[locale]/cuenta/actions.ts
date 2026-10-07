@@ -55,7 +55,9 @@ export async function login(
     .eq("id", data.user.id)
     .single();
 
-  return await redirect(profile?.is_admin ? "/admin" : "/cuenta");
+  // El viajero vuelve a la home ya con sesión, no a su perfil (Sofía, 06/10):
+  // `/cuenta` queda a un click en el navbar. El admin sigue yendo al panel.
+  return await redirect(profile?.is_admin ? "/admin" : "/");
 }
 
 export async function signup(

@@ -156,15 +156,16 @@ export default async function NosotrosPage({
             {/* `w-fit`: el filete mide el ancho del titulo y no el de la
                 columna. El `id` del `RevealItem` no se mueve: lo usan las
                 mediciones de centrado de esta pagina. */}
-            <div className="w-fit">
+            {/* Título centrado y en `text-h2`, como todos (regla de Sofía del
+                06/10), y el filete AZUL como el título: el filete toma el color
+                del texto. Antes era el oro oscuro. */}
+            <div className="mx-auto w-fit text-center">
               <RevealItem y={0} duration={1} id="nos-proposito-title">
-                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                <h2 className="font-display text-h2 font-bold text-[#05125a]">
                   {t("purpose.title")}
                 </h2>
               </RevealItem>
-              {/* Oro oscuro: sobre el dorado el `#f9d78f` de los otros filetes
-                  da 1,20:1, o sea que no se ve. */}
-              <TitleRule tone="goldDeep" grow className="mt-3 mb-6" />
+              <TitleRule tone="blue" align="center" grow className="mt-3 mb-6" />
             </div>
             {/* **Los resaltados NO cambian de tipografía**, sólo de color y
                 peso: llevaban `font-display` y con Sorts Mill Goudy —que tiene
@@ -199,24 +200,6 @@ export default async function NosotrosPage({
               219px que le reservaba lugar. Tampoco lleva botón de continuar. */}
         </Reveal>
 
-        {/* Frase destacada nueva (pedido de la organización, 23/09):
-            inmediatamente después de "Nuestro propósito" y antes de la
-            imagen, con jerarquía Nivel 1 — la misma escala que los grandes
-            hitos narrativos del sitio. Es la frase que hasta ahora cerraba
-            "Nuestro enfoque". */}
-        <Reveal
-          as="section"
-          amount={0.3}
-          once={false}
-          className="flex w-full items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile py-16 text-center text-[#05125a] md:px-margin-desktop md:py-24"
-        >
-          <RevealItem y={20} duration={1}>
-            <p className="mx-auto max-w-3xl font-display text-headline-md leading-snug md:text-headline-lg">
-              {t("quote")}
-            </p>
-          </RevealItem>
-        </Reveal>
-
         {/* Julia pidió video acá; va la imagen hasta que llegue. La key del slot
             es la del bloque "Evolución Consciente" que el rediseño elimina, para
             no perder la foto que la clienta ya subió. */}
@@ -227,13 +210,17 @@ export default async function NosotrosPage({
           id="video"
           image={content("nosotros.proposito.image")}
           imageAlt={t("videoAlt")}
-          text={content("nosotros.frase")}
+          // La frase "Nuestro rol no es definir..." vive ACÁ desde el 06/10
+          // (pedido de Sofía): antes tenía su propia franja dorada entre
+          // "Nuestro propósito" y esta imagen, y la imagen iba sin texto. Va
+          // sin punto final. Desplaza al slot `nosotros.frase` y a su toggle,
+          // que ya no se muestran en /admin/multimedia (las filas quedan).
+          text={t("quote")}
           amount={0.4}
           once={false}
           y={0}
           duration={1.2}
           veil={0.3}
-          overlay={isEnabled(content("nosotros.proposito.overlay"))}
           // En el telefono la caja es vertical y de esta foto —la figura
           // acostada, que ocupa el ancho entero— sobrevive apenas el 26% del
           // ancho: centrado, el recorte caia en la cadera y no se entendia que
@@ -280,7 +267,7 @@ export default async function NosotrosPage({
           amount={0.25}
           once={false}
           stagger={0}
-          className="relative overflow-hidden flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] px-margin-mobile pt-[35px] pb-[88px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
+          className="relative overflow-hidden flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#f9d78f,#b3964b)] min-h-[calc(100svh-var(--navbar-h))] px-margin-mobile py-[35px] text-[#05125a] md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
         >
           {/* Marca de agua a los dos costados, el mismo recurso que la
               biblioteca de /contenidos: el simbolo del manual, tono sobre tono,
@@ -314,43 +301,53 @@ export default async function NosotrosPage({
             />
           </div>
           <div className="relative z-10 mx-auto max-w-3xl">
-            <div className="w-fit">
+            {/* Centrado, `text-h2` y filete azul: lo mismo que "Nuestro
+                propósito" (regla del 06/10). */}
+            <div className="mx-auto w-fit text-center">
               <RevealItem y={0} duration={1} id="nos-enfoque-title">
-                <h2 className="font-display text-headline-md font-bold text-[#05125a] md:text-headline-lg">
+                <h2 className="font-display text-h2 font-bold text-[#05125a]">
                   {t("enfoque.title")}
                 </h2>
               </RevealItem>
-              {/* Oro oscuro, igual que en "Nuestro propósito": sobre este fondo
-                  el `#f9d78f` de las franjas crema da 1,20:1 y no se ve. */}
-              <TitleRule tone="goldDeep" grow className="mt-3 mb-6" />
+              <TitleRule tone="blue" align="center" grow className="mt-3 mb-6" />
             </div>
             {/* Simplificado a pedido de la organización (23/09): en vez de
                 volver a explicar las metodologías, explica PARA QUIÉN es este
                 trabajo. La frase itálica que cerraba esta pantalla se movió
                 después de "Nuestro propósito" (item 5 del doc de
                 correcciones), donde ahora vive sola con jerarquía Nivel 1. */}
-            <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-left">
+            {/* Resaltados de Sofía (06/10): "liberar estructuras", "expandir
+                sus capacidades" y "capas más profundas de conocimiento", en
+                negrita y sin cambiar de tipografía — el mismo tratamiento que
+                los de "Nuestro propósito". */}
+            <div className="space-y-6 text-body-md leading-relaxed text-[#05125a] text-left [&_strong]:font-bold [&_strong]:text-[#05125a]">
               <RevealItem y={14} duration={0.8} delay={0.15}>
-              <p>{t("enfoque.p1")}</p>
+              <p>
+                {t.rich("enfoque.p1", {
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
+              </p>
               </RevealItem>
               <RevealItem y={14} duration={0.8} delay={0.3}>
-              <p>{t("enfoque.p2")}</p>
+              <p>
+                {t.rich("enfoque.p2", {
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
+              </p>
               </RevealItem>
             </div>
           </div>
+          {/* **Una pantalla entera también en mobile** (Sofía, 06/10): el alto
+              es el de la pantalla MENOS el navbar, que es lo que se ve con la
+              sección arriba de todo, y el padding pasa a ser parejo para que el
+              texto quede centrado en ese alto. */}
           {/* **Sin indicador "Estela"** (pedido de Ignacio, 16/09): la frase
               en italica cierra la pantalla y no lleva nada abajo. `#estela`
               sigue siendo el destino del desplegable de "Nosotros" del navbar;
               lo que se saca es el atajo, no el ancla.
 
-              El `pb-[88px]` de mobile se queda, pero **ya no es el hueco del
-              indicador sino el del boton flotante "Volver arriba"**, que es
-              `fixed` y cae justo sobre la esquina derecha del cierre en
-              italica. Medido a 390x844 con la seccion apoyada en el pie de la
-              pantalla: con los 35px del mockup el boton le tapa 47px a la
-              ultima linea, con 88px quedan 6px de aire. El boton se saco del
-              sitio el 01/10 (pedido de Ignacio); el padding se deja como
-              estaba para no mover la pantalla. */}
+              El `pb-[88px]` que le dejaba lugar al boton flotante "Volver
+              arriba" se fue el 06/10: el boton ya no existe desde el 01/10. */}
         </Reveal>
 
         {/* Pantalla 6 — "Estela, founder", la ultima de contenido. Copy de la
@@ -394,18 +391,20 @@ export default async function NosotrosPage({
           className="relative flex w-full flex-col items-center justify-center bg-[linear-gradient(135deg,#05125a,#0079b3)] px-margin-mobile pt-[35px] pb-[76px] text-[#d0c5b4] md:min-h-[100svh] md:px-margin-desktop md:pt-[100px] md:pb-[100px]"
         >
           <div className="mx-auto max-w-3xl">
-            <div className="w-fit">
+            {/* Título centrado y en `text-h2` (Sofía, 06/10: "Estela founder
+                centrado, todos los títulos centrados es regla"). */}
+            <div className="mx-auto w-fit text-center">
               <RevealItem y={0} duration={1} id="nos-estela-title">
                 {/* Dorado, no el blanco cálido por defecto — coherencia con el
                     resto de las secciones de fondo azul (pedido de Ignacio,
                     20/09): "Nuestro propósito" de la home usa este mismo
                     tratamiento, título en `primary-container` y cuerpo en el
                     tostado `#d0c5b4`. */}
-                <h2 className="font-display text-headline-md font-bold text-primary-container md:text-headline-lg">
+                <h2 className="font-display text-h2 font-bold text-primary-container">
                   {t("estela.title")}
                 </h2>
               </RevealItem>
-              <TitleRule grow className="mt-3 mb-6" />
+              <TitleRule align="center" grow className="mt-3 mb-6" />
             </div>
             <div className="space-y-6 text-body-md leading-relaxed text-left">
               <RevealItem y={14} duration={0.8} delay={0.15}>

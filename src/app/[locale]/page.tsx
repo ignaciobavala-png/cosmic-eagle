@@ -146,11 +146,11 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </div>
         </Reveal>
 
-        {/* El texto y las cuatro frases son los de la entrega del 04/09, que es
-            la version definitiva de esta pantalla. Las frases resaltadas son
-            FRASES y no palabras sueltas ("potencial evolutivo", no
-            "potencial"): cada una viaja entera al centro, y sueltas no
-            significan nada en la lista final. */}
+        {/* Tres momentos (Sofía, 06/10): los párrafos, sólo las frases clave
+            en su lugar, y los párrafos de vuelta juntos con el botón. Las
+            frases resaltadas son FRASES y no palabras sueltas ("potencial
+            evolutivo", no "potencial"): en el segundo momento quedan solas en
+            pantalla y sueltas no significarían nada. */}
         <ScrollStory
           id="relato"
           paragraphs={t.raw("relato.paragraphs") as string[]}
@@ -206,8 +206,12 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           id="proposito"
           amount={0.3}
           stagger={0}
-          className="relative flex min-h-[100svh] w-full flex-col items-center justify-center bg-[linear-gradient(180deg,#0a1660_0%,#05125a_55%,#030b38_100%)] px-6 pb-[90px] pt-[100px] text-center md:pb-[120px] md:pt-[140px]"
+          className="relative flex min-h-[100svh] w-full flex-col items-center justify-center bg-[linear-gradient(180deg,#0a1660_0%,#05125a_55%,#030b38_100%)] px-6 pb-[150px] pt-[48px] text-center md:pb-[120px] md:pt-[140px]"
         >
+          {/* Mobile (Sofía, 06/10): el bloque sube —el `justify-center` lo
+              centraba en la pantalla y quedaba bajo— cargando el padding abajo
+              en vez de arriba, y el cuerpo crece a 18px para que llene mejor el
+              ancho del teléfono. */}
           {/* Umbral 0.3. El titulo y la linea van juntos en 1.6s; la linea
               crece de 0 a 70px en ese mismo tiempo (en la home SI crece, en
               /viajes es estatica). El cuerpo todavia entra como un bloque: el
@@ -217,7 +221,10 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             <RevealItem y={30} duration={1.6}>
               {/* `text-h2`: mismo tamaño que tenía en duro (34px/56px),
                   ahora nombrado en el token de globals.css. */}
-              <h2 className="font-display text-h2 font-bold tracking-[0.5px] text-primary-container">
+              {/* "PROPÓSITO" a secas y en mayúscula (Sofía, 06/10): el
+                  párrafo de abajo arranca con "Nuestro propósito es...", y el
+                  título lo repetía. */}
+              <h2 className="font-display text-h2 font-bold uppercase tracking-[0.5px] text-primary-container">
                 {t("purpose.title")}
               </h2>
             </RevealItem>
@@ -240,7 +247,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                 más. Antes se resaltaba la frase entera "impulsar la
                 evolución... expandir su conciencia", que era mucho más que
                 lo que pidió. */}
-            <p className="mx-auto mt-[30px] max-w-[640px] text-[16px] leading-[1.8] tracking-[0.3px] text-[#d0c5b4] md:mt-[50px] md:text-[20px] md:leading-[1.9]">
+            <p className="mx-auto mt-[30px] max-w-[640px] text-[18px] leading-[1.75] tracking-[0.3px] text-[#d0c5b4] md:mt-[50px] md:text-[20px] md:leading-[1.9]">
               {t.rich("purpose.body", {
                 gold: (chunks) => (
                   <span className="text-primary-container">{chunks}</span>
@@ -307,27 +314,21 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           reveal={{ amount: 0.25, stagger: 0 }}
         >
           <div className="mx-auto flex w-full max-w-narrative flex-col items-center gap-12 md:flex-row md:gap-16">
-            <div className="w-full md:flex-1">
-              {/* El `w-fit` envuelve al titulo Y al filete: es lo que hace
-                  que el filete mida el renglon mas largo del titulo —que aca
-                  esta partido a mano con `<br>`— y no el ancho de la columna.
-                  Envolver solo al filete no sirve: `w-full` dentro de `w-fit`
-                  no tiene de donde sacar el ancho. */}
-              <div className="w-fit">
-                <RevealItem duration={0.8}>
-                  {/* El quiebre en dos renglones es fijo, no un wrap por ancho:
-                      es decisión de diseño de la v2 del fix. */}
-                  {/* `text-h3`: Sofia aclaró (24/09) que este título NO puede
-                      ser el mismo nivel que "Nuestro propósito" ("no es
-                      simétrico"), así que queda un escalón debajo en el
-                      sistema h1/h2/h3 en vez de igualar su tamaño. */}
-                  <h2 className="mb-3.5 font-display text-h3 font-bold text-[#05125a] md:mb-3">
-                    {t("contenidos.title")}
-                  </h2>
-                </RevealItem>
-                {/* Oro oscuro y no el claro: sobre el fondo dorado el filete
-                    claro da 1,00:1 y no se ve. */}
-                <TitleRule tone="goldDark" grow className="mb-5 md:mb-6" />
+            {/* El mismo formato que "Propósito" (Sofía, 06/10): título en
+                mayúscula al tamaño `text-h2` —todos los títulos iguales y
+                centrados, regla del 06/10, que reemplaza la del 24/09 que lo
+                dejaba un escalón abajo—, filete centrado de ancho fijo y cuerpo
+                centrado. El filete va AZUL como el título: la regla es que el
+                filete toma el color del texto (antes era oro oscuro, que sobre
+                el fondo dorado se leía como una raya amarilla). */}
+            <div className="w-full text-center md:flex-1">
+              <RevealItem duration={0.8}>
+                <h2 className="font-display text-h2 font-bold uppercase tracking-[0.5px] text-[#05125a]">
+                  {t("contenidos.title")}
+                </h2>
+              </RevealItem>
+              <div className="mx-auto mt-4 mb-[30px] w-[120px] md:mt-5 md:mb-[50px] md:w-[160px]">
+                <TitleRule tone="blue" align="center" grow />
               </div>
               {/* El cuerpo va AZUL, no negro. Hasta el 11/09 era negro puro en
                   mobile y gris #333 en escritorio, que era spec explícita de
@@ -341,7 +342,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               {/* Subido junto con el título (24/09): "que todas las letras
                   sean relativamente un poquito más grandes para que quede
                   compensado con que el slide ahora es más alto". */}
-              <div className="space-y-5 text-[clamp(15px,4vw,17px)] leading-[1.8] text-[#05125a] md:max-w-[480px] md:space-y-6 md:text-[18px]">
+              <div className="space-y-5 text-[18px] leading-[1.75] text-[#05125a] md:mx-auto md:max-w-[480px] md:space-y-6 md:text-[18px]">
                 <RevealItem duration={0.8} delay={0.15}>
                   <p>{t("contenidos.body")}</p>
                 </RevealItem>
@@ -445,7 +446,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <div className="mx-auto w-full max-w-3xl">
             <Reveal amount={0.3} stagger={0} className="text-center">
               <RevealItem y={30} duration={1.2}>
-                <h2 className="font-display text-h3 font-bold text-primary-container">
+                <h2 className="font-display text-h2 font-bold text-primary-container">
                   {t("faqs.title")}
                 </h2>
               </RevealItem>

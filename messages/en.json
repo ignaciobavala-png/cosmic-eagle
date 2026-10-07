@@ -5,7 +5,7 @@
   "Header": {
     "nav": {
       "nosotros": "About us",
-      "experiencias": "Sessions & Retreats",
+      "experiencias": "Experiences",
       "contenidos": "Content",
       "miCuenta": "My Account"
     },
@@ -42,7 +42,7 @@
     },
     "links": {
       "nosotros": "About us",
-      "experiencias": "Sessions & Retreats",
+      "experiencias": "Experiences",
       "contenidos": "Content",
       "preguntasFrecuentes": "Frequently asked questions",
       "privacidad": "Privacy",
@@ -121,12 +121,12 @@
       "p1": "Our purpose is to <strong>fuel human evolution</strong>, creating spaces that allow each person to transform their reality, expand their consciousness, and deepen the connection with their soul.",
       "p2": "We accompany people at different stages of this path: from those beginning a process of deep <strong>transformation</strong>, to healers, guides, and experienced practitioners entering new stages of <strong>evolution</strong>, development, and service."
     },
-    "quote": "Our role is not to define what someone should experience or become, but to create the conditions for their own process to unfold.",
+    "quote": "Our role is not to define what someone should experience or become, but to create the conditions for their own process to unfold",
     "videoAlt": "A lit ceremony circle",
     "enfoque": {
       "title": "Our approach",
-      "p1": "This work is for people willing to go through deep processes of transformation and to release the structures that limit their evolution; for healers and practitioners seeking to open themselves to new forms of knowledge; for leaders who want to expand their capacities; and for those seeking greater clarity about the purpose and direction of their life.",
-      "p2": "For those already immersed in an evolutionary process, it also offers the possibility of accessing deeper layers of knowledge about consciousness, the soul, and human evolution."
+      "p1": "This work is for people willing to go through deep processes of transformation and to <strong>release the structures</strong> that limit their evolution; for healers and practitioners seeking to open themselves to new forms of knowledge; for leaders who want to <strong>expand their capacities</strong>; and for those seeking greater clarity about the purpose and direction of their life.",
+      "p2": "For those already immersed in an evolutionary process, it also offers the possibility of accessing <strong>deeper layers of knowledge</strong> about consciousness, the soul, and human evolution."
     },
     "estela": {
       "title": "Estela, founder",
@@ -137,8 +137,8 @@
     },
     "cierreAlt": "Cosmic texture",
     "actions": {
-      "explorar": "Explore experiences",
-      "profundizar": "Go deeper"
+      "explorar": "Experiences",
+      "profundizar": "Content"
     }
   },
   "GateModal": {
@@ -170,7 +170,7 @@
       "invalid": "The link is not valid. Try requesting a new one.",
       "passwordChanged": "Done, your password has been updated."
     },
-    "titleLogin": "Welcome back",
+    "titleLogin": "Welcome",
     "titleSignup": "Welcome",
     "myAccount": "My Account",
     "logout": "Log out",
@@ -476,7 +476,7 @@
   "Home": {
     "heroAlt": "A figure made of particles gazing into the cosmos",
     "purpose": {
-      "title": "Our purpose",
+      "title": "Purpose",
       "body": "Our purpose is to fuel human <gold>evolution</gold>, creating spaces that allow each person to <gold>transform</gold> their reality, expand their <gold>consciousness</gold>, and deepen the connection with their <gold>soul</gold>.",
       "cta": "Go deeper"
     },
@@ -505,9 +505,9 @@
     "faqs": {
       "title": "Curious about the journey?",
       "intro": "Here are a few things you may want to know before exploring further.",
-      "more": "Explore further →"
+      "more": "Explore further"
     },
     "cierreAlt": "Sunrise over the horizon",
-    "cierre": "When the soul is ready,<br></br>the path appears."
+    "cierre": "When the soul is ready,<br></br>the path appears"
   }
 }

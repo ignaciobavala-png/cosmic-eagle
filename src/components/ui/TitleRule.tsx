@@ -43,6 +43,16 @@ const TONE = {
     center:
       "bg-[linear-gradient(to_right,transparent_0%,#755c21_50%,transparent_100%)]",
   },
+  /**
+   * `#05125a`, el azul del cuerpo. **Regla de Sofía (06/10): el filete va del
+   * color del texto del título.** Sobre dorado el título es azul, así que el
+   * filete también — los tres oros de arriba quedan para títulos en oro.
+   */
+  blue: {
+    left: "bg-[linear-gradient(to_right,#05125a_0%,#05125a_55%,transparent_100%)]",
+    center:
+      "bg-[linear-gradient(to_right,transparent_0%,#05125a_50%,transparent_100%)]",
+  },
 } as const;
 
 export function TitleRule({

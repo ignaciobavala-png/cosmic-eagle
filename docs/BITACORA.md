@@ -3114,3 +3114,63 @@ los tres salen en `rgb(249, 215, 143)`.
 
 Queda en `#d0c5b4` el párrafo de "Nuestro propósito" de la home (`page.tsx`
 ~243), que el pedido no menciona.
+
+## 2026-10-07 — Reunión con Sofía del 06/10: versión mobile
+
+Notas de Ignacio en `docs/entregas/2026-10-06-reunion-sofia-mobile/notas.md`,
+con sus dos aclaraciones del 07/10.
+
+**Dos reglas nuevas, para todo el sitio:**
+
+- **El filete toma el color del texto del título.** `TitleRule` suma el tono
+  `blue` (`#05125a`) y pasa a usarse bajo todo título azul: Contenidos de la
+  home, Propósito y Enfoque de /nosotros, /faqs, el detalle de viaje y las
+  legales. Antes era oro oscuro, que sobre el dorado se leía como raya amarilla.
+- **Todos los títulos centrados y del mismo tamaño** (`text-h2`). Cae la regla
+  del 24/09 que dejaba Contenidos un escalón abajo de Propósito ("no es
+  simétrico").
+
+**Home.**
+
+- **El relato pasa a tres momentos** (`ScrollStory`, `300vh` en vez de
+  `400vh`): los tres párrafos juntos → el blanco se apaga de una y quedan las
+  frases clave en su lugar → los párrafos vuelven juntos y entra el botón. Se
+  fueron los párrafos de a uno, el apagado por tramos, el viaje de las palabras
+  al centro y el degradé de la lista (con la medición en vivo de offsets que lo
+  sostenía). "Párrafo unificado", aclaró Ignacio, es "aparecen juntos, no van
+  apareciendo".
+- **"PROPÓSITO"** a secas y en mayúscula: el párrafo arranca con "Nuestro
+  propósito es...". En mobile sube (el padding se carga abajo) y el cuerpo pasa
+  a 18px. **Contenidos copia ese formato**: centrado, mayúscula, `text-h2`,
+  filete centrado de ancho fijo y azul.
+- Divisorias de las FAQs = el filete fino del sitio (1px con las puntas
+  desvanecidas, del color del texto), en las dos variantes de `FaqList`.
+- Sin flecha en "Explorar más" y sin punto en "Cuando el alma está lista".
+
+**Navegación**: "Sesiones y Retiros" → "Experiencias" (navbar y footer, también
+en inglés). ES/EN más grande y más junto, sólo en el drawer (`large`).
+
+**Login**: el título dice "Bienvenido". **El mail se perdía con la contraseña
+mal** porque React 19 vacía el formulario después de cada action, también con
+error: ahora el mail va controlado (medido: queda el mail, se vacía la clave).
+Después de entrar el viajero va a `/` y no a `/cuenta`; el admin sigue a
+`/admin` y un `next` se respeta. El registro no cambió.
+
+**/nosotros.**
+
+- "Nuestro rol no es definir..." deja su franja dorada y va **sobre la imagen
+  que seguía**, sin punto final. Esa imagen iba sin texto (el toggle
+  `nosotros.proposito.overlay` estaba en `false`): la frase va fija, y
+  `nosotros.frase` y su toggle salen del panel (las filas quedan en la base).
+- "Nuestro enfoque" ocupa una pantalla también en mobile
+  (`100svh - navbar`), con "liberar estructuras", "expandir sus capacidades" y
+  "capas más profundas de conocimiento" en negrita.
+- Propósito, Enfoque y "Estela, founder" centrados y en `text-h2`.
+- El cierre "Un viaje hacia el Humano de Luz" pierde la mayúscula y la negrita:
+  va como las otras frases sobre imagen (`text-h2`, oro, recta). Los botones
+  dicen "Experiencias" y "Contenidos".
+
+Verificado con capturas a 390x844 y 1440x900 contra `next start`.
+
+Quedó afuera: el Propósito de /nosotros sigue titulado "Nuestro propósito"
+aunque el párrafo arranca igual (el pedido fue sobre la home).
