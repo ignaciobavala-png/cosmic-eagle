@@ -163,7 +163,7 @@ export default async function NosotrosPage({
                 propósito es..." (07/10). */}
             <div className="mx-auto w-fit text-center">
               <RevealItem y={0} duration={1} id="nos-proposito-title">
-                <h2 className="font-display text-h2 font-bold uppercase text-[#05125a]">
+                <h2 className="font-display text-h2 font-bold text-[#05125a]">
                   {t("purpose.title")}
                 </h2>
               </RevealItem>
