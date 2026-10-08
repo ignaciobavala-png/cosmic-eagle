@@ -185,7 +185,9 @@ function ExperienceCard({ trip }: { trip: TripCardData }) {
             el cierre de la inscripción, los correos, el detalle); sólo no se
             muestra en la tarjeta. */}
 
-        <div className="mt-auto pt-6">
+        {/* El botón va centrado en la tarjeta (pedido de la organización,
+            08/10); los tags y el título siguen alineados a la izquierda. */}
+        <div className="mt-auto flex justify-center pt-6">
           {/* TODO: copy pendiente — el documento pide "un botón directo para
               ver la experiencia y/o inscribirse" sin dar el texto exacto.
               "Ver experiencia" es un placeholder hasta que la organización lo
