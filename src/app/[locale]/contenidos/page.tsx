@@ -123,6 +123,8 @@ export default async function ContenidosPage({
           overlay={isEnabled(content("contenidos.hero.overlay"))}
           hardEdge
           titleClassName="text-primary-fixed-dim"
+          titleRule="gold"
+          raised
         />
 
         {/* La biblioteca vive sobre la banda dorada. **El envoltorio NO lleva

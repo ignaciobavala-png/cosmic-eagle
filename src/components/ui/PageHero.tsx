@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import { BackgroundMedia } from "./BackgroundMedia";
 import { CtaLink } from "./CtaLink";
+import { TitleRule } from "./TitleRule";
 
 type Action = { label: string; href: string };
 
@@ -24,6 +25,8 @@ export function PageHero({
   fadeTo,
   hardEdge = false,
   titleClassName = "text-primary",
+  titleRule,
+  raised = false,
 }: {
   image: string;
   imageAlt?: string;
@@ -98,6 +101,18 @@ export function PageHero({
    * el orden de la hoja, no el de las clases.
    */
   titleClassName?: string;
+  /**
+   * El filete bajo el titulo, como el de los titulos de seccion. Se pasa el
+   * tono del color del titulo (regla de Sofia del 06/10). Lo pidio la
+   * organizacion para /contenidos el 08/10.
+   */
+  titleRule?: "gold" | "goldDark" | "goldDeep" | "blue";
+  /**
+   * Sube el bloque de texto por encima del centro geometrico. Con un parrafo
+   * largo, centrado exacto queda bajo a la vista y casi tocando el indicador
+   * de scroll del pie (pedido de la organizacion para /contenidos, 08/10).
+   */
+  raised?: boolean;
 }) {
   const full = height === "full";
   return (
@@ -172,13 +187,24 @@ export function PageHero({
         />
       )}
 
-      <div className="relative z-10 flex h-full flex-col items-center justify-center px-margin-mobile md:px-margin-desktop text-center">
+      <div className={`relative z-10 flex h-full flex-col items-center justify-center px-margin-mobile md:px-margin-desktop text-center ${raised ? "pb-24 md:pb-28" : ""}`}>
         {overlay && (
           <>
             {eyebrow && <div className="mb-5">{eyebrow}</div>}
-            <h1 className={`font-display text-display-mobile md:text-display-lg ${titleClassName} text-shadow-glow max-w-3xl text-balance`}>
-              {title}
-            </h1>
+            {/* Con filete, el `h1` va envuelto en un `w-fit`: el filete es
+                `w-full` y mide lo que mide el titulo. */}
+            {titleRule ? (
+              <div className="w-fit max-w-3xl">
+                <h1 className={`font-display text-display-mobile md:text-display-lg ${titleClassName} text-shadow-glow text-balance`}>
+                  {title}
+                </h1>
+                <TitleRule tone={titleRule} align="center" className="mt-3" />
+              </div>
+            ) : (
+              <h1 className={`font-display text-display-mobile md:text-display-lg ${titleClassName} text-shadow-glow max-w-3xl text-balance`}>
+                {title}
+              </h1>
+            )}
             {subtitle && (
               <p className="mt-5 max-w-xl text-body-md md:text-body-lg text-primary-fixed-dim">
                 {subtitle}
