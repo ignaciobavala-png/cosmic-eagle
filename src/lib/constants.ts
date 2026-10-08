@@ -190,17 +190,13 @@ export const NAV_LINKS: NavLink[] = [
     // SESIONES · RETIROS que lee `?tipo=` (mismo criterio que `?categoria=`
     // en Contenidos, ver `ExperienceFilter`). Los rotulos son Sesiones y
     // Viajes desde la entrega del 02/09, que cerro esa pregunta.
-    // "Calendario" es el unico hijo que NO es un ancla de /viajes: es una
-    // pagina propia con las dos carteleras abiertas, para quien entra a ver
-    // cual es la proxima fecha y no a leer el relato de cada tipo de
-    // experiencia (pedido de Ignacio, 17/09). Va ultimo a proposito: primero
-    // el indice de la pagina, despues el atajo que se va del sitio narrativo.
+    // Hubo un tercer hijo, "Calendario" (/calendario, 17/09), que se saco
+    // junto con la pagina a pedido de la organizacion (08/10).
     children: [
       ...TRIP_TYPES.map((t) => ({
         labelKey: `tipo.${t.value}`,
         href: `/viajes?tipo=${t.value}#cartelera`,
       })),
-      { labelKey: "experiencias.calendario", href: "/calendario" },
     ],
     childrenRequireAuth: true,
   },

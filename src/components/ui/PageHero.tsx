@@ -48,11 +48,8 @@ export function PageHero({
   /**
    * `banner` es el hero historico (82% del alto, con el pie desvanecido sobre
    * el fondo de la pagina). `compact` es el mismo banner a poco menos de media
-   * pantalla: existe para /calendario, donde el hero no puede empujar las
-   * fechas debajo del pliegue —la pagina existe justamente para llegar rapido a
-   * la proxima fecha— pero tampoco queremos una pagina sin portada, sola
-   * dentro del sitio. Si alguna vez se unifica con `banner`, se cambia ahi y
-   * listo: nadie mas lo usa. `full` es el del rediseño de Julia: ocupa la
+   * pantalla: lo usaba /calendario (que se saco el 08/10) y hoy no lo usa
+   * nadie. `full` es el del rediseño de Julia: ocupa la
    * pantalla VISIBLE (una pantalla menos el navbar) y corta seco, porque debajo
    * arranca una seccion opaca con su propio fondo y no hay degrade del `body`
    * que dejar ver. Sin `min-h`: un piso en `rem` volveria a empujar el

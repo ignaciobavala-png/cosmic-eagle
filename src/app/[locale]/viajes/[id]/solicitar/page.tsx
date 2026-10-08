@@ -262,7 +262,7 @@ export default async function SolicitarPage({
             <div className={`p-6 md:p-8 ${panel}`}>
               <h2 className={`mb-2 ${panelTitle}`}>{cierre.title}</h2>
               <p className={panelBody}>{cierre.body}</p>
-              <Link href="/calendario" className={`mt-6 ${pillButton}`}>
+              <Link href="/viajes#cartelera" className={`mt-6 ${pillButton}`}>
                 Ver las fechas abiertas
               </Link>
             </div>
