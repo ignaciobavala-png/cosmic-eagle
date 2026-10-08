@@ -111,9 +111,10 @@ export function Footer() {
           fue el `justify-between` y el `md:text-left`: eran para repartir dos
           bloques a los extremos, y con uno solo dejaban el copyright pegado a
           la izquierda en escritorio. Ahora la linea va centrada en los dos
-          anchos. */}
+          anchos. Va en la serif de la marca, como los titulos de las columnas
+          (pedido del 08/10): en Montserrat se leia como texto de sistema. */}
       <div className="mx-auto mt-14 flex max-w-narrative flex-col items-center justify-center gap-4 border-t border-primary-fixed-dim/8 pt-6 text-center">
-        <p className="text-label-sm uppercase text-on-surface-variant/70">
+        <p className="font-display text-[14px] uppercase leading-5 tracking-[0.12em] text-on-surface-variant/80">
           {t("copyright")}
         </p>
       </div>

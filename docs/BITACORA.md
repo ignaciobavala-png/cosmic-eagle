@@ -3238,3 +3238,6 @@ sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
   (Sesión/Retiro) era blanca sobre dorado y pasa al azul `#05125a`, como el
   botón; la del estado sobre la foto pasa al oro claro `#f9d78f`, como el
   candado de la biblioteca. Medido en el browser: ningún texto blanco en las 7.
+- **El copyright del footer pasa a la serif de la marca** (Sorts Mill Goudy,
+  14px, versalitas con tracking), como los títulos de las columnas: en
+  Montserrat 12px se leía como texto de sistema.
