@@ -3234,3 +3234,7 @@ sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
   son del sitio y quedan editables en `/admin/multimedia`
   (`contenidos.tema.<valor>.image`, recorte 4:5 igual en todas las pantallas).
   La ficha `/contenidos/[slug]` conserva su menú de píldoras (`LibraryNav`).
+- **Sin letra blanca en las tarjetas de la cartelera**: la etiqueta del tipo
+  (Sesión/Retiro) era blanca sobre dorado y pasa al azul `#05125a`, como el
+  botón; la del estado sobre la foto pasa al oro claro `#f9d78f`, como el
+  candado de la biblioteca. Medido en el browser: ningún texto blanco en las 7.

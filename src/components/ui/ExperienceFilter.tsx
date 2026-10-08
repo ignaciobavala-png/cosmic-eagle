@@ -151,11 +151,14 @@ function ExperienceCard({ trip }: { trip: TripCardData }) {
       ? tTrip(`status.${STATUS_KEY[trip.status]}`)
       : undefined;
 
+  // Sin letra blanca adentro de la tarjeta (pedido de la organización, 08/10):
+  // el estado sobre la foto va en el oro claro, como el candado de la
+  // biblioteca, y el tipo en azul sobre el dorado, como el botón.
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-[16px] bg-[#fff6eb] shadow-[0_8px_24px_rgba(0,0,0,0.15)] transition-[transform,box-shadow] duration-300 hover:-translate-y-2 hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)]">
       <TripCover tripId={trip.id} imageUrl={trip.image_url} variant="strip">
         {status && (
-          <span className="absolute right-3 top-3 rounded-full bg-[#05125a]/80 px-3 py-1 text-label-sm uppercase text-white backdrop-blur-md">
+          <span className="absolute right-3 top-3 rounded-full bg-[#05125a]/85 px-3 py-1 text-label-sm uppercase text-[#f9d78f] backdrop-blur-md">
             {status}
           </span>
         )}
@@ -164,7 +167,7 @@ function ExperienceCard({ trip }: { trip: TripCardData }) {
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-4 flex flex-wrap gap-2.5">
           {tipo && (
-            <span className="rounded-full bg-[linear-gradient(135deg,#f9d78f,#b3964b)] whitespace-nowrap px-3.5 py-1.5 font-body text-[10.5px] font-semibold uppercase tracking-[0.08em] text-white">
+            <span className="rounded-full bg-[linear-gradient(135deg,#f9d78f,#b3964b)] whitespace-nowrap px-3.5 py-1.5 font-body text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#05125a]">
               {tipo}
             </span>
           )}
