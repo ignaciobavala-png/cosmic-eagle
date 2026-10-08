@@ -1,9 +1,9 @@
 import { ChevronDown } from "lucide-react";
 import { BackgroundMedia } from "./BackgroundMedia";
-import { CtaLink } from "./CtaLink";
+import { CtaLink, type CtaTone } from "./CtaLink";
 import { TitleRule } from "./TitleRule";
 
-type Action = { label: string; href: string };
+type Action = { label: string; href: string; tone?: CtaTone };
 
 /**
  * P1 — Hero de pagina. Banner full-bleed, titulo serif centrado, subtitulo,
@@ -17,6 +17,7 @@ export function PageHero({
   title,
   subtitle,
   actions = [],
+  subtitleStyle = "body",
   scrollHint,
   scrollTo,
   priority = true,
@@ -37,6 +38,13 @@ export function PageHero({
   eyebrow?: React.ReactNode;
   title: React.ReactNode;
   subtitle?: string;
+  /**
+   * `display` pone la bajada en la misma letra y el mismo cuerpo que el
+   * titulo. La usa el detalle de una experiencia para el lugar (pedido de la
+   * organizacion, 08/10: "Tulum, Mexico igual que el titulo, en letra
+   * grande"). Por prop y no por `className`, por la trampa de siempre.
+   */
+  subtitleStyle?: "body" | "display";
   actions?: Action[];
   scrollHint?: string;
   scrollTo?: string;
@@ -206,16 +214,26 @@ export function PageHero({
               </h1>
             )}
             {subtitle && (
-              <p className="mt-5 max-w-xl text-body-md md:text-body-lg text-primary-fixed-dim">
+              <p
+                className={
+                  subtitleStyle === "display"
+                    ? `mt-2 max-w-3xl font-display text-display-mobile md:text-display-lg ${titleClassName} text-shadow-glow text-balance`
+                    : "mt-5 max-w-xl text-body-md md:text-body-lg text-primary-fixed-dim"
+                }
+              >
                 {subtitle}
               </p>
             )}
             {actions.length > 0 && (
-              <div className="mt-8 flex w-full max-w-sm flex-col items-stretch gap-3 sm:mt-9 sm:w-auto sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
+              // Los botones van a su ancho, también en mobile. Antes se estiraban
+              // a una barra de lado a lado, que no es el botón del sistema
+              // (pedido de la organización, 08/10).
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-9 sm:gap-4">
                 {actions.map((action) => (
                   <CtaLink
                     key={action.href + action.label}
                     href={action.href}
+                    tone={action.tone}
                   >
                     {action.label}
                   </CtaLink>

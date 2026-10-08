@@ -222,6 +222,7 @@ export default async function ViajePage({ params }: Props) {
           }
           title={trip.title}
           subtitle={trip.location ?? undefined}
+          subtitleStyle="display"
           scrollHint={t("hero.scrollHint")}
           scrollTo="detalle"
           actions={
@@ -234,6 +235,9 @@ export default async function ViajePage({ params }: Props) {
                     href: user
                       ? solicitarHref
                       : `/cuenta?next=${encodeURIComponent(solicitarHref)}`,
+                    // El dorado sólido de "Ver experiencia" en la tarjeta: es
+                    // el botón que se toca para llegar acá (08/10).
+                    tone: "goldSolid",
                   },
                 ]
               : []
