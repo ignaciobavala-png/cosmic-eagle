@@ -276,7 +276,7 @@ test("recorrido por el sitio, sección por sección", async ({ page }) => {
       "El índice de la biblioteca: una tarjeta por tema."
     );
 
-    // Se entra al primer tema que tiene contenidos (los vacíos no son links).
+    // Se entra al primer tema (el primero tiene contenidos).
     const tema = page.locator('a[href*="categoria="]').first();
     if (await tema.count()) {
       await tema.click();

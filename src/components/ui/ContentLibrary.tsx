@@ -99,11 +99,6 @@ export function ContentLibrary({
   );
   const openSlug = opened && opened.topic === active ? opened.slug : null;
 
-  const withContent = useMemo(
-    () => new Set(articles.map((article) => article.category)),
-    [articles]
-  );
-
   const inCategory = useMemo(
     () => articles.filter((article) => article.category === active),
     [articles, active]
@@ -179,7 +174,6 @@ export function ContentLibrary({
               >
                 <TopicCard
                   category={category}
-                  empty={!withContent.has(category.value)}
                   onChoose={goTo}
                 />
               </li>
@@ -319,38 +313,38 @@ export function ContentLibrary({
 
 /**
  * Una tarjeta del índice de temas: la foto a sangre, y abajo el nombre del
- * tema con su filete. Sin la cantidad de contenidos: nadie la pidió (08/10).
- * El velo azul de abajo es
- * para que el texto se lea sobre cualquier foto que suba la clienta; no es un
- * corte entre secciones.
+ * tema con su filete. Nada más (08/10): se probaron la cantidad de contenidos
+ * y un "Próximamente" en los temas vacíos, y la organización pidió sacar los
+ * dos. Un tema vacío se ve y se toca igual que los demás, y adentro dice que
+ * todavía no tiene contenidos. El velo azul de abajo es para que el texto se
+ * lea sobre cualquier foto que suba la clienta; no es un corte entre secciones.
  *
  * Es un `<a>` de verdad a `?categoria=` (se indexa, abre en pestaña nueva) y el
- * click simple se intercepta para entrar sin pedirle nada al servidor. **Un
- * tema sin contenidos dice "Próximamente" y no se puede tocar**: entrar para
- * leer "todavía no hay contenidos" se lee como un error (es lo que le pasó a
- * Sofía el 07/10 con dos temas vacíos).
+ * click simple se intercepta para entrar sin pedirle nada al servidor.
  */
 function TopicCard({
   category,
-  empty,
   onChoose,
 }: {
   category: LibraryCategory;
-  empty: boolean;
   onChoose: (value: string) => void;
 }) {
-  const t = useTranslations("Contenidos");
-
-  const content = (
-    <>
+  return (
+    <Link
+      href={`/contenidos?categoria=${category.value}`}
+      onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+        if (!isPlainClick(event)) return;
+        event.preventDefault();
+        onChoose(category.value);
+      }}
+      className="group relative block aspect-[4/5] overflow-hidden rounded-2xl border border-[#f9d78f]/70 bg-[#05125a] shadow-[0_18px_50px_-24px_rgba(5,18,90,0.6)] transition-[border-color,box-shadow] duration-300 hover:border-[#f9d78f] hover:shadow-[0_22px_60px_-22px_rgba(5,18,90,0.75)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#05125a]"
+    >
       <Image
         src={category.image}
         alt=""
         fill
         sizes="(min-width: 1024px) 20vw, 50vw"
-        className={`object-cover transition-transform duration-1000 ${
-          empty ? "opacity-60" : "group-hover:scale-105"
-        }`}
+        className="object-cover transition-transform duration-1000 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-[#05125a]/95 via-[#05125a]/35 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-center px-3 pb-4 text-center sm:px-4 sm:pb-6">
@@ -360,37 +354,7 @@ function TopicCard({
           </h3>
           <TitleRule tone="gold" align="center" className="mt-2" />
         </div>
-        {empty && (
-          <p className="mt-2 text-[11px] uppercase tracking-[0.14em] text-primary sm:text-label-sm">
-            {t("library.soon")}
-          </p>
-        )}
       </div>
-    </>
-  );
-
-  const frame =
-    "relative block aspect-[4/5] overflow-hidden rounded-2xl border border-[#f9d78f]/70 bg-[#05125a] shadow-[0_18px_50px_-24px_rgba(5,18,90,0.6)]";
-
-  if (empty) {
-    return (
-      <div aria-disabled="true" className={frame}>
-        {content}
-      </div>
-    );
-  }
-
-  return (
-    <Link
-      href={`/contenidos?categoria=${category.value}`}
-      onClick={(event: MouseEvent<HTMLAnchorElement>) => {
-        if (!isPlainClick(event)) return;
-        event.preventDefault();
-        onChoose(category.value);
-      }}
-      className={`group ${frame} transition-[border-color,box-shadow] duration-300 hover:border-[#f9d78f] hover:shadow-[0_22px_60px_-22px_rgba(5,18,90,0.75)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#05125a]`}
-    >
-      {content}
     </Link>
   );
 }

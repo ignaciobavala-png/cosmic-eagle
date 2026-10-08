@@ -3227,8 +3227,10 @@ sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
   (título con filete + sus textos + "← Todos los temas"). El tema vive en
   `?categoria=` con `pushState` y se lee con `useSearchParams`: el "atrás" del
   celular vuelve al índice y los links del navbar siguen cayendo en su tema.
-  Los temas vacíos dicen "Próximamente" y no se pueden tocar. **Sin cantidad
-  de contenidos** en la tarjeta: se probó y se sacó, nadie la pidió. Las fotos
+  **La tarjeta lleva sólo foto y nombre**: se probaron la cantidad de
+  contenidos y un "Próximamente" en los temas vacíos, y la organización pidió
+  sacar los dos. Un tema vacío se toca igual y adentro dice que no hay
+  contenidos todavía. Las fotos
   son del sitio y quedan editables en `/admin/multimedia`
   (`contenidos.tema.<valor>.image`, recorte 4:5 igual en todas las pantallas).
   La ficha `/contenidos/[slug]` conserva su menú de píldoras (`LibraryNav`).
