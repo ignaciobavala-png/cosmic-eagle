@@ -273,8 +273,15 @@ test("recorrido por el sitio, sección por sección", async ({ page }) => {
     await capturar(
       page,
       "La biblioteca",
-      "Los contenidos que carga la clienta desde el panel, filtrables por categoría. Hoy hay dos ensayos publicados."
+      "El índice de la biblioteca: una tarjeta por tema."
     );
+
+    // Se entra al primer tema que tiene contenidos (los vacíos no son links).
+    const tema = page.locator('a[href*="categoria="]').first();
+    if (await tema.count()) {
+      await tema.click();
+      await page.waitForTimeout(1000);
+    }
 
     const articulo = page.locator('a[href^="/contenidos/"]').first();
     if (await articulo.count()) {

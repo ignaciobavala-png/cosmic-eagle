@@ -1,33 +1,36 @@
 "use client";
 
-import { useMemo, useState, type MouseEvent } from "react";
+import { useMemo, useRef, useState, type MouseEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft, Lock } from "lucide-react";
 import { ArticleBody } from "./ArticleBody";
 import { ArticleAudio } from "./ArticleAudio";
 import { CtaLink } from "./CtaLink";
-import { CategoryMenu } from "./CategoryMenu";
+import { TitleRule } from "./TitleRule";
 import { formatArticleDate, type ArticleBlock } from "@/lib/article";
 import type { FormatLocale } from "@/lib/format";
 
 /**
  * La biblioteca de /contenidos como experiencia de un solo espacio.
  *
- * Pedido de la organización (23/09,
- * `docs/entregas/2026-09-23-feedback-org/CEJ_Correcciones_Contenidos.docx`):
- * los cinco temas funcionan como menú principal **fijo/sticky**; al elegir un
- * tema se muestran directamente sus textos; al abrir uno, su título y el inicio
- * del contenido van dentro de **un recuadro de lectura acotado con scroll
- * propio** (nunca el artículo entero como página gigante), y debajo aparecen
- * "otros contenidos disponibles". La navegación de los temas queda a la vista
- * todo el tiempo para no sentir que se salió de la biblioteca.
+ * **Se entra por un índice** (pedido de la organización, 08/10): cinco
+ * tarjetas con foto, una por tema, en lugar de la fila de píldoras que había
+ * desde el 23/09. Al tocar una se entra al tema —su título, sus textos y
+ * "← Todos los temas"—; al abrir un texto, su título y el inicio del contenido
+ * van dentro de **un recuadro de lectura acotado con scroll propio** (nunca el
+ * artículo entero como página gigante), y debajo aparecen "otros contenidos
+ * disponibles" (`docs/entregas/2026-09-23-feedback-org/CEJ_Correcciones_Contenidos.docx`).
  *
- * **Es un client component y el estado (tema + texto abierto) vive acá**: no hay
- * navegación entre rutas al cambiar de tema o al abrir un texto, que es lo que
- * rompería la sensación de biblioteca. La lista no se vuelve a pedir: filtra en
- * memoria sobre los artículos que ya trajo el Server Component.
+ * **El tema vive en la URL (`?categoria=`), no en un estado**: elegir uno hace
+ * `pushState` y `useSearchParams` lo devuelve (Next integra la History API
+ * nativa con su router). Así el "atrás" del celular vuelve al índice en vez de
+ * sacar de la página, refrescar o compartir el link cae en el mismo tema, y
+ * los links del navbar a cada tema siguen funcionando. Nada de eso pide al
+ * servidor: la lista filtra en memoria sobre los artículos que ya trajo el
+ * Server Component.
  *
  * **El cuerpo de un texto cerrado nunca llega hasta acá.** El servidor solo
  * manda `blocks` de lo que la RLS dejó leer; lo cerrado viaja con `blocks: null`
@@ -51,28 +54,55 @@ export type LibraryArticle = {
   audio_url: string | null;
 };
 
-export type LibraryCategory = { value: string; label: string };
+export type LibraryCategory = {
+  value: string;
+  label: string;
+  /** La foto de su tarjeta en el índice (slot `contenidos.tema.<value>.image`). */
+  image: string;
+};
+
+/** Click simple, sin modificadores: lo único que se intercepta. Ctrl/cmd/shift/click medio abren en pestaña nueva y eso es del browser (mismo criterio que `ExperienceGate`). */
+function isPlainClick(event: MouseEvent<HTMLAnchorElement>) {
+  return !(
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  );
+}
 
 export function ContentLibrary({
   categories,
   articles,
-  initialCategory,
 }: {
   categories: LibraryCategory[];
   articles: LibraryArticle[];
-  /** Viene de `?categoria=` para que los links del navbar caigan en el tema. */
-  initialCategory: string | null;
 }) {
   const t = useTranslations("Contenidos");
   const tCat = useTranslations("ArticleCategories");
   const locale = (useLocale() === "en" ? "en" : "es") as FormatLocale;
-  const firstCategory = categories[0]?.value ?? "";
-  const [active, setActive] = useState(
-    initialCategory && categories.some((c) => c.value === initialCategory)
-      ? initialCategory
-      : firstCategory
+  const searchParams = useSearchParams();
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Un `?categoria=` desconocido cae en el índice, no en un tema vacío.
+  const requested = searchParams.get("categoria");
+  const activeCategory =
+    categories.find((c) => c.value === requested) ?? null;
+  const active = activeCategory?.value ?? null;
+
+  // El texto abierto recuerda en qué tema se abrió: al cambiar de tema (o
+  // volver al índice, también con el "atrás" del browser) el lector se
+  // cierra solo, sin un efecto que lo resetee.
+  const [opened, setOpened] = useState<{ slug: string; topic: string } | null>(
+    null
   );
-  const [openSlug, setOpenSlug] = useState<string | null>(null);
+  const openSlug = opened && opened.topic === active ? opened.slug : null;
+
+  const withContent = useMemo(
+    () => new Set(articles.map((article) => article.category)),
+    [articles]
+  );
 
   const inCategory = useMemo(
     () => articles.filter((article) => article.category === active),
@@ -82,9 +112,6 @@ export function ContentLibrary({
   const openArticle = openSlug
     ? articles.find((article) => article.slug === openSlug) ?? null
     : null;
-
-  const activeLabel =
-    categories.find((c) => c.value === active)?.label ?? t("library.fallback");
 
   /**
    * "Otros contenidos": primero los del mismo tema, y si no alcanzan se
@@ -103,18 +130,22 @@ export function ContentLibrary({
     return [...same, ...rest].slice(0, 6);
   }, [articles, openArticle]);
 
-  function chooseCategory(value: string) {
-    setActive(value);
-    setOpenSlug(null);
-    // El tema queda en la URL sin navegar: refrescar o compartir el link cae en
-    // el mismo tema, y el `?categoria=` del navbar sigue funcionando.
+  /** Va al tema (o al índice con `null`) dejando una entrada en el historial. */
+  function goTo(value: string | null) {
     const url = new URL(window.location.href);
-    url.searchParams.set("categoria", value);
-    window.history.replaceState(null, "", url.toString());
+    if (value) url.searchParams.set("categoria", value);
+    else url.searchParams.delete("categoria");
+    window.history.pushState(null, "", url.toString());
+    // La vista nueva arranca donde arrancaba la anterior: sin esto, quien
+    // toca una tarjeta de abajo cae en la mitad de la lista del tema.
+    requestAnimationFrame(() => {
+      rootRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   function openText(slug: string) {
-    setOpenSlug(slug);
+    if (!active) return;
+    setOpened({ slug, topic: active });
     // El recuadro aparece debajo de la grilla; sin esto la persona que toca una
     // tarjeta del final no lo vería.
     requestAnimationFrame(() => {
@@ -125,47 +156,76 @@ export function ContentLibrary({
   }
 
   return (
-    <div>
-      {/* Menú fijo de los cinco temas. Es una barra de crema flotante
-          (`sticky`) debajo del navbar, no una franja a sangre: dentro de la
-          columna `max-w-narrative` un fondo de ancho completo no cubriría el
-          ancho real de la sección y dejaría costura contra el degradé dorado.
-          El envoltorio de la sección NO puede tener `overflow-hidden` o el
-          sticky no se pega. */}
-      <nav
-        aria-label={t("library.ariaNav")}
-        className="sticky top-[var(--navbar-h)] z-30 mx-auto w-full max-w-3xl py-3 md:rounded-2xl md:border md:border-[#b3964b]/40 md:bg-[#fff6eb]/95 md:px-4 md:shadow-[0_10px_30px_-16px_rgba(5,18,90,0.55)] md:backdrop-blur-sm"
-      >
-        <CategoryMenu
-          items={categories}
-          active={active}
-          onChoose={chooseCategory}
-        />
-      </nav>
-
-      <div className="mt-10">
-        {/* El tema activo ya no se repite como título visible ni como
-            etiqueta en cada tarjeta (correcciones del 03/10, §4.1: la misma
-            palabra salía tres veces en una pantalla). El menú ya lo dice; el
-            encabezado queda para los lectores de pantalla. */}
-        <h2 className="sr-only">{activeLabel}</h2>
-
-        {inCategory.length === 0 ? (
-          <p className="mx-auto max-w-md text-center text-body-md text-[#05125a]">
-            {t("library.empty")}
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {inCategory.map((article) => (
-              <LibraryCard
-                key={article.slug}
-                article={article}
-                onOpen={openText}
-              />
+    <div
+      ref={rootRef}
+      className="scroll-mt-[calc(var(--navbar-h)+2rem)]"
+    >
+      {!activeCategory ? (
+        <nav aria-label={t("library.ariaNav")}>
+          {/* El índice. En mobile dos columnas con la quinta centrada; en
+              escritorio, los cinco en una fila. La tarjeta tiene la misma
+              proporción en todas las pantallas: la foto la elige la clienta y
+              un recorte que cambia según el ancho deja al sujeto cortado en
+              una pantalla sí y en otra no. */}
+          <ul className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-5">
+            {categories.map((category, index) => (
+              <li
+                key={category.value}
+                className={
+                  index === categories.length - 1 && categories.length % 2 === 1
+                    ? "col-span-2 mx-auto w-[calc(50%-0.5rem)] sm:w-[calc(50%-0.75rem)] lg:col-span-1 lg:w-full"
+                    : undefined
+                }
+              >
+                <TopicCard
+                  category={category}
+                  empty={!withContent.has(category.value)}
+                  onChoose={goTo}
+                />
+              </li>
             ))}
+          </ul>
+        </nav>
+      ) : (
+        <div>
+          <button
+            type="button"
+            onClick={() => goTo(null)}
+            className="inline-flex items-center gap-2 text-label-sm uppercase text-[#05125a] transition-colors hover:text-on-primary-container"
+          >
+            <ArrowLeft size={15} aria-hidden="true" />
+            {t("library.allTopics")}
+          </button>
+
+          {/* El título del tema, como todos los títulos del sitio: centrado,
+              en text-h2 y con el filete del color del texto (regla de Sofía,
+              06/10). Sobre el dorado, azul. */}
+          <div className="mx-auto mt-6 w-fit max-w-3xl text-center">
+            <h2 className="font-display text-h2 text-[#05125a] text-balance">
+              {activeCategory.label}
+            </h2>
+            <TitleRule tone="blue" align="center" className="mt-3" />
           </div>
-        )}
-      </div>
+
+          <div className="mt-10">
+            {inCategory.length === 0 ? (
+              <p className="mx-auto max-w-md text-center text-body-md text-[#05125a]">
+                {t("library.empty")}
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {inCategory.map((article) => (
+                  <LibraryCard
+                    key={article.slug}
+                    article={article}
+                    onOpen={openText}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {openArticle && (
         <section
@@ -190,7 +250,7 @@ export function ContentLibrary({
               </div>
               <button
                 type="button"
-                onClick={() => setOpenSlug(null)}
+                onClick={() => setOpened(null)}
                 className="inline-flex shrink-0 items-center gap-2 text-label-sm uppercase text-on-primary-container transition-colors hover:text-[#05125a]"
               >
                 <ArrowLeft size={15} aria-hidden="true" />
@@ -258,6 +318,84 @@ export function ContentLibrary({
 }
 
 /**
+ * Una tarjeta del índice de temas: la foto a sangre, y abajo el nombre del
+ * tema con su filete. Sin la cantidad de contenidos: nadie la pidió (08/10).
+ * El velo azul de abajo es
+ * para que el texto se lea sobre cualquier foto que suba la clienta; no es un
+ * corte entre secciones.
+ *
+ * Es un `<a>` de verdad a `?categoria=` (se indexa, abre en pestaña nueva) y el
+ * click simple se intercepta para entrar sin pedirle nada al servidor. **Un
+ * tema sin contenidos dice "Próximamente" y no se puede tocar**: entrar para
+ * leer "todavía no hay contenidos" se lee como un error (es lo que le pasó a
+ * Sofía el 07/10 con dos temas vacíos).
+ */
+function TopicCard({
+  category,
+  empty,
+  onChoose,
+}: {
+  category: LibraryCategory;
+  empty: boolean;
+  onChoose: (value: string) => void;
+}) {
+  const t = useTranslations("Contenidos");
+
+  const content = (
+    <>
+      <Image
+        src={category.image}
+        alt=""
+        fill
+        sizes="(min-width: 1024px) 20vw, 50vw"
+        className={`object-cover transition-transform duration-1000 ${
+          empty ? "opacity-60" : "group-hover:scale-105"
+        }`}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#05125a]/95 via-[#05125a]/35 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center px-3 pb-4 text-center sm:px-4 sm:pb-6">
+        <div className="w-fit max-w-full">
+          <h3 className="font-display text-[19px] leading-[1.2] text-primary-container text-balance sm:text-headline-md">
+            {category.label}
+          </h3>
+          <TitleRule tone="gold" align="center" className="mt-2" />
+        </div>
+        {empty && (
+          <p className="mt-2 text-[11px] uppercase tracking-[0.14em] text-primary sm:text-label-sm">
+            {t("library.soon")}
+          </p>
+        )}
+      </div>
+    </>
+  );
+
+  const frame =
+    "relative block aspect-[4/5] overflow-hidden rounded-2xl border border-[#f9d78f]/70 bg-[#05125a] shadow-[0_18px_50px_-24px_rgba(5,18,90,0.6)]";
+
+  if (empty) {
+    return (
+      <div aria-disabled="true" className={frame}>
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      href={`/contenidos?categoria=${category.value}`}
+      onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+        if (!isPlainClick(event)) return;
+        event.preventDefault();
+        onChoose(category.value);
+      }}
+      className={`group ${frame} transition-[border-color,box-shadow] duration-300 hover:border-[#f9d78f] hover:shadow-[0_22px_60px_-22px_rgba(5,18,90,0.75)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#05125a]`}
+    >
+      {content}
+    </Link>
+  );
+}
+
+/**
  * Tarjeta de la grilla. Es un `<a>` de verdad —se indexa y abre en pestaña
  * nueva— y sólo se intercepta el click cuando el texto es legible, para
  * abrirlo dentro de la biblioteca. Un texto cerrado navega a su ficha, donde
@@ -276,17 +414,7 @@ function LibraryCard({
     <Link
       href={`/contenidos/${article.slug}`}
       onClick={(event: MouseEvent<HTMLAnchorElement>) => {
-        // Ctrl/cmd/shift/click medio abren en pestaña nueva: eso es del
-        // browser y no se intercepta (mismo criterio que `ExperienceGate`).
-        if (
-          event.button !== 0 ||
-          event.metaKey ||
-          event.ctrlKey ||
-          event.shiftKey ||
-          event.altKey
-        ) {
-          return;
-        }
+        if (!isPlainClick(event)) return;
         if (article.locked || !article.blocks) return;
         event.preventDefault();
         onOpen(article.slug);

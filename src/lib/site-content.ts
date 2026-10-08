@@ -53,6 +53,23 @@ export function isEnabled(value: string): boolean {
   return value !== "false";
 }
 
+/**
+ * El slot de la imagen de un tema de la biblioteca. Una función y no un `map`
+ * sobre una lista: así la key sale como literal (`contenidos.tema.salud.image`)
+ * y `SlotKey` no se ensancha a `string`.
+ */
+function topicSlot<V extends string>(value: V, label: string, fallback: string) {
+  return {
+    key: `contenidos.tema.${value}.image` as const,
+    label: `Tarjeta de tema: ${label}`,
+    help: "La imagen de la tarjeta de este tema en el índice de la biblioteca. El nombre del tema va abajo, sobre la imagen.",
+    type: "image" as const,
+    fallback,
+    ratio: "4/5",
+    maxPx: 1200,
+  };
+}
+
 export type SlotGroup = {
   id: string;
   title: string;
@@ -360,6 +377,14 @@ export const SITE_GROUPS = [
         type: "boolean",
         fallback: "true",
       },
+      // Las cinco tarjetas del índice de temas (pedido de la organización,
+      // 08/10). Arrancan con fotos del sitio; el recorte es el mismo en todas
+      // las pantallas para que el sujeto no quede cortado en una sí y en otra no.
+      topicSlot("preparacion", "Preparación & Integración", IMAGES.homePromesas),
+      topicSlot("salud", "Salud & Bienestar", IMAGES.portal2),
+      topicSlot("evolucion", "Evolución & Conciencia", IMAGES.portal3),
+      topicSlot("tecnologia", "Tecnología Humana", IMAGES.homeCierre),
+      topicSlot("testimonios", "Testimonios", IMAGES.nosotrosProposito),
     ],
   },
   {

@@ -12,7 +12,6 @@ import { localized } from "@/lib/localized";
 import { getSiteContent, isEnabled } from "@/lib/site-content";
 import {
   ARTICLE_CATEGORY_LIST,
-  isArticleCategory,
   parseArticleBody,
 } from "@/lib/article";
 import { canRead } from "@/lib/content-access";
@@ -34,11 +33,11 @@ export async function generateMetadata({
 }
 
 /**
- * Biblioteca de contenidos, rediseñada según el pedido de la organización del
- * 23/09 (docs/entregas/2026-09-23-feedback-org/CEJ_Correcciones_Contenidos.docx):
- * cinco temas como menú fijo, los textos de la categoría elegida, y la lectura
- * dentro de un recuadro acotado sin salir de la biblioteca. Toda la interacción
- * vive en `ContentLibrary`.
+ * Biblioteca de contenidos, según los pedidos de la organización del 23/09
+ * (docs/entregas/2026-09-23-feedback-org/CEJ_Correcciones_Contenidos.docx) y
+ * del 08/10: un índice de cinco tarjetas de tema, los textos del tema elegido,
+ * y la lectura dentro de un recuadro acotado sin salir de la biblioteca. Toda
+ * la interacción vive en `ContentLibrary`.
  *
  * **Se lee la vista `articles_public` para el listado** (trae los metadatos de
  * TODO lo publicado, incluido lo que esta persona no puede leer: la clienta pide
@@ -53,16 +52,11 @@ export async function generateMetadata({
  */
 export default async function ContenidosPage({
   params,
-  searchParams,
 }: PageProps<"/[locale]/contenidos">) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Contenidos");
   const tCat = await getTranslations("ArticleCategories");
-  const { categoria } = await searchParams;
-  // Una categoria desconocida cae en el listado completo en vez de 404: es un
-  // filtro, no una ruta (mismo criterio que `?tipo=` en /viajes).
-  const active = isArticleCategory(categoria) ? categoria : null;
   const content = await getSiteContent(locale);
 
   const supabase = await createClient();
@@ -112,6 +106,7 @@ export default async function ContenidosPage({
   const categories = ARTICLE_CATEGORY_LIST.map((category) => ({
     value: category.value,
     label: tCat(category.value),
+    image: content(`contenidos.tema.${category.value}.image` as const),
   }));
 
   return (
@@ -130,11 +125,10 @@ export default async function ContenidosPage({
           raised
         />
 
-        {/* La biblioteca vive sobre la banda dorada. **El envoltorio NO lleva
-            `overflow-hidden`**: el menú de temas es `sticky` y un ancestro
-            recortado le impide pegarse (el scroll container pasa a ser esa caja
-            que no scrollea). La marca de agua, que sí necesita recorte, vive en
-            su propia capa absoluta. */}
+        {/* La biblioteca vive sobre la banda dorada. La marca de agua, que
+            necesita recorte, vive en su propia capa absoluta: el envoltorio no
+            lleva `overflow-hidden` (lo pedía el menú `sticky` de temas que
+            hubo hasta el 08/10, y sigue siendo lo seguro si vuelve algo fijo). */}
         <CreamSection
           id="biblioteca"
           background={GOLD}
@@ -161,7 +155,6 @@ export default async function ContenidosPage({
             <ContentLibrary
               categories={categories}
               articles={articles}
-              initialCategory={active}
             />
           </div>
         </CreamSection>

@@ -97,6 +97,8 @@ narrativos con calendario desplegable), `/viajes/[id]`, `/contenidos`,
 `/calendario` (17/09) **se sacó el 08/10** a pedido de la organización: redirige
 a `/viajes`. Y desde el 08/10 **la tarjeta de la cartelera no muestra la fecha**:
 la organización la escribe en el nombre. `start_date` se sigue cargando y usando.
+`/contenidos` entra por un **índice de cinco tarjetas de tema** (08/10), no por
+píldoras; el tema vive en `?categoria=` (`pushState` + `useSearchParams`).
 
 **Tests.** Playwright en `e2e/` (`docs/E2E.md`): 38 públicos + 18 del panel, más
 dos recorridos que generan capturas para mostrarle el producto a la clienta

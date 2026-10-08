@@ -3222,3 +3222,13 @@ sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
   corta recto siempre: se fueron `fadeTo`, la máscara del pie del `banner` y
   `hardEdge` (que era la excepción), más `CREAM_HEX`/`GOLD_HEX`. Las líneas
   finas entre ítems (puntas desvanecidas) NO entran en la regla: confirmado.
+- **/contenidos entra por un índice de temas**: cinco tarjetas con foto en
+  lugar de la fila de píldoras fija del 23/09. Al tocar una se entra al tema
+  (título con filete + sus textos + "← Todos los temas"). El tema vive en
+  `?categoria=` con `pushState` y se lee con `useSearchParams`: el "atrás" del
+  celular vuelve al índice y los links del navbar siguen cayendo en su tema.
+  Los temas vacíos dicen "Próximamente" y no se pueden tocar. **Sin cantidad
+  de contenidos** en la tarjeta: se probó y se sacó, nadie la pidió. Las fotos
+  son del sitio y quedan editables en `/admin/multimedia`
+  (`contenidos.tema.<valor>.image`, recorte 4:5 igual en todas las pantallas).
+  La ficha `/contenidos/[slug]` conserva su menú de píldoras (`LibraryNav`).
