@@ -3208,3 +3208,12 @@ sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
   dos habilitaciones `programa` vigentes y los 8 artículos publicados son
   `publico`. Lo más probable son las dos categorías vacías (Salud & Bienestar
   y Testimonios), que dicen "Todavía no hay contenidos". Sin confirmar con ella.
+- **Compartir un contenido por link**: botón en `/admin/contenidos` que genera
+  `/compartido/<token>` y lo copia. Quien lo abre lee el contenido entero sin
+  cuenta, aunque sea `programa` o borrador. El token vive en `article_shares`
+  (sólo admin), no en `articles`, que lee `anon`; la página lee por la función
+  `shared_article(token)` (`security definer`, devuelve sólo lo que se
+  muestra). Página dinámica y `noindex`. Probado en local con un link real
+  (200, audio, `noindex`; token falso 404). **Queda un link de prueba del
+  borrador de bienvenida en producción** (el `DELETE` por MCP se trabó):
+  quitarlo con "Dejar de compartir".

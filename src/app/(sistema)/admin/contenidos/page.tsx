@@ -3,6 +3,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { articleCategoryLabel, formatArticleDate } from "@/lib/article";
 import { DeleteArticleButton } from "./DeleteArticleButton";
+import { ShareArticleButton } from "./ShareArticleButton";
 
 const STATUS_LABEL: Record<string, string> = {
   draft: "Borrador",
@@ -21,10 +22,14 @@ const STATUS_CLASS: Record<string, string> = {
  */
 export default async function AdminContenidosPage() {
   const supabase = await createClient();
-  const { data: articles } = await supabase
-    .from("articles")
-    .select("id, title, slug, category, status, cover_url, published_at, updated_at")
-    .order("updated_at", { ascending: false });
+  const [{ data: articles }, { data: shares }] = await Promise.all([
+    supabase
+      .from("articles")
+      .select("id, title, slug, category, status, cover_url, published_at, updated_at")
+      .order("updated_at", { ascending: false }),
+    supabase.from("article_shares").select("article_id, token"),
+  ]);
+  const tokenById = new Map((shares ?? []).map((s) => [s.article_id, s.token]));
 
   return (
     <div>
@@ -45,7 +50,9 @@ export default async function AdminContenidosPage() {
         <Link href="/contenidos" className="text-secondary hover:underline">
           /contenidos
         </Link>
-        . Mientras esté en borrador no lo ve nadie más que tú.
+        . Mientras esté en borrador no lo ve nadie más que tú. Con
+        &ldquo;Compartir&rdquo; se copia un link para mandar: quien lo abre lee
+        ese contenido entero, sin cuenta, aunque sea de programa o un borrador.
       </p>
 
       {!articles || articles.length === 0 ? (
@@ -110,6 +117,10 @@ export default async function AdminContenidosPage() {
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-4">
+                      <ShareArticleButton
+                        id={article.id}
+                        initialToken={tokenById.get(article.id) ?? null}
+                      />
                       <Link
                         href={`/admin/contenidos/${article.id}/editar`}
                         className="text-secondary hover:underline"

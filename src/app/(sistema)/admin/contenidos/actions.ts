@@ -255,3 +255,39 @@ export async function deleteArticle(id: string) {
 
   revalidateArticlePaths();
 }
+
+/**
+ * Crea el link para compartir un contenido, o devuelve el que ya tiene: hay uno
+ * solo por contenido, así que volver a tocar "Compartir" no invalida el que ya
+ * se mandó. El token lo genera la base (`article_shares.token`).
+ */
+export async function shareArticle(
+  id: string
+): Promise<{ token: string | null; error: string | null }> {
+  const supabase = await createClient();
+
+  const { error: insertError } = await supabase
+    .from("article_shares")
+    .upsert({ article_id: id }, { onConflict: "article_id", ignoreDuplicates: true });
+  if (insertError) return { token: null, error: insertError.message };
+
+  const { data, error } = await supabase
+    .from("article_shares")
+    .select("token")
+    .eq("article_id", id)
+    .single();
+  if (error) return { token: null, error: error.message };
+
+  revalidatePath("/admin/contenidos");
+  return { token: data.token, error: null };
+}
+
+/** Borra el link: deja de abrir en el acto, la página compartida no cachea. */
+export async function unshareArticle(id: string): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("article_shares").delete().eq("article_id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/contenidos");
+  return { error: null };
+}

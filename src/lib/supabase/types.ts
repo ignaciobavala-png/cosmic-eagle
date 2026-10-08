@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      article_shares: {
+        Row: {
+          article_id: string
+          token: string
+          created_at: string
+          created_by: string | null
+        }
+        Insert: {
+          article_id: string
+          token?: string
+          created_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          article_id?: string
+          token?: string
+          created_at?: string
+          created_by?: string | null
+        }
+        Relationships: []
+      }
       access_codes: {
         Row: {
           code: string
@@ -1030,6 +1051,20 @@ export type Database = {
     }
     Functions: {
       redeem_access_code: { Args: { p_code: string }; Returns: string }
+      shared_article: {
+        Args: { p_token: string }
+        Returns: {
+          title: string
+          title_en: string | null
+          excerpt: string | null
+          excerpt_en: string | null
+          body: string
+          body_en: string | null
+          cover_url: string | null
+          audio_url: string | null
+          category: Database["public"]["Enums"]["article_category"]
+        }[]
+      }
     }
     Enums: {
       admin_notification_kind:
