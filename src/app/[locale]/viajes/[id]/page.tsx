@@ -6,7 +6,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { createClient } from "@/lib/supabase/server";
 import { PageHero } from "@/components/ui/PageHero";
-import { CreamSection, CREAM_HEX } from "@/components/ui/CreamSection";
+import { CreamSection } from "@/components/ui/CreamSection";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal, RevealItem } from "@/components/ui/Reveal";
 import { TitleRule } from "@/components/ui/TitleRule";
@@ -242,7 +242,6 @@ export default async function ViajePage({ params }: Props) {
                 ]
               : []
           }
-          fadeTo={CREAM_HEX}
         />
 
         <CreamSection

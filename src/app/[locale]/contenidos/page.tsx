@@ -125,7 +125,6 @@ export default async function ContenidosPage({
           scrollHint={t("hero.scrollHint")}
           scrollTo="biblioteca"
           overlay={isEnabled(content("contenidos.hero.overlay"))}
-          hardEdge
           titleClassName="text-primary-fixed-dim"
           titleRule="gold"
           raised

@@ -86,7 +86,6 @@ export default async function NosotrosPage({
           scrollTo="enfoque"
           height="full"
           overlay={isEnabled(content("nosotros.hero.overlay"))}
-          hardEdge
         />
 
         {/* Pantalla 1 — las cuatro palabras, juntas y sin símbolos desde el

@@ -204,6 +204,8 @@ azul, oro champagne, glassmorphism. Todos los tokens en `@theme` dentro de
   más un campo de estrellas fijo en `body::before`. `html` lleva
   `background-color` a propósito, para que el degradé no se dimensione contra el
   viewport.
+- **Entre una sección y otra el corte es recto, nunca un degradé** (regla de
+  la organización, 08/10): `PageHero` ya no tiene `fadeTo` ni máscara al pie.
 - Los degradés azules van **rectos**, de `#05125A` a `#0079B3` (navbar y footer),
   sin mesetas ni escalas intermedias.
 - **Navbar opaco** (`h-16 lg:h-21`): todos los `main` llevan `pt-16 lg:pt-21` o

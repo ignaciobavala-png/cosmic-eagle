@@ -15,13 +15,6 @@ import { Reveal } from "./Reveal";
 export const CREAM = "bg-[#fcedcd]";
 
 /**
- * El mismo crema como hex suelto, para cuando hace falta interpolarlo en un
- * degrade y no alcanza con la clase (Tailwind no genera reglas a partir de
- * valores armados en runtime). Lo usa el `fadeTo` de `PageHero`.
- */
-export const CREAM_HEX = "#fcedcd";
-
-/**
  * Alias historico del crema profundo, que desde el 10/09 es el crema del
  * sistema: la prueba en /faqs se aprobo ("mucha luz" en el resto del sitio) y
  * el valor se mudo a `CREAM`. Se conserva el nombre para no romper imports.
@@ -45,13 +38,6 @@ export const CREAM_DEEP = CREAM;
  * fondo, asi que el boton va azul.
  */
 export const GOLD = "bg-[linear-gradient(135deg,#f9d78f,#b3964b)]";
-
-/**
- * El arranque del degrade dorado como hex suelto, para el `fadeTo` del
- * `PageHero`: el hero se funde con el BORDE SUPERIOR de la franja, que en un
- * degrade a 135 grados es el color de arriba a la izquierda.
- */
-export const GOLD_HEX = "#f9d78f";
 
 /**
  * El crema claro de Julia (`#fff6eb`, el token `primary`), que hasta el 10/09

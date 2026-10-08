@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { PageHero } from "@/components/ui/PageHero";
-import { CreamSection, CREAM_HEX } from "@/components/ui/CreamSection";
+import { CreamSection } from "@/components/ui/CreamSection";
 import { Reveal } from "@/components/ui/Reveal";
 import { TitleRule } from "@/components/ui/TitleRule";
 import { FaqList } from "@/components/ui/FaqList";
@@ -67,7 +67,6 @@ export default async function FaqsPage({
           scrollHint={t("hero.scrollHint")}
           scrollTo="preguntas"
           overlay={isEnabled(content("faqs.hero.overlay"))}
-          fadeTo={CREAM_HEX}
         />
 
         {/* La seccion NO es el elemento observado, a diferencia del resto del

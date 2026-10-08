@@ -3217,3 +3217,8 @@ sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
   (200, audio, `noindex`; token falso 404). **Queda un link de prueba del
   borrador de bienvenida en producción** (el `DELETE` por MCP se trabó):
   quitarlo con "Dejar de compartir".
+- **Regla: entre secciones, corte recto, nunca degradé.** El hero de /faqs y el
+  del detalle de una experiencia se fundían en la crema (`fadeTo`). `PageHero`
+  corta recto siempre: se fueron `fadeTo`, la máscara del pie del `banner` y
+  `hardEdge` (que era la excepción), más `CREAM_HEX`/`GOLD_HEX`. Las líneas
+  finas entre ítems (puntas desvanecidas) NO entran en la regla: confirmado.

@@ -23,8 +23,6 @@ export function PageHero({
   priority = true,
   height = "banner",
   overlay = true,
-  fadeTo,
-  hardEdge = false,
   titleClassName = "text-primary",
   titleRule,
   raised = false,
@@ -67,41 +65,6 @@ export function PageHero({
    * indicador debajo del pliegue en una pantalla baja.
    */
   height?: "banner" | "compact" | "full";
-  /**
-   * Color al que se funde el PIE del banner, cuando lo que sigue es una seccion
-   * opaca con fondo propio (en la practica, siempre una `CreamSection`: se pasa
-   * `CREAM_HEX`).
-   *
-   * Existe porque el corte hero -> crema era un borde recto de 15,11:1 medido
-   * (el maximo posible es 21:1, negro sobre blanco), y a la clienta no le
-   * gustan los contrastes marcados. Con esto la foto entra al crema en vez de
-   * chocar contra el.
-   *
-   * **Apaga la mascara del `banner`**, que desvanece el pie a transparente para
-   * dejar ver el degrade del `body`: ese fundido es al azul del chrome, y
-   * cuando abajo hay una franja opaca ese azul no se ve nunca. Los dos juntos
-   * darian dos pasajes encima.
-   *
-   * Va por `style` y no por clase: Tailwind escanea literales en el codigo
-   * fuente, asi que un color interpolado no genera regla.
-   */
-  fadeTo?: string;
-  /**
-   * El banner corta RECTO contra la seccion de abajo: sin pasaje y sin la
-   * mascara del pie. Es lo contrario de `fadeTo`, y por eso se excluyen.
-   *
-   * No alcanza con no pasar `fadeTo`: sin el vuelve la mascara del `banner`,
-   * que desvanece la foto a transparente. Cuando abajo hay una franja opaca eso
-   * no deja ver el degrade del `body` como un corte limpio, sino un pasaje al
-   * azul del chrome — el fundido que se queria sacar, en otro color. Este flag
-   * apaga las dos cosas.
-   *
-   * Lo pidio Ignacio el 15/09 para la prueba de la franja dorada de
-   * /contenidos. Va contra el criterio de "sin contrastes marcados" con el que
-   * nacio `fadeTo` (el corte mide 15,11:1), asi que si Sofia lo mira y no le
-   * gusta, se vuelve poniendo `fadeTo={GOLD_HEX}` y sacando este flag.
-   */
-  hardEdge?: boolean;
   /**
    * Color del titulo. Por defecto el blanco calido; /contenidos lo pide en oro
    * (`text-primary-fixed-dim`, el oro de acento para headings sobre oscuro).
@@ -152,17 +115,12 @@ export function PageHero({
             : "relative min-h-[30rem] h-[82svh] max-h-[min(52rem,calc(100svh-var(--navbar-h)))] w-full overflow-hidden md:min-h-[36rem] md:h-[82vh]"
       }
     >
-      {/* La foto y sus tintes van juntos dentro de un grupo enmascarado: el borde
-          inferior se desvanece a transparente y deja ver el degrade del `body`,
-          en vez de cortar contra un negro que no coincide con el azul de la
-          pagina. Sin la mascara el limite banner/seccion queda como una linea. */}
-      <div
-        className={
-          full || fadeTo || hardEdge
-            ? "absolute inset-0"
-            : "absolute inset-0 [mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_48%,rgba(0,0,0,0.55)_76%,rgba(0,0,0,0.18)_92%,transparent_100%)]"
-        }
-      >
+      {/* **El hero corta RECTO contra la sección de abajo, siempre.** Regla de
+          la organización (08/10): entre una sección y otra va una línea
+          divisoria, nunca un degradé. Se fueron la máscara que desvanecía el
+          pie a transparente y el pasaje a crema (`fadeTo`), y con ellos la
+          prop `hardEdge`, que era la excepción y ahora es la regla. */}
+      <div className="absolute inset-0">
         <BackgroundMedia src={image} alt={imageAlt} priority={priority} />
         {/* Tinte azul + oscurecido al pie, para asentar el titulo.
             El oscurecido de arriba se saco cuando el navbar paso a ser una
@@ -172,28 +130,6 @@ export function PageHero({
         <div className="absolute inset-0 bg-[#05102a]/35" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#05060a]/45" />
       </div>
-
-      {/* Pasaje al fondo de la seccion siguiente. Las paradas intermedias no
-          son decorativas: un degrade lineal de dos paradas sobre una foto
-          oscura deja una banda gris a mitad de camino, porque el 50% de opacidad
-          cae justo donde mas se nota. Con el arranque suave el crema entra
-          recien en el ultimo cuarto.
-
-          **La altura es corta a proposito** (56/80px): el indicador de scroll
-          vive a 32px del pie, o sea adentro de esta banda, y con un pasaje mas
-          alto quedaria apoyado sobre crema pleno, donde el oro de acento da
-          1,7:1. Medido con esta altura sobre /contenidos: el indicador va de
-          5,63:1 a 11,30:1 contra el fondo que le toca en cada punto. Si algun
-          dia se agranda, hay que volver a mirar ese contraste. */}
-      {fadeTo && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-14 md:h-20"
-          style={{
-            backgroundImage: `linear-gradient(to bottom, transparent 0%, color-mix(in srgb, ${fadeTo} 12%, transparent) 45%, color-mix(in srgb, ${fadeTo} 55%, transparent) 78%, ${fadeTo} 100%)`,
-          }}
-        />
-      )}
 
       <div className={`relative z-10 flex h-full flex-col items-center justify-center px-margin-mobile md:px-margin-desktop text-center ${raised ? "pb-24 md:pb-28" : ""}`}>
         {overlay && (
