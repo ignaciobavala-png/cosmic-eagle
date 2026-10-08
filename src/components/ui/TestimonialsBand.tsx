@@ -1,5 +1,6 @@
 import type { Testimonial } from "@/lib/testimonials";
 import { Reveal } from "./Reveal";
+import { TitleRule } from "./TitleRule";
 import { TestimonialViewer } from "./TestimonialViewer";
 
 /**
@@ -45,7 +46,16 @@ export function TestimonialsBand({
       {/* Estandar de Experiencias: umbral 0.22 y reversible, como el resto de
           /viajes, que es la unica pagina donde vive esta banda. */}
       <Reveal amount={0.22} once={false} className="mx-auto max-w-5xl">
-        <h3 className="font-display text-headline-md text-primary">{title}</h3>
+        {/* Título dorado, en `text-h2` y con filete del mismo oro, como el
+            de la home (pedido de la organización, 08/10: "está un poco
+            dejado"). Sobre azul el oro de texto es `primary-container`
+            (regla del 28/08), y el filete va del color del título (06/10). */}
+        <div className="mx-auto w-fit">
+          <h3 className="font-display text-h2 text-primary-container">
+            {title}
+          </h3>
+          <TitleRule tone="gold" align="center" className="mt-3" />
+        </div>
         {label ? (
           <p className="mb-9 mt-2 text-label-sm uppercase text-primary-container">
             {label}
@@ -54,11 +64,15 @@ export function TestimonialsBand({
           <div className="mb-9" />
         )}
 
-        {/* Mas bajo que en la home: alla el bloque es el protagonista de una
-            pantalla entera y aca cierra una seccion que ya viene larga. */}
+        {/* Letra un poco mas grande que el default del visor (08/10). El
+            alto acompaña: medido el 08/10, el testimonio mas largo ocupa 239px
+            de los 256 utiles en mobile y 168 de 196 en escritorio. Si entra
+            uno mas largo, `line-clamp` lo corta y queda el "Leer completo". */}
         <TestimonialViewer
           testimonials={testimonials}
-          alturaClassName="h-[240px] sm:h-[200px]"
+          alturaClassName="h-[320px] sm:h-[260px]"
+          quoteClassName="text-[17px] sm:text-[19px]"
+          captionClassName="text-[14px] sm:text-[15px]"
         />
       </Reveal>
     </div>

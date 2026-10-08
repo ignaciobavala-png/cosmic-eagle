@@ -51,6 +51,7 @@ export function TestimonialViewer({
   /** Alto del bloque de texto. Se fija para que la sección no salte al pasar. */
   alturaClassName = "h-[300px] sm:h-[260px]",
   quoteClassName = "text-[15px] sm:text-[17px]",
+  captionClassName = "text-[12px] sm:text-[13px]",
   auto = false,
   dots = false,
 }: {
@@ -58,6 +59,8 @@ export function TestimonialViewer({
   className?: string;
   alturaClassName?: string;
   quoteClassName?: string;
+  /** Tamaño del nombre de quien firma. */
+  captionClassName?: string;
   /**
    * Pase automático cada 3s. **Apagado en todo el sitio** (ver arriba): sólo
    * avanzan las flechas. Queda como prop por si algún juego lo quiere.
@@ -124,7 +127,7 @@ export function TestimonialViewer({
               >
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
-              <figcaption className="mt-4 text-[12px] font-bold tracking-normal text-primary-container sm:text-[13px]">
+              <figcaption className={`mt-4 font-bold tracking-normal text-primary-container ${captionClassName}`}>
                 {t.author_name}
                 {t.author_location && ` — ${t.author_location}`}
               </figcaption>
