@@ -331,6 +331,7 @@
       "scrollHint": "Ver la biblioteca"
     },
     "library": {
+      "listen": "Escuchar",
       "ariaNav": "Temas de la biblioteca",
       "fallback": "Biblioteca",
       "empty": "Todavía no hay contenidos publicados en esta categoría.",

@@ -81,9 +81,12 @@ export default async function ContenidosPage({
   // `body` a propósito.
   const { data: readable } = await supabase
     .from("articles")
-    .select("slug, body, body_en");
+    .select("slug, body, body_en, audio_url");
 
   // En /en cada campo usa su `_en` si está cargado (docs/I18N.md §6).
+  const audioBySlug = new Map(
+    (readable ?? []).map((row) => [row.slug, row.audio_url])
+  );
   const bodyBySlug = new Map(
     (readable ?? []).map((row) => [row.slug, localized(locale, row.body, row.body_en)])
   );
@@ -102,6 +105,7 @@ export default async function ContenidosPage({
       published_at: meta.published_at,
       locked,
       blocks: body ? parseArticleBody(body) : null,
+      audio_url: body ? (audioBySlug.get(slug) ?? null) : null,
     };
   });
 

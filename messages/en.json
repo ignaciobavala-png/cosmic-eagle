@@ -331,6 +331,7 @@
       "scrollHint": "View the library"
     },
     "library": {
+      "listen": "Listen",
       "ariaNav": "Library topics",
       "fallback": "Library",
       "empty": "There is no content published in this category yet.",

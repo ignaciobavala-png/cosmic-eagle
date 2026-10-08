@@ -6,6 +6,7 @@ import { ArrowLeft, Lock } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ArticleBody } from "@/components/ui/ArticleBody";
+import { ArticleAudio } from "@/components/ui/ArticleAudio";
 import { CreamSection } from "@/components/ui/CreamSection";
 import { LibraryNav } from "@/components/ui/LibraryNav";
 import { createClient } from "@/lib/supabase/server";
@@ -73,7 +74,7 @@ async function getArticle(slug: string, locale: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("articles")
-    .select("title, excerpt, body, body_en, cover_url, category, published_at")
+    .select("title, excerpt, body, body_en, cover_url, category, published_at, audio_url")
     .eq("slug", slug)
     .maybeSingle();
 
@@ -213,9 +214,20 @@ export default async function ContenidoPage({
                 // El recuadro de lectura acotado: el cuerpo scrollea adentro y
                 // la página no se convierte en el artículo entero, como pide el
                 // documento §5.
-                <div className="max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-[#f9d78f] bg-white/60 p-5 sm:p-8">
-                  <ArticleBody blocks={blocks} tone="light" />
-                </div>
+                <>
+                  {/* El audio va AFUERA del recuadro con scroll: si quedara
+                      adentro, se iría de la vista apenas se empieza a leer. */}
+                  {article?.audio_url && (
+                    <ArticleAudio
+                      src={article.audio_url}
+                      label={t("library.listen")}
+                      className="mb-6"
+                    />
+                  )}
+                  <div className="max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-[#f9d78f] bg-white/60 p-5 sm:p-8">
+                    <ArticleBody blocks={blocks} tone="light" />
+                  </div>
+                </>
               )}
             </div>
 

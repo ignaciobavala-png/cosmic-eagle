@@ -3182,3 +3182,29 @@ relevo de 0,04), en el oro plano y sin el degradé de tres colores; el blanco se
 sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
 "PROPÓSITO", como en la home. Subido sin probar, a pedido de Ignacio: lo revisa
 él en producción.
+
+## 2026-10-08 — Pedidos de la organización: calendario, tarjetas, títulos y la bienvenida
+
+- **/calendario se fue** (página, desplegable, slots, tests) y redirige a
+  `/viajes`. Con ella se borró `TripCarousel`, que sólo usaba esa página.
+- **La tarjeta de la cartelera ya no muestra la fecha**: la organización la
+  escribe en el nombre ("Sábado 7 de Noviembre 2026"). `start_date` se sigue
+  cargando y usando. "Ver experiencia" va centrado.
+- Hero de /contenidos con filete y el bloque más arriba (`titleRule`,
+  `raised` de `PageHero`); la banda de testimonios de /viajes con título
+  dorado `text-h2`, filete y letra más grande (medido: nada se corta).
+- Detalle de una experiencia: "Postularme" pasa al `goldSolid` a su ancho (en
+  mobile era una barra que se salía de la pantalla) y el lugar va con la letra
+  del título (`subtitleStyle="display"`).
+- **Audio en los artículos** (`articles.audio_url`): el guion del video de
+  bienvenida llegó con su locución (`docs/entregas/2026-10-08-guion-video-bienvenida/`,
+  el audio en `cosmic-eagle-material/`). El panel sube el archivo **desde el
+  browser** directo a `site-assets` para no chocar con el tope de ~4,5MB de
+  Vercel; el server action sólo acepta URLs de nuestro bucket. La URL se lee de
+  `articles` (gateada por nivel), no de `articles_public`. El bucket necesitó
+  los tipos de audio. Cargado como **borrador**, nivel `miembros`, categoría
+  Preparación, con título provisorio "Bienvenido a Cosmic Eagle Journey".
+- **"Sofía no veía cosas en Contenidos"**: por permisos no puede ser. Tiene
+  dos habilitaciones `programa` vigentes y los 8 artículos publicados son
+  `publico`. Lo más probable son las dos categorías vacías (Salud & Bienestar
+  y Testimonios), que dicen "Todavía no hay contenidos". Sin confirmar con ella.

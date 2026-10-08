@@ -45,6 +45,7 @@ function parseArticleForm(formData: FormData) {
   const status = formData.get("status");
   const accessLevel = formData.get("access_level");
   const slugField = formData.get("slug");
+  const audioField = formData.get("audio_url");
 
   if (
     typeof title !== "string" ||
@@ -76,11 +77,33 @@ function parseArticleForm(formData: FormData) {
       category,
       status,
       access_level: accessLevel,
+      audio_url: ownAudioUrl(audioField),
       title_en: optionalEnglish(formData, "title_en"),
       excerpt_en: optionalEnglish(formData, "excerpt_en"),
       body_en: optionalEnglish(formData, "body_en"),
     },
   } as const;
+}
+
+/**
+ * El audio lo sube el browser (`AudioField`) y acá sólo llega la URL. Se acepta
+ * únicamente una de nuestro bucket: el campo es oculto pero viaja en el form, y
+ * no tiene que poder apuntar el reproductor a cualquier lado.
+ */
+function ownAudioUrl(value: FormDataEntryValue | null): string | null {
+  if (typeof value !== "string" || !value.trim()) return null;
+  const url = value.trim();
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  return base && url.startsWith(`${base}${PUBLIC_PREFIX}articles/audio/`)
+    ? url
+    : null;
+}
+
+/** Borra un archivo de nuestro bucket a partir de su URL pública. */
+async function removeOwnFile(supabase: SupabaseClient, url: string | null | undefined) {
+  if (!url?.includes(PUBLIC_PREFIX)) return;
+  const path = url.split(PUBLIC_PREFIX)[1]?.split("?")[0];
+  if (path) await supabase.storage.from(BUCKET).remove([decodeURIComponent(path)]);
 }
 
 /**
@@ -183,7 +206,7 @@ export async function updateArticle(
   // el archivo nuevo, nunca la URL a borrar.
   const { data: current } = await supabase
     .from("articles")
-    .select("cover_url, slug")
+    .select("cover_url, slug, audio_url")
     .eq("id", id)
     .single();
 
@@ -198,6 +221,11 @@ export async function updateArticle(
 
   if (error) return { error: friendlyError(error.message, "guardar") };
 
+  // El audio anterior se borra recién con el cambio guardado.
+  if (current?.audio_url && current.audio_url !== parsed.data.audio_url) {
+    await removeOwnFile(supabase, current.audio_url);
+  }
+
   revalidateArticlePaths();
   redirect("/admin/contenidos");
 }
@@ -207,7 +235,7 @@ export async function deleteArticle(id: string) {
 
   const { data: article } = await supabase
     .from("articles")
-    .select("slug, cover_url")
+    .select("slug, cover_url, audio_url")
     .eq("id", id)
     .single();
 
@@ -222,6 +250,8 @@ export async function deleteArticle(id: string) {
       await supabase.storage.from(BUCKET).remove([decodeURIComponent(path)]);
     }
   }
+
+  await removeOwnFile(supabase, article?.audio_url);
 
   revalidateArticlePaths();
 }

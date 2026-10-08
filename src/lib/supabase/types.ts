@@ -214,6 +214,7 @@ export type Database = {
       articles: {
         Row: {
           access_level: Database["public"]["Enums"]["content_access_level"]
+          audio_url: string | null
           body: string
           body_en: string | null
           category: Database["public"]["Enums"]["article_category"]
@@ -232,6 +233,7 @@ export type Database = {
         }
         Insert: {
           access_level?: Database["public"]["Enums"]["content_access_level"]
+          audio_url?: string | null
           body: string
           body_en?: string | null
           category?: Database["public"]["Enums"]["article_category"]
@@ -250,6 +252,7 @@ export type Database = {
         }
         Update: {
           access_level?: Database["public"]["Enums"]["content_access_level"]
+          audio_url?: string | null
           body?: string
           body_en?: string | null
           category?: Database["public"]["Enums"]["article_category"]

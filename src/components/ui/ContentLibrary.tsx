@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft, Lock } from "lucide-react";
 import { ArticleBody } from "./ArticleBody";
+import { ArticleAudio } from "./ArticleAudio";
 import { CtaLink } from "./CtaLink";
 import { CategoryMenu } from "./CategoryMenu";
 import { formatArticleDate, type ArticleBlock } from "@/lib/article";
@@ -46,6 +47,8 @@ export type LibraryArticle = {
   locked: boolean;
   /** `null` cuando está cerrado o no se pudo leer el cuerpo. */
   blocks: ArticleBlock[] | null;
+  /** El audio, si tiene. Sólo llega cuando el cuerpo se pudo leer. */
+  audio_url: string | null;
 };
 
 export type LibraryCategory = { value: string; label: string };
@@ -194,6 +197,16 @@ export function ContentLibrary({
                 {t("library.back")}
               </button>
             </div>
+
+            {/* El audio va afuera del recuadro con scroll, para que no se
+                vaya de la vista apenas se empieza a leer. */}
+            {openArticle.blocks && openArticle.audio_url && (
+              <ArticleAudio
+                src={openArticle.audio_url}
+                label={t("library.listen")}
+                className="mt-6"
+              />
+            )}
 
             {/* El recuadro de lectura: alto acotado y scroll PROPIO, que es lo
                 que evita la "página gigante". El resto de la biblioteca no se

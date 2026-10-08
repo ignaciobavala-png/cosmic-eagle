@@ -12,6 +12,7 @@ import {
 import { CONTENT_ACCESS_LEVELS } from "@/lib/content-access";
 import type { Tables } from "@/lib/supabase/types";
 import { EnglishFields } from "@/components/admin/EnglishFields";
+import { AudioField } from "./AudioField";
 import type { ArticleFormState } from "./actions";
 
 const STATUS_OPTIONS = [
@@ -157,6 +158,8 @@ export function ArticleForm({
           {!cropping && !article?.cover_url && !framerProps && "Sin portada la tarjeta va sin imagen."}
         </p>
       </div>
+
+      <AudioField labelClass={labelClass} initialUrl={article?.audio_url ?? null} />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
