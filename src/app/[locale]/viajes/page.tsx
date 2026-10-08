@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MediaStatement } from "@/components/ui/MediaStatement";
+import { TitleRule } from "@/components/ui/TitleRule";
 import { CreamSection, GOLD } from "@/components/ui/CreamSection";
 import { ExperienceFilter } from "@/components/ui/ExperienceFilter";
 import { ExperienceGate } from "@/components/ui/ExperienceGate";
@@ -115,9 +116,14 @@ export default async function ViajesPage({
           className="mx-auto w-full max-w-narrative px-gutter pb-4 pt-12 md:pb-8 md:pt-20"
         >
           <div className="mx-auto max-w-2xl">
-            <h1 className="text-center font-display text-h2 text-primary-container">
-              {t("hero.title")}
-            </h1>
+            {/* El filete del título, como en el resto de las secciones
+                (pedido del 08/10). Va centrado y del color del título. */}
+            <div className="mx-auto w-fit">
+              <h1 className="text-center font-display text-h2 text-primary-container">
+                {t("hero.title")}
+              </h1>
+              <TitleRule tone="gold" align="center" className="mt-3" />
+            </div>
             <p className="mt-5 text-left text-body-md leading-relaxed text-primary md:text-body-lg [&_strong]:font-semibold [&_strong]:text-primary-container">
               {t.rich("about.body", {
                 strong: (chunks) => <strong>{chunks}</strong>,

@@ -3241,3 +3241,7 @@ sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
 - **El copyright del footer pasa a la serif de la marca** (Sorts Mill Goudy,
   14px, versalitas con tracking), como los títulos de las columnas: en
   Montserrat 12px se leía como texto de sistema.
+- **/viajes: filete bajo el título "Sesiones y Retiros"**, como el de las demás
+  secciones (pedido del 08/10, con captura marcada en mobile). La altura no
+  cambió: el 03/10 se quitó la pantalla completa a propósito; si la quieren
+  de vuelta, es una decisión aparte.
