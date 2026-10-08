@@ -93,10 +93,10 @@ expone los metadatos de lo cerrado para dibujar el candado, la habilitación
 queda ninguna sobre el chrome viejo. Home puramente narrativa y **estática**
 (`○`, sin consultar Supabase con cookies), `/nosotros`, `/viajes` (dos bloques
 narrativos con calendario desplegable), `/viajes/[id]`, `/contenidos`,
-`/contenidos/[slug]`, `/faqs`, `/privacidad`, `/terminos`, `/cuenta`. Desde el
-17/09 hay ademas `/calendario`: las dos carteleras abiertas y nada mas, el
-atajo para quien entra a ver la proxima fecha. Es el tercer hijo del
-desplegable de Experiencias y el unico que no es un ancla de `/viajes`.
+`/contenidos/[slug]`, `/faqs`, `/privacidad`, `/terminos`, `/cuenta`.
+`/calendario` (17/09) **se sacó el 08/10** a pedido de la organización: redirige
+a `/viajes`. Y desde el 08/10 **la tarjeta de la cartelera no muestra la fecha**:
+la organización la escribe en el nombre. `start_date` se sigue cargando y usando.
 
 **Tests.** Playwright en `e2e/` (`docs/E2E.md`): 38 públicos + 18 del panel, más
 dos recorridos que generan capturas para mostrarle el producto a la clienta
@@ -136,7 +136,6 @@ src/
 │   │       ├── solicitar/        # ETAPA 1: filtro corto + pantalla de estado + Cómo pagar
 │   │       ├── salud/            # ETAPA 2: sólo aprobada + pagada
 │   │       └── consentimiento/   # firma, después del formulario de salud
-│   ├── calendario/               # atajo: las dos carteleras abiertas, hero corto
 │   ├── contenidos/               # biblioteca + [slug] (muro si el nivel no alcanza)
 │   ├── faqs/  privacidad/  terminos/
 │   ├── cuenta/                   # acceso (AuthScreen) + panel del viajero
@@ -232,7 +231,7 @@ sistema original están en `docs/RECORRIDO.md` §4: `PageHero` (P1),
 Del rediseño: `ImmersiveHero`, `CreamSection` (la franja clara),
 `MediaStatement`, `ScrollStory` / `StickyStory` / `WordSequence` (los bloques de
 scroll largo), `TestimonialViewer` (los tres juegos de testimonios),
-`TripCarousel` + `Collapsible` (la cartelera), `TripCover` (**la única pieza que
+`ExperienceFilter` + `Collapsible` (la cartelera), `TripCover` (**la única pieza que
 decide el recorte de una portada**), `ArticleBody`, `LegalPage`, `AuthScreen`,
 `GateModal` + `ExperienceGate`, `BackgroundMedia`, `Reveal` / `RevealItem` /
 `RevealLine`, `CtaLink` (variantes `solid`, `ghost`, `pill`, `outline`, `glass`).

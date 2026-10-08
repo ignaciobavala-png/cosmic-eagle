@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { formatDateRangeCompact } from "@/lib/format";
+import { useTranslations } from "next-intl";
 import { CtaLink, CTA_TONES } from "./CtaLink";
 import type { TripCardData } from "./TripCard";
 import { TripCover } from "./TripCover";
@@ -145,7 +144,6 @@ export function ExperienceFilter({
 function ExperienceCard({ trip }: { trip: TripCardData }) {
   const t = useTranslations("Viajes");
   const tTrip = useTranslations("TripTypes");
-  const locale = useLocale() === "en" ? "en" : "es";
   const tipoKey = trip.type ? TYPE_BADGE_KEY[trip.type] : undefined;
   const tipo = tipoKey ? t(`filter.${tipoKey}`) : undefined;
   const status =
@@ -181,14 +179,11 @@ function ExperienceCard({ trip }: { trip: TripCardData }) {
           {trip.title}
         </h3>
 
-        <div className="mt-4 border-t border-[#e0e0e0] pt-4">
-          <span className="block font-display text-[10px] font-semibold uppercase tracking-[0.12em] text-on-primary-container">
-            {t("card.date")}
-          </span>
-          <span className="mt-1.5 block font-body text-[19px] font-semibold uppercase leading-tight tracking-[0.02em] text-[#05125a]">
-            {formatDateRangeCompact(trip.start_date, trip.end_date, locale)}
-          </span>
-        </div>
+        {/* **Sin fecha** (pedido de la organización, 08/10): la escriben en
+            el nombre de la experiencia, y repetirla abajo quedaba redundante.
+            `start_date` sigue cargándose y manda en todo lo demás (el orden,
+            el cierre de la inscripción, los correos, el detalle); sólo no se
+            muestra en la tarjeta. */}
 
         <div className="mt-auto pt-6">
           {/* TODO: copy pendiente — el documento pide "un botón directo para
