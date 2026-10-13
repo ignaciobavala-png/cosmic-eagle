@@ -3245,3 +3245,12 @@ sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
   secciones (pedido del 08/10, con captura marcada en mobile). La altura no
   cambió: el 03/10 se quitó la pantalla completa a propósito; si la quieren
   de vuelta, es una decisión aparte.
+
+## 2026-10-12 — /contenidos: el hero a pantalla completa
+
+- El hero de `/contenidos` pasa a `height="full"` (una pantalla visible menos el
+  navbar), como la home y `/nosotros`. Pedido de Sofía: que Contenidos siga la
+  línea de las otras secciones. Antes usaba `banner` (82%, tope 52rem).
+- Medido en Chrome: el hero termina justo en el borde de la pantalla y el
+  indicador "Ver la biblioteca" queda visible a 1440×900, 1440×700 y 390×844.
+- Se conservan el título dorado, el filete y `raised`.

@@ -119,6 +119,7 @@ export default async function ContenidosPage({
           subtitle={content("contenidos.hero.subtitle")}
           scrollHint={t("hero.scrollHint")}
           scrollTo="biblioteca"
+          height="full"
           overlay={isEnabled(content("contenidos.hero.overlay"))}
           titleClassName="text-primary-fixed-dim"
           titleRule="gold"
