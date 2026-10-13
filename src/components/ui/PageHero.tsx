@@ -26,6 +26,7 @@ export function PageHero({
   titleClassName = "text-primary",
   titleRule,
   raised = false,
+  titleSize = "display",
 }: {
   image: string;
   imageAlt?: string;
@@ -84,6 +85,13 @@ export function PageHero({
    * de scroll del pie (pedido de la organizacion para /contenidos, 08/10).
    */
   raised?: boolean;
+  /**
+   * `h2` pone el titulo en `text-h2`, el tamano de los titulos de seccion
+   * (regla del 06/10: todos centrados y del mismo tamano). Por defecto el
+   * `display` del hero historico. Va por prop por lo mismo que el color: dos
+   * utilidades de tamano compiten y gana el orden de la hoja.
+   */
+  titleSize?: "display" | "h2";
 }) {
   const full = height === "full";
   return (
@@ -139,7 +147,7 @@ export function PageHero({
                 `w-full` y mide lo que mide el titulo. */}
             {titleRule ? (
               <div className="w-fit max-w-3xl">
-                <h1 className={`font-display text-display-mobile md:text-display-lg ${titleClassName} text-shadow-glow text-balance`}>
+                <h1 className={`font-display ${titleSize === "h2" ? "text-h2" : "text-display-mobile md:text-display-lg"} ${titleClassName} text-shadow-glow text-balance`}>
                   {title}
                 </h1>
                 <TitleRule tone={titleRule} align="center" className="mt-3" />

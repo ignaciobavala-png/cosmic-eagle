@@ -3254,3 +3254,10 @@ sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
 - Medido en Chrome: el hero termina justo en el borde de la pantalla y el
   indicador "Ver la biblioteca" queda visible a 1440×900, 1440×700 y 390×844.
 - Se conservan el título dorado, el filete y `raised`.
+- **Revisión contra el estándar (13/10):** el filete ya era el de 1px con extremos
+  desvanecidos, pero el título del hero estaba en `primary-fixed-dim` (`#e3c37d`)
+  y el filete `gold` es `#f9d78f`: no eran el mismo color (regla de Sofía del
+  06/10). El título pasa a `primary-container` y a `text-h2` (`PageHero` estrena
+  `titleSize="h2"`; por defecto sigue el `display` de siempre). Medido: título y
+  filete `rgb(249,215,143)`, 56px en escritorio y 34px en mobile, filete de 1px
+  del ancho del título, hero entero a 1440×900, 1440×700 y 390×844.

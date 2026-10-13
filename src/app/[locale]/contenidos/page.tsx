@@ -121,7 +121,8 @@ export default async function ContenidosPage({
           scrollTo="biblioteca"
           height="full"
           overlay={isEnabled(content("contenidos.hero.overlay"))}
-          titleClassName="text-primary-fixed-dim"
+          titleClassName="text-primary-container"
+          titleSize="h2"
           titleRule="gold"
           raised
         />
