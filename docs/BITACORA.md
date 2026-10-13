@@ -3261,3 +3261,9 @@ sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
   `titleSize="h2"`; por defecto sigue el `display` de siempre). Medido: título y
   filete `rgb(249,215,143)`, 56px en escritorio y 34px en mobile, filete de 1px
   del ancho del título, hero entero a 1440×900, 1440×700 y 390×844.
+- **El texto del hero de /contenidos sube sobre las personas (13/10):** `raised`
+  pasa de un padding fijo (`pb-24 md:pb-28`) a uno proporcional al alto
+  (`pb-[36svh] md:pb-[30svh]`): con el fijo, en pantallas bajas el párrafo caía
+  sobre las cabezas de la imagen. Medido: el párrafo termina a 466px (1440×900),
+  396px (1440×700), 529px (1920×1080), 430px (390×844) y 384px (390×700), todos
+  por encima de las cabezas. `raised` sólo lo usa /contenidos.

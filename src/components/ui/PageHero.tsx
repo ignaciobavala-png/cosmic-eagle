@@ -139,7 +139,7 @@ export function PageHero({
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#05060a]/45" />
       </div>
 
-      <div className={`relative z-10 flex h-full flex-col items-center justify-center px-margin-mobile md:px-margin-desktop text-center ${raised ? "pb-24 md:pb-28" : ""}`}>
+      <div className={`relative z-10 flex h-full flex-col items-center justify-center px-margin-mobile md:px-margin-desktop text-center ${raised ? "pb-[36svh] md:pb-[30svh]" : ""}`}>
         {overlay && (
           <>
             {eyebrow && <div className="mb-5">{eyebrow}</div>}
