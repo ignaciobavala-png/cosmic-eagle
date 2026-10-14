@@ -1,13 +1,22 @@
 import Link from "next/link";
-import { CircleUser } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import {
   EXPERIENCE_LEVELS,
+  GENDER_LABELS,
   RELATIONSHIP_STATES,
-  buildContacts,
+  filterContacts,
   type Contact,
 } from "@/lib/crm";
+import { loadContacts } from "@/lib/crm-data";
+import { GENDERS } from "@/app/[locale]/cuenta/profile-fields";
 import { CopyEmails } from "../suscriptores/CopyEmails";
+import { DeleteContactButton } from "./DeleteContactButton";
+import { SendEmailPanel } from "./SendEmailPanel";
+import { MAX_RECIPIENTS } from "./actions";
+
+// El envío de correos segmentados es una server action que se queda esperando
+// ~600 ms por mail; sin esto Vercel la corta a los pocos segundos.
+export const maxDuration = 60;
 
 /**
  * CRM — primera version. Ver docs/CRM.md.
@@ -18,8 +27,9 @@ import { CopyEmails } from "../suscriptores/CopyEmails";
  * una vista con `security_invoker = true` (la RLS de applications_* ya deja leer
  * solo a admin, asi que la vista no abre nada nuevo).
  *
- * De los cuatro ejes que pidio la clienta solo estan los dos calculables:
- * experiencia y geografia. Genero y cargo no tienen de donde salir todavia.
+ * Ejes de filtro: estado, experiencia (nivel), pais, genero y viaje. El cargo
+ * (healer, lider, influencer) no tiene de donde salir todavia. Desde el 14/10 el
+ * grupo filtrado se puede eliminar de a uno y recibir un correo (SendEmailPanel).
  */
 
 const STATE_CLASS: Record<string, string> = {
@@ -98,43 +108,22 @@ function FilterRow({
 export default async function AdminCrmPage({
   searchParams,
 }: {
-  searchParams: Promise<{ estado?: string; nivel?: string; pais?: string }>;
+  searchParams: Promise<{
+    estado?: string;
+    nivel?: string;
+    pais?: string;
+    genero?: string;
+    viaje?: string;
+  }>;
 }) {
   // Ya awaiteado: `query` y no `params` para no confundirlo con el params de la ruta.
   const query = await searchParams;
   const supabase = await createClient();
 
-  const [{ data: profiles }, { data: applications }, { data: healthForms }] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("id, full_name, email, avatar_url, is_admin, created_at")
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("applications")
-        .select("user_id, status, previous_ceremonies, created_at"),
-      supabase
-        .from("health_form_first_time")
-        .select("country, created_at, applications(user_id)"),
-    ]);
-
-  const contacts = buildContacts({
-    profiles: profiles ?? [],
-    applications: applications ?? [],
-    // El pais cuelga del formulario extenso; se aplana el join acá para que
-    // `buildContacts` no dependa de la forma que devuelve PostgREST.
-    healthForms: (healthForms ?? []).flatMap((h) =>
-      h.applications
-        ? [
-            {
-              user_id: h.applications.user_id,
-              country: h.country,
-              created_at: h.created_at,
-            },
-          ]
-        : []
-    ),
-  });
+  const [contacts, { data: trips }] = await Promise.all([
+    loadContacts(supabase),
+    supabase.from("trips").select("id, title").order("start_date", { ascending: false }),
+  ]);
 
   function countBy(predicate: (c: Contact) => boolean) {
     return contacts.filter(predicate).length;
@@ -147,13 +136,20 @@ export default async function AdminCrmPage({
   const activeState = query.estado ?? null;
   const activeLevel = query.nivel ?? null;
   const activeCountry = query.pais ?? null;
+  const activeGender = query.genero ?? null;
+  const activeTrip = query.viaje ?? null;
 
-  const filtered = contacts.filter(
-    (c) =>
-      (!activeState || c.state === activeState) &&
-      (!activeLevel || c.experience === activeLevel) &&
-      (!activeCountry || c.country === activeCountry)
-  );
+  const filtered = filterContacts(contacts, query);
+
+  // Cómo se nombra el grupo en el redactor y en la confirmación.
+  const groupParts = [
+    activeState && RELATIONSHIP_STATES.find((s) => s.value === activeState)?.label,
+    activeLevel && EXPERIENCE_LEVELS.find((l) => l.value === activeLevel)?.label,
+    activeCountry,
+    activeGender && GENDER_LABELS[activeGender as keyof typeof GENDER_LABELS],
+    activeTrip && trips?.find((t) => t.id === activeTrip)?.title,
+  ].filter(Boolean);
+  const groupLabel = groupParts.length ? groupParts.join(" · ") : "todas las personas registradas";
 
   const emails = filtered
     .map((c) => c.email)
@@ -208,6 +204,42 @@ export default async function AdminCrmPage({
             }))}
           />
         )}
+        <FilterRow
+          label="Género"
+          param="genero"
+          active={activeGender}
+          current={query}
+          options={GENDERS.map((g) => ({
+            value: g,
+            label: GENDER_LABELS[g],
+            count: countBy((c) => c.gender === g),
+          }))}
+        />
+        {trips && trips.length > 0 && (
+          <FilterRow
+            label="Viaje"
+            param="viaje"
+            active={activeTrip}
+            current={query}
+            options={trips
+              .map((trip) => ({
+                value: trip.id,
+                label: trip.title,
+                count: countBy((c) => c.tripIds.includes(trip.id)),
+              }))
+              .filter((opt) => opt.count > 0)}
+          />
+        )}
+      </div>
+
+      <div className="mb-8">
+        <SendEmailPanel
+          key={groupLabel}
+          filters={query}
+          count={filtered.filter((c) => c.email && !c.isAdmin).length}
+          max={MAX_RECIPIENTS}
+          groupLabel={groupLabel}
+        />
       </div>
 
       {filtered.length === 0 ? (
@@ -216,16 +248,18 @@ export default async function AdminCrmPage({
         </p>
       ) : (
         <div className="glass-card overflow-x-auto rounded-2xl">
-          <table className="w-full min-w-[54rem] text-sm">
+          <table className="w-full min-w-[60rem] text-sm">
             <thead>
               <tr className="border-b border-outline-variant text-left text-on-surface-variant">
                 <th className="px-5 py-3 font-medium">Persona</th>
                 <th className="px-5 py-3 font-medium">País</th>
+                <th className="px-5 py-3 font-medium">Género</th>
                 <th className="px-5 py-3 font-medium">Experiencia</th>
                 <th className="px-5 py-3 font-medium">Ceremonias</th>
                 <th className="px-5 py-3 font-medium">Estado</th>
                 <th className="px-5 py-3 font-medium">Registro</th>
                 <th className="px-5 py-3 font-medium sr-only">Ficha</th>
+                <th className="px-5 py-3 font-medium sr-only">Eliminar</th>
               </tr>
             </thead>
             <tbody>
@@ -236,19 +270,12 @@ export default async function AdminCrmPage({
                 >
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      {contact.avatarUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={contact.avatarUrl}
-                          alt=""
-                          className="h-8 w-8 shrink-0 rounded-full object-cover"
-                        />
-                      ) : (
-                        <CircleUser
-                          size={32}
-                          className="shrink-0 text-on-surface-variant/50"
-                        />
-                      )}
+                      <span
+                        aria-hidden="true"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-outline/40 font-display text-sm text-on-surface-variant"
+                      >
+                        {(contact.fullName?.trim()?.[0] ?? contact.email?.[0] ?? "?").toUpperCase()}
+                      </span>
                       <div className="min-w-0">
                         <p className="truncate font-medium text-on-surface">
                           {contact.fullName ?? "Sin nombre"}
@@ -266,6 +293,9 @@ export default async function AdminCrmPage({
                   </td>
                   <td className="px-5 py-4 text-on-surface-variant">
                     {contact.country ?? "—"}
+                  </td>
+                  <td className="px-5 py-4 text-on-surface-variant">
+                    {GENDER_LABELS[contact.gender as keyof typeof GENDER_LABELS] ?? "—"}
                   </td>
                   <td className="px-5 py-4 text-on-surface-variant">
                     {EXPERIENCE_LEVELS.find(
@@ -297,6 +327,14 @@ export default async function AdminCrmPage({
                       Ficha de salud →
                     </Link>
                   </td>
+                  <td className="px-5 py-4 text-right">
+                    {!contact.isAdmin && (
+                      <DeleteContactButton
+                        id={contact.id}
+                        name={contact.fullName ?? contact.email ?? "esta persona"}
+                      />
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -305,10 +343,10 @@ export default async function AdminCrmPage({
       )}
 
       <p className="mt-6 text-xs text-on-surface-variant/70">
-        Los umbrales de Avanzado y Experto son provisorios y el país solo lo
-        tienen quienes completaron el formulario de primera vez. Género y cargo
-        (healer, líder, influencer) todavía no se registran en ningún lado — ver
-        docs/CRM.md.
+        Los umbrales de Avanzado y Experto son provisorios. País y género los
+        completa cada persona en su perfil; mientras no lo hizo, el país sale de
+        su última solicitud. El cargo (healer, líder, influencer) todavía no se
+        registra en ningún lado — ver docs/CRM.md.
       </p>
     </div>
   );

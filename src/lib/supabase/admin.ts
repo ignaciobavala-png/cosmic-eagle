@@ -18,7 +18,9 @@ import type { Database } from "./types";
  *    de cliente, el build falla en vez de filtrar la llave al bundle.
  * 2. La variable **no lleva `NEXT_PUBLIC_`**. Nunca. Con ese prefijo, Next la
  *    inlinea en el JavaScript que se descarga el visitante.
- * 3. **Ningun otro archivo importa esto.** Toda la app —panel de admin incluido—
+ * 3. **Casi ningun otro archivo importa esto** (el unico segundo consumidor es
+ *    `deleteContact` del CRM, que necesita `auth.admin.deleteUser` y pasa antes
+ *    por una verificacion de `profiles.is_admin`). Toda la app —panel de admin incluido—
  *    trabaja con la sesion del usuario y su RLS, que es lo que hace que un bug
  *    de policy se note. Si aparece un segundo consumidor, hay que justificar por
  *    que no puede usar `createClient` de server.ts.

@@ -291,3 +291,35 @@ export async function unshareArticle(id: string): Promise<{ error: string | null
   revalidatePath("/admin/contenidos");
   return { error: null };
 }
+
+/**
+ * Sube o baja un contenido en el orden del sitio (14/10, pedido de la
+ * clienta). `sort_order` puede tener empates (los nuevos entran con 0), así que
+ * no se intercambian dos valores: se lee el orden que hoy se ve, se mueve el
+ * contenido una posición y se renumera todo de 1 a N. Son decenas de filas.
+ */
+export async function moveArticle(id: string, direction: "up" | "down") {
+  const supabase = await createClient();
+  const { data: rows } = await supabase
+    .from("articles")
+    .select("id")
+    .order("sort_order", { ascending: true })
+    .order("published_at", { ascending: false, nullsFirst: true })
+    .order("created_at", { ascending: false });
+  if (!rows) return;
+
+  const ids = rows.map((r) => r.id);
+  const from = ids.indexOf(id);
+  const to = direction === "up" ? from - 1 : from + 1;
+  if (from < 0 || to < 0 || to >= ids.length) return;
+
+  [ids[from], ids[to]] = [ids[to], ids[from]];
+
+  await Promise.all(
+    ids.map((articleId, index) =>
+      supabase.from("articles").update({ sort_order: index + 1 }).eq("id", articleId)
+    )
+  );
+
+  revalidateArticlePaths();
+}

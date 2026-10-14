@@ -8,11 +8,11 @@ import { redirect } from "@/i18n/redirect";
 import { publicPath } from "@/i18n/public-path";
 import { dialCodeFor } from "@/lib/phone-countries";
 import { capitalizeName } from "@/lib/person-name";
-import { REFERRAL_SOURCES } from "./profile-fields";
+import { canonicalCountry } from "@/lib/countries";
+import { GENDERS, REFERRAL_SOURCES } from "./profile-fields";
 
 export type LoginState = { error: string | null };
 export type SignupState = { error: string | null };
-export type AvatarState = { error: string | null };
 export type RecoverState = { error: string | null; sent: boolean };
 export type NewPasswordState = { error: string | null };
 export type ProfileState = { error: string | null; saved: boolean };
@@ -183,58 +183,6 @@ export async function updatePassword(
   return await redirect("/cuenta?aviso=clave-cambiada");
 }
 
-export async function updateAvatar(
-  _prevState: AvatarState,
-  formData: FormData
-): Promise<AvatarState> {
-  const t = await getTranslations("Cuenta");
-  const file = formData.get("avatar");
-
-  if (!(file instanceof File) || file.size === 0) {
-    return { error: t("formErrors.chooseImage") };
-  }
-
-  if (!file.type.startsWith("image/")) {
-    return { error: t("formErrors.notImage") };
-  }
-
-  if (file.size > 3 * 1024 * 1024) {
-    return { error: t("formErrors.tooBig") };
-  }
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: t("formErrors.sessionExpired") };
-  }
-
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const path = `${user.id}/avatar.${ext}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from("avatars")
-    .upload(path, file, { upsert: true, contentType: file.type });
-
-  if (uploadError) {
-    return { error: t("formErrors.uploadFailed") };
-  }
-
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from("avatars").getPublicUrl(path);
-
-  await supabase
-    .from("profiles")
-    .update({ avatar_url: `${publicUrl}?v=${Date.now()}` })
-    .eq("id", user.id);
-
-  revalidatePath(publicPath("/"), "layout");
-  return { error: null };
-}
-
 /**
  * El perfil personal de /cuenta (correcciones de la organización, 03/10,
  * §5.1, opción A): lo estable de la persona. La salud no pasa por acá.
@@ -253,6 +201,8 @@ export async function updateProfile(
   };
 
   const fullName = text("full_name");
+  const country = canonicalCountry(text("country"));
+  const gender = text("gender");
   const phoneNumber = text("phone_number");
   const dial = dialCodeFor(text("phone_country"));
   const profession = text("profession");
@@ -264,6 +214,8 @@ export async function updateProfile(
 
   if (
     !fullName ||
+    !country ||
+    !(GENDERS as readonly string[]).includes(gender) ||
     !phoneNumber ||
     !dial ||
     !profession ||
@@ -291,6 +243,8 @@ export async function updateProfile(
     .from("profiles")
     .update({
       full_name: capitalizeName(fullName),
+      country,
+      gender,
       phone: `+${dial} ${phoneNumber}`,
       profession,
       social_url: socialUrl || null,

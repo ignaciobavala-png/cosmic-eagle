@@ -3,12 +3,23 @@
  *
  * Todo lo de aca es derivado: no hay tabla de CRM. El universo son las personas
  * registradas (`profiles`) y las etiquetas salen de su historial de solicitudes.
- * Los ejes que la clienta pidio y NO se pueden calcular (genero, cargo, y pais
- * para quien nunca lleno el formulario largo) todavia no tienen de donde salir
- * — falta definir si los carga el admin o se los pedimos a la persona.
+ *
+ * Pais y genero los carga la propia persona en su perfil (14/10). El pais, para
+ * quien todavia no lo cargo, se completa con el de su ultima solicitud (el
+ * filtro corto lo pide a todos) y, en ultimo lugar, con el del formulario de
+ * salud. El cargo (healer, lider, influencer) sigue sin tener de donde salir.
  */
 
 import type { Enums } from "@/lib/supabase/types";
+import { canonicalCountry } from "@/lib/countries";
+import { GENDERS } from "@/app/[locale]/cuenta/profile-fields";
+
+export const GENDER_LABELS: Record<(typeof GENDERS)[number], string> = {
+  mujer: "Mujer",
+  hombre: "Hombre",
+  no_binario: "No binario",
+  prefiero_no_decir: "Prefiere no decirlo",
+};
 
 /**
  * Escala de experiencia de la reunion del 2026-08-03.
@@ -50,6 +61,8 @@ export type RelationshipState = (typeof RELATIONSHIP_STATES)[number]["value"];
 
 export type ApplicationRow = {
   user_id: string;
+  trip_id: string;
+  residence_country: string;
   status: Enums<"application_status">;
   previous_ceremonies: number;
   created_at: string;
@@ -70,19 +83,22 @@ export type ProfileRow = {
   id: string;
   full_name: string | null;
   email: string | null;
-  avatar_url: string | null;
   is_admin: boolean;
   created_at: string;
+  country: string | null;
+  gender: string | null;
 };
 
 export type Contact = {
   id: string;
   fullName: string | null;
   email: string | null;
-  avatarUrl: string | null;
   isAdmin: boolean;
   createdAt: string;
   country: string | null;
+  gender: string | null;
+  /** Los viajes a los que aplicó (cualquier estado): para segmentar por experiencia. */
+  tripIds: string[];
   ceremonies: number;
   experience: ExperienceLevel;
   state: RelationshipState;
@@ -120,11 +136,14 @@ export function buildContacts({
       0
     );
 
-    const country =
-      healthForms
-        .filter((h) => h.user_id === profile.id)
-        .sort((a, b) => b.created_at.localeCompare(a.created_at))[0]?.country ??
-      null;
+    const latest = <T extends { created_at: string }>(rows: T[]) =>
+      [...rows].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+
+    const country = canonicalCountry(
+      profile.country ??
+        latest(all)?.residence_country ??
+        latest(healthForms.filter((h) => h.user_id === profile.id))?.country
+    );
 
     const state: RelationshipState = approved
       ? "viajero"
@@ -143,14 +162,35 @@ export function buildContacts({
       id: profile.id,
       fullName: profile.full_name,
       email: profile.email,
-      avatarUrl: profile.avatar_url,
       isAdmin: profile.is_admin,
       createdAt: profile.created_at,
       country,
+      gender: profile.gender,
+      tripIds: [...new Set(all.map((a) => a.trip_id))],
       ceremonies,
       experience: experienceLevel(ceremonies),
       state,
       applications: all.length,
     };
   });
+}
+
+export type ContactFilters = {
+  estado?: string;
+  nivel?: string;
+  pais?: string;
+  genero?: string;
+  viaje?: string;
+};
+
+/** Un solo criterio para la tabla y para el envío: lo que se ve es lo que recibe. */
+export function filterContacts(contacts: Contact[], f: ContactFilters): Contact[] {
+  return contacts.filter(
+    (c) =>
+      (!f.estado || c.state === f.estado) &&
+      (!f.nivel || c.experience === f.nivel) &&
+      (!f.pais || c.country === f.pais) &&
+      (!f.genero || c.gender === f.genero) &&
+      (!f.viaje || c.tripIds.includes(f.viaje))
+  );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState, type MouseEvent } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
@@ -10,8 +10,7 @@ import { ArticleBody } from "./ArticleBody";
 import { ArticleAudio } from "./ArticleAudio";
 import { CtaLink } from "./CtaLink";
 import { TitleRule } from "./TitleRule";
-import { formatArticleDate, type ArticleBlock } from "@/lib/article";
-import type { FormatLocale } from "@/lib/format";
+import type { ArticleBlock } from "@/lib/article";
 
 /**
  * La biblioteca de /contenidos como experiencia de un solo espacio.
@@ -45,7 +44,6 @@ export type LibraryArticle = {
   excerpt: string | null;
   cover_url: string | null;
   category: string;
-  published_at: string | null;
   /** El nivel del texto supera al de quien mira: se muestra con candado. */
   locked: boolean;
   /** `null` cuando está cerrado o no se pudo leer el cuerpo. */
@@ -81,7 +79,6 @@ export function ContentLibrary({
 }) {
   const t = useTranslations("Contenidos");
   const tCat = useTranslations("ArticleCategories");
-  const locale = (useLocale() === "en" ? "en" : "es") as FormatLocale;
   const searchParams = useSearchParams();
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -236,11 +233,6 @@ export function ContentLibrary({
                 <h3 className="mt-4 font-display text-headline-md font-bold text-[#05125a] text-balance">
                   {openArticle.title}
                 </h3>
-                {formatArticleDate(openArticle.published_at) && (
-                  <p className="mt-2 text-label-sm uppercase text-on-primary-container">
-                    {formatArticleDate(openArticle.published_at, locale)}
-                  </p>
-                )}
               </div>
               <button
                 type="button"
@@ -373,7 +365,6 @@ function LibraryCard({
   onOpen: (slug: string) => void;
 }) {
   const t = useTranslations("Contenidos");
-  const locale = (useLocale() === "en" ? "en" : "es") as FormatLocale;
   return (
     <Link
       href={`/contenidos/${article.slug}`}
@@ -419,11 +410,11 @@ function LibraryCard({
           <span className="block text-label-sm uppercase text-on-primary-container">
             {article.locked ? t("library.statusLocked") : t("library.statusPublished")}
           </span>
-          <span className="mt-1 block text-body-md text-[#05125a]">
-            {article.locked
-              ? t("library.requiresAccess")
-              : (formatArticleDate(article.published_at, locale) ?? "—")}
-          </span>
+          {article.locked && (
+            <span className="mt-1 block text-body-md text-[#05125a]">
+              {t("library.requiresAccess")}
+            </span>
+          )}
         </div>
       </div>
     </Link>

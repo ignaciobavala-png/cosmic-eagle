@@ -270,6 +270,15 @@
       "intro": "Con estos datos te conocemos antes de cualquier experiencia. Los completas una vez y los puedes cambiar cuando quieras.",
       "fullName": "Nombre completo",
       "phone": "Teléfono",
+      "country": "País de residencia",
+      "gender": "Género",
+      "chooseGender": "Elige una opción",
+      "genders": {
+        "mujer": "Mujer",
+        "hombre": "Hombre",
+        "no_binario": "No binario",
+        "prefiero_no_decir": "Prefiero no decirlo"
+      },
       "profession": "Profesión u oficio",
       "social": "Red social o sitio web",
       "optional": "(opcional)",
@@ -322,6 +331,9 @@
     "updated": "Última actualización: {date}"
   },
   "Contenidos": {
+    "testimonials": {
+      "title": "Testimonios"
+    },
     "meta": {
       "title": "Contenidos | Cosmic Eagle",
       "description": "Preparación e integración, salud, evolución, tecnología humana y testimonios: la biblioteca de contenidos de Cosmic Eagle.",

@@ -18,10 +18,13 @@ import {
 import { splitPhone } from "@/lib/phone-countries";
 import { capitalizeName } from "@/lib/person-name";
 import { updateProfile, type ProfileState } from "./actions";
-import { REFERRAL_SOURCES } from "./profile-fields";
+import { COUNTRY_NAMES } from "@/lib/countries";
+import { GENDERS, REFERRAL_SOURCES } from "./profile-fields";
 
 export type ProfileData = {
   full_name: string | null;
+  country: string | null;
+  gender: string | null;
   phone: string | null;
   profession: string | null;
   social_url: string | null;
@@ -64,6 +67,13 @@ export function ProfileCard({ profile }: { profile: ProfileData }) {
 
   if (!editing) {
     const rows: [string, string | null][] = [
+      [t("country"), profile.country],
+      [
+        t("gender"),
+        profile.gender && (GENDERS as readonly string[]).includes(profile.gender)
+          ? t(`genders.${profile.gender}`)
+          : null,
+      ],
       [t("phone"), profile.phone],
       [t("profession"), profile.profession],
       [t("social"), profile.social_url],
@@ -128,6 +138,49 @@ export function ProfileCard({ profile }: { profile: ProfileData }) {
             defaultValue={profile.full_name ? capitalizeName(profile.full_name) : ""}
             className={fieldInput}
           />
+        </div>
+
+        <div className={fieldWrap}>
+          <label htmlFor="profile-country" className={fieldLabel}>
+            {t("country")}
+          </label>
+          <input
+            id="profile-country"
+            name="country"
+            type="text"
+            required
+            list="profile-country-list"
+            autoComplete="country-name"
+            defaultValue={profile.country ?? ""}
+            className={fieldInput}
+          />
+          <datalist id="profile-country-list">
+            {COUNTRY_NAMES.map((name) => (
+              <option key={name} value={name} />
+            ))}
+          </datalist>
+        </div>
+
+        <div className={fieldWrap}>
+          <label htmlFor="profile-gender" className={fieldLabel}>
+            {t("gender")}
+          </label>
+          <select
+            id="profile-gender"
+            name="gender"
+            required
+            defaultValue={profile.gender ?? ""}
+            className={fieldInput}
+          >
+            <option value="" disabled>
+              {t("chooseGender")}
+            </option>
+            {GENDERS.map((gender) => (
+              <option key={gender} value={gender} className="text-[#05125a]">
+                {t(`genders.${gender}`)}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className={fieldWrap}>

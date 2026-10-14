@@ -246,6 +246,7 @@ export type Database = {
           id: string
           published_at: string | null
           slug: string
+          sort_order: number
           status: Database["public"]["Enums"]["article_status"]
           title: string
           title_en: string | null
@@ -265,6 +266,7 @@ export type Database = {
           id?: string
           published_at?: string | null
           slug: string
+          sort_order?: number
           status?: Database["public"]["Enums"]["article_status"]
           title: string
           title_en?: string | null
@@ -284,6 +286,7 @@ export type Database = {
           id?: string
           published_at?: string | null
           slug?: string
+          sort_order?: number
           status?: Database["public"]["Enums"]["article_status"]
           title?: string
           title_en?: string | null
@@ -702,9 +705,11 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          country: string | null
           created_at: string
           email: string | null
           full_name: string | null
+          gender: string | null
           id: string
           is_admin: boolean
           phone: string | null
@@ -718,9 +723,11 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
+          gender?: string | null
           id: string
           is_admin?: boolean
           phone?: string | null
@@ -734,9 +741,11 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
+          gender?: string | null
           id?: string
           is_admin?: boolean
           phone?: string | null
@@ -990,6 +999,7 @@ export type Database = {
           id: string | null
           published_at: string | null
           slug: string | null
+          sort_order: number | null
           title: string | null
           title_en: string | null
         }
@@ -1095,7 +1105,7 @@ export type Database = {
         | "final_details"
         | "integration"
         | "feedback"
-      testimonial_placement: "home" | "sesiones" | "viajes"
+      testimonial_placement: "home" | "sesiones" | "viajes" | "contenidos"
       trip_category: "mixto" | "mujeres" | "hombres" | "avanzados"
       trip_status: "draft" | "open" | "closed" | "completed"
       trip_type: "retiro" | "ceremonia"
@@ -1258,7 +1268,7 @@ export const Constants = {
         "integration",
         "feedback",
       ],
-      testimonial_placement: ["home", "sesiones", "viajes"],
+      testimonial_placement: ["home", "sesiones", "viajes", "contenidos"],
       trip_category: ["mixto", "mujeres", "hombres", "avanzados"],
       trip_status: ["draft", "open", "closed", "completed"],
       trip_type: ["retiro", "ceremonia"],

@@ -3267,3 +3267,42 @@ sigue apagando de una. Sección a `350vh`. Y el Propósito de /nosotros pasa a
   sobre las cabezas de la imagen. Medido: el párrafo termina a 466px (1440×900),
   396px (1440×700), 529px (1920×1080), 430px (390×844) y 384px (390×700), todos
   por encima de las cabezas. `raised` sólo lo usa /contenidos.
+
+## 14/10 — Pedidos de Sofía: contenidos, avatar, KPI, CRM y correos segmentados
+
+Todo en el working tree, **sin commit ni push**. Las migraciones **ya están
+aplicadas en la base** (`20261014120000`, `20261014120100`).
+
+- **Orden de los contenidos:** `articles.sort_order` (se rellenó con el orden que
+  ya tenía el sitio). Flechas subir/bajar en `/admin/contenidos`
+  (`moveArticle` renumera todo de 1 a N: los nuevos entran con 0 y empatan, así
+  que no se intercambian dos valores). El listado público y los "otros
+  contenidos" ordenan por `sort_order`. `articles_public` ganó la columna al final.
+- **Sin fecha en los artículos:** se sacó de la tarjeta, del lector y de la ficha;
+  de la tabla del panel también. `published_at` sigue en la base.
+- **Testimonios en /contenidos:** nuevo valor `contenidos` en
+  `testimonial_placement` (migración propia, por la trampa del enum), banda al pie
+  de la biblioteca, se carga desde `/admin/testimonios`. Sin testimonios cargados
+  no se muestra. **Es una interpretación del pedido** ("agregar testimonios a la
+  sección artículos"); la categoría de artículo `testimonios` ya existía.
+- **Artículo de bienvenida publicado** (`bienvenido-a-cosmic-eagle-journey`,
+  tenía audio). Sigue con acceso `miembros`: lo ve quien tiene sesión.
+- **Avatar = inicial del nombre.** Se sacó `AvatarUpload` y `updateAvatar`;
+  `Header`, `/cuenta` y el CRM muestran la letra. `avatar_url` ya no se lee. Las
+  policies del bucket `avatars` quedan (inofensivas); si se quiere cerrar la
+  escritura directa por API hay que borrarlas.
+- **KPI "Experiencias activas"** (viajes + sesiones) y tarjeta "Personas en el CRM"
+  en el dashboard.
+- **CRM:** el país no se veía porque salía sólo del formulario de salud (etapa 2).
+  Ahora `profiles.country` + `profiles.gender` (se piden en el perfil de /cuenta)
+  con el país de la última solicitud como respaldo, y `canonicalCountry` unifica
+  "chile"/"Chile ". Filtros nuevos: género y viaje. Eliminar personas
+  (`deleteContact`: `auth.admin.deleteUser`, borra antes `consents` por el
+  `on delete restrict`; no deja borrar admins ni a uno mismo). **Segundo
+  consumidor de `createAdminClient`**, documentado en `admin.ts`.
+- **Correos segmentados** (`SendEmailPanel`, `sendSegmentedEmail`): el público se
+  calcula en el servidor con el mismo `filterContacts` de la tabla; máximo 80 por
+  envío, 600 ms entre mails, plantilla `MensajeEquipo`. Sin baja automática: el
+  pie pide responder el correo.
+- **Informe de comunicaciones** para la integración de WhatsApp:
+  `~/Escritorio/informe-comunicaciones-cosmic-eagle.html` (fuera del repo).

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
-import { articleCategoryLabel, formatArticleDate } from "@/lib/article";
+import { articleCategoryLabel } from "@/lib/article";
 import { DeleteArticleButton } from "./DeleteArticleButton";
 import { ShareArticleButton } from "./ShareArticleButton";
+import { MoveArticleButtons } from "./MoveArticleButtons";
 
 const STATUS_LABEL: Record<string, string> = {
   draft: "Borrador",
@@ -25,8 +26,12 @@ export default async function AdminContenidosPage() {
   const [{ data: articles }, { data: shares }] = await Promise.all([
     supabase
       .from("articles")
-      .select("id, title, slug, category, status, cover_url, published_at, updated_at")
-      .order("updated_at", { ascending: false }),
+      .select("id, title, slug, category, status, cover_url")
+      // El mismo orden que ve el público (ver moveArticle). Los borradores, que
+      // el público no ve, entran con 0 y quedan arriba hasta que se los mueva.
+      .order("sort_order", { ascending: true })
+      .order("published_at", { ascending: false, nullsFirst: true })
+      .order("created_at", { ascending: false }),
     supabase.from("article_shares").select("article_id, token"),
   ]);
   const tokenById = new Map((shares ?? []).map((s) => [s.article_id, s.token]));
@@ -53,6 +58,7 @@ export default async function AdminContenidosPage() {
         . Mientras esté en borrador no lo ve nadie más que tú. Con
         &ldquo;Compartir&rdquo; se copia un link para mandar: quien lo abre lee
         ese contenido entero, sin cuenta, aunque sea de programa o un borrador.
+        Con las flechas se cambia el orden en que aparecen en el sitio.
       </p>
 
       {!articles || articles.length === 0 ? (
@@ -64,19 +70,26 @@ export default async function AdminContenidosPage() {
           <table className="w-full min-w-[44rem] text-sm">
             <thead>
               <tr className="border-b border-outline-variant text-left text-on-surface-variant">
+                <th className="px-5 py-3 font-medium">Orden</th>
                 <th className="px-5 py-3 font-medium">Título</th>
                 <th className="px-5 py-3 font-medium">Categoría</th>
-                <th className="px-5 py-3 font-medium">Publicado</th>
                 <th className="px-5 py-3 font-medium">Estado</th>
                 <th className="px-5 py-3 font-medium text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {articles.map((article) => (
+              {articles.map((article, index) => (
                 <tr
                   key={article.id}
                   className="border-b border-outline-variant/40 last:border-0"
                 >
+                  <td className="px-5 py-4">
+                    <MoveArticleButtons
+                      id={article.id}
+                      isFirst={index === 0}
+                      isLast={index === articles.length - 1}
+                    />
+                  </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="relative h-10 w-16 shrink-0 overflow-hidden rounded bg-surface-container-lowest">
@@ -102,9 +115,6 @@ export default async function AdminContenidosPage() {
                   </td>
                   <td className="px-5 py-4 text-on-surface-variant">
                     {articleCategoryLabel(article.category)}
-                  </td>
-                  <td className="px-5 py-4 text-on-surface-variant">
-                    {formatArticleDate(article.published_at) ?? "—"}
                   </td>
                   <td className="px-5 py-4">
                     <span

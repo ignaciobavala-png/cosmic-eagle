@@ -17,6 +17,8 @@ import {
 import { canRead } from "@/lib/content-access";
 import { viewerContentLevel } from "@/lib/content-access-server";
 import { IMAGES } from "@/lib/constants";
+import { TestimonialsBand } from "@/components/ui/TestimonialsBand";
+import { getTestimonials } from "@/lib/testimonials";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 export async function generateMetadata({
@@ -61,14 +63,16 @@ export default async function ContenidosPage({
 
   const supabase = await createClient();
 
-  const [{ data: metas }, viewerLevel] = await Promise.all([
+  const [{ data: metas }, viewerLevel, testimonios] = await Promise.all([
     supabase
       .from("articles_public")
       .select(
-        "slug, title, title_en, excerpt, excerpt_en, cover_url, category, published_at, access_level"
+        "slug, title, title_en, excerpt, excerpt_en, cover_url, category, access_level"
       )
+      .order("sort_order", { ascending: true })
       .order("published_at", { ascending: false, nullsFirst: false }),
     viewerContentLevel(supabase),
+    getTestimonials("contenidos", locale),
   ]);
 
   // El cuerpo, sólo de lo que la RLS deja leer. `articles_public` no expone
@@ -96,7 +100,6 @@ export default async function ContenidosPage({
       excerpt: localized(locale, meta.excerpt, meta.excerpt_en),
       cover_url: meta.cover_url,
       category: meta.category!,
-      published_at: meta.published_at,
       locked,
       blocks: body ? parseArticleBody(body) : null,
       audio_url: body ? (audioBySlug.get(slug) ?? null) : null,
@@ -159,6 +162,11 @@ export default async function ContenidosPage({
               articles={articles}
             />
           </div>
+
+          <TestimonialsBand
+            title={t("testimonials.title")}
+            testimonials={testimonios}
+          />
         </CreamSection>
       </main>
       <Footer />

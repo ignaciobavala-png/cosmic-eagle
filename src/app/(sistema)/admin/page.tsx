@@ -3,9 +3,9 @@ import {
   CalendarCheck2,
   ClipboardList,
   Compass,
-  Flame,
   Mail,
   UserCheck,
+  Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { TRIP_TYPES, tripAdminPath, tripTypeLabel } from "@/lib/trip-type";
@@ -39,6 +39,7 @@ export default async function AdminDashboardPage() {
     { count: pendingCount },
     { count: approvedCount },
     { count: subscribers },
+    { count: contactsCount },
     { data: upcomingTrips },
     { data: recentApplications },
   ] = await Promise.all([
@@ -71,6 +72,10 @@ export default async function AdminDashboardPage() {
     supabase
       .from("newsletter_subscribers")
       .select("*", { count: "exact", head: true }),
+    supabase
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("is_admin", false),
     // "Proximo" es literal: sin el filtro por fecha, el orden ascendente
     // devolvia el viaje MAS VIEJO de la base y la tarjeta anunciaba como
     // proximo algo que ya habia pasado. Se descarta lo terminado, no lo
@@ -91,19 +96,14 @@ export default async function AdminDashboardPage() {
   ]);
 
   const stats = [
+    // Un solo KPI para viajes y sesiones (Sofía, 14/10). Lleva al listado de
+    // viajes; el detalle por tipo queda en el hint.
     {
       href: TRIP_TYPES.retiro.adminPath,
-      label: "Viajes activos",
-      value: openRetiros ?? 0,
-      hint: `${totalRetiros ?? 0} en total`,
+      label: "Experiencias activas",
+      value: (openRetiros ?? 0) + (openCeremonias ?? 0),
+      hint: `${openRetiros ?? 0} de ${totalRetiros ?? 0} viajes · ${openCeremonias ?? 0} de ${totalCeremonias ?? 0} sesiones`,
       icon: Compass,
-    },
-    {
-      href: TRIP_TYPES.ceremonia.adminPath,
-      label: "Sesiones activas",
-      value: openCeremonias ?? 0,
-      hint: `${totalCeremonias ?? 0} en total`,
-      icon: Flame,
     },
     {
       href: "/admin/solicitudes?status=pending_review",
@@ -119,6 +119,13 @@ export default async function AdminDashboardPage() {
       value: approvedCount ?? 0,
       hint: "acceso al panel de viajero",
       icon: UserCheck,
+    },
+    {
+      href: "/admin/crm",
+      label: "Personas en el CRM",
+      value: contactsCount ?? 0,
+      hint: "segmentar y enviar correos",
+      icon: Users,
     },
     {
       href: "/admin/suscriptores",

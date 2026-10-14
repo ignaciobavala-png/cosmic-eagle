@@ -18,6 +18,7 @@ import { PagoRegistrado } from "@/emails/PagoRegistrado";
 import { RecordatorioSaldo } from "@/emails/RecordatorioSaldo";
 import { FormulariosPendientes } from "@/emails/FormulariosPendientes";
 import { DatosFinales } from "@/emails/DatosFinales";
+import { MensajeEquipo } from "@/emails/MensajeEquipo";
 
 const VIAJE = "Sesión en Buenos Aires";
 const FECHAS = "5 de septiembre de 2026";
@@ -102,6 +103,16 @@ export const PREVIEWS: Record<string, { titulo: string; el: () => React.ReactEle
   consentimiento: {
     titulo: "[4A] Falta sólo el consentimiento",
     el: () => FormulariosPendientes({ ...base, falta: "consentimiento" }),
+  },
+  mensaje: {
+    titulo: "[CRM] Mensaje del equipo",
+    el: () =>
+      MensajeEquipo({
+        nombre: base.nombre,
+        asunto: "Una invitación para ti",
+        mensaje:
+          "Queríamos contarte que abrimos nuevas fechas.\n\nSi quieres saber más, responde este correo.",
+      }),
   },
   datos: {
     titulo: "[7] Datos finales",

@@ -13,3 +13,12 @@ export const REFERRAL_SOURCES = [
 ] as const;
 
 export type ReferralSource = (typeof REFERRAL_SOURCES)[number];
+
+/**
+ * Género, para segmentar los correos del CRM. El valor se guarda en
+ * `profiles.gender` (hay un CHECK con la misma lista); la etiqueta sale de
+ * `Cuenta.profile.genders.<valor>` y, en el panel, de `GENDER_LABELS`.
+ */
+export const GENDERS = ["mujer", "hombre", "no_binario", "prefiero_no_decir"] as const;
+
+export type Gender = (typeof GENDERS)[number];

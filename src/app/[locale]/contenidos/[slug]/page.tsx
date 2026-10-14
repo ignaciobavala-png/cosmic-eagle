@@ -13,11 +13,9 @@ import { createClient } from "@/lib/supabase/server";
 import { localizeRow } from "@/lib/localized";
 import { AccessCodeForm } from "@/components/ui/AccessCodeForm";
 import {
-  formatArticleDate,
   parseArticleBody,
 } from "@/lib/article";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import type { FormatLocale } from "@/lib/format";
 
 /**
  * Los "otros contenidos" que van debajo del recuadro de lectura (pedido de la
@@ -29,8 +27,9 @@ async function getOthers(slug: string, category: string, locale: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("articles_public")
-    .select("slug, title, title_en, category, published_at")
+    .select("slug, title, title_en, category")
     .neq("slug", slug)
+    .order("sort_order", { ascending: true })
     .order("published_at", { ascending: false, nullsFirst: false });
 
   const rows = (data ?? [])
@@ -56,7 +55,7 @@ async function getTeaser(slug: string, locale: string) {
   const { data } = await supabase
     .from("articles_public")
     .select(
-      "title, title_en, excerpt, excerpt_en, cover_url, category, published_at, access_level"
+      "title, title_en, excerpt, excerpt_en, cover_url, category, access_level"
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -74,7 +73,7 @@ async function getArticle(slug: string, locale: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("articles")
-    .select("title, excerpt, body, body_en, cover_url, category, published_at, audio_url")
+    .select("title, excerpt, body, body_en, cover_url, category, audio_url")
     .eq("slug", slug)
     .maybeSingle();
 
@@ -114,7 +113,6 @@ export default async function ContenidoPage({
 }) {
   const { locale: rawLocale, slug } = await params;
   setRequestLocale(rawLocale);
-  const locale: FormatLocale = rawLocale === "en" ? "en" : "es";
   const t = await getTranslations("Contenidos");
   const tCat = await getTranslations("ArticleCategories");
   const [teaser, article] = await Promise.all([
@@ -130,7 +128,6 @@ export default async function ContenidoPage({
   const locked = !article;
 
   const blocks = article ? parseArticleBody(article.body) : [];
-  const date = formatArticleDate(teaser.published_at, locale);
   const others = await getOthers(slug, teaser.category!, rawLocale);
 
   return (
@@ -174,11 +171,6 @@ export default async function ContenidoPage({
               <span className="rounded-full border border-on-primary-container/40 px-3 py-1 text-label-sm uppercase text-on-primary-container">
                 {tCat(teaser.category!)}
               </span>
-              {date && (
-                <span className="text-label-sm uppercase text-on-primary-container">
-                  {date}
-                </span>
-              )}
             </div>
 
             <h1 className="mt-5 font-display text-display-mobile font-bold text-[#05125a] text-balance md:text-display-lg">

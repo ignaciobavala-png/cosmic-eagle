@@ -15,7 +15,6 @@ import {
   Sparkles,
   BookOpen,
   User,
-  CircleUser,
   ChevronDown,
 } from "lucide-react";
 import Image from "next/image";
@@ -37,7 +36,6 @@ const iconMap = {
 
 type AccountProfile = {
   fullName: string | null;
-  avatarUrl: string | null;
   isAdmin: boolean;
 } | null;
 
@@ -66,14 +64,13 @@ export function Header() {
 
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, avatar_url, is_admin")
+        .select("full_name, is_admin")
         .eq("id", user.id)
         .single();
 
       if (!active) return;
       setProfile({
         fullName: data?.full_name ?? null,
-        avatarUrl: data?.avatar_url ?? null,
         isAdmin: data?.is_admin ?? false,
       });
     }
@@ -94,15 +91,14 @@ export function Header() {
   // `<a>` del panel: se arma una vez y lo usan los dos.
   const accountContent = profile ? (
     <>
-      {profile.avatarUrl ? (
-        <img
-          src={profile.avatarUrl}
-          alt=""
-          className="w-7 h-7 rounded-full object-cover"
-        />
-      ) : (
-        <CircleUser size={20} />
-      )}
+      {/* El avatar es siempre la inicial del nombre (Sofía, 14/10): no se
+          sube foto, así que `avatar_url` ya no se lee ni se muestra. */}
+      <span
+        aria-hidden="true"
+        className="flex h-7 w-7 items-center justify-center rounded-full border border-primary-container/60 font-display text-sm leading-none text-primary-container"
+      >
+        {(profile.fullName?.trim()?.[0] ?? "?").toUpperCase()}
+      </span>
       <span className="font-display text-label-sm uppercase">
         {profile.fullName?.split(" ")[0] || t("accountFallback")}
       </span>

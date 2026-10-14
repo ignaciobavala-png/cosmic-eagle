@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { CircleUser } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AnswerList } from "../../AnswerList";
 import {
@@ -49,7 +48,7 @@ export default async function FichaSaludPage({
   const [{ data: profile }, { data: applications }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("id, full_name, email, avatar_url, is_admin, created_at")
+      .select("id, full_name, email, is_admin, created_at, country, gender")
       .eq("id", id)
       .single(),
     supabase
@@ -71,6 +70,8 @@ export default async function FichaSaludPage({
     profiles: [profile],
     applications: rows.map((a) => ({
       user_id: a.user_id,
+      trip_id: a.trip_id,
+      residence_country: a.residence_country,
       status: a.status,
       previous_ceremonies: a.previous_ceremonies,
       created_at: a.created_at,
@@ -98,16 +99,12 @@ export default async function FichaSaludPage({
       </Link>
 
       <div className="flex items-center gap-4 mb-2">
-        {profile.avatar_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={profile.avatar_url}
-            alt=""
-            className="h-14 w-14 shrink-0 rounded-full object-cover"
-          />
-        ) : (
-          <CircleUser size={56} className="shrink-0 text-on-surface-variant/50" />
-        )}
+        <span
+          aria-hidden="true"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-outline/40 font-display text-2xl text-on-surface-variant"
+        >
+          {(profile.full_name?.trim()?.[0] ?? profile.email?.[0] ?? "?").toUpperCase()}
+        </span>
         <div className="min-w-0">
           <h1 className="font-display text-2xl sm:text-3xl text-primary-fixed-dim break-words">
             {profile.full_name ?? "Sin nombre"}

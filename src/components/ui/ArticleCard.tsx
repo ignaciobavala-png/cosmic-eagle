@@ -1,9 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { Lock } from "lucide-react";
-import { formatArticleDate } from "@/lib/article";
-import type { FormatLocale } from "@/lib/format";
 
 export type ArticleCardData = {
   slug: string;
@@ -11,7 +9,6 @@ export type ArticleCardData = {
   excerpt: string | null;
   cover_url: string | null;
   category: string;
-  published_at: string | null;
 };
 
 /**
@@ -41,8 +38,6 @@ export async function ArticleCard({
 }) {
   const t = await getTranslations("Contenidos");
   const tCat = await getTranslations("ArticleCategories");
-  const locale: FormatLocale = (await getLocale()) === "en" ? "en" : "es";
-  const date = formatArticleDate(article.published_at, locale);
 
   return (
     <Link
@@ -96,9 +91,11 @@ export async function ArticleCard({
           <span className="block text-label-sm uppercase text-on-primary-container">
             {locked ? t("library.statusLocked") : t("library.statusPublished")}
           </span>
-          <span className="mt-1 block text-body-md text-[#05125a]">
-            {locked ? t("library.requiresAccess") : (date ?? "—")}
-          </span>
+          {locked && (
+            <span className="mt-1 block text-body-md text-[#05125a]">
+              {t("library.requiresAccess")}
+            </span>
+          )}
         </div>
       </div>
     </Link>

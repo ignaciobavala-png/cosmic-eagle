@@ -8,7 +8,7 @@ import { LoginForm } from "./LoginForm";
 import { SignupForm } from "./SignupForm";
 import { logout } from "./actions";
 import { MisSolicitudes } from "./MisSolicitudes";
-import { AvatarUpload } from "./AvatarUpload";
+import { Avatar } from "./Avatar";
 import { ProfileCard, type ProfileData } from "./ProfileCard";
 import { capitalizeName } from "@/lib/person-name";
 import { funnelSurface } from "@/components/forms/styles";
@@ -85,13 +85,13 @@ export default async function CuentaPage({
     } | null;
   }[] = [];
 
-  let profile: (ProfileData & { avatar_url: string | null }) | null = null;
+  let profile: ProfileData | null = null;
 
   if (user) {
     const { data } = await supabase
       .from("profiles")
       .select(
-        "full_name, avatar_url, is_admin, phone, profession, social_url, prior_experience, spiritual_practices, referral_source, referred_by, profile_completed_at"
+        "full_name, is_admin, country, gender, phone, profession, social_url, prior_experience, spiritual_practices, referral_source, referred_by, profile_completed_at"
       )
       .eq("id", user.id)
       .single();
@@ -166,9 +166,8 @@ export default async function CuentaPage({
           // primero que sigue es el perfil personal.
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 py-10 md:py-14">
             <div className="flex items-center gap-5">
-              <AvatarUpload
-                avatarUrl={profile?.avatar_url ?? null}
-                fallbackLabel={(profile?.full_name?.trim()?.[0] ?? user.email?.[0] ?? "?").toUpperCase()}
+              <Avatar
+                label={(profile?.full_name?.trim()?.[0] ?? user.email?.[0] ?? "?").toUpperCase()}
               />
               <div className="min-w-0">
                 {/* El nombre sale capitalizado aunque se haya tipeado en
