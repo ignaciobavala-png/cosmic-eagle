@@ -3306,3 +3306,10 @@ aplicadas en la base** (`20261014120000`, `20261014120100`).
   pie pide responder el correo.
 - **Informe de comunicaciones** para la integración de WhatsApp:
   `~/Escritorio/informe-comunicaciones-cosmic-eagle.html` (fuera del repo).
+- **Corrección (14/10, tarde):** la banda de testimonios al pie de /contenidos
+  sobraba: la tarjeta de tema "Testimonios" ya existe (categoría de artículo
+  `testimonios`). Se sacó la banda y la opción "Contenidos" del panel (el valor
+  del enum queda en la base). Los 5 testimonios largos de Sesiones (Amando
+  Veracruz, Elvira, Irene, Margarita, Vicky) se copiaron desde `testimonials.body`
+  como artículos publicados y públicos de esa categoría (`testimonio-<nombre>`),
+  con su versión en inglés. Son copias: editar uno en un lado no cambia el otro.

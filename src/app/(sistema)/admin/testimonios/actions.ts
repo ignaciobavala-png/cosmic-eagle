@@ -16,7 +16,6 @@ export type TestimonialFormState = { error: string | null };
 function revalidateTestimonialPaths() {
   revalidatePath(publicPath("/"), "page");
   revalidatePath(publicPath("/viajes"), "page");
-  revalidatePath(publicPath("/contenidos"), "page");
   revalidatePath("/admin/testimonios");
 }
 

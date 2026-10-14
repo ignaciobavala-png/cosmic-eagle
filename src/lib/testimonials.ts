@@ -44,11 +44,6 @@ export const TESTIMONIAL_PLACEMENTS = [
     where: "La banda de testimonios de Experiencias, debajo de la cartelera.",
   },
   {
-    value: "contenidos",
-    label: "Contenidos — “Testimonios”",
-    where: "La banda de testimonios al pie de la biblioteca de Contenidos.",
-  },
-  {
     value: "viajes",
     label: "Viajes Cósmicos — “Nuestros Viajeros”",
     where: "Hoy no se muestra en el sitio: Experiencias usa la de Sanadores.",
