@@ -181,7 +181,7 @@ export default async function ContenidoPage({
               <p className="mt-5 text-body-lg text-[#05125a]">{teaser.excerpt}</p>
             )}
 
-            <div className="mt-10 border-t border-[#f9d78f] pt-10">
+            <div className="mt-10 sm:mt-14">
               {locked ? (
                 <div className="rounded-2xl border border-[#f9d78f] bg-[#fff6eb] px-6 py-8 text-center sm:px-10">
                   <Lock
@@ -216,9 +216,7 @@ export default async function ContenidoPage({
                       className="mb-6"
                     />
                   )}
-                  <div className="max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-[#f9d78f] bg-white/60 p-5 sm:p-8">
-                    <ArticleBody blocks={blocks} tone="light" />
-                  </div>
+                  <ArticleBody blocks={blocks} tone="light" floating />
                 </>
               )}
             </div>

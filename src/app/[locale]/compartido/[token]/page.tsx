@@ -96,7 +96,7 @@ export default async function CompartidoPage({
               <p className="mt-5 text-body-lg text-[#05125a]">{article.excerpt}</p>
             )}
 
-            <div className="mt-10 border-t border-[#f9d78f] pt-10">
+            <div className="mt-10 sm:mt-14">
               {article.audio_url && (
                 <ArticleAudio
                   src={article.audio_url}
@@ -104,9 +104,7 @@ export default async function CompartidoPage({
                   className="mb-6"
                 />
               )}
-              <div className="max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-[#f9d78f] bg-white/60 p-5 sm:p-8">
-                <ArticleBody blocks={blocks} tone="light" />
-              </div>
+              <ArticleBody blocks={blocks} tone="light" floating />
             </div>
           </article>
         </CreamSection>

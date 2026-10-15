@@ -40,13 +40,33 @@ const TONO = {
 export function ArticleBody({
   blocks,
   tone = "dark",
+  floating = false,
 }: {
   blocks: ArticleBlock[];
   tone?: keyof typeof TONO;
+  /**
+   * Lectura "flotante" (15/10, pedido de la organización): sin recuadro, el
+   * texto directo sobre la crema. Filete con estrella al arranque y estrella al
+   * cierre, apertura en serif con capitular dorada y citas centradas. Sólo para
+   * `tone="light"`; las legales siguen con la plantilla de siempre.
+   */
+  floating?: boolean;
 }) {
   const c = TONO[tone];
-  return (
-    <div className="flex flex-col gap-5">
+  const body = (
+    <div
+      className={
+        floating
+          ? "flex flex-col gap-5 text-pretty sm:gap-6 " +
+            // Apertura en la serif del sitio con capitular dorada (el dorado
+            // oscuro es relleno/ornamento, no texto chico: la capitular mide
+            // 4em). `[&>p:first-child]` sólo toca un párrafo de apertura; si el
+            // artículo abre con un título no hay capitular.
+            "[&>p:first-child]:font-display [&>p:first-child]:text-[20px] [&>p:first-child]:leading-[1.55] sm:[&>p:first-child]:text-[24px] " +
+            "[&>p:first-child::first-letter]:float-left [&>p:first-child::first-letter]:pr-2 [&>p:first-child::first-letter]:pt-1 [&>p:first-child::first-letter]:font-display [&>p:first-child::first-letter]:text-[2.9em] [&>p:first-child::first-letter]:leading-[0.8] [&>p:first-child::first-letter]:text-[#b3964b] sm:[&>p:first-child::first-letter]:pr-2.5 sm:[&>p:first-child::first-letter]:pt-1.5 sm:[&>p:first-child::first-letter]:text-[4.2em]"
+          : "flex flex-col gap-5"
+      }
+    >
       {blocks.map((block, index) => {
         switch (block.type) {
           case "heading":
@@ -73,7 +93,11 @@ export function ArticleBody({
             return (
               <blockquote
                 key={index}
-                className={`my-2 border-l-2 py-1 pl-5 font-display text-body-lg ${c.quote}`}
+                className={
+                  floating
+                    ? `my-3 px-2 text-center font-display text-[21px] leading-[1.5] sm:px-6 sm:text-[24px] ${c.heading} before:mb-3 before:block before:text-sm before:text-[#b3964b] before:content-['✦']`
+                    : `my-2 border-l-2 py-1 pl-5 font-display text-body-lg ${c.quote}`
+                }
               >
                 {block.text}
               </blockquote>
@@ -85,7 +109,7 @@ export function ArticleBody({
                 {block.items.map((item, i) => (
                   <li
                     key={i}
-                    className={`relative pl-6 text-body-md leading-relaxed ${c.body}`}
+                    className={`relative pl-6 leading-relaxed ${floating ? "text-[17px] sm:text-[18px]" : "text-body-md"} ${c.body}`}
                   >
                     {/* La estrella de cuatro puntas del sistema de Julia, en
                         texto: es decorativa y no la tiene que leer un lector de
@@ -111,13 +135,40 @@ export function ArticleBody({
             return (
               <p
                 key={index}
-                className={`text-body-md leading-relaxed ${c.body}`}
+                className={
+                  floating
+                    ? `text-[17px] leading-[1.8] sm:text-[18px] sm:leading-[30px] ${c.body}`
+                    : `text-body-md leading-relaxed ${c.body}`
+                }
               >
                 {block.text}
               </p>
             );
         }
       })}
+    </div>
+  );
+
+  if (!floating) return body;
+
+  const filete = "h-px flex-1 bg-gradient-to-r from-transparent to-[#b3964b]";
+  return (
+    <div>
+      <div
+        aria-hidden="true"
+        className="mb-10 flex items-center gap-4 text-[#b3964b] sm:mb-12"
+      >
+        <span className={filete} />
+        <span className="text-sm">✦</span>
+        <span className={filete + " rotate-180"} />
+      </div>
+      {body}
+      <div
+        aria-hidden="true"
+        className="mt-12 flex justify-center text-[#b3964b] sm:mt-14"
+      >
+        ✦
+      </div>
     </div>
   );
 }
