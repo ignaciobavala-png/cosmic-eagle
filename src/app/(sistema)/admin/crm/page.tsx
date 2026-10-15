@@ -6,13 +6,13 @@ import {
   RELATIONSHIP_STATES,
   filterContacts,
   type Contact,
+  MAX_RECIPIENTS,
 } from "@/lib/crm";
 import { loadContacts } from "@/lib/crm-data";
 import { GENDERS } from "@/app/[locale]/cuenta/profile-fields";
 import { CopyEmails } from "../suscriptores/CopyEmails";
 import { DeleteContactButton } from "./DeleteContactButton";
 import { SendEmailPanel } from "./SendEmailPanel";
-import { MAX_RECIPIENTS } from "./actions";
 
 // El envío de correos segmentados es una server action que se queda esperando
 // ~600 ms por mail; sin esto Vercel la corta a los pocos segundos.

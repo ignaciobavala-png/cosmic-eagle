@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email/resend";
 import { SEND_INTERVAL_MS } from "@/lib/email/schedule-config";
-import { filterContacts, type ContactFilters } from "@/lib/crm";
+import { filterContacts, MAX_RECIPIENTS, type ContactFilters } from "@/lib/crm";
 import { loadContacts } from "@/lib/crm-data";
 import { MensajeEquipo } from "@/emails/MensajeEquipo";
 import { capitalizeName } from "@/lib/person-name";
@@ -16,7 +16,6 @@ import { capitalizeName } from "@/lib/person-name";
  * entran en menos de un minuto. Si el grupo es más grande, se pide afinar el
  * filtro en vez de cortarlo en silencio.
  */
-export const MAX_RECIPIENTS = 80;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

@@ -194,3 +194,6 @@ export function filterContacts(contacts: Contact[], f: ContactFilters): Contact[
       (!f.viaje || c.tripIds.includes(f.viaje))
   );
 }
+
+/** Tope de destinatarios por envío segmentado (ver actions.ts del CRM). */
+export const MAX_RECIPIENTS = 80;
