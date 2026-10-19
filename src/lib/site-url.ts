@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { isMaintenanceActive } from "@/lib/maintenance";
 
 /**
  * El mismo origen pero **sin consultar el request**: sirve para la metadata
@@ -30,8 +31,9 @@ export async function getSiteUrl(): Promise<string> {
   // vuelve al host desde donde se pidió —`cosmic-eagle.vercel.app`, que está
   // en la lista blanca de Redirect URLs—. Al apagar el mantenimiento vuelve
   // solo al dominio.
-  const explicit =
-    process.env.MAINTENANCE_MODE === "on" ? undefined : process.env.NEXT_PUBLIC_SITE_URL;
+  const explicit = (await isMaintenanceActive())
+    ? undefined
+    : process.env.NEXT_PUBLIC_SITE_URL;
   if (explicit) return explicit.replace(/\/+$/, "");
 
   const h = await headers();

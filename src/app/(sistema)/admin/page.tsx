@@ -10,6 +10,8 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { TRIP_TYPES, tripAdminPath, tripTypeLabel } from "@/lib/trip-type";
 import { todayUTC } from "@/lib/trip-dates";
+import { LAUNCH_KEY } from "@/lib/maintenance";
+import { LaunchCard } from "./LaunchCard";
 
 const STATUS_LABEL: Record<string, string> = {
   pending_review: "Pendiente",
@@ -42,6 +44,7 @@ export default async function AdminDashboardPage() {
     { count: contactsCount },
     { data: upcomingTrips },
     { data: recentApplications },
+    { data: launchRow },
   ] = await Promise.all([
     supabase
       .from("trips")
@@ -93,6 +96,7 @@ export default async function AdminDashboardPage() {
       .eq("status", "pending_review")
       .order("created_at", { ascending: false })
       .limit(5),
+    supabase.from("site_content").select("value").eq("key", LAUNCH_KEY).maybeSingle(),
   ]);
 
   const stats = [
@@ -149,6 +153,11 @@ export default async function AdminDashboardPage() {
   return (
     <div>
       <h1 className="font-display text-3xl text-primary-fixed-dim mb-8">Dashboard</h1>
+
+      <LaunchCard
+        launched={launchRow?.value === "true"}
+        maintenanceEnabled={process.env.MAINTENANCE_MODE === "on"}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
         {stats.map((card) => {

@@ -18,7 +18,7 @@ const SIN_IDIOMA = /^\/(admin|api|mantenimiento)(\/|$)/;
 export async function proxy(request: NextRequest) {
   // Antes que todo: en modo "en construcción" el dominio propio no llega ni a
   // tocar Supabase (ver src/lib/maintenance.ts).
-  const maintenance = maintenanceResponse(request);
+  const maintenance = await maintenanceResponse(request);
   if (maintenance) return maintenance;
 
   const cookies = await refreshSession(request);
