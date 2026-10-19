@@ -224,7 +224,7 @@ export function ContentLibrary({
           aria-label={t("library.readerAria")}
           className="mt-16 scroll-mt-[calc(var(--navbar-h)+5rem)]"
         >
-          <div className="mx-auto max-w-3xl rounded-2xl border border-[#b3964b]/50 bg-[#fff6eb] p-5 shadow-[0_18px_50px_-24px_rgba(5,18,90,0.45)] sm:p-8">
+          <div className="mx-auto max-w-3xl">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="min-w-0">
                 <span className="rounded-full border border-on-primary-container/40 px-3 py-1 text-label-sm uppercase text-on-primary-container">
@@ -244,8 +244,10 @@ export function ContentLibrary({
               </button>
             </div>
 
-            {/* El audio va afuera del recuadro con scroll, para que no se
-                vaya de la vista apenas se empieza a leer. */}
+            {/* Sin cajas (19/10, pedido de la organización: "que no todo sean
+                cuadrados"): el texto flota sobre la crema, igual que en
+                /contenidos/[slug]. Se va el scroll propio: el artículo abierto
+                crece con su texto. */}
             {openArticle.blocks && openArticle.audio_url && (
               <ArticleAudio
                 src={openArticle.audio_url}
@@ -254,12 +256,9 @@ export function ContentLibrary({
               />
             )}
 
-            {/* El recuadro de lectura: alto acotado y scroll PROPIO, que es lo
-                que evita la "página gigante". El resto de la biblioteca no se
-                mueve mientras se lee. */}
-            <div className="mt-6 max-h-[65vh] overflow-y-auto overscroll-contain rounded-xl border border-[#f9d78f] bg-white/70 p-5 sm:p-7">
+            <div className="mt-8">
               {openArticle.blocks ? (
-                <ArticleBody blocks={openArticle.blocks} tone="light" />
+                <ArticleBody blocks={openArticle.blocks} tone="light" floating />
               ) : (
                 <div className="py-6 text-center">
                   <Lock
