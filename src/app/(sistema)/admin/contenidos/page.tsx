@@ -1,10 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
-import { articleCategoryLabel } from "@/lib/article";
 import { DeleteArticleButton } from "./DeleteArticleButton";
 import { ShareArticleButton } from "./ShareArticleButton";
 import { MoveArticleButtons } from "./MoveArticleButtons";
+import { CategorySelect } from "./CategorySelect";
 
 const STATUS_LABEL: Record<string, string> = {
   draft: "Borrador",
@@ -58,7 +58,7 @@ export default async function AdminContenidosPage() {
         . Mientras esté en borrador no lo ve nadie más que tú. Con
         &ldquo;Compartir&rdquo; se copia un link para mandar: quien lo abre lee
         ese contenido entero, sin cuenta, aunque sea de programa o un borrador.
-        Con las flechas se cambia el orden en que aparecen en el sitio.
+        Con las flechas se cambia el orden en que aparecen en el sitio, y con el selector de categoría se reubica un contenido en otro tema.
       </p>
 
       {!articles || articles.length === 0 ? (
@@ -113,8 +113,8 @@ export default async function AdminContenidosPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-5 py-4 text-on-surface-variant">
-                    {articleCategoryLabel(article.category)}
+                  <td className="px-5 py-4">
+                    <CategorySelect id={article.id} value={article.category} />
                   </td>
                   <td className="px-5 py-4">
                     <span

@@ -323,3 +323,24 @@ export async function moveArticle(id: string, direction: "up" | "down") {
 
   revalidateArticlePaths();
 }
+
+/**
+ * Reubica un contenido en otra categoría desde el listado. Solo toca la
+ * columna `category`; el resto del artículo queda como está.
+ */
+export async function setArticleCategory(
+  id: string,
+  category: string
+): Promise<{ error: string | null }> {
+  if (!isArticleCategory(category)) return { error: "Categoría inválida." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("articles")
+    .update({ category })
+    .eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidateArticlePaths();
+  return { error: null };
+}
