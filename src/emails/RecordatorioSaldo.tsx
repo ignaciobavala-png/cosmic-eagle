@@ -38,8 +38,11 @@ export function RecordatorioSaldo({
 
       <Paragraph>Hola {nombre},</Paragraph>
 
+      {/* Texto de Sofía del 27/10, literal (tuteo). */}
+      <Paragraph>Esperamos que estés muy bien.</Paragraph>
+
       <Paragraph>
-        Te escribimos para recordarte que queda un saldo pendiente de{" "}
+        Te recordamos que tienes un saldo pendiente de{" "}
         <strong>{formatAmount(saldo)}</strong> para <strong>{viaje}</strong>
         {fechas ? ` (${fechas})` : ""}.
       </Paragraph>
@@ -47,23 +50,27 @@ export function RecordatorioSaldo({
       <Paragraph>
         {fechaLimite ? (
           <>
-            La fecha límite para completarlo es el <strong>{fechaLimite}</strong>.
-            Puedes pagarlo desde tu espacio personal, de una vez o en cuotas.
+            Puedes completar tu pago hasta el <strong>{fechaLimite}</strong>,
+            directamente desde tu cuenta.
           </>
         ) : (
           <>
-            Puedes completarlo desde tu espacio personal antes de la experiencia,
-            de una vez o en cuotas.
+            Puedes completar tu pago antes de la experiencia, directamente desde
+            tu cuenta.
           </>
         )}
       </Paragraph>
 
-      <CtaButton href={url}>Ver mi saldo</CtaButton>
+      <Paragraph>
+        Si necesitas coordinar otros plazos, escríbenos con confianza y
+        buscamos juntos una solución.
+      </Paragraph>
 
       <Paragraph>
-        Si necesitas conversar sobre los plazos, escríbenos con confianza.
-        Siempre hay manera de acomodarlo.
+        Nos alegra mucho que pronto podamos compartir esta experiencia.
       </Paragraph>
+
+      <CtaButton href={url}>Ver saldo</CtaButton>
     </BaseLayout>
   );
 }

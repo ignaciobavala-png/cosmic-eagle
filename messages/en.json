@@ -460,10 +460,14 @@
     "includes": {
       "title": "What's included"
     },
+    "rooms": {
+      "open": "See room types"
+    },
     "postulate": {
       "title": "Apply for this experience",
       "deposit": "or reserve your spot with {amount}",
-      "body": "Participation is defined through an application with a few health questions. Our team reviews it and replies to you.",
+      "body": "To sign up we ask you to fill in this form and, once approved, pay the reservation.",
+      "status": "View my application status",
       "submit": "Complete application",
       "loginSubmit": "Log in and apply",
       "needAccount": "You need an account to apply. <link>Create account</link>"

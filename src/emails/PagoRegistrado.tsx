@@ -66,6 +66,14 @@ export function PagoRegistrado({
 
       <Paragraph>Hola {nombre},</Paragraph>
 
+      {/* Reserva con seña: texto de Sofía del 27/10, literal. */}
+      {esSena && !sinCargo && (
+        <Paragraph>
+          Qué alegría saber que nos acompañarás en <strong>{viaje}</strong>
+          {fechas ? ` (${fechas})` : ""}.
+        </Paragraph>
+      )}
+
       <Paragraph>
         {sinCargo ? (
           <>
@@ -83,11 +91,21 @@ export function PagoRegistrado({
               </>
             ) : (
               <>
-                Recibimos tu pago de{" "}
-                <strong>{formatAmount(montoPagado)}</strong> para{" "}
-                <strong>{viaje}</strong>
-                {fechas ? ` (${fechas})` : ""}. Tu lugar en el círculo está
-                {esSena ? " reservado" : " confirmado"}.
+                {esSena ? (
+                  <>
+                    Hemos recibido tu pago de{" "}
+                    <strong>{formatAmount(montoPagado)}</strong> y tu cupo ya
+                    está reservado.
+                  </>
+                ) : (
+                  <>
+                    Recibimos tu pago de{" "}
+                    <strong>{formatAmount(montoPagado)}</strong> para{" "}
+                    <strong>{viaje}</strong>
+                    {fechas ? ` (${fechas})` : ""}. Tu lugar en el círculo está
+                    confirmado.
+                  </>
+                )}
               </>
             )}
           </>
@@ -100,23 +118,37 @@ export function PagoRegistrado({
           cambia es peor que no darla. */}
       {esSena && saldo > 0 && (
         <Paragraph>
-          Queda un saldo pendiente de <strong>{formatAmount(saldo)}</strong>.
-          Puedes completarlo cuando quieras desde tu cuenta, con los mismos
-          medios de pago. Si necesitas conversar sobre los plazos, escríbenos
-          con confianza.
+          El saldo pendiente (<strong>{formatAmount(saldo)}</strong>) puedes
+          completarlo desde tu cuenta hasta 10 días antes del viaje. Si
+          necesitas conversar sobre los plazos, escríbenos.
         </Paragraph>
       )}
 
       {necesitaSalud ? (
         <>
-          <Paragraph>
-            Queda un paso importante: el formulario de salud completo. Es más
-            largo que el primero y es lo que nos permite preparar la ceremonia
-            y cuidar tu proceso, así que tómate el tiempo de responderlo con
-            calma.
-          </Paragraph>
+          {esSena && !sinCargo ? (
+            <Paragraph>
+              Incluimos un formulario de experiencia e intenciones que te
+              pedimos rellenar para conocerte mejor y preparar tu experiencia
+              con el cuidado que merece.
+            </Paragraph>
+          ) : (
+            <Paragraph>
+              Queda un paso importante: el formulario de salud completo. Es más
+              largo que el primero y es lo que nos permite preparar la
+              ceremonia y cuidar tu proceso, así que tómate el tiempo de
+              responderlo con calma.
+            </Paragraph>
+          )}
 
           <CtaButton href={url}>Completar el formulario de salud</CtaButton>
+
+          {esSena && !sinCargo && (
+            <Paragraph>
+              ¡Gracias por tu confianza! Nos alegra mucho compartir este viaje
+              contigo.
+            </Paragraph>
+          )}
         </>
       ) : (
         <>

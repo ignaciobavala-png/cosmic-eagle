@@ -32,28 +32,43 @@ export function FormulariosPendientes({
   url: string;
 }) {
   return (
-    <BaseLayout preview="Te faltan unos pasos para completar tu inscripción">
-      <Title>Te faltan unos pasos</Title>
+    <BaseLayout preview="Ya falta poco para completar tu inscripción">
+      <Title>
+        {falta === "ambos"
+          ? "Ya falta poco para completar tu inscripción"
+          : "Te falta un paso"}
+      </Title>
 
       <Paragraph>Hola {nombre},</Paragraph>
 
-      <Paragraph>
-        Tu cupo en <strong>{viaje}</strong>
-        {fechas ? ` (${fechas})` : ""} está reservado, pero todavía nos falta
-        {falta === "ambos"
-          ? " tu formulario de salud y tu consentimiento informado."
-          : " tu consentimiento informado firmado."}
-      </Paragraph>
-
       {falta === "ambos" ? (
-        <Paragraph>
-          Para poder confirmar tu participación necesitamos que los completes. El
-          formulario de salud es más largo que el primero y es lo que nos permite
-          preparar la ceremonia y cuidar tu proceso, así que tómate el tiempo de
-          responderlo con calma. El consentimiento se firma después, y explica en
-          qué consiste la experiencia y cómo te acompañamos.
-        </Paragraph>
+        <>
+          {/* Texto de Sofía del 27/10, literal (tuteo). */}
+          <Paragraph>
+            Qué alegría que pronto nos acompañarás en <strong>{viaje}</strong>
+            {fechas ? ` (${fechas})` : ""}.
+          </Paragraph>
+          <Paragraph>
+            Tu cupo ya está reservado. Solo quedan dos pasos para completar tu
+            inscripción: el formulario de salud y el consentimiento informado.
+          </Paragraph>
+          <Paragraph>
+            El formulario nos ayudará a conocerte mejor y preparar tu
+            experiencia con el cuidado que merece.
+          </Paragraph>
+          <Paragraph>
+            Luego podrás revisar y firmar el consentimiento informado.
+          </Paragraph>
+        </>
       ) : (
+        <Paragraph>
+          Tu cupo en <strong>{viaje}</strong>
+          {fechas ? ` (${fechas})` : ""} está reservado, pero todavía nos falta
+          tu consentimiento informado firmado.
+        </Paragraph>
+      )}
+
+      {falta === "ambos" ? null : (
         <Paragraph>
           Es el documento que explica en qué consiste la experiencia, cuál es el
           rol del facilitador y cómo cuidamos tu información. Se lee con calma y
@@ -62,12 +77,13 @@ export function FormulariosPendientes({
       )}
 
       <CtaButton href={url}>
-        {falta === "ambos" ? "Completar mi formulario" : "Leer y firmar"}
+        {falta === "ambos"
+          ? "Completar formulario de salud y consentimiento informado"
+          : "Leer y firmar"}
       </CtaButton>
 
       <Paragraph>
-        Si tuviste algún problema para completarlo o quieres conversar algo
-        antes, escríbenos.
+        Si tienes alguna duda o necesitas ayuda, escríbenos con confianza.
       </Paragraph>
     </BaseLayout>
   );

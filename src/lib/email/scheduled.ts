@@ -247,7 +247,7 @@ function dueEmails(app: Candidate, today: Date): Pending[] {
       applicationId: app.id,
       kind: "forms_pending",
       to: app.email,
-      subject: "Te faltan unos pasos para completar tu inscripción",
+      subject: "Ya falta poco para completar tu inscripción",
       react: FormulariosPendientes({
         nombre,
         viaje: trip.title,

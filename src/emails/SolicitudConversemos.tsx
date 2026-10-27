@@ -32,28 +32,27 @@ export function SolicitudConversemos({
 
       <Paragraph>Hola {nombre},</Paragraph>
 
+      {/* Texto de Sofía del 27/10, literal. */}
       <Paragraph>
-        Gracias por tu postulación y por la honestidad con la que compartiste tu
-        información.
+        Gracias por tu postulación para <strong>{viaje}</strong>.
       </Paragraph>
 
       <Paragraph>
-        Antes de avanzar nos gustaría conversar contigo. Hay algunos aspectos de
-        lo que nos contaste que preferimos mirar juntos, con calma, para
-        entender qué cuidados necesita tu proceso.
+        Antes de continuar con el proceso, nos gustaría conversar contigo para
+        conocer un poco mejor algunos aspectos de la información que
+        compartiste.
       </Paragraph>
 
       <Paragraph>
-        Esto no significa que no puedas participar. Significa que queremos
-        hacerlo bien.
+        Esto no significa que tu postulación haya sido rechazada, sino que
+        queremos asegurarnos de que la experiencia sea adecuada y segura para
+        ti.
       </Paragraph>
 
       <Paragraph>
-        Nuestro equipo se pondrá en contacto contigo. Si prefieres, puedes
-        responder este correo y coordinamos.
+        Nuestro equipo se pondrá en contacto contigo para coordinar una
+        conversación.
       </Paragraph>
-
-      <Paragraph>Un abrazo.</Paragraph>
     </BaseLayout>
   );
 }

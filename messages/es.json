@@ -460,10 +460,14 @@
     "includes": {
       "title": "Qué incluye"
     },
+    "rooms": {
+      "open": "Ver tipos de habitación"
+    },
     "postulate": {
       "title": "Postularte a esta experiencia",
       "deposit": "o reservá tu cupo con {amount}",
-      "body": "La participación se define a través de una solicitud con unas preguntas de salud. Nuestro equipo la revisa y te responde.",
+      "body": "Para inscribirte te pedimos rellenar este formulario y una vez aprobado realizar el pago de la reserva.",
+      "status": "Ver el estado de mi solicitud",
       "submit": "Completar solicitud",
       "loginSubmit": "Iniciar sesión y postularme",
       "needAccount": "Necesitás una cuenta para postularte. <link>Crear cuenta</link>"

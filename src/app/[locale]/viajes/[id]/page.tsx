@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -25,6 +26,9 @@ import { localizeRow } from "@/lib/localized";
 import { isTripType } from "@/lib/trip-type";
 import { formatTripTime, isTripCategory } from "@/lib/trip-fields";
 import { getSiteContent } from "@/lib/site-content";
+import { todayUTC } from "@/lib/trip-dates";
+import { parseRoomOptions, type RoomOption } from "@/lib/trip-rooms";
+import { ScreeningForm } from "./solicitar/ScreeningForm";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 type Props = { params: Promise<{ locale: string; id: string }> };
@@ -73,7 +77,7 @@ async function getTrip(id: string, locale: string) {
   const { data } = await supabase
     .from("trips")
     .select(
-      "id, title, title_en, description, description_en, location, start_date, end_date, capacity, price, deposit_amount, status, image_url, type, schedule, terms, terms_en, category, start_time, end_time, venue_type, venue_type_en, includes, includes_en"
+      "id, title, title_en, description, description_en, location, start_date, end_date, capacity, price, deposit_amount, status, image_url, type, schedule, terms, terms_en, category, start_time, end_time, venue_type, venue_type_en, includes, includes_en, gallery, room_options"
     )
     .eq("id", id)
     .single();
@@ -124,6 +128,20 @@ export default async function ViajePage({ params }: Props) {
 
   const solicitarHref = `/viajes/${trip.id}/solicitar`;
   const isOpen = trip.status === "open";
+
+  // El filtro corto va en esta misma página (pedido de Sofía, 27/10): quien ya
+  // tiene solicitud no lo ve de nuevo, sino un link a su pantalla de estado.
+  // Sin viaje terminado, igual que el cierre del alta en /solicitar.
+  const puedePostular = isOpen && trip.end_date >= todayUTC();
+  let yaPostulo = false;
+  if (user && puedePostular) {
+    const { data: apps } = await supabase
+      .from("my_applications")
+      .select("id")
+      .eq("trip_id", trip.id)
+      .limit(1);
+    yaPostulo = !!apps?.length;
+  }
   const schedule = groupScheduleByDay(
     localizeSchedule(parseSchedule(trip.schedule), locale)
   );
@@ -142,7 +160,15 @@ export default async function ViajePage({ params }: Props) {
   // /admin/multimedia y no en `trips`. Vacia = la seccion no se dibuja.
   const cancelacion = content("condiciones.cancelacion").trim();
 
-  const details = [
+  const rooms = parseRoomOptions(trip.room_options);
+  const gallery = trip.gallery ?? [];
+
+  const details: {
+    icon: typeof Wallet;
+    label: string;
+    value: string;
+    rooms?: RoomOption[];
+  }[] = [
     {
       icon: CalendarDays,
       label: t("fields.fechas"),
@@ -186,6 +212,8 @@ export default async function ViajePage({ params }: Props) {
         trip.price > 0
           ? formatAmount(trip.price, formatLocale)
           : t("priceConfirm"),
+      // Con variantes de habitación (Sofía, 27/10) el aporte se abre y las lista.
+      rooms: rooms.length > 0 ? rooms : undefined,
     },
   ];
 
@@ -286,12 +314,36 @@ export default async function ViajePage({ params }: Props) {
               )}
             </RevealItem>
 
+            {/* Fotos del lugar (retiros). Con una sola se ve grande; con más, grilla. */}
+            {gallery.length > 0 && (
+              <RevealItem y={14} duration={0.8} delay={0.2}>
+                <ul
+                  className={`mt-10 grid gap-3 ${gallery.length === 1 ? "grid-cols-1" : "grid-cols-2 md:grid-cols-3"}`}
+                >
+                  {gallery.map((src, i) => (
+                    <li
+                      key={src}
+                      className={`relative aspect-[4/3] overflow-hidden rounded-2xl ${gallery.length > 1 && i === 0 ? "col-span-2 md:col-span-1" : ""}`}
+                    >
+                      <Image
+                        src={src}
+                        alt={`${trip.title} — ${i + 1}`}
+                        fill
+                        sizes="(min-width: 768px) 360px, 50vw"
+                        className="object-cover"
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </RevealItem>
+            )}
+
             {/* Las fichas de datos sobre crema: tarjeta blanca con filete
                 dorado. El `glass-card` de antes era vidrio dorado sobre fondo
                 oscuro y sobre crema no se ve. */}
             <RevealItem y={14} duration={0.8} delay={0.3}>
               <dl className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {details.map(({ icon: Icon, label, value }) => (
+                {details.map(({ icon: Icon, label, value, rooms: roomList }) => (
                   <div
                     key={label}
                     className="rounded-2xl border border-[#f9d78f] bg-[#fff6eb] p-4"
@@ -300,7 +352,30 @@ export default async function ViajePage({ params }: Props) {
                       <Icon size={14} />
                       {label}
                     </dt>
-                    <dd className="text-[#05125a]">{value}</dd>
+                    {roomList ? (
+                      <dd className="text-[#05125a]">
+                        <details className="group">
+                          <summary className="cursor-pointer list-none">
+                            {value}
+                            <span className="ml-2 text-xs text-on-primary-container underline underline-offset-4 group-open:hidden">
+                              {t("rooms.open")}
+                            </span>
+                          </summary>
+                          <ul className="mt-3 flex flex-col gap-1.5 border-t border-[#f9d78f] pt-3 text-sm">
+                            {roomList.map((r) => (
+                              <li key={r.label} className="flex justify-between gap-4">
+                                <span className="capitalize">{r.label}</span>
+                                <span className="font-semibold">
+                                  {formatAmount(r.price, formatLocale)}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </details>
+                      </dd>
+                    ) : (
+                      <dd className="text-[#05125a]">{value}</dd>
+                    )}
                   </div>
                 ))}
               </dl>
@@ -399,42 +474,31 @@ export default async function ViajePage({ params }: Props) {
                   <TitleRule align="center" grow className="mt-3 mb-7" />
                 </div>
 
-                {trip.price > 0 && (
-                  <RevealItem y={14} duration={0.8} delay={0.15}>
-                    <p className="font-display text-[2rem] font-bold text-white">
-                      {formatAmount(trip.price, formatLocale)}
-                    </p>
-                    {/* La seña se anuncia acá, antes de postularse: es parte de
-                        decidir si uno puede. Que exista la opción sale de
-                        `deposit_amount`; si el viaje se paga completo, esta
-                        línea no aparece. */}
-                    {trip.deposit_amount && (
-                      <p className="mt-1 text-sm text-white/70">
-                        {t("postulate.deposit", {
-                          amount: formatAmount(trip.deposit_amount, formatLocale),
-                        })}
-                      </p>
-                    )}
-                  </RevealItem>
-                )}
-
                 <RevealItem y={14} duration={0.8} delay={0.3}>
                   <p className="mx-auto mt-6 max-w-lg text-body-md leading-relaxed text-white/75">
                     {t("postulate.body")}
                   </p>
-                  <div className="mt-8 flex justify-center">
-                    <CtaLink
-                      href={
-                        user
-                          ? solicitarHref
-                          : `/cuenta?next=${encodeURIComponent(solicitarHref)}`
-                      }
-                    >
-                      {user
-                        ? t("postulate.submit")
-                        : t("postulate.loginSubmit")}
-                    </CtaLink>
-                  </div>
+                  {user && puedePostular && !yaPostulo ? (
+                    <div className="mt-8 text-left">
+                      <ScreeningForm tripId={trip.id} defaultEmail={user.email} />
+                    </div>
+                  ) : (
+                    <div className="mt-8 flex justify-center">
+                      <CtaLink
+                        href={
+                          user
+                            ? solicitarHref
+                            : `/cuenta?next=${encodeURIComponent(solicitarHref)}`
+                        }
+                      >
+                        {user
+                          ? yaPostulo
+                            ? t("postulate.status")
+                            : t("postulate.submit")
+                          : t("postulate.loginSubmit")}
+                      </CtaLink>
+                    </div>
+                  )}
                   {!user && (
                     <p className="mt-4 text-xs text-white/60">
                       {t.rich("postulate.needAccount", {

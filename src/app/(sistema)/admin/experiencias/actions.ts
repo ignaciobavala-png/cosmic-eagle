@@ -8,6 +8,7 @@ import { parseSchedule, sortSchedule } from "@/lib/trip-schedule";
 import { TRIP_TYPES, isTripType, tripAdminPath, tripTypeLabel } from "@/lib/trip-type";
 import { isTripCategory } from "@/lib/trip-fields";
 import { uploadTripCover } from "@/lib/trip-cover";
+import { MAX_GALLERY_IMAGES, parseRoomOptions } from "@/lib/trip-rooms";
 import { publicPath } from "@/i18n/public-path";
 
 export type TripFormState = { error: string | null };
@@ -130,9 +131,31 @@ function parseTripForm(formData: FormData) {
   const rawCategory = formData.get("category");
   const categoryValue = isTripCategory(rawCategory) ? rawCategory : "mixto";
 
+  // Galería y habitaciones sólo viajan en los retiros: en una Sesión el form ni
+  // los dibuja, y sin `has` un guardado la pisaría con vacío.
+  const extras: { gallery?: string[]; room_options?: { label: string; price: number }[] } = {};
+  if (formData.has("gallery")) {
+    let urls: unknown = [];
+    try {
+      urls = JSON.parse(String(formData.get("gallery")));
+    } catch {}
+    // Sólo URLs https; la subida la hace el browser al bucket público.
+    extras.gallery = (Array.isArray(urls) ? urls : [])
+      .filter((u): u is string => typeof u === "string" && /^https:\/\/[^\s]+$/.test(u))
+      .slice(0, MAX_GALLERY_IMAGES);
+  }
+  if (formData.has("room_options")) {
+    let rooms: unknown = [];
+    try {
+      rooms = JSON.parse(String(formData.get("room_options")));
+    } catch {}
+    extras.room_options = parseRoomOptions(rooms);
+  }
+
   return {
     error: null,
     data: {
+      ...extras,
       // El titulo es OPCIONAL desde la correccion del 03/09 ("por el momento el
       // cliente prefiere no poner titulo"), pero la columna es NOT NULL y el
       // nombre del viaje se usa en todos lados: el asunto de cada correo, el

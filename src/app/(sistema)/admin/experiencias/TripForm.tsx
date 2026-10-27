@@ -14,6 +14,8 @@ import {
 } from "@/lib/trip-fields";
 import { TRIP_TYPES } from "@/lib/trip-type";
 import { ScheduleEditor } from "./ScheduleEditor";
+import { GalleryField, RoomOptionsField } from "./TripExtras";
+import { parseRoomOptions } from "@/lib/trip-rooms";
 import type { TripFormState } from "./actions";
 
 const STATUS_OPTIONS: { value: Tables<"trips">["status"]; label: string }[] = [
@@ -496,6 +498,16 @@ export function TripForm({
           </div>
         </div>
       </details>
+
+      {!isSesion && (
+        <Section
+          title="Lugar y habitaciones"
+          hint="Para retiros: fotos del lugar y, si hay más de un tipo de habitación, cada uno con su precio."
+        >
+          <GalleryField initial={trip?.gallery ?? []} />
+          <RoomOptionsField initial={parseRoomOptions(trip?.room_options)} />
+        </Section>
+      )}
 
       <Section title="Condiciones y estado">
       <div className="flex flex-col gap-1.5">

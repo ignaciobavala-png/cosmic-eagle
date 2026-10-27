@@ -886,6 +886,8 @@ export type Database = {
           end_time: string | null
           includes: string | null
           includes_en: string | null
+          gallery: string[]
+          room_options: Json
           map_url: string | null
           packing_list: string | null
           packing_list_en: string | null
@@ -923,6 +925,8 @@ export type Database = {
           end_time?: string | null
           includes?: string | null
           includes_en?: string | null
+          gallery?: string[]
+          room_options?: Json
           map_url?: string | null
           packing_list?: string | null
           packing_list_en?: string | null
@@ -960,6 +964,8 @@ export type Database = {
           end_time?: string | null
           includes?: string | null
           includes_en?: string | null
+          gallery?: string[]
+          room_options?: Json
           map_url?: string | null
           packing_list?: string | null
           packing_list_en?: string | null
