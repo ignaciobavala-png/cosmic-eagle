@@ -167,20 +167,29 @@ function ExperienceCard({ trip }: { trip: TripCardData }) {
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-4 flex flex-wrap gap-2.5">
           {tipo && (
-            <span className="rounded-full bg-[linear-gradient(135deg,#f9d78f,#b3964b)] whitespace-nowrap px-3.5 py-1.5 font-body text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#05125a]">
+            <span className="rounded-[4px] bg-[linear-gradient(135deg,#f9d78f,#b3964b)] whitespace-nowrap px-3.5 py-1.5 font-body text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#05125a]">
               {tipo}
             </span>
           )}
           {trip.location && (
-            <span className="rounded-full border border-[#0079b3]/40 bg-[linear-gradient(135deg,rgba(0,121,179,0.2),rgba(5,18,90,0.2))] whitespace-nowrap px-3.5 py-1.5 font-body text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#05125a]">
+            <span className="rounded-[4px] border border-[#0079b3]/40 bg-[linear-gradient(135deg,rgba(0,121,179,0.2),rgba(5,18,90,0.2))] whitespace-nowrap px-3.5 py-1.5 font-body text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#05125a]">
               {trip.location}
             </span>
           )}
         </div>
 
-        <h3 className="font-display text-headline-md text-[#05125a]">
+        {/* El título lleva la fecha (la escribe la organización en el
+            nombre) y baja de `headline-md` a 20px: con los tags y el botón
+            era demasiado peso junto (pedido de Sofía, 27/10). La bajada es
+            la descripción de la experiencia, recortada a tres renglones. */}
+        <h3 className="font-display text-[20px] leading-[28px] text-[#05125a]">
           {trip.title}
         </h3>
+        {trip.description && (
+          <p className="mt-3 line-clamp-3 text-[14px] leading-relaxed text-[#05125a]/80">
+            {trip.description}
+          </p>
+        )}
 
         {/* **Sin fecha** (pedido de la organización, 08/10): la escriben en
             el nombre de la experiencia, y repetirla abajo quedaba redundante.

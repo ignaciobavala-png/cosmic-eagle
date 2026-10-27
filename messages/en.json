@@ -404,7 +404,7 @@
     },
     "cierre": {
       "imageAlt": "Sunrise over a sacred landscape",
-      "text": "A journey inward.<br></br>A remembrance of our deepest nature.<br></br>An activation of the light that lives within us."
+      "text": "Activating the light that already lives within us"
     },
     "filter": {
       "groupLabel": "Filter experiences",
@@ -490,15 +490,12 @@
     "relato": {
       "paragraphs": [
         "Human beings are in constant evolution. As we expand our consciousness, we begin to discover that we are much more than our personal history, our mind, or the reality we perceive through the senses.",
-        "Our work explores this evolutionary potential and the multidimensional nature of human experience: our capacity to transform, to access deeper levels of intelligence, and to reconnect with the soul dimension.",
-        "From this perspective, human evolution becomes part of a much broader field of consciousness, opening a path toward deep knowledge, cosmic wisdom, and an expanded understanding of who and what we are."
+        "Our work explores this evolutionary potential and the multidimensional nature of human experience: our capacity to transform, to access deeper levels of intelligence, and to reconnect with the soul dimension."
       ],
       "keywords": [
         "consciousness",
         "evolutionary potential",
-        "soul dimension",
-        "deep knowledge",
-        "cosmic wisdom"
+        "soul dimension"
       ],
       "cta": "Explore experiences"
     },

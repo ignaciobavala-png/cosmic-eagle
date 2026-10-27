@@ -404,7 +404,7 @@
     },
     "cierre": {
       "imageAlt": "Amanecer sobre un paisaje sagrado",
-      "text": "Un viaje hacia adentro.<br></br>Un recuerdo de nuestra naturaleza más profunda.<br></br>Una activación de la luz que habita en nosotros."
+      "text": "Activar la luz que ya habita en nosotros"
     },
     "filter": {
       "groupLabel": "Filtrar experiencias",
@@ -490,15 +490,12 @@
     "relato": {
       "paragraphs": [
         "Los seres humanos estamos en constante evolución. A medida que expandimos nuestra conciencia, comenzamos a descubrir que somos mucho más que nuestra historia personal, nuestra mente o la realidad que percibimos a través de los sentidos.",
-        "Nuestro trabajo explora este potencial evolutivo y la naturaleza multidimensional de la experiencia humana: nuestra capacidad de transformarnos, de acceder a niveles más profundos de inteligencia y de reconectar con la dimensión del alma.",
-        "Desde esta perspectiva, la evolución humana pasa a ser parte de un campo de conciencia mucho más amplio, abriendo un camino hacia un conocimiento profundo, la sabiduría cósmica y una comprensión expandida de quiénes y qué somos."
+        "Nuestro trabajo explora este potencial evolutivo y la naturaleza multidimensional de la experiencia humana: nuestra capacidad de transformarnos, de acceder a niveles más profundos de inteligencia y de reconectar con la dimensión del alma."
       ],
       "keywords": [
         "conciencia",
         "potencial evolutivo",
-        "dimensión del alma",
-        "conocimiento profundo",
-        "sabiduría cósmica"
+        "dimensión del alma"
       ],
       "cta": "Explorar experiencias"
     },

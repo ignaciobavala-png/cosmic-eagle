@@ -49,7 +49,7 @@ export function TestimonialViewer({
   testimonials,
   className = "",
   /** Alto del bloque de texto. Se fija para que la sección no salte al pasar. */
-  alturaClassName = "h-[300px] sm:h-[260px]",
+  alturaClassName = "h-[230px] sm:h-[220px]",
   quoteClassName = "text-[15px] sm:text-[17px]",
   captionClassName = "text-[12px] sm:text-[13px]",
   auto = false,
@@ -128,7 +128,7 @@ export function TestimonialViewer({
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
               <figcaption className={`mt-4 font-bold tracking-normal text-primary-container ${captionClassName}`}>
-                {t.author_name}
+                {t.author_name.split(" ")[0]}
                 {t.author_location && ` — ${t.author_location}`}
               </figcaption>
               {t.body && (
