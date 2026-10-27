@@ -19,6 +19,7 @@ import { RecordatorioSaldo } from "@/emails/RecordatorioSaldo";
 import { FormulariosPendientes } from "@/emails/FormulariosPendientes";
 import { DatosFinales } from "@/emails/DatosFinales";
 import { MensajeEquipo } from "@/emails/MensajeEquipo";
+import { CRM_TEMPLATE_NUEVAS_FECHAS } from "@/lib/email/crm-templates";
 
 const VIAJE = "Sesión en Buenos Aires";
 const FECHAS = "5 de septiembre de 2026";
@@ -109,9 +110,8 @@ export const PREVIEWS: Record<string, { titulo: string; el: () => React.ReactEle
     el: () =>
       MensajeEquipo({
         nombre: base.nombre,
-        asunto: "Una invitación para ti",
-        mensaje:
-          "Queríamos contarte que abrimos nuevas fechas.\n\nSi quieres saber más, responde este correo.",
+        asunto: CRM_TEMPLATE_NUEVAS_FECHAS.subject,
+        mensaje: CRM_TEMPLATE_NUEVAS_FECHAS.message,
       }),
   },
   datos: {

@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Mail } from "lucide-react";
 import type { ContactFilters } from "@/lib/crm";
+import { CRM_TEMPLATE_NUEVAS_FECHAS } from "@/lib/email/crm-templates";
 import { sendSegmentedEmail, type SendResultState } from "./actions";
 
 /**
@@ -90,6 +91,22 @@ export function SendEmailPanel({
       )}
 
       <div className="mt-4 flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={() => {
+            if (
+              (subject.trim() || message.trim()) &&
+              !confirm("Esto reemplaza lo que ya escribiste. ¿Seguir?")
+            ) {
+              return;
+            }
+            setSubject(CRM_TEMPLATE_NUEVAS_FECHAS.subject);
+            setMessage(CRM_TEMPLATE_NUEVAS_FECHAS.message);
+          }}
+          className="self-start rounded-lg border border-outline-variant px-3 py-1.5 text-xs text-on-surface-variant hover:text-on-surface"
+        >
+          Usar texto: {CRM_TEMPLATE_NUEVAS_FECHAS.label}
+        </button>
         <input
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
