@@ -179,10 +179,10 @@ function ExperienceCard({ trip }: { trip: TripCardData }) {
         </div>
 
         {/* El título lleva la fecha (la escribe la organización en el
-            nombre) y baja de `headline-md` a 20px: con los tags y el botón
+            nombre) y baja de `headline-md` a 18px: con los tags y el botón
             era demasiado peso junto (pedido de Sofía, 27/10). La bajada es
             la descripción de la experiencia, recortada a tres renglones. */}
-        <h3 className="font-display text-[20px] leading-[28px] text-[#05125a]">
+        <h3 className="font-display text-[18px] leading-[26px] text-[#05125a]">
           {trip.title}
         </h3>
         {trip.description && (
