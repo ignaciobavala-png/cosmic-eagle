@@ -35,6 +35,42 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_agent_log: {
+        Row: {
+          id: number
+          user_id: string | null
+          conversation_id: string | null
+          kind: string
+          tool: string
+          args: Json
+          rows_returned: number | null
+          error: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          user_id?: string | null
+          conversation_id?: string | null
+          kind: string
+          tool: string
+          args?: Json
+          rows_returned?: number | null
+          error?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          user_id?: string | null
+          conversation_id?: string | null
+          kind?: string
+          tool?: string
+          args?: Json
+          rows_returned?: number | null
+          error?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       materiales: {
         Row: {
           id: string

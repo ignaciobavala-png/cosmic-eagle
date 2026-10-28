@@ -60,7 +60,10 @@ const GROUPS: { title: string; links: NavLink[] }[] = [
   },
   {
     title: "Comunicación",
-    links: [{ href: "/admin/material", label: "Envío material" }],
+    links: [
+      { href: "/admin/ia", label: "Asistente" },
+      { href: "/admin/material", label: "Envío material" },
+    ],
   },
   {
     title: "Personas",
@@ -146,7 +149,10 @@ export function AdminNav({ unread = 0 }: { unread?: number }) {
   }, [open]);
 
   return (
-    <header className="border-b border-parchment/10 bg-surface/80 backdrop-blur-xl">
+    /* `relative z-40`: sin z-index el header (apilado por el backdrop-blur) queda
+       debajo de todo lo que el contenido pinte con `opacity` < 1 — los numeros
+       de los filtros del CRM se veian a traves del desplegable. */
+    <header className="relative z-40 border-b border-parchment/10 bg-surface/80 backdrop-blur-xl">
       <nav className="flex items-center justify-between gap-3 px-5 md:px-8 h-16 max-w-6xl mx-auto">
         <div className="flex min-w-0 items-center gap-3 md:gap-5">
           <Link

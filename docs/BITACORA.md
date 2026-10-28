@@ -3356,3 +3356,30 @@ y el único admin quedan).
   cobro, códigos de acceso ni documentos de Envío material.
 - **Ojo para la simulación:** los correos salen de verdad. Con direcciones reales
   les llegan los mails de aprobación y pago; conviene usar alias `+prueba`.
+
+### 2026-10-28 (noche) — Rama `ia`: asistente de IA del panel, etapa 1
+
+Arranca el proyecto de que un agente opere la plataforma (`docs/IA.md`). Rama `ia`,
+sin pushear ni mergear.
+
+- **Hecho:** sección `/admin/ia` (grupo Comunicación → Asistente) con chat en
+  streaming; `/api/ia/chat` con sesión + `is_admin` verificados en el servidor;
+  agente `ToolLoopAgent` (AI SDK v7, `deepseek-flash`) con 4 herramientas de
+  **lectura**; tabla `ai_agent_log` (migración aplicada en producción, RLS admin).
+- **Decidido:** el modelo ve nombres, no mails ni teléfonos, y nada de salud
+  (columnas listadas a mano en cada herramienta). SDK y no `fetch` directo, por la
+  aprobación de herramientas firmada que trae la v7.
+- **Medido antes de construir:** 7 casos con `deepseek-flash` y 4 herramientas
+  inventadas (pedido completo, datos faltantes, año inferido, desambiguación,
+  pedido peligroso): sin alucinar ids ni claves, y avisa cuando le falta una
+  herramienta. No probado todavía con 30 herramientas ni bajo intento de forzarlo.
+- **Verificado:** tsc y eslint limpios; `e2e/ia.panel.spec.ts` pasa; capturas de
+  escritorio y móvil. Dos cosas que salieron de la prueba: el agente avisó solo
+  que el "Retiro en Los Vilos" sigue `open` con fechas ya pasadas, y que hay
+  sesiones de octubre `completed` sin inscriptos.
+- **Para producción:** cargar `DEEPSEEK_API_KEY` en Vercel (Production). Las dos
+  keys que se pegaron en el chat durante la configuración hay que borrarlas en
+  DeepSeek.
+- **Pendiente:** etapa 2 (escrituras con confirmación, firma y deshacer), imágenes
+  por la UI, y el motor compartido con WhatsApp.
+
