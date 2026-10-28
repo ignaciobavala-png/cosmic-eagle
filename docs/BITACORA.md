@@ -3313,3 +3313,46 @@ aplicadas en la base** (`20261014120000`, `20261014120100`).
   Veracruz, Elvira, Irene, Margarita, Vicky) se copiaron desde `testimonials.body`
   como artículos publicados y públicos de esa categoría (`testimonio-<nombre>`),
   con su versión en inglés. Son copias: editar uno en un lado no cambia el otro.
+
+## 2026-10-28 — "Envío material": documentos con el formato del cuaderno de Egipto
+
+La organización mandó el **cuaderno de preparación de Egipto** (PDF, 32 páginas,
+copiado a `docs/entregas/2026-10-28-texto-egipto/`) como ejemplo de formato y
+pidió una sección del panel para generar comunicaciones así, compartirlas por
+link y, después, mandarlas a Contenidos y por correo (segmentado por viaje). El
+objetivo de fondo que más les interesa es conectar WhatsApp con una IA.
+
+- **Hecho (esta sesión):** la sección `/admin/material` ("Envío material", grupo
+  Comunicación) con editor de bloques, vista previa, link compartible
+  (`/material/<token>`) y "Guardar como PDF". Migración `materiales` +
+  `shared_material()` aplicada. Detalle y trampas en `docs/MATERIAL.md`.
+- **Decidido:** una sola plantilla, estricta al PDF; el documento son bloques
+  (jsonb), nunca HTML; fotos comprimidas en el browser y subidas directo a
+  Storage; el link por token en la misma fila (tabla admin-only).
+- **Pendiente, pedido y conversado:** "enviar a contenidos" con categoría (y que
+  allá también se vea con este formato), pop-up de envío por correo con casillas
+  por viaje (reusa `SendEmailPanel`), y WhatsApp + IA como proyecto aparte.
+- **Para consultar a la organización:** si el cuaderno es sólo de Egipto o de
+  cada viaje; si el envío va sólo a aprobadas o también a suscriptoras; si hay
+  teléfonos y permiso para WhatsApp. El PDF de ejemplo tiene erratas y mezcla
+  tuteo con voseo: es texto de ellas, no se tocó.
+- **Verificado:** `e2e/material.escritura.spec.ts` pasa de punta a punta;
+  captura de escritorio y móvil, y PDF impreso revisados a mano.
+
+### 2026-10-28 (tarde) — Punto cero de las solicitudes
+
+Pedido de la organización: dejar la base sin solicitudes para simular el embudo
+completo de nuevo. **Se borraron las solicitudes, no las cuentas** (las 6 cuentas
+y el único admin quedan).
+
+- Borrado en producción: 4 solicitudes (con su cascada), las 3 habilitaciones de
+  contenido que salieron de ellas (`content_grants.application_id` es
+  `on delete set null`: sin borrarlas las cuentas habrían conservado el acceso a
+  `programa`) y los 7 avisos del panel. Los formularios de salud, consentimientos,
+  comprobantes y correos programados estaban en 0.
+- **Respaldo previo** (con datos personales, fuera del repo):
+  `~/Escritorio/things/cosmic-eagle-material/backup-solicitudes-2026-10-28.json`.
+- No se tocó: cuentas, viajes, artículos, FAQs, testimonios, legales, medios de
+  cobro, códigos de acceso ni documentos de Envío material.
+- **Ojo para la simulación:** los correos salen de verdad. Con direcciones reales
+  les llegan los mails de aprobación y pago; conviene usar alias `+prueba`.

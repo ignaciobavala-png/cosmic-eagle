@@ -59,6 +59,10 @@ const GROUPS: { title: string; links: NavLink[] }[] = [
     ],
   },
   {
+    title: "Comunicación",
+    links: [{ href: "/admin/material", label: "Envío material" }],
+  },
+  {
     title: "Personas",
     links: [
       { href: "/admin/acceso", label: "Niveles de acceso" },

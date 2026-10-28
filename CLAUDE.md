@@ -74,7 +74,9 @@ loguea y devuelve `not_configured` sin fallar y sin dejar fila.
 
 **Panel de admin** (`/admin`, protegido por `profiles.is_admin`): dashboard, CRUD
 de experiencias, solicitudes (revisión + pago a mano), CRM, contenidos, FAQs,
-testimonios, multimedia, pagos, legales, acceso, suscriptores, notificaciones.
+testimonios, multimedia, pagos, legales, acceso, suscriptores, notificaciones y
+**envío material** (documentos con el formato del cuaderno de Egipto, por link y PDF;
+`docs/MATERIAL.md`).
 Un admin no puede revisar su propia solicitud.
 
 **Contenido editable por la clienta, sin tocar código**: imágenes y textos de las
@@ -184,7 +186,7 @@ public/img/                       # assets fijos de layout, WebP
 primitivas) · `FLUJO_INSCRIPCION.md` · `CONSENTIMIENTO.md` · `PAGOS.md` ·
 `ENCUADRADO.md` · `COMUNICACIONES.md` (las 15 del embudo) · `EMAIL.md` ·
 `AUTH_EMAIL.md` · `NOTIFICACIONES.md` · `BIBLIOTECA.md` ·
-`ACCESO_CONTENIDOS.md` · `CONTENIDOS.md` · `FAQS.md` · `MULTIMEDIA.md` ·
+`ACCESO_CONTENIDOS.md` · `MATERIAL.md` · `CONTENIDOS.md` · `FAQS.md` · `MULTIMEDIA.md` ·
 `PORTADAS.md` · `CRM.md` · `FORMULARIOS.md` · `EXPERIENCIAS_2026.md` ·
 `COPY_HUERFANO.md` · `HOME_REDISENO.md` · `REDISENO_JULIA_HTML.md` ·
 `CORRECCIONES_JULIA_*.md` · `entregas/` (lo que mandan las clientas).

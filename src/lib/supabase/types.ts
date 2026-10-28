@@ -35,6 +35,45 @@ export type Database = {
         }
         Relationships: []
       }
+      materiales: {
+        Row: {
+          id: string
+          title: string
+          eyebrow: string | null
+          cover_url: string | null
+          back_cover_url: string | null
+          blocks: Json
+          share_token: string | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          eyebrow?: string | null
+          cover_url?: string | null
+          back_cover_url?: string | null
+          blocks?: Json
+          share_token?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          title?: string
+          eyebrow?: string | null
+          cover_url?: string | null
+          back_cover_url?: string | null
+          blocks?: Json
+          share_token?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Relationships: []
+      }
       access_codes: {
         Row: {
           code: string
@@ -1067,6 +1106,16 @@ export type Database = {
     }
     Functions: {
       redeem_access_code: { Args: { p_code: string }; Returns: string }
+      shared_material: {
+        Args: { p_token: string }
+        Returns: {
+          title: string
+          eyebrow: string | null
+          cover_url: string | null
+          back_cover_url: string | null
+          blocks: Json
+        }[]
+      }
       shared_article: {
         Args: { p_token: string }
         Returns: {
