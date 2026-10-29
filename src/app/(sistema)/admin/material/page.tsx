@@ -12,7 +12,6 @@ export default async function AdminMaterialPage() {
   const { data: materiales } = await supabase
     .from("materiales")
     .select("id, title, share_token, updated_at")
-    .not("html", "is", null)
     .order("updated_at", { ascending: false });
 
   return (

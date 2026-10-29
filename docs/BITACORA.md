@@ -3396,4 +3396,5 @@ compartir al lado de cada contenido.
 - Se sacó `MaterialDocument`, `lib/material.ts` y el e2e del editor.
 - `HtmlFrame` (iframe sandbox sin `allow-same-origin`) dibuja todo HTML subido.
 - `ShareButton` en `/contenidos/[slug]`. Ver `docs/MATERIAL.md`.
-- Pendiente: los 2 documentos viejos de `materiales` y sus 6 imágenes.
+- Se borraron los 2 documentos viejos de `materiales`, sus 6 imágenes y las
+  columnas del editor (`20261029150000_materiales_solo_html.sql`).

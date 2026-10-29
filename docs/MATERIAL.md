@@ -36,9 +36,9 @@ que se inyecta antes de `</body>` y avisa por `postMessage`.
   migración (`20261029140000_html_subido.sql`).
 - `shared_article` y `shared_material` se recrearon (cambió el tipo de retorno).
 
-## Lo que quedó del editor viejo
+## El editor viejo
 
-La tabla `materiales` sigue con `blocks`, `eyebrow` y las tapas: había 2
-documentos del editor de bloques y 6 imágenes en Storage (`site-assets/material/`).
-El panel nuevo sólo lista los que tienen `html`. Pendiente: decidir si se
-descartan y se borran esas columnas y archivos.
+Se descartó del todo el 29/10: se borraron los 2 documentos de prueba, las 6
+imágenes de `site-assets/material/` y las columnas `blocks`, `eyebrow` y las
+tapas (`20261029150000_materiales_solo_html.sql`). `materiales.html` es
+obligatorio.

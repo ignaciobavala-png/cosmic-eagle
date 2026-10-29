@@ -75,11 +75,7 @@ export type Database = {
         Row: {
           id: string
           title: string
-          eyebrow: string | null
-          cover_url: string | null
-          back_cover_url: string | null
-          blocks: Json
-          html: string | null
+          html: string
           share_token: string | null
           created_at: string
           updated_at: string
@@ -88,11 +84,7 @@ export type Database = {
         Insert: {
           id?: string
           title: string
-          eyebrow?: string | null
-          cover_url?: string | null
-          back_cover_url?: string | null
-          blocks?: Json
-          html?: string | null
+          html: string
           share_token?: string | null
           created_at?: string
           updated_at?: string
@@ -101,11 +93,7 @@ export type Database = {
         Update: {
           id?: string
           title?: string
-          eyebrow?: string | null
-          cover_url?: string | null
-          back_cover_url?: string | null
-          blocks?: Json
-          html?: string | null
+          html?: string
           share_token?: string | null
           created_at?: string
           updated_at?: string
