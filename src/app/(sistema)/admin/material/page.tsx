@@ -11,7 +11,8 @@ export default async function AdminMaterialPage() {
   const supabase = await createClient();
   const { data: materiales } = await supabase
     .from("materiales")
-    .select("id, title, eyebrow, cover_url, share_token, updated_at")
+    .select("id, title, share_token, updated_at")
+    .not("html", "is", null)
     .order("updated_at", { ascending: false });
 
   return (
@@ -24,20 +25,20 @@ export default async function AdminMaterialPage() {
           href="/admin/material/nuevo"
           className="bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg px-4 py-2.5 text-sm whitespace-nowrap hover:bg-primary-fixed transition-colors"
         >
-          Nuevo documento
+          Subir documento
         </Link>
       </div>
 
       <p className="mb-8 max-w-2xl text-sm text-on-surface-variant">
-        Arma un documento con el formato del cuaderno de preparación: subes las
-        fotos, escribes el texto y se genera solo, con tapa, índice y
-        columnas. Con &ldquo;Compartir&rdquo; se copia un link para mandar:
-        quien lo abre lo lee y lo puede guardar como PDF, sin cuenta.
+        Sube un documento ya armado en formato HTML. Con &ldquo;Compartir&rdquo;
+        se copia un link para mandar: quien lo abre lo lee sin cuenta. Para
+        publicarlo en la biblioteca, créalo desde Contenidos con el formato
+        &ldquo;HTML subido&rdquo;.
       </p>
 
       {!materiales || materiales.length === 0 ? (
         <p className="text-on-surface-variant">
-          Todavía no hay documentos. Crea el primero con &ldquo;Nuevo
+          Todavía no hay documentos. Sube el primero con &ldquo;Subir
           documento&rdquo;.
         </p>
       ) : (
@@ -57,28 +58,9 @@ export default async function AdminMaterialPage() {
                   className="border-b border-outline-variant/40 last:border-0"
                 >
                   <td className="px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-14 w-10 shrink-0 overflow-hidden rounded bg-surface-container-lowest">
-                        {material.cover_url && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={material.cover_url}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-on-surface font-medium">
-                          {material.title}
-                        </p>
-                        {material.eyebrow && (
-                          <p className="text-on-surface-variant text-xs">
-                            {material.eyebrow}
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                    <p className="text-on-surface font-medium">
+                      {material.title}
+                    </p>
                   </td>
                   <td className="px-5 py-4 text-on-surface-variant whitespace-nowrap">
                     {new Date(material.updated_at).toLocaleDateString("es", {

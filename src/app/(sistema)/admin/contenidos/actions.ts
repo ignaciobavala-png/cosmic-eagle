@@ -8,6 +8,7 @@ import { isArticleCategory, slugify } from "@/lib/article";
 import { isContentAccessLevel } from "@/lib/content-access";
 import type { ArticleStatus } from "@/lib/article";
 import { optionalEnglish } from "@/components/admin/EnglishFields";
+import { readHtmlFile } from "@/lib/html-upload";
 
 export type ArticleFormState = { error: string | null };
 
@@ -37,7 +38,7 @@ function revalidateArticlePaths() {
   revalidatePath("/admin/contenidos");
 }
 
-function parseArticleForm(formData: FormData) {
+async function parseArticleForm(formData: FormData) {
   const title = formData.get("title");
   const body = formData.get("body");
   const excerpt = formData.get("excerpt");
@@ -46,12 +47,17 @@ function parseArticleForm(formData: FormData) {
   const accessLevel = formData.get("access_level");
   const slugField = formData.get("slug");
   const audioField = formData.get("audio_url");
+  // Un contenido es texto (con las cinco reglas) o un HTML subido: en ese caso
+  // el cuerpo es el archivo y se dibuja en un iframe aislado (`HtmlFrame`).
+  const isHtml = formData.get("body_format") === "html";
+
+  const upload = isHtml ? await readHtmlFile(formData.get("html_file")) : null;
+  if (upload?.error) return { error: upload.error, data: null } as const;
 
   if (
     typeof title !== "string" ||
     !title.trim() ||
-    typeof body !== "string" ||
-    !body.trim() ||
+    (!isHtml && (typeof body !== "string" || !body.trim())) ||
     !isArticleCategory(category) ||
     !isStatus(status) ||
     !isContentAccessLevel(accessLevel)
@@ -71,7 +77,9 @@ function parseArticleForm(formData: FormData) {
     data: {
       slug,
       title: title.trim(),
-      body: body.trim(),
+      body_format: isHtml ? "html" : "text",
+      // `undefined` = HTML sin archivo nuevo: al editar se conserva el actual.
+      body: isHtml ? upload?.html : (body as string).trim(),
       excerpt:
         typeof excerpt === "string" && excerpt.trim() ? excerpt.trim() : null,
       category,
@@ -80,7 +88,8 @@ function parseArticleForm(formData: FormData) {
       audio_url: ownAudioUrl(audioField),
       title_en: optionalEnglish(formData, "title_en"),
       excerpt_en: optionalEnglish(formData, "excerpt_en"),
-      body_en: optionalEnglish(formData, "body_en"),
+      // Un HTML subido no tiene version en ingles: es un unico archivo.
+      body_en: isHtml ? null : optionalEnglish(formData, "body_en"),
     },
   } as const;
 }
@@ -174,8 +183,12 @@ export async function createArticle(
   _prevState: ArticleFormState,
   formData: FormData
 ): Promise<ArticleFormState> {
-  const parsed = parseArticleForm(formData);
-  if (parsed.error) return { error: parsed.error };
+  const parsed = await parseArticleForm(formData);
+  if (!parsed.data) return { error: parsed.error };
+
+  if (parsed.data.body === undefined) {
+    return { error: "Elige el archivo .html a subir." };
+  }
 
   const supabase = await createClient();
 
@@ -184,7 +197,7 @@ export async function createArticle(
 
   const { error } = await supabase
     .from("articles")
-    .insert({ ...parsed.data, cover_url: cover.url ?? null });
+    .insert({ ...parsed.data, body: parsed.data.body, cover_url: cover.url ?? null });
 
   if (error) return { error: friendlyError(error.message, "crear") };
 
@@ -197,8 +210,8 @@ export async function updateArticle(
   _prevState: ArticleFormState,
   formData: FormData
 ): Promise<ArticleFormState> {
-  const parsed = parseArticleForm(formData);
-  if (parsed.error) return { error: parsed.error };
+  const parsed = await parseArticleForm(formData);
+  if (!parsed.data) return { error: parsed.error };
 
   const supabase = await createClient();
 

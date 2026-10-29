@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { HtmlFrame } from "@/components/ui/HtmlFrame";
 import { ArticleBody } from "@/components/ui/ArticleBody";
 import { ArticleAudio } from "@/components/ui/ArticleAudio";
 import { CreamSection } from "@/components/ui/CreamSection";
@@ -58,7 +59,8 @@ export default async function CompartidoPage({
   const article = await getShared(token, locale);
   if (!article) notFound();
 
-  const blocks = parseArticleBody(article.body);
+  const isHtml = article.body_format === "html";
+  const blocks = isHtml ? [] : parseArticleBody(article.body);
 
   return (
     <>
@@ -104,7 +106,13 @@ export default async function CompartidoPage({
                   className="mb-6"
                 />
               )}
-              <ArticleBody blocks={blocks} tone="light" floating />
+              {isHtml ? (
+                <div className="overflow-hidden rounded-2xl border border-[#f9d78f]">
+                  <HtmlFrame html={article.body} title={article.title} />
+                </div>
+              ) : (
+                <ArticleBody blocks={blocks} tone="light" floating />
+              )}
             </div>
           </article>
         </CreamSection>

@@ -3383,3 +3383,17 @@ sin pushear ni mergear.
 - **Pendiente:** etapa 2 (escrituras con confirmación, firma y deshacer), imágenes
   por la UI, y el motor compartido con WhatsApp.
 
+
+## 2026-10-29 — Envío material pasa a HTML subido
+
+El editor de bloques de "Envío material" (28/10) no les gustó: no tienen tiempo
+de armar documentos en el panel. Lo que piden: subir HTML ya hecho, sacar link,
+cargarlo también en Contenidos con selector de categoría, y un botón de
+compartir al lado de cada contenido.
+
+- Migración `20261029140000_html_subido.sql`: `materiales.html`,
+  `articles.body_format`, y `shared_article`/`shared_material` recreadas.
+- Se sacó `MaterialDocument`, `lib/material.ts` y el e2e del editor.
+- `HtmlFrame` (iframe sandbox sin `allow-same-origin`) dibuja todo HTML subido.
+- `ShareButton` en `/contenidos/[slug]`. Ver `docs/MATERIAL.md`.
+- Pendiente: los 2 documentos viejos de `materiales` y sus 6 imágenes.

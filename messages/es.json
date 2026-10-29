@@ -368,6 +368,8 @@
         "invalido": "No encontramos ese código. Revisa que esté bien escrito."
       },
       "backToLibrary": "Volver a la biblioteca",
+      "share": "Compartir",
+      "shared": "Link copiado",
       "allTopics": "Todos los temas"
     }
   },

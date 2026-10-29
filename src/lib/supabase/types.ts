@@ -79,6 +79,7 @@ export type Database = {
           cover_url: string | null
           back_cover_url: string | null
           blocks: Json
+          html: string | null
           share_token: string | null
           created_at: string
           updated_at: string
@@ -91,6 +92,7 @@ export type Database = {
           cover_url?: string | null
           back_cover_url?: string | null
           blocks?: Json
+          html?: string | null
           share_token?: string | null
           created_at?: string
           updated_at?: string
@@ -103,6 +105,7 @@ export type Database = {
           cover_url?: string | null
           back_cover_url?: string | null
           blocks?: Json
+          html?: string | null
           share_token?: string | null
           created_at?: string
           updated_at?: string
@@ -313,6 +316,7 @@ export type Database = {
           audio_url: string | null
           body: string
           body_en: string | null
+          body_format: string
           category: Database["public"]["Enums"]["article_category"]
           cover_url: string | null
           created_at: string
@@ -333,6 +337,7 @@ export type Database = {
           audio_url?: string | null
           body: string
           body_en?: string | null
+          body_format?: string
           category?: Database["public"]["Enums"]["article_category"]
           cover_url?: string | null
           created_at?: string
@@ -353,6 +358,7 @@ export type Database = {
           audio_url?: string | null
           body?: string
           body_en?: string | null
+          body_format?: string
           category?: Database["public"]["Enums"]["article_category"]
           cover_url?: string | null
           created_at?: string
@@ -1146,10 +1152,7 @@ export type Database = {
         Args: { p_token: string }
         Returns: {
           title: string
-          eyebrow: string | null
-          cover_url: string | null
-          back_cover_url: string | null
-          blocks: Json
+          html: string
         }[]
       }
       shared_article: {
@@ -1164,6 +1167,7 @@ export type Database = {
           cover_url: string | null
           audio_url: string | null
           category: Database["public"]["Enums"]["article_category"]
+          body_format: string
         }[]
       }
     }

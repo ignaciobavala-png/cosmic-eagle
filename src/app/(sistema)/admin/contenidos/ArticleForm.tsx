@@ -43,6 +43,11 @@ export function ArticleForm({
   const [slug, setSlug] = useState(article?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(Boolean(article));
 
+  // Texto con las cinco reglas, o un HTML ya armado que sube la organizacion.
+  const [format, setFormat] = useState<"text" | "html">(
+    article?.body_format === "html" ? "html" : "text"
+  );
+
   const coverInputRef = useRef<HTMLInputElement>(null);
   const { working: cropping, framerProps, pick } = useCoverCrop({
     aspect: ARTICLE_COVER_ASPECT,
@@ -222,31 +227,74 @@ export function ArticleForm({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="body" className={labelClass}>
-          Texto
+        <label htmlFor="body_format" className={labelClass}>
+          Formato del contenido
         </label>
-        <textarea
-          id="body"
-          name="body"
-          rows={16}
-          required
-          defaultValue={article?.body ?? ""}
-          className={`${inputClass} font-body leading-relaxed`}
-        />
-        <p className="text-xs text-on-surface-variant">
-          Deja una línea en blanco entre párrafos. Una línea que empiece con{" "}
-          <code className="text-primary-fixed-dim">## </code> se ve como
-          subtítulo.
-        </p>
+        <select
+          id="body_format"
+          name="body_format"
+          value={format}
+          onChange={(event) => setFormat(event.target.value as "text" | "html")}
+          className={inputClass}
+        >
+          <option value="text">Texto (se escribe acá)</option>
+          <option value="html">HTML subido (un archivo ya armado)</option>
+        </select>
       </div>
+
+      {format === "html" ? (
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="html_file" className={labelClass}>
+            Archivo HTML
+          </label>
+          <input
+            id="html_file"
+            name="html_file"
+            type="file"
+            accept=".html,.htm,text/html"
+            required={article?.body_format !== "html"}
+            className="text-sm text-on-surface-variant file:mr-3 file:rounded-lg file:border file:border-outline-variant file:bg-surface-container-low file:px-3 file:py-1.5 file:text-sm file:text-on-surface-variant"
+          />
+          <p className="text-xs text-on-surface-variant">
+            Hasta 3MB. Se muestra dentro de la página del contenido. Si lleva
+            fotos, que estén dentro del archivo (o en links públicos) y
+            comprimidas.
+            {article?.body_format === "html" &&
+              " Si no eliges uno, se mantiene el actual."}
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="body" className={labelClass}>
+              Texto
+            </label>
+            <textarea
+              id="body"
+              name="body"
+              rows={16}
+              required
+              defaultValue={article?.body_format === "html" ? "" : (article?.body ?? "")}
+              className={`${inputClass} font-body leading-relaxed`}
+            />
+            <p className="text-xs text-on-surface-variant">
+              Deja una línea en blanco entre párrafos. Una línea que empiece con{" "}
+              <code className="text-primary-fixed-dim">## </code> se ve como
+              subtítulo.
+            </p>
+          </div>
+        </>
+      )}
 
       <EnglishFields
         fieldClassName={`${inputClass} w-full`}
-        hint="Lo que se ve en la versión en inglés del sitio. Un campo vacío aparece en castellano; el texto sigue las mismas reglas que el de arriba."
+        hint="Lo que se ve en la versión en inglés del sitio. Un campo vacío aparece en castellano; el texto sigue las mismas reglas que el de arriba. Un HTML subido es un solo archivo: no tiene versión en inglés."
         fields={[
           { name: "title_en", label: "Title", value: article?.title_en },
           { name: "excerpt_en", label: "Excerpt", value: article?.excerpt_en, rows: 2 },
-          { name: "body_en", label: "Text", value: article?.body_en, rows: 12 },
+          ...(format === "text"
+            ? [{ name: "body_en", label: "Text", value: article?.body_en, rows: 12 }]
+            : []),
         ]}
       />
 

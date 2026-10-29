@@ -75,8 +75,7 @@ loguea y devuelve `not_configured` sin fallar y sin dejar fila.
 **Panel de admin** (`/admin`, protegido por `profiles.is_admin`): dashboard, CRUD
 de experiencias, solicitudes (revisión + pago a mano), CRM, contenidos, FAQs,
 testimonios, multimedia, pagos, legales, acceso, suscriptores, notificaciones y
-**envío material** (documentos con el formato del cuaderno de Egipto, por link y PDF;
-`docs/MATERIAL.md`) y, en la rama `ia`, **asistente de IA** (`/admin/ia`, `docs/IA.md`).
+**envío material** (HTML ya armado que sube la organización, por link; también se carga como contenido; `docs/MATERIAL.md`) y, en la rama `ia`, **asistente de IA** (`/admin/ia`, `docs/IA.md`).
 Un admin no puede revisar su propia solicitud.
 
 **Contenido editable por la clienta, sin tocar código**: imágenes y textos de las

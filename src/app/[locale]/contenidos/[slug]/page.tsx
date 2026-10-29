@@ -6,6 +6,8 @@ import { ArrowLeft, Lock } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ArticleBody } from "@/components/ui/ArticleBody";
+import { HtmlFrame } from "@/components/ui/HtmlFrame";
+import { ShareButton } from "@/components/ui/ShareButton";
 import { ArticleAudio } from "@/components/ui/ArticleAudio";
 import { CreamSection } from "@/components/ui/CreamSection";
 import { LibraryNav } from "@/components/ui/LibraryNav";
@@ -73,7 +75,9 @@ async function getArticle(slug: string, locale: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("articles")
-    .select("title, excerpt, body, body_en, cover_url, category, audio_url")
+    .select(
+      "title, excerpt, body, body_en, body_format, cover_url, category, audio_url"
+    )
     .eq("slug", slug)
     .maybeSingle();
 
@@ -127,7 +131,8 @@ export default async function ContenidoPage({
   // alcanza. La pagina se dibuja igual, con el muro en lugar del texto.
   const locked = !article;
 
-  const blocks = article ? parseArticleBody(article.body) : [];
+  const isHtml = article?.body_format === "html";
+  const blocks = article && !isHtml ? parseArticleBody(article.body) : [];
   const others = await getOthers(slug, teaser.category!, rawLocale);
 
   return (
@@ -159,13 +164,20 @@ export default async function ContenidoPage({
           <LibraryNav active={teaser.category!} />
 
           <article className="mx-auto mt-12 max-w-3xl">
-            <Link
-              href="/contenidos"
-              className="inline-flex items-center gap-2 text-label-sm uppercase text-on-primary-container transition-colors hover:text-[#05125a]"
-            >
-              <ArrowLeft size={15} />
-              {t("library.backToLibrary")}
-            </Link>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <Link
+                href="/contenidos"
+                className="inline-flex items-center gap-2 text-label-sm uppercase text-on-primary-container transition-colors hover:text-[#05125a]"
+              >
+                <ArrowLeft size={15} />
+                {t("library.backToLibrary")}
+              </Link>
+              <ShareButton
+                title={teaser.title!}
+                label={t("library.share")}
+                copiedLabel={t("library.shared")}
+              />
+            </div>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <span className="rounded-full border border-on-primary-container/40 px-3 py-1 text-label-sm uppercase text-on-primary-container">
@@ -216,7 +228,13 @@ export default async function ContenidoPage({
                       className="mb-6"
                     />
                   )}
-                  <ArticleBody blocks={blocks} tone="light" floating />
+                  {isHtml ? (
+                    <div className="overflow-hidden rounded-2xl border border-[#f9d78f]">
+                      <HtmlFrame html={article!.body} title={teaser.title!} />
+                    </div>
+                  ) : (
+                    <ArticleBody blocks={blocks} tone="light" floating />
+                  )}
                 </>
               )}
             </div>

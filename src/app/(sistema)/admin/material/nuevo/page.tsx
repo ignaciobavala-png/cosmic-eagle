@@ -14,7 +14,7 @@ export default function NuevoMaterialPage() {
         Envío material
       </Link>
       <h1 className="font-display text-3xl text-primary-fixed-dim mb-8">
-        Nuevo documento
+        Subir documento
       </h1>
       <MaterialForm action={createMaterial} />
     </div>
