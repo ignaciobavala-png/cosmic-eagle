@@ -64,9 +64,24 @@ export function articleCategoryLabel(value: string): string {
   return isArticleCategory(value) ? ARTICLE_CATEGORIES[value].label : value;
 }
 
-/** Toda portada de articulo se guarda en 16:9, como la de los viajes. */
-export const ARTICLE_COVER_ASPECT = 16 / 9;
-export const ARTICLE_COVER_MAX_PX = 1600;
+/**
+ * La foto de un contenido la pone su categoria (29/10, pedido de la
+ * organizacion: una sola foto por tema, para no necesitar una por articulo).
+ * Son archivos fijos de layout en `public/img/categorias/`, no subidas del
+ * panel. `position` es el `object-position` que mantiene el sujeto a la vista
+ * cuando la foto vertical se recorta a 16:9 o 21:9.
+ */
+const CATEGORY_COVERS: Record<ArticleCategory, { src: string; position: string }> = {
+  salud: { src: "/img/categorias/salud.webp", position: "50% 35%" },
+  evolucion: { src: "/img/categorias/evolucion.webp", position: "50% 55%" },
+  preparacion: { src: "/img/categorias/preparacion.webp", position: "50% 50%" },
+  tecnologia: { src: "/img/categorias/tecnologia.webp", position: "50% 50%" },
+  testimonios: { src: "/img/categorias/testimonios.webp", position: "50% 10%" },
+};
+
+export function articleCover(category: string) {
+  return isArticleCategory(category) ? CATEGORY_COVERS[category] : null;
+}
 
 /**
  * Titulo -> slug de la URL. Corre en el browser (para sugerirlo mientras se

@@ -14,9 +14,7 @@ import { LibraryNav } from "@/components/ui/LibraryNav";
 import { createClient } from "@/lib/supabase/server";
 import { localizeRow } from "@/lib/localized";
 import { AccessCodeForm } from "@/components/ui/AccessCodeForm";
-import {
-  parseArticleBody,
-} from "@/lib/article";
+import { articleCover, parseArticleBody } from "@/lib/article";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 /**
@@ -57,7 +55,7 @@ async function getTeaser(slug: string, locale: string) {
   const { data } = await supabase
     .from("articles_public")
     .select(
-      "title, title_en, excerpt, excerpt_en, cover_url, category, access_level"
+      "title, title_en, excerpt, excerpt_en, category, access_level"
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -75,9 +73,7 @@ async function getArticle(slug: string, locale: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("articles")
-    .select(
-      "title, excerpt, body, body_en, body_format, cover_url, category, audio_url"
-    )
+    .select("title, excerpt, body, body_en, body_format, category, audio_url")
     .eq("slug", slug)
     .maybeSingle();
 
@@ -97,11 +93,12 @@ export async function generateMetadata({
   const teaser = await getTeaser(slug, locale);
 
   if (!teaser) return { title: t("meta.notFound") };
+  const cover = articleCover(teaser.category!);
 
   return {
     title: `${teaser.title} | Cosmic Eagle`,
     description: teaser.excerpt ?? undefined,
-    openGraph: teaser.cover_url ? { images: [teaser.cover_url] } : undefined,
+    openGraph: cover ? { images: [cover.src] } : undefined,
   };
 }
 
@@ -133,19 +130,21 @@ export default async function ContenidoPage({
 
   const isHtml = article?.body_format === "html";
   const blocks = article && !isHtml ? parseArticleBody(article.body) : [];
+  const cover = articleCover(teaser.category!);
   const others = await getOthers(slug, teaser.category!, rawLocale);
 
   return (
     <>
       <Header />
       <main className="pt-[var(--navbar-h)]">
-        {teaser.cover_url && (
+        {cover && (
           <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9] md:aspect-[21/9]">
             <Image
-              src={teaser.cover_url}
+              src={cover.src}
               alt=""
               fill
               priority
+              style={{ objectPosition: cover.position }}
               sizes="100vw"
               className="object-cover"
             />

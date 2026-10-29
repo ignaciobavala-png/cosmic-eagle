@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
+import { articleCover } from "@/lib/article";
 import { DeleteArticleButton } from "./DeleteArticleButton";
 import { ShareArticleButton } from "./ShareArticleButton";
 import { MoveArticleButtons } from "./MoveArticleButtons";
@@ -26,7 +27,7 @@ export default async function AdminContenidosPage() {
   const [{ data: articles }, { data: shares }] = await Promise.all([
     supabase
       .from("articles")
-      .select("id, title, slug, category, status, cover_url")
+      .select("id, title, slug, category, status")
       // El mismo orden que ve el público (ver moveArticle). Los borradores, que
       // el público no ve, entran con 0 y quedan arriba hasta que se los mueva.
       .order("sort_order", { ascending: true })
@@ -93,9 +94,9 @@ export default async function AdminContenidosPage() {
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="relative h-10 w-16 shrink-0 overflow-hidden rounded bg-surface-container-lowest">
-                        {article.cover_url && (
+                        {articleCover(article.category) && (
                           <Image
-                            src={article.cover_url}
+                            src={articleCover(article.category)!.src}
                             alt=""
                             fill
                             sizes="64px"

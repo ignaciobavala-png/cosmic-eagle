@@ -10,7 +10,7 @@ import { ArticleAudio } from "@/components/ui/ArticleAudio";
 import { CreamSection } from "@/components/ui/CreamSection";
 import { createClient } from "@/lib/supabase/server";
 import { localizeRow } from "@/lib/localized";
-import { parseArticleBody } from "@/lib/article";
+import { articleCover, parseArticleBody } from "@/lib/article";
 
 /**
  * Un contenido abierto por link (pedido de la organización, 08/10): el admin lo
@@ -59,6 +59,7 @@ export default async function CompartidoPage({
   const article = await getShared(token, locale);
   if (!article) notFound();
 
+  const cover = articleCover(article.category);
   const isHtml = article.body_format === "html";
   const blocks = isHtml ? [] : parseArticleBody(article.body);
 
@@ -66,13 +67,14 @@ export default async function CompartidoPage({
     <>
       <Header />
       <main className="pt-[var(--navbar-h)]">
-        {article.cover_url && (
+        {cover && (
           <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9] md:aspect-[21/9]">
             <Image
-              src={article.cover_url}
+              src={cover.src}
               alt=""
               fill
               priority
+              style={{ objectPosition: cover.position }}
               sizes="100vw"
               className="object-cover"
             />

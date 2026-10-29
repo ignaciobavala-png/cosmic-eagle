@@ -2,12 +2,12 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Lock } from "lucide-react";
+import { articleCover } from "@/lib/article";
 
 export type ArticleCardData = {
   slug: string;
   title: string;
   excerpt: string | null;
-  cover_url: string | null;
   category: string;
 };
 
@@ -38,6 +38,7 @@ export async function ArticleCard({
 }) {
   const t = await getTranslations("Contenidos");
   const tCat = await getTranslations("ArticleCategories");
+  const cover = articleCover(article.category);
 
   return (
     <Link
@@ -45,11 +46,12 @@ export async function ArticleCard({
       className="group flex flex-col overflow-hidden rounded-2xl border border-[#f9d78f] bg-[#fff6eb] transition-colors duration-300 hover:border-on-primary-container/50"
     >
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#05125a]">
-        {article.cover_url ? (
+        {cover ? (
           <Image
-            src={article.cover_url}
+            src={cover.src}
             alt=""
             fill
+            style={{ objectPosition: cover.position }}
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             className="object-cover transition-transform duration-1000 group-hover:scale-105"
           />

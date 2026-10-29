@@ -115,62 +115,6 @@ async function removeOwnFile(supabase: SupabaseClient, url: string | null | unde
   if (path) await supabase.storage.from(BUCKET).remove([decodeURIComponent(path)]);
 }
 
-/**
- * Sube la portada si el form trae una. Devuelve `url: undefined` cuando no hay
- * archivo, para distinguir "no tocar la portada" de "portada vacia".
- *
- * `currentUrl` es la que se reemplaza: se borra despues de subir la nueva, asi
- * el bucket no crece con cada edicion.
- */
-async function uploadCover(
-  supabase: SupabaseClient,
-  formData: FormData,
-  currentUrl?: string | null
-): Promise<{ error: string | null; url?: string }> {
-  const file = formData.get("cover");
-
-  if (!(file instanceof File) || file.size === 0) return { error: null };
-
-  if (!file.type.startsWith("image/")) {
-    return { error: "La portada debe ser una imagen." };
-  }
-
-  // El bucket es publico y un SVG servido inline puede llevar script adentro.
-  if (file.type === "image/svg+xml") {
-    return { error: "Los SVG no están permitidos. Sube JPG, PNG o WebP." };
-  }
-
-  // Llega ya recortada y comprimida del browser; el tope es la red de
-  // contencion por si la compresion no corrio y subio el original.
-  if (file.size > 5 * 1024 * 1024) {
-    return { error: "La portada no puede superar los 5MB." };
-  }
-
-  const ext = file.type.split("/")[1]?.replace("jpeg", "jpg") ?? "webp";
-  // Nombre nuevo en cada subida: con un path fijo la URL no cambia y el CDN
-  // sigue sirviendo la imagen vieja despues de reemplazarla.
-  const path = `articles/${crypto.randomUUID()}.${ext}`;
-
-  const { error } = await supabase.storage
-    .from(BUCKET)
-    .upload(path, file, { contentType: file.type });
-
-  if (error) return { error: "No se pudo subir la portada. Prueba de nuevo." };
-
-  if (currentUrl?.includes(PUBLIC_PREFIX)) {
-    const oldPath = currentUrl.split(PUBLIC_PREFIX)[1]?.split("?")[0];
-    if (oldPath) {
-      await supabase.storage.from(BUCKET).remove([decodeURIComponent(oldPath)]);
-    }
-  }
-
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from(BUCKET).getPublicUrl(path);
-
-  return { error: null, url: publicUrl };
-}
-
 /** El slug es unico: el mensaje crudo de Postgres no le dice nada a la clienta. */
 function friendlyError(message: string, action: "crear" | "guardar") {
   if (message.includes("articles_slug_key")) {
@@ -192,12 +136,9 @@ export async function createArticle(
 
   const supabase = await createClient();
 
-  const cover = await uploadCover(supabase, formData);
-  if (cover.error) return { error: cover.error };
-
   const { error } = await supabase
     .from("articles")
-    .insert({ ...parsed.data, body: parsed.data.body, cover_url: cover.url ?? null });
+    .insert({ ...parsed.data, body: parsed.data.body });
 
   if (error) return { error: friendlyError(error.message, "crear") };
 
@@ -215,21 +156,15 @@ export async function updateArticle(
 
   const supabase = await createClient();
 
-  // La portada actual se relee de la base para poder borrarla: el cliente manda
-  // el archivo nuevo, nunca la URL a borrar.
   const { data: current } = await supabase
     .from("articles")
-    .select("cover_url, slug, audio_url")
+    .select("slug, audio_url")
     .eq("id", id)
     .single();
 
-  const cover = await uploadCover(supabase, formData, current?.cover_url);
-  if (cover.error) return { error: cover.error };
-
-  // Sin archivo nuevo la portada queda como esta: no se pisa con null.
   const { error } = await supabase
     .from("articles")
-    .update(cover.url ? { ...parsed.data, cover_url: cover.url } : parsed.data)
+    .update(parsed.data)
     .eq("id", id);
 
   if (error) return { error: friendlyError(error.message, "guardar") };

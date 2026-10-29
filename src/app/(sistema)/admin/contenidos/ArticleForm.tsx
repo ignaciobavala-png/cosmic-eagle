@@ -1,12 +1,8 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
-import { CoverFramer } from "@/components/admin/CoverFramer";
-import { useCoverCrop } from "@/components/admin/use-cover-crop";
+import { useActionState, useState } from "react";
 import {
   ARTICLE_CATEGORY_LIST,
-  ARTICLE_COVER_ASPECT,
-  ARTICLE_COVER_MAX_PX,
   slugify,
 } from "@/lib/article";
 import { CONTENT_ACCESS_LEVELS } from "@/lib/content-access";
@@ -47,13 +43,6 @@ export function ArticleForm({
   const [format, setFormat] = useState<"text" | "html">(
     article?.body_format === "html" ? "html" : "text"
   );
-
-  const coverInputRef = useRef<HTMLInputElement>(null);
-  const { working: cropping, framerProps, pick } = useCoverCrop({
-    aspect: ARTICLE_COVER_ASPECT,
-    maxPx: ARTICLE_COVER_MAX_PX,
-    inputRef: coverInputRef,
-  });
 
   function handleTitle(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;
@@ -121,48 +110,10 @@ export function ArticleForm({
         </p>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="cover" className={labelClass}>
-          Portada
-        </label>
-        {framerProps ? (
-          // Con un archivo nuevo elegido, el encuadre REEMPLAZA a la preview:
-          // la ventana del recorte ya muestra lo que se va a guardar, y las dos
-          // juntas dirian dos veces lo mismo.
-          <CoverFramer {...framerProps} className="w-full max-w-80" />
-        ) : (
-          article?.cover_url && (
-            <div className="relative aspect-[16/9] w-full max-w-64 overflow-hidden rounded-lg border border-outline-variant">
-              {/* <img> y no next/image: puede ser un blob: y el optimizador no
-                  lo puede resolver (mismo caso que TripForm). */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={article.cover_url}
-                alt="Portada actual del contenido"
-                className="h-full w-full object-cover"
-              />
-              {/* Zona segura, igual que en las portadas de viaje: lo que queda
-                  fuera del 75% central se pierde en el recorte de la tarjeta. */}
-              <div className="pointer-events-none absolute inset-[12.5%] border border-dashed border-primary-fixed-dim/60" />
-            </div>
-          )
-        )}
-        <input
-          ref={coverInputRef}
-          id="cover"
-          name="cover"
-          type="file"
-          accept="image/*"
-          onChange={pick}
-          className="text-sm text-on-surface-variant file:mr-3 file:rounded-lg file:border file:border-outline-variant file:bg-surface-container-low file:px-3 file:py-1.5 file:text-sm file:text-on-surface-variant"
-        />
-        <p className="text-xs text-on-surface-variant">
-          {cropping && "Recortando… "}
-          {!cropping && !framerProps && "Se recorta sola a 16:9 y el encuadre se elige al elegir la foto. "}
-          {!cropping && article?.cover_url && "Si no eliges una, se mantiene la actual. "}
-          {!cropping && !article?.cover_url && !framerProps && "Sin portada la tarjeta va sin imagen."}
-        </p>
-      </div>
+      <p className="rounded-lg border border-outline-variant px-4 py-3 text-xs text-on-surface-variant">
+        La foto del contenido la pone la categoría: no hace falta subir una por
+        artículo.
+      </p>
 
       <AudioField labelClass={labelClass} initialUrl={article?.audio_url ?? null} />
 
@@ -303,7 +254,7 @@ export function ArticleForm({
       <div className="flex items-center gap-4">
         <button
           type="submit"
-          disabled={pending || cropping}
+          disabled={pending}
           className="bg-primary-container text-on-primary font-medium tracking-[0.05em] rounded-lg px-6 py-2.5 text-sm hover:bg-primary-fixed transition-colors disabled:opacity-40"
         >
           {pending ? "Guardando…" : "Guardar"}

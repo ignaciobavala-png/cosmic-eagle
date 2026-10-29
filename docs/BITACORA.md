@@ -3398,3 +3398,15 @@ compartir al lado de cada contenido.
 - `ShareButton` en `/contenidos/[slug]`. Ver `docs/MATERIAL.md`.
 - Se borraron los 2 documentos viejos de `materiales`, sus 6 imágenes y las
   columnas del editor (`20261029150000_materiales_solo_html.sql`).
+
+### 29/10 (más tarde) — una foto por categoría en Contenidos
+
+La organización no quiere cargar una foto por artículo: **la imagen la pone la
+categoría** (`articleCover()` en `src/lib/article.ts`, archivos en
+`public/img/categorias/`, con su `object-position`). Salud=1, Evolución=2,
+Tecnología=4 (según la numeración de los archivos que mandaron), Preparación=6 y
+Testimonios=5 (elegidas por afinidad: anillo = ciclo/integración, torso con
+destello = testimonio). Se sacó el campo "Portada" del formulario de contenidos;
+`articles.cover_url` queda en la tabla, sin uso (3 artículos tenían una propia).
+Los HTML subidos ya no se abren "en línea" en la biblioteca: la tarjeta navega
+a la página del contenido, donde viven en su iframe.

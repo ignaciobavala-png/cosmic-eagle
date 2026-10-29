@@ -10,7 +10,7 @@ import { ArticleBody } from "./ArticleBody";
 import { ArticleAudio } from "./ArticleAudio";
 import { CtaLink } from "./CtaLink";
 import { TitleRule } from "./TitleRule";
-import type { ArticleBlock } from "@/lib/article";
+import { articleCover, type ArticleBlock } from "@/lib/article";
 
 /**
  * La biblioteca de /contenidos como experiencia de un solo espacio.
@@ -42,7 +42,6 @@ export type LibraryArticle = {
   slug: string;
   title: string;
   excerpt: string | null;
-  cover_url: string | null;
   category: string;
   /** El nivel del texto supera al de quien mira: se muestra con candado. */
   locked: boolean;
@@ -364,6 +363,7 @@ function LibraryCard({
   onOpen: (slug: string) => void;
 }) {
   const t = useTranslations("Contenidos");
+  const cover = articleCover(article.category);
   return (
     <Link
       href={`/contenidos/${article.slug}`}
@@ -376,11 +376,12 @@ function LibraryCard({
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#f9d78f] bg-[#fff6eb] transition-colors duration-300 hover:border-on-primary-container/50"
     >
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#05125a]">
-        {article.cover_url ? (
+        {cover ? (
           <Image
-            src={article.cover_url}
+            src={cover.src}
             alt=""
             fill
+            style={{ objectPosition: cover.position }}
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             className="object-cover transition-transform duration-1000 group-hover:scale-105"
           />

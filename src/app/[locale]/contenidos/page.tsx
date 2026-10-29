@@ -65,7 +65,7 @@ export default async function ContenidosPage({
     supabase
       .from("articles_public")
       .select(
-        "slug, title, title_en, excerpt, excerpt_en, cover_url, category, access_level"
+        "slug, title, title_en, excerpt, excerpt_en, category, access_level"
       )
       .order("sort_order", { ascending: true })
       .order("published_at", { ascending: false, nullsFirst: false }),
@@ -76,14 +76,18 @@ export default async function ContenidosPage({
   // `body` a propósito.
   const { data: readable } = await supabase
     .from("articles")
-    .select("slug, body, body_en, audio_url");
+    .select("slug, body, body_en, body_format, audio_url");
 
   // En /en cada campo usa su `_en` si está cargado (docs/I18N.md §6).
   const audioBySlug = new Map(
     (readable ?? []).map((row) => [row.slug, row.audio_url])
   );
+  // Un HTML subido no se lee "en linea" como texto: sin cuerpo parseado, la
+  // tarjeta navega a /contenidos/<slug>, donde se dibuja en su iframe.
   const bodyBySlug = new Map(
-    (readable ?? []).map((row) => [row.slug, localized(locale, row.body, row.body_en)])
+    (readable ?? [])
+      .filter((row) => row.body_format !== "html")
+      .map((row) => [row.slug, localized(locale, row.body, row.body_en)])
   );
 
   const articles: LibraryArticle[] = (metas ?? []).map((meta) => {
@@ -95,7 +99,6 @@ export default async function ContenidosPage({
       slug,
       title: localized(locale, meta.title!, meta.title_en),
       excerpt: localized(locale, meta.excerpt, meta.excerpt_en),
-      cover_url: meta.cover_url,
       category: meta.category!,
       locked,
       blocks: body ? parseArticleBody(body) : null,
