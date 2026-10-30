@@ -48,6 +48,7 @@ Lo que devuelve una herramienta **sale a DeepSeek**, un tercero. Por eso:
 |---|---|
 | `listar_viajes` | retiros y sesiones: fechas, USD, cupo, solicitudes por estado, lugares libres. Por defecto solo próximos; `cuando: pasados` para la historia |
 | `listar_solicitudes` | nombre, país, estado, pago y evento (filtros por estado, pago, viaje, nombre, `tipo` retiro/sesión y `cuando`) |
+| `consultar_crm` | segmentos del CRM (estado, nivel de experiencia, país, género, evento) con conteos del segmento completo; sin mails |
 | `ver_participante` | ficha de una persona + historial de reservas (qué retiros y sesiones, cuáles ya pasaron, si asistió) |
 | `listar_textos_sitio` | clave, grupo y valor actual de los textos editables (para encontrar la clave antes de cambiarlos) |
 | `listar_avisos` | la campanita: solicitudes nuevas, comprobantes, correos que fallaron |
@@ -65,6 +66,10 @@ Lo que devuelve una herramienta **sale a DeepSeek**, un tercero. Por eso:
 - `ver_participante` expone país, género, profesión, experiencia previa,
   prácticas espirituales y cómo nos conoció, **sin** mail, teléfono ni salud.
   `asistio` = aprobada + evento pasado + pago distinto de `pending`.
+
+**Cierre automático:** `/api/cron/cerrar-eventos` (13:30 UTC, exige `CRON_SECRET`)
+pasa a `completed` lo `open`/`closed` cuya `end_date` ya pasó. Un evento que
+termina hoy se cierra mañana.
 
 ## Auditoría
 

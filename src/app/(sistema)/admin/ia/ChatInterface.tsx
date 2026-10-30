@@ -22,6 +22,7 @@ const SUGERENCIAS = [
 const HERRAMIENTAS: Record<string, string> = {
   listar_viajes: "viajes y sesiones",
   listar_solicitudes: "solicitudes",
+  consultar_crm: "el CRM",
   ver_participante: "la ficha de un participante",
   listar_textos_sitio: "textos del sitio",
   listar_avisos: "avisos",

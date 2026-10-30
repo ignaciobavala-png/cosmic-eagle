@@ -2,6 +2,8 @@ import { tool } from "ai";
 import { z } from "zod";
 import type { createClient } from "@/lib/supabase/server";
 import { SITE_GROUPS } from "@/lib/site-content";
+import { EXPERIENCE_LEVELS, RELATIONSHIP_STATES, filterContacts } from "@/lib/crm";
+import { loadContacts } from "@/lib/crm-data";
 
 /**
  * Herramientas de LECTURA del agente del panel (etapa 1 de /admin/ia).
@@ -278,6 +280,56 @@ export function buildReadTools(ctx: Ctx) {
             };
           });
           return { rows, extra: ids.length > 1 ? { aviso: "Hay más de una persona con ese nombre." } : undefined };
+        }),
+    }),
+
+    consultar_crm: tool({
+      description:
+        "Segmenta a las personas registradas como el CRM del panel: estado de la relación (viajero = tiene una reserva aprobada, solicitante = reserva en revisión, potencial = se registró pero nunca viajó), nivel de experiencia (nuevo, principiante, intermedio, avanzado, experto, según ceremonias), país, género y evento. Devuelve el conteo total del segmento y hasta 25 personas. Sirve para '¿cuántos viajeros nuevos hay?', '¿quiénes son de Chile y ya viajaron?'. NO trae mails ni teléfonos. Los umbrales de avanzado (10) y experto (20) son provisorios.",
+      inputSchema: z.object({
+        estado: z.enum(RELATIONSHIP_STATES.map((s) => s.value) as [string, ...string[]]).optional(),
+        nivel: z.enum(EXPERIENCE_LEVELS.map((l) => l.value) as [string, ...string[]]).optional(),
+        pais: z.string().optional().describe("País tal como figura en el CRM, ej. 'Chile'"),
+        genero: z.enum(["mujer", "hombre", "no_binario", "prefiero_no_decir"]).optional(),
+        viaje_id: z.string().uuid().optional().describe("Solo personas con una reserva (cualquier estado) en este evento"),
+      }),
+      execute: (args) =>
+        leer(ctx, "consultar_crm", args, async () => {
+          const todos = await loadContacts(supabase);
+          // Las cuentas del equipo no son contactos.
+          const segmento = filterContacts(todos, {
+            estado: args.estado,
+            nivel: args.nivel,
+            pais: args.pais,
+            genero: args.genero,
+            viaje: args.viaje_id,
+          }).filter((c) => !c.isAdmin);
+
+          const contar = (key: "state" | "experience") => {
+            const out: Record<string, number> = {};
+            for (const c of segmento) out[c[key]] = (out[c[key]] ?? 0) + 1;
+            return out;
+          };
+
+          return {
+            rows: segmento
+              .slice(0, MAX_ROWS)
+              .map((c) => ({
+                nombre: c.fullName,
+                pais: c.country,
+                genero: c.gender,
+                estado: c.state,
+                nivel: c.experience,
+                ceremonias: c.ceremonies,
+                solicitudes: c.applications,
+              })),
+            extra: {
+              total_segmento: segmento.length,
+              por_estado: contar("state"),
+              por_nivel: contar("experience"),
+              ...(segmento.length > MAX_ROWS ? { aviso: "Se muestran 25; los conteos son del segmento completo." } : {}),
+            },
+          };
         }),
     }),
 
