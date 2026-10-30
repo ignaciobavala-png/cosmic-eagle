@@ -46,10 +46,25 @@ Lo que devuelve una herramienta **sale a DeepSeek**, un tercero. Por eso:
 
 | Herramienta | Qué devuelve |
 |---|---|
-| `listar_viajes` | viajes y sesiones: fechas, USD, cupo, solicitudes por estado, lugares libres |
-| `listar_solicitudes` | nombre, país, estado, pago y viaje (filtros por estado, pago, viaje, nombre) |
+| `listar_viajes` | retiros y sesiones: fechas, USD, cupo, solicitudes por estado, lugares libres. Por defecto solo próximos; `cuando: pasados` para la historia |
+| `listar_solicitudes` | nombre, país, estado, pago y evento (filtros por estado, pago, viaje, nombre, `tipo` retiro/sesión y `cuando`) |
+| `ver_participante` | ficha de una persona + historial de reservas (qué retiros y sesiones, cuáles ya pasaron, si asistió) |
 | `listar_textos_sitio` | clave, grupo y valor actual de los textos editables (para encontrar la clave antes de cambiarlos) |
 | `listar_avisos` | la campanita: solicitudes nuevas, comprobantes, correos que fallaron |
+
+## Fechas y tipo de evento (30/10)
+
+- `momento()` en `tools.ts` calcula `ya sucedió` / `en curso` / `próximo` contra
+  la fecha de **Buenos Aires** (`trips.start_date`/`end_date` son `date`, sin
+  hora) y marca `estado_desactualizado` si un evento pasado sigue `open`/`closed`
+  (hoy hay un retiro así). En un evento pasado `lugares_libres` es `null`.
+- Antes `listar_viajes` ordenaba por fecha ascendente con tope de 25: la historia
+  tapaba lo que viene. Ahora el default es `proximos`.
+- Cada resultado trae `tipo_nombre` (Retiro / Sesión). No existe la entidad
+  "invitado": una solicitud es la reserva de una persona en **un** evento.
+- `ver_participante` expone país, género, profesión, experiencia previa,
+  prácticas espirituales y cómo nos conoció, **sin** mail, teléfono ni salud.
+  `asistio` = aprobada + evento pasado + pago distinto de `pending`.
 
 ## Auditoría
 

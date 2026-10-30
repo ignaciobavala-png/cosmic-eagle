@@ -36,6 +36,31 @@ function cleanSearch(text: string) {
   return text.replace(/[%,()*\\]/g, " ").trim().slice(0, 60);
 }
 
+/** Hoy en Buenos Aires como `YYYY-MM-DD`: `trips.start_date`/`end_date` son `date`, sin hora. */
+function hoyAR() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }).format(new Date());
+}
+
+const TIPO_NOMBRE = { retiro: "Retiro", ceremonia: "Sesión" } as const;
+
+/**
+ * Lo que el modelo no debe deducir solo: si el evento ya pasó y de qué tipo es.
+ * Comparar strings `YYYY-MM-DD` es comparar fechas. `estado_desactualizado`
+ * marca un evento pasado que sigue 'open' o 'closed' (nadie lo pasó a
+ * 'completed'): el dato está mal cargado, no el evento.
+ */
+function momento(trip: { type: string; status: string; start_date: string; end_date: string }) {
+  const hoy = hoyAR();
+  const yaPaso = trip.end_date < hoy;
+  const enCurso = !yaPaso && trip.start_date <= hoy;
+  return {
+    tipo_nombre: TIPO_NOMBRE[trip.type as keyof typeof TIPO_NOMBRE] ?? trip.type,
+    momento: yaPaso ? "ya sucedió" : enCurso ? "en curso" : "próximo",
+    ya_paso: yaPaso,
+    ...(yaPaso && (trip.status === "open" || trip.status === "closed") ? { estado_desactualizado: true } : {}),
+  };
+}
+
 function clip(text: string | null, max = 240) {
   if (!text) return null;
   return text.length > max ? `${text.slice(0, max)}…` : text;
@@ -76,7 +101,7 @@ export function buildReadTools(ctx: Ctx) {
   return {
     listar_viajes: tool({
       description:
-        "Lista los viajes (tipo 'retiro') y las sesiones (tipo 'ceremonia') con fecha, precio en USD, cupo y cuántas solicitudes hay en cada estado. Usala para saber qué existe, cuántos lugares quedan o encontrar el id de un viaje.",
+        "Lista los retiros (tipo 'retiro') y las sesiones (tipo 'ceremonia') con fecha, precio en USD, cupo, cuántas solicitudes hay en cada estado y si ya sucedió ('momento'). Por defecto trae solo los próximos o en curso: para lo que ya pasó usá cuando='pasados'. Usala para saber qué existe, cuántos lugares quedan o encontrar el id de un evento.",
       inputSchema: z.object({
         tipo: z.enum(["retiro", "ceremonia"]).optional().describe("retiro = Viaje Cósmico, ceremonia = Sesión Cósmica"),
         estado: z
@@ -84,14 +109,22 @@ export function buildReadTools(ctx: Ctx) {
           .optional()
           .describe("draft = borrador, open = abierto a inscripción, closed = cerrado, completed = ya pasó"),
         texto: z.string().optional().describe("Parte del nombre"),
+        cuando: z
+          .enum(["proximos", "pasados", "todos"])
+          .optional()
+          .describe("proximos (por defecto) = los que terminan hoy o después; pasados = los que ya sucedieron, el más reciente primero; todos"),
       }),
       execute: (args) =>
         leer(ctx, "listar_viajes", args, async () => {
+          const cuando = args.cuando ?? "proximos";
+          const hoy = hoyAR();
           let query = supabase
             .from("trips")
             .select("id, title, type, status, category, start_date, end_date, capacity, price, deposit_amount, city, country")
-            .order("start_date", { ascending: true })
+            .order("start_date", { ascending: cuando !== "pasados" })
             .limit(MAX_ROWS);
+          if (cuando === "proximos") query = query.gte("end_date", hoy);
+          if (cuando === "pasados") query = query.lt("end_date", hoy);
           if (args.tipo) query = query.eq("type", args.tipo);
           if (args.estado) query = query.eq("status", args.estado);
           if (args.texto && cleanSearch(args.texto)) query = query.ilike("title", `%${cleanSearch(args.texto)}%`);
@@ -112,11 +145,14 @@ export function buildReadTools(ctx: Ctx) {
               const porEstado: Record<string, number> = {};
               for (const a of own) porEstado[a.status] = (porEstado[a.status] ?? 0) + 1;
               const aprobadas = porEstado.approved ?? 0;
+              const m = momento(trip);
               return {
                 ...trip,
+                ...m,
                 solicitudes_por_estado: porEstado,
                 aprobadas,
-                lugares_libres: Math.max(trip.capacity - aprobadas, 0),
+                // En un evento que ya pasó "lugares libres" no significa nada.
+                lugares_libres: m.ya_paso ? null : Math.max(trip.capacity - aprobadas, 0),
               };
             }),
           };
@@ -125,7 +161,7 @@ export function buildReadTools(ctx: Ctx) {
 
     listar_solicitudes: tool({
       description:
-        "Lista solicitudes de inscripción con nombre, país, estado de revisión, estado y monto de pago, y a qué viaje corresponden. NO devuelve mails, teléfonos ni datos de salud: si te piden contactar a alguien, decí que eso se hace desde el panel. Devuelve como máximo 25, las más nuevas primero.",
+        "Lista solicitudes de inscripción (cada una es la reserva de una persona en UN evento, retiro o sesión; el campo trip.tipo_nombre lo dice y trip.momento aclara si ya sucedió) con nombre, país, ceremonias previas, estado de revisión, estado y monto de pago. NO devuelve mails, teléfonos ni datos de salud: si te piden contactar a alguien, decí que eso se hace desde el panel. Devuelve como máximo 25, las más nuevas primero.",
       inputSchema: z.object({
         estado: z
           .enum(["pending_review", "needs_conversation", "approved", "rejected", "expired"])
@@ -134,13 +170,22 @@ export function buildReadTools(ctx: Ctx) {
         pago: z.enum(["pending", "deposit_paid", "paid", "waived"]).optional(),
         viaje_id: z.string().uuid().optional().describe("Id de un viaje, sacado de listar_viajes"),
         nombre: z.string().optional().describe("Parte del nombre de la persona"),
+        tipo: z.enum(["retiro", "ceremonia"]).optional().describe("Solo reservas de retiros o solo de sesiones"),
+        cuando: z
+          .enum(["proximos", "pasados"])
+          .optional()
+          .describe("Filtra por si el evento al que apunta la solicitud ya sucedió (pasados) o no (proximos). Sin esto trae ambos"),
       }),
       execute: (args) =>
         leer(ctx, "listar_solicitudes", args, async () => {
+          const hoy = hoyAR();
+          // `!inner` solo cuando se filtra por el evento: sin él, un filtro sobre la
+          // tabla embebida no descarta la fila de la solicitud.
+          const inner = args.tipo || args.cuando ? "!inner" : "";
           let query = supabase
             .from("applications")
             .select(
-              "id, full_name, residence_country, status, payment_status, amount_paid, created_at, reviewed_at, trip:trips(id, title, type, start_date)"
+              `id, full_name, residence_country, status, payment_status, amount_paid, previous_ceremonies, created_at, reviewed_at, trip:trips${inner}(id, title, type, status, start_date, end_date)`
             )
             .order("created_at", { ascending: false })
             .limit(MAX_ROWS);
@@ -148,10 +193,91 @@ export function buildReadTools(ctx: Ctx) {
           if (args.pago) query = query.eq("payment_status", args.pago);
           if (args.viaje_id) query = query.eq("trip_id", args.viaje_id);
           if (args.nombre && cleanSearch(args.nombre)) query = query.ilike("full_name", `%${cleanSearch(args.nombre)}%`);
+          if (args.tipo) query = query.eq("trips.type", args.tipo);
+          if (args.cuando === "proximos") query = query.gte("trips.end_date", hoy);
+          if (args.cuando === "pasados") query = query.lt("trips.end_date", hoy);
 
           const { data, error } = await query;
           if (error) return { error: error.message };
-          return { rows: data };
+          return { rows: data.map((a) => ({ ...a, trip: a.trip ? { ...a.trip, ...momento(a.trip) } : null })) };
+        }),
+    }),
+
+    ver_participante: tool({
+      description:
+        "Ficha de una persona: país, profesión, experiencia previa y su HISTORIAL completo de reservas (a qué retiros y sesiones se anotó, cuáles ya sucedieron, estado y pago de cada una), con totales por tipo. 'asistio' es true solo si la reserva fue aprobada, el evento ya pasó y hay pago (o está exonerado). NO trae mail, teléfono ni salud. Si el nombre coincide con varias personas, devuelve a todas: preguntá cuál.",
+      inputSchema: z.object({
+        nombre: z.string().min(2).describe("Parte del nombre de la persona"),
+      }),
+      execute: (args) =>
+        leer(ctx, "ver_participante", args, async () => {
+          const needle = cleanSearch(args.nombre);
+          if (needle.length < 2) return { error: "Nombre demasiado corto." };
+
+          const { data: apps, error } = await supabase
+            .from("applications")
+            .select(
+              "id, user_id, full_name, residence_country, status, payment_status, amount_paid, previous_ceremonies, created_at, trip:trips(id, title, type, status, start_date, end_date)"
+            )
+            .ilike("full_name", `%${needle}%`)
+            .order("created_at", { ascending: false })
+            .limit(100);
+          if (error) return { error: error.message };
+          if (!apps.length) return { rows: [] };
+
+          const ids = [...new Set(apps.map((a) => a.user_id))].slice(0, 10);
+          const { data: perfiles, error: perfilesError } = await supabase
+            .from("profiles")
+            .select("id, country, gender, profession, prior_experience, spiritual_practices, referral_source")
+            .in("id", ids);
+          if (perfilesError) return { error: perfilesError.message };
+
+          const rows = ids.map((id) => {
+            const own = apps.filter((a) => a.user_id === id);
+            const perfil = perfiles.find((p) => p.id === id);
+            const historial = own
+              .filter((a) => a.trip)
+              .map((a) => {
+                const m = momento(a.trip!);
+                const asistio = a.status === "approved" && m.ya_paso && a.payment_status !== "pending";
+                return {
+                  evento: a.trip!.title,
+                  tipo_nombre: m.tipo_nombre,
+                  inicio: a.trip!.start_date,
+                  fin: a.trip!.end_date,
+                  momento: m.momento,
+                  estado_reserva: a.status,
+                  pago: a.payment_status,
+                  monto_pagado_usd: a.amount_paid,
+                  asistio,
+                };
+              })
+              .sort((x, y) => y.inicio.localeCompare(x.inicio));
+            const asistidos = historial.filter((h) => h.asistio);
+            return {
+              nombre: own[0].full_name,
+              pais_residencia: own[0].residence_country,
+              ceremonias_previas_declaradas: Math.max(...own.map((a) => a.previous_ceremonies)),
+              perfil: perfil
+                ? {
+                    pais: perfil.country,
+                    genero: perfil.gender,
+                    profesion: perfil.profession,
+                    experiencia_previa: clip(perfil.prior_experience),
+                    practicas_espirituales: clip(perfil.spiritual_practices),
+                    como_nos_conocio: perfil.referral_source,
+                  }
+                : null,
+              totales: {
+                reservas: historial.length,
+                retiros_asistidos: asistidos.filter((h) => h.tipo_nombre === "Retiro").length,
+                sesiones_asistidas: asistidos.filter((h) => h.tipo_nombre === "Sesión").length,
+                proximos: historial.filter((h) => h.momento !== "ya sucedió" && h.estado_reserva === "approved").length,
+              },
+              historial,
+            };
+          });
+          return { rows, extra: ids.length > 1 ? { aviso: "Hay más de una persona con ese nombre." } : undefined };
         }),
     }),
 
