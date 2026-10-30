@@ -15,12 +15,14 @@ const SUGERENCIAS = [
   "¿Qué viajes y sesiones hay cargados y cuántos lugares quedan?",
   "¿Qué solicitudes están esperando revisión?",
   "¿Hay avisos sin leer en la campanita?",
+  "¿En qué retiros y sesiones estuvo cada participante de la última sesión?",
   "¿Qué dice hoy el título de la home?",
 ];
 
 const HERRAMIENTAS: Record<string, string> = {
   listar_viajes: "viajes y sesiones",
   listar_solicitudes: "solicitudes",
+  ver_participante: "la ficha de un participante",
   listar_textos_sitio: "textos del sitio",
   listar_avisos: "avisos",
 };
