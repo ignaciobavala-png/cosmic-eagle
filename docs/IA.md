@@ -86,6 +86,27 @@ termina hoy se cierra mañana.
   `output_tokens` (migración `20261101160000`). Medida inicial: una consulta
   simple con dos herramientas gastó ~8.300 tokens de entrada.
 
+## Voz y correo al equipo (01/11)
+
+- **Dictado gratis:** botón de micrófono en el chat (Web Speech API del navegador,
+  `es-AR`). El texto cae en el cuadro y **no se envía solo**: se revisa antes,
+  sobre todo los nombres propios. Chrome manda el audio a Google para
+  transcribirlo; en Firefox no existe y el botón no aparece.
+- **`enviar_correo_equipo`** (primera herramienta de escritura): correo interno
+  por Resend (`AvisoInterno`) a una persona del equipo o a todos. El destinatario
+  sale de `profiles.is_admin` en el servidor: el modelo no ve ni escribe
+  direcciones, y no puede escribirle a un viajero. **Exige aprobación**: el chat
+  muestra el borrador completo con "Aprobar y enviar" / "Rechazar"
+  (`toolApproval: 'user-approval'`) y el pedido va firmado
+  (`experimental_toolApprovalSecret`, derivado de la llave de servicio salvo que
+  exista `TOOL_APPROVAL_SECRET`). Tope de 20 correos por persona y día; cada envío
+  queda en `ai_agent_log` (`kind='write'`).
+- Hoy hay **una sola cuenta admin** (sin nombre cargado), así que "todos" o
+  cualquier nombre llegan a esa cuenta. Cuando Estela y Sofía tengan cuenta de
+  admin con nombre, se las puede nombrar.
+- El e2e prueba el camino de rechazo. **El de aprobar (envío real por Resend) todavía
+  no se probó**: falta hacerlo una vez a mano desde `/admin/ia`.
+
 ## Auditoría
 
 `ai_agent_log` (migración `20261028160000`): una fila por llamada a herramienta

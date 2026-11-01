@@ -1,9 +1,9 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, type UIMessage } from "ai";
-import { Loader2, Send, Square } from "lucide-react";
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses, type UIMessage } from "ai";
+import { Loader2, Mic, Send, Square } from "lucide-react";
 
 /**
  * Chat del asistente. Renderiza SOLO las partes `text` y un renglon por cada
@@ -27,6 +27,7 @@ const HERRAMIENTAS: Record<string, string> = {
   ver_participante: "la ficha de un participante",
   listar_textos_sitio: "textos del sitio",
   listar_avisos: "avisos",
+  enviar_correo_equipo: "el envío de correo al equipo",
 };
 
 /** `**negrita**` dentro de una linea; lo demas, texto plano. */
@@ -97,7 +98,150 @@ function ToolLine({ part }: { part: { type: string; state?: string } }) {
   );
 }
 
-function MessageView({ message }: { message: UIMessage }) {
+
+type CorreoInput = { para?: string; asunto?: string; mensaje?: string };
+
+/**
+ * Borrador del correo al equipo: se muestra COMPLETO y no sale hasta que la
+ * persona aprueba. Despues del clic el chat continua solo
+ * (`sendAutomaticallyWhen`).
+ */
+function CorreoCard({
+  part,
+  onRespond,
+}: {
+  part: { state?: string; input?: CorreoInput; approval?: { id: string; approved?: boolean }; output?: { enviados?: string[]; fallidos?: string[]; error?: string } };
+  onRespond: (id: string, approved: boolean) => void;
+}) {
+  const input = part.input ?? {};
+  return (
+    <div className="rounded-xl border border-primary-fixed-dim/40 bg-surface-container/40 p-3 text-xs space-y-2">
+      <p className="font-semibold text-on-surface">Correo al equipo</p>
+      <p>
+        <span className="text-on-surface-variant">Para:</span> {input.para}
+      </p>
+      <p>
+        <span className="text-on-surface-variant">Asunto:</span> {input.asunto}
+      </p>
+      <p className="whitespace-pre-wrap rounded-lg bg-black/10 p-2 text-on-surface">{input.mensaje}</p>
+
+      {part.state === "approval-requested" && part.approval && (
+        <div className="flex gap-2 pt-1">
+          <button
+            type="button"
+            onClick={() => onRespond(part.approval!.id, true)}
+            className="rounded-lg bg-primary-container px-3 py-1.5 font-semibold text-on-primary hover:bg-primary-fixed transition-colors"
+          >
+            Aprobar y enviar
+          </button>
+          <button
+            type="button"
+            onClick={() => onRespond(part.approval!.id, false)}
+            className="rounded-lg border border-outline-variant/60 px-3 py-1.5 text-on-surface-variant hover:text-on-surface"
+          >
+            Rechazar
+          </button>
+        </div>
+      )}
+      {part.state === "approval-responded" && <p className="text-on-surface-variant">Enviando…</p>}
+      {part.state === "output-denied" && <p className="text-on-surface-variant">Rechazaste este correo: no se envió.</p>}
+      {part.state === "output-available" &&
+        (part.output?.error ? (
+          <p className="text-error">{part.output.error}</p>
+        ) : (
+          <p className="text-on-surface-variant">
+            {part.output?.enviados?.length ? `✓ Enviado a ${part.output.enviados.join(", ")}.` : ""}
+            {part.output?.fallidos?.length ? ` ✕ No se pudo enviar a ${part.output.fallidos.join(", ")}.` : ""}
+          </p>
+        ))}
+    </div>
+  );
+}
+
+/** Tipos minimos de la Web Speech API (no vienen en lib.dom). */
+type SpeechRec = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((e: { resultIndex: number; results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> }) => void) | null;
+  onerror: ((e: { error: string }) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+
+/**
+ * Dictado por voz, gratis: usa el reconocimiento del navegador (Web Speech API).
+ * El texto cae en el cuadro y NO se envia solo: hay que revisarlo, sobre todo los
+ * nombres propios. Chrome manda el audio a Google para transcribirlo; en Firefox
+ * no existe y el boton no aparece.
+ */
+function useDictation(onText: (text: string) => void) {
+  const recRef = useRef<SpeechRec | null>(null);
+  const [listening, setListening] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  // false en el servidor y en la hidratacion; despues, lo que diga el navegador.
+  const supported = useSyncExternalStore(
+    () => () => {},
+    () => {
+      const w = window as unknown as { SpeechRecognition?: unknown; webkitSpeechRecognition?: unknown };
+      return Boolean(w.SpeechRecognition ?? w.webkitSpeechRecognition);
+    },
+    () => false
+  );
+
+  useEffect(() => () => recRef.current?.stop(), []);
+
+  function toggle(currentText: string) {
+    if (listening) {
+      recRef.current?.stop();
+      return;
+    }
+    const w = window as unknown as { SpeechRecognition?: new () => SpeechRec; webkitSpeechRecognition?: new () => SpeechRec };
+    const Ctor = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+    if (!Ctor) return;
+
+    const rec = new Ctor();
+    rec.lang = "es-AR";
+    rec.continuous = true;
+    rec.interimResults = true;
+    const base = currentText ? `${currentText.trimEnd()} ` : "";
+    let finals = "";
+
+    rec.onresult = (e) => {
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) finals += r[0].transcript;
+        else interim += r[0].transcript;
+      }
+      onText(`${base}${finals}${interim}`.trimStart());
+    };
+    rec.onerror = (e) => {
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+        setVoiceError("Permití el micrófono en el navegador para dictar.");
+      } else if (e.error !== "no-speech" && e.error !== "aborted") {
+        setVoiceError("No se pudo escuchar. Probá de nuevo.");
+      }
+    };
+    rec.onend = () => setListening(false);
+
+    setVoiceError(null);
+    recRef.current = rec;
+    rec.start();
+    setListening(true);
+  }
+
+  return { supported, listening, voiceError, toggle };
+}
+
+function MessageView({
+  message,
+  onApproval,
+}: {
+  message: UIMessage;
+  onApproval: (id: string, approved: boolean) => void;
+}) {
   const isUser = message.role === "user";
   return (
     <div className={isUser ? "flex justify-end" : "flex justify-start"}>
@@ -119,6 +263,9 @@ function MessageView({ message }: { message: UIMessage }) {
                 <Prose key={i} text={part.text} />
               );
             }
+            if (part.type === "tool-enviar_correo_equipo") {
+              return <CorreoCard key={i} part={part as never} onRespond={onApproval} />;
+            }
             if (part.type.startsWith("tool-")) {
               return <ToolLine key={i} part={part as { type: string; state?: string }} />;
             }
@@ -136,12 +283,16 @@ export function ChatInterface() {
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, status, stop, error, clearError } = useChat({
+  const { messages, sendMessage, status, stop, error, clearError, addToolApprovalResponse } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/ia/chat",
       body: { conversationId },
     }),
+    // Tras aprobar o rechazar un correo, el chat sigue solo.
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
   });
+
+  const dictation = useDictation(setInput);
 
   const busy = status === "submitted" || status === "streaming";
 
@@ -177,7 +328,13 @@ export function ChatInterface() {
             </div>
           </div>
         ) : (
-          messages.map((m) => <MessageView key={m.id} message={m} />)
+          messages.map((m) => (
+            <MessageView
+              key={m.id}
+              message={m}
+              onApproval={(id, approved) => addToolApprovalResponse({ id, approved })}
+            />
+          ))
         )}
 
         {status === "submitted" && (
@@ -188,6 +345,11 @@ export function ChatInterface() {
         {error && (
           <p role="alert" className="text-sm text-error">
             No se pudo obtener la respuesta. Probá de nuevo en un momento.
+          </p>
+        )}
+        {dictation.voiceError && (
+          <p role="alert" className="text-xs text-error">
+            {dictation.voiceError}
           </p>
         )}
         <div ref={bottomRef} />
@@ -217,6 +379,22 @@ export function ChatInterface() {
           placeholder="Escribí tu consulta…"
           className="flex-1 resize-none rounded-lg border border-outline-variant/60 bg-transparent px-3 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary-fixed-dim/60 focus:outline-none max-h-32"
         />
+        {dictation.supported && (
+          <button
+            type="button"
+            onClick={() => dictation.toggle(input)}
+            aria-label={dictation.listening ? "Dejar de dictar" : "Dictar con la voz"}
+            aria-pressed={dictation.listening}
+            title="Dictado por voz (el navegador procesa el audio)"
+            className={`rounded-lg border p-2.5 transition-colors ${
+              dictation.listening
+                ? "border-error text-error animate-pulse"
+                : "border-outline-variant/60 text-on-surface-variant hover:text-on-surface"
+            }`}
+          >
+            <Mic size={16} />
+          </button>
+        )}
         {busy ? (
           <button
             type="button"

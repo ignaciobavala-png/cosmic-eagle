@@ -46,3 +46,18 @@ test("contesta con datos reales y deja el rastro en el log", async ({ page }) =>
   await expect(page.getByText(/reasoning/i)).toHaveCount(0);
   expect(errores, "errores de JS").toEqual([]);
 });
+
+test("el correo al equipo pide aprobacion y, rechazado, no sale", async ({ page }) => {
+  await page.goto("/admin/ia");
+  await page.getByLabel("Mensaje para el asistente").fill(
+    'Mandale un correo a todo el equipo con asunto "Prueba del asistente" y mensaje "Esto es una prueba, ignorar."'
+  );
+  await page.getByRole("button", { name: "Enviar" }).click();
+
+  // Aparece el borrador con los botones; nada salio todavia.
+  await expect(page.getByText("Correo al equipo")).toBeVisible({ timeout: 90_000 });
+  await expect(page.getByRole("button", { name: "Aprobar y enviar" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Rechazar" }).click();
+  await expect(page.getByText("Rechazaste este correo: no se envió.")).toBeVisible({ timeout: 90_000 });
+});

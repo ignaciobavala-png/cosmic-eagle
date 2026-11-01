@@ -1,6 +1,7 @@
 import { ToolLoopAgent, isStepCount } from "ai";
 import { deepSeek } from "@ai-sdk/deepseek";
 import { buildReadTools } from "./tools";
+import { approvalSecret, buildWriteTools } from "./write-tools";
 
 /**
  * El agente del panel (/admin/ia). Se arma POR REQUEST con el cliente de la
@@ -33,7 +34,7 @@ function instructions() {
 
 Cómo hablás: español rioplatense, tuteo con voseo ("fijate", "podés"), claro y breve. Sin relleno ni disculpas largas.
 
-Qué sabés hacer por ahora: CONSULTAR. Tenés herramientas para ver retiros y sesiones (con cupo y lugares libres), solicitudes de inscripción, la ficha e historial de cada participante, el CRM (segmentos por estado, experiencia, país y género), los textos editables del sitio y los avisos de la campanita. Todavía NO podés crear, editar, aprobar ni borrar nada, ni mandar correos. Si te piden algo de eso, decilo con claridad y explicá dónde se hace en el panel (Solicitudes, Experiencias, Multimedia, Contenidos…). No inventes herramientas ni sugieras vías que no existen.
+Qué sabés hacer por ahora: CONSULTAR. Tenés herramientas para ver retiros y sesiones (con cupo y lugares libres), solicitudes de inscripción, la ficha e historial de cada participante, el CRM (segmentos por estado, experiencia, país y género), los textos editables del sitio y los avisos de la campanita. Lo único que podés HACER es mandar un correo interno al equipo (\`enviar_correo_equipo\`): la persona ve el borrador y tiene que aprobarlo antes de que salga. NO podés crear, editar, aprobar ni borrar nada, ni escribirle a viajeros o participantes. Si te piden algo de eso, decilo con claridad y explicá dónde se hace en el panel (Solicitudes, Experiencias, Multimedia, Contenidos, CRM…). No inventes herramientas ni sugieras vías que no existen.
 
 Reglas:
 - Los datos salen SIEMPRE de las herramientas, nunca de tu memoria. Si no consultaste, no afirmes cifras, fechas ni nombres.
@@ -48,6 +49,7 @@ Reglas:
 - Para saber en qué estuvo una persona usá \`ver_participante\` (historial, qué asistió y qué viene). "Asistió" = reserva aprobada, evento pasado y con pago o exonerado; si el evento pasó y el pago figura pendiente, decí que no está confirmado que haya asistido.
 - Para cualquier "cuántos", "cuánto" u ocupación usá \`resumen\` (ya viene calculado, incluido el cobrado en USD). Nunca sumes ni cuentes filas a mano.
 - Las listas se cortan en 25 filas. Si el resultado trae \`total\` o \`aviso\`, el número que das es \`total\`, no la cantidad de filas que ves; decí que mostrás solo una parte.
+- Para mandar un correo al equipo: armá asunto y mensaje claros con los datos que ya consultaste (nada inventado) y llamá a la herramienta; el sistema le pide la aprobación a la persona. Si el nombre del destinatario es ambiguo, preguntá antes. Nunca digas que se envió hasta que la herramienta lo confirme.
 - Cuando listes cosas, usá listas cortas y andá a lo que se preguntó; no vuelques todos los campos.`;
 }
 
@@ -59,7 +61,9 @@ export function buildAgent(ctx: Parameters<typeof buildReadTools>[0]) {
   return new ToolLoopAgent({
     model: deepSeek(MODEL_ID),
     instructions: instructions(),
-    tools: buildReadTools(ctx),
+    tools: { ...buildReadTools(ctx), ...buildWriteTools(ctx) },
+    toolApproval: { enviar_correo_equipo: "user-approval" },
+    experimental_toolApprovalSecret: approvalSecret() ?? undefined,
     stopWhen: isStepCount(MAX_STEPS),
     onStepEnd: (step) => {
       inputTokens += step.usage.inputTokens ?? 0;
