@@ -2,6 +2,7 @@ import { ToolLoopAgent, isStepCount } from "ai";
 import { deepSeek } from "@ai-sdk/deepseek";
 import { buildReadTools } from "./tools";
 import { approvalSecret, buildWriteTools } from "./write-tools";
+import { guiaParaPrompt } from "./panel-guide";
 
 /**
  * El agente del panel (/admin/ia). Se arma POR REQUEST con el cliente de la
@@ -21,7 +22,7 @@ export const MODEL_ID = "deepseek-flash";
 /** Tope de pasos por mensaje: cada paso es una llamada paga al modelo. */
 const MAX_STEPS = 8;
 
-function instructions() {
+function instructions(pagina: string | null) {
   const hoy = new Date().toLocaleDateString("es-AR", {
     weekday: "long",
     day: "numeric",
@@ -50,17 +51,19 @@ Reglas:
 - Para cualquier "cuántos", "cuánto" u ocupación usá \`resumen\` (ya viene calculado, incluido el cobrado en USD). Nunca sumes ni cuentes filas a mano.
 - Las listas se cortan en 25 filas. Si el resultado trae \`total\` o \`aviso\`, el número que das es \`total\`, no la cantidad de filas que ves; decí que mostrás solo una parte.
 - Para mandar un correo al equipo: armá asunto y mensaje claros con los datos que ya consultaste (nada inventado) y llamá a la herramienta; el sistema le pide la aprobación a la persona. Si el nombre del destinatario es ambiguo, preguntá antes. Nunca digas que se envió hasta que la herramienta lo confirme.
-- Cuando listes cosas, usá listas cortas y andá a lo que se preguntó; no vuelques todos los campos.`;
+- Cuando listes cosas, usá listas cortas y andá a lo que se preguntó; no vuelques todos los campos.
+
+${guiaParaPrompt(pagina)}`;
 }
 
-export function buildAgent(ctx: Parameters<typeof buildReadTools>[0]) {
+export function buildAgent(ctx: Parameters<typeof buildReadTools>[0] & { pagina?: string | null }) {
   // Tokens del turno: se suman por paso y se anotan una vez al terminar.
   let inputTokens = 0;
   let outputTokens = 0;
 
   return new ToolLoopAgent({
     model: deepSeek(MODEL_ID),
-    instructions: instructions(),
+    instructions: instructions(ctx.pagina ?? null),
     tools: { ...buildReadTools(ctx), ...buildWriteTools(ctx) },
     toolApproval: { enviar_correo_equipo: "user-approval" },
     experimental_toolApprovalSecret: approvalSecret() ?? undefined,

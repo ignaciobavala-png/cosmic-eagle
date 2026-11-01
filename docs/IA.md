@@ -107,6 +107,26 @@ termina hoy se cierra mañana.
 - El e2e prueba el camino de rechazo. **El de aprobar (envío real por Resend) todavía
   no se probó**: falta hacerlo una vez a mano desde `/admin/ia`.
 
+## Burbuja del asistente en todo el panel (01/11)
+
+- **`AssistantBubble`** (`src/app/(sistema)/admin/AssistantBubble.tsx`) vive en el
+  layout del admin: botón flotante en todas las pantallas menos `/admin/ia`. Misma
+  `ChatInterface` en `variant="bubble"`.
+- **La charla sobrevive a la navegación** (el layout no se desmonta) y cerrada
+  no se desmonta: si contesta con la ventana cerrada, aparece un punto en el botón.
+- **Sabe dónde estás:** el cliente manda `pagina` (la ruta) y el servidor la limpia
+  con `cleanPagina` (solo `/admin…`, sin query). `src/lib/ia/panel-guide.ts` trae
+  el mapa del panel (qué hace cada sección y cómo se usa) y, de la pantalla actual,
+  el detalle. **Si una pantalla cambia, se actualiza esa guía**: es lo que evita
+  que el asistente invente botones. Lo que no está en la guía, lo dice.
+- **Sugerencias por pantalla** (en `AssistantBubble.tsx`), "Nueva conversación"
+  y mensajes de error del servidor tal cual (tope diario, mensaje largo).
+- **Responsive:** hoja a pantalla completa en celular, ventana abajo a la derecha
+  en escritorio. Esc la cierra y devuelve el foco al botón. Solo transiciones CSS
+  (`motion-reduce`), sin cambiar el árbol.
+- e2e: `e2e/ia.panel.spec.ts` (abre, sabe la pantalla, responde, Esc, no aparece
+  en `/admin/ia`).
+
 ## Auditoría
 
 `ai_agent_log` (migración `20261028160000`): una fila por llamada a herramienta

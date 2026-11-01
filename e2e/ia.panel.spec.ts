@@ -61,3 +61,28 @@ test("el correo al equipo pide aprobacion y, rechazado, no sale", async ({ page 
   await page.getByRole("button", { name: "Rechazar" }).click();
   await expect(page.getByText("Rechazaste este correo: no se envió.")).toBeVisible({ timeout: 90_000 });
 });
+
+test("la burbuja esta en las pantallas del panel, sabe donde estas y no aparece en /admin/ia", async ({ page }) => {
+  await page.goto("/admin/solicitudes");
+  const fab = page.getByRole("button", { name: "Abrir el asistente" });
+  await expect(fab).toBeVisible();
+
+  await fab.click();
+  const ventana = page.getByRole("dialog", { name: "Asistente" });
+  await expect(ventana).toBeVisible();
+  await expect(ventana.getByText("Estás en: Solicitudes")).toBeVisible();
+
+  // La charla sobrevive a la navegacion: se abre, se pregunta, se cambia de pantalla.
+  await ventana.getByRole("button", { name: "¿Cómo reviso y apruebo una solicitud?" }).click();
+  await expect(ventana.getByRole("button", { name: "Enviar" })).toBeVisible({ timeout: 90_000 });
+  await expect(ventana.getByText(/Estela/i).first()).toBeVisible();
+
+  // Esc cierra y devuelve el foco al boton.
+  await page.keyboard.press("Escape");
+  await expect(ventana).toBeHidden();
+  await expect(fab).toBeFocused();
+
+  // En /admin/ia ya esta el chat completo: no hay burbuja.
+  await page.goto("/admin/ia");
+  await expect(page.getByRole("button", { name: "Abrir el asistente" })).toHaveCount(0);
+});

@@ -1,6 +1,7 @@
 import { createAgentUIStreamResponse } from "ai";
 import { createClient } from "@/lib/supabase/server";
 import { buildAgent } from "@/lib/ia/agent";
+import { cleanPagina } from "@/lib/ia/panel-guide";
 
 /**
  * Chat del agente del panel. El rol sale de LA SESION, en el servidor: nunca de
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
     .single();
   if (!profile?.is_admin) return Response.json({ error: "No autorizado" }, { status: 403 });
 
-  let body: { messages?: unknown; conversationId?: unknown };
+  let body: { messages?: unknown; conversationId?: unknown; pagina?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -83,6 +84,7 @@ export async function POST(request: Request) {
     supabase,
     userId: user.id,
     conversationId,
+    pagina: cleanPagina(body.pagina),
   });
 
   return createAgentUIStreamResponse({

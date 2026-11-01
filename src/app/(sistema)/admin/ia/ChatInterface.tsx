@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses, type UIMessage } from "ai";
-import { Loader2, Mic, Send, Square } from "lucide-react";
+import { Loader2, Mic, RotateCcw, Send, Square } from "lucide-react";
 
 /**
  * Chat del asistente. Renderiza SOLO las partes `text` y un renglon por cada
@@ -277,24 +277,89 @@ function MessageView({
   );
 }
 
-export function ChatInterface() {
+export const SUGERENCIAS_IA = SUGERENCIAS;
+
+/**
+ * `variant="page"` es la pantalla completa de /admin/ia; `"bubble"` es el mismo
+ * chat dentro de la burbuja flotante (sin marco propio: lo pone la burbuja).
+ * `pagina` es la ruta donde esta la persona: el servidor la usa para explicar
+ * ESA pantalla. `active` enfoca el cuadro cuando la burbuja se abre.
+ */
+export function ChatInterface({
+  variant = "page",
+  pagina,
+  suggestions = SUGERENCIAS,
+  active = true,
+  onBusyChange,
+}: {
+  variant?: "page" | "bubble";
+  pagina?: string;
+  suggestions?: string[];
+  active?: boolean;
+  onBusyChange?: (busy: boolean) => void;
+}) {
   // Une las llamadas de una misma charla en `ai_agent_log`.
-  const [conversationId] = useState(() => crypto.randomUUID());
+  const [conversationId, setConversationId] = useState(() => crypto.randomUUID());
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const { messages, sendMessage, status, stop, error, clearError, addToolApprovalResponse } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/ia/chat",
-      body: { conversationId },
-    }),
+  // El body se lee en cada envio: la burbuja sigue montada al navegar y la
+  // pantalla cambia entre mensaje y mensaje.
+  const bodyRef = useRef({ conversationId, pagina });
+  useEffect(() => {
+    bodyRef.current = { conversationId, pagina };
+  }, [conversationId, pagina]);
+
+  // `body` es una funcion que el transporte llama al ENVIAR, no al renderizar:
+  // la regla de refs no lo distingue. Sin esto, la ruta y la charla quedarian
+  // congeladas en el valor del primer render (y el reenvio tras aprobar un
+  // correo no pasaria por `sendMessage`).
+  /* eslint-disable react-hooks/refs */
+  const [transport] = useState(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/ia/chat",
+        body: () => bodyRef.current,
+      })
+  );
+  /* eslint-enable react-hooks/refs */
+
+  const { messages, setMessages, sendMessage, status, stop, error, clearError, addToolApprovalResponse } = useChat({
+    transport,
     // Tras aprobar o rechazar un correo, el chat sigue solo.
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
   });
 
+  function newConversation() {
+    stop();
+    clearError();
+    setMessages([]);
+    setInput("");
+    setConversationId(crypto.randomUUID());
+  }
+
+  // El servidor contesta con `{ error }` (tope diario, mensaje largo…): se muestra tal cual.
+  const errorText = (() => {
+    if (!error) return null;
+    try {
+      const parsed = JSON.parse(error.message) as { error?: string };
+      if (parsed.error) return parsed.error;
+    } catch {}
+    return "No se pudo obtener la respuesta. Probá de nuevo en un momento.";
+  })();
+
   const dictation = useDictation(setInput);
 
   const busy = status === "submitted" || status === "streaming";
+
+  useEffect(() => {
+    onBusyChange?.(busy);
+  }, [busy, onBusyChange]);
+
+  useEffect(() => {
+    if (active && variant === "bubble") inputRef.current?.focus();
+  }, [active, variant]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -309,13 +374,30 @@ export function ChatInterface() {
   }
 
   return (
-    <div className="glass-card rounded-2xl flex flex-col h-[calc(100dvh-17rem)] min-h-[26rem]">
-      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4" aria-live="polite">
+    <div
+      className={
+        variant === "bubble"
+          ? "flex h-full min-h-0 flex-col"
+          : "glass-card rounded-2xl flex flex-col h-[calc(100dvh-17rem)] min-h-[26rem]"
+      }
+    >
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-4" aria-live="polite">
+        {messages.length > 0 && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={newConversation}
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-on-surface-variant hover:text-on-surface transition-colors"
+            >
+              <RotateCcw size={12} aria-hidden /> Nueva conversación
+            </button>
+          </div>
+        )}
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center gap-3 text-center">
             <p className="text-sm text-on-surface-variant">Probá con alguna de estas:</p>
             <div className="flex flex-wrap justify-center gap-2 max-w-xl">
-              {SUGERENCIAS.map((s) => (
+              {suggestions.map((s) => (
                 <button
                   key={s}
                   type="button"
@@ -344,7 +426,7 @@ export function ChatInterface() {
         )}
         {error && (
           <p role="alert" className="text-sm text-error">
-            No se pudo obtener la respuesta. Probá de nuevo en un momento.
+            {errorText}
           </p>
         )}
         {dictation.voiceError && (
@@ -362,11 +444,12 @@ export function ChatInterface() {
         }}
         className="flex items-end gap-2 border-t border-outline-variant/40 p-3"
       >
-        <label htmlFor="ia-input" className="sr-only">
+        <label htmlFor={variant === "bubble" ? "ia-input-bubble" : "ia-input"} className="sr-only">
           Mensaje para el asistente
         </label>
         <textarea
-          id="ia-input"
+          id={variant === "bubble" ? "ia-input-bubble" : "ia-input"}
+          ref={inputRef}
           rows={1}
           value={input}
           onChange={(e) => setInput(e.target.value)}

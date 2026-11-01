@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AdminNav } from "./AdminNav";
+import { AssistantBubble } from "./AssistantBubble";
 
 export default async function AdminLayout({
   children,
@@ -33,6 +34,7 @@ export default async function AdminLayout({
     <div className="min-h-screen bg-void-black">
       <AdminNav unread={unread ?? 0} />
       <main className="px-5 md:px-8 max-w-6xl mx-auto py-10">{children}</main>
+      <AssistantBubble />
     </div>
   );
 }
