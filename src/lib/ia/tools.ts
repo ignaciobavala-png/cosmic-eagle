@@ -4,6 +4,7 @@ import type { createClient } from "@/lib/supabase/server";
 import { SITE_GROUPS } from "@/lib/site-content";
 import { EXPERIENCE_LEVELS, RELATIONSHIP_STATES, filterContacts } from "@/lib/crm";
 import { loadContacts } from "@/lib/crm-data";
+import { includesLoose, matchNames } from "./names";
 
 /**
  * Herramientas de LECTURA del agente del panel (etapa 1 de /admin/ia).
@@ -25,16 +26,16 @@ import { loadContacts } from "@/lib/crm-data";
  */
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
-type Ctx = {
+export type Ctx = {
   supabase: Supabase;
   userId: string;
   conversationId: string | null;
 };
 
-const MAX_ROWS = 25;
+export const MAX_ROWS = 25;
 
 /** Saca lo que rompe un filtro de PostgREST (`%`, `,`, parentesis). */
-function cleanSearch(text: string) {
+export function cleanSearch(text: string) {
   return text.replace(/[%,()*\\]/g, " ").trim().slice(0, 60);
 }
 
@@ -67,7 +68,7 @@ function momento(trip: { type: string; status: string; start_date: string; end_d
  * El total real de una consulta con tope: sin esto el modelo toma "25 filas"
  * por "25 en total". `total` viene de `count: "exact"` de PostgREST.
  */
-function total(count: number | null, shown: number) {
+export function total(count: number | null, shown: number) {
   if (count === null) return undefined;
   return {
     total: count,
@@ -75,7 +76,20 @@ function total(count: number | null, shown: number) {
   };
 }
 
-function clip(text: string | null, max = 240) {
+/**
+ * Resuelve un nombre (con acentos, sin ellos, mal tipeado) a las solicitudes que
+ * le corresponden. Trae solo `id, user_id, full_name` y compara en memoria
+ * (`names.ts`): reemplaza al `ilike`, que no distingue "Sofia" de "Sofía".
+ */
+type PorNombre = { error: string } | { error?: undefined; matches: { id: string; user_id: string; full_name: string }[] };
+
+async function solicitudesPorNombre(supabase: Supabase, nombre: string): Promise<PorNombre> {
+  const { data, error } = await supabase.from("applications").select("id, user_id, full_name").limit(5000);
+  if (error) return { error: error.message };
+  return { matches: matchNames(nombre, data, (a) => a.full_name) };
+}
+
+export function clip(text: string | null, max = 240) {
   if (!text) return null;
   return text.length > max ? `${text.slice(0, max)}…` : text;
 }
@@ -84,7 +98,7 @@ function clip(text: string | null, max = 240) {
  * Corre una lectura, la registra y devuelve un resultado que el modelo puede
  * leer incluso si fallo (`{ error }`): lanzar cortaria el turno entero.
  */
-async function leer<T>(
+export async function leer<T>(
   ctx: Ctx,
   toolName: string,
   args: Record<string, unknown>,
@@ -143,7 +157,14 @@ export function buildReadTools(ctx: Ctx) {
           if (cuando === "pasados") query = query.lt("end_date", hoy);
           if (args.tipo) query = query.eq("type", args.tipo);
           if (args.estado) query = query.eq("status", args.estado);
-          if (args.texto && cleanSearch(args.texto)) query = query.ilike("title", `%${cleanSearch(args.texto)}%`);
+          if (args.texto && cleanSearch(args.texto)) {
+            // Titulos sin acentos ("Sabado") y con ellos ("Sábado") deben coincidir.
+            const { data: titulos, error: titulosError } = await supabase.from("trips").select("id, title");
+            if (titulosError) return { error: titulosError.message };
+            const ids = titulos.filter((t) => includesLoose(t.title, args.texto!)).map((t) => t.id);
+            if (!ids.length) return { rows: [], extra: total(0, 0) };
+            query = query.in("id", ids);
+          }
 
           const { data: trips, error, count } = await query;
           if (error) return { error: error.message };
@@ -210,7 +231,12 @@ export function buildReadTools(ctx: Ctx) {
           if (args.estado) query = query.eq("status", args.estado);
           if (args.pago) query = query.eq("payment_status", args.pago);
           if (args.viaje_id) query = query.eq("trip_id", args.viaje_id);
-          if (args.nombre && cleanSearch(args.nombre)) query = query.ilike("full_name", `%${cleanSearch(args.nombre)}%`);
+          if (args.nombre && cleanSearch(args.nombre)) {
+            const found = await solicitudesPorNombre(supabase, args.nombre);
+            if (found.error !== undefined) return { error: found.error };
+            if (!found.matches.length) return { rows: [], extra: total(0, 0) };
+            query = query.in("id", found.matches.map((m) => m.id));
+          }
           if (args.tipo) query = query.eq("trips.type", args.tipo);
           if (args.cuando === "proximos") query = query.gte("trips.end_date", hoy);
           if (args.cuando === "pasados") query = query.lt("trips.end_date", hoy);
@@ -235,12 +261,18 @@ export function buildReadTools(ctx: Ctx) {
           const needle = cleanSearch(args.nombre);
           if (needle.length < 2) return { error: "Nombre demasiado corto." };
 
+          const found = await solicitudesPorNombre(supabase, needle);
+          if (found.error !== undefined) return { error: found.error };
+          const userIds = [...new Set(found.matches.map((m) => m.user_id))].slice(0, 10);
+          if (!userIds.length) return { rows: [] };
+
+          // Todas las reservas de esas personas (no solo las que coincidieron por nombre).
           const { data: apps, error } = await supabase
             .from("applications")
             .select(
               "id, user_id, full_name, residence_country, status, payment_status, amount_paid, previous_ceremonies, created_at, trip:trips(id, title, type, status, start_date, end_date)"
             )
-            .ilike("full_name", `%${needle}%`)
+            .in("user_id", userIds)
             .order("created_at", { ascending: false })
             .limit(100);
           if (error) return { error: error.message };
@@ -397,11 +429,17 @@ export function buildReadTools(ctx: Ctx) {
       execute: (args) =>
         leer(ctx, "consultar_crm", args, async () => {
           const todos = await loadContacts(supabase);
+          // "mexico" y "México" son el mismo pais: se resuelve contra los que existen.
+          const pais = args.pais
+            ? [...new Set(todos.map((c) => c.country).filter((c): c is string => Boolean(c)))].find((c) =>
+                includesLoose(c, args.pais!) && includesLoose(args.pais!, c)
+              ) ?? args.pais
+            : undefined;
           // Las cuentas del equipo no son contactos.
           const segmento = filterContacts(todos, {
             estado: args.estado,
             nivel: args.nivel,
-            pais: args.pais,
+            pais,
             genero: args.genero,
             viaje: args.viaje_id,
           }).filter((c) => !c.isAdmin);
@@ -446,7 +484,7 @@ export function buildReadTools(ctx: Ctx) {
           if (error) return { error: error.message };
           const actuales = new Map(overrides.map((o) => [o.key, o.value]));
 
-          const needle = args.texto ? cleanSearch(args.texto).toLowerCase() : "";
+          const needle = args.texto ? cleanSearch(args.texto) : "";
           const rows = SITE_GROUPS.flatMap((group) =>
             group.slots
               .filter((slot) => slot.type === "text" || slot.type === "multiline")
@@ -459,8 +497,7 @@ export function buildReadTools(ctx: Ctx) {
               }))
           ).filter(
             (row) =>
-              !needle ||
-              `${row.clave} ${row.etiqueta} ${row.valor ?? ""}`.toLowerCase().includes(needle)
+              !needle || includesLoose(`${row.clave} ${row.etiqueta} ${row.valor ?? ""}`, needle)
           );
 
           return { rows: rows.slice(0, MAX_ROWS), extra: rows.length > MAX_ROWS ? { hay_mas: rows.length - MAX_ROWS } : undefined };
