@@ -2,13 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { publicPath } from "@/i18n/public-path";
+import { parseArticleForm } from "@/lib/article-form";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { isArticleCategory, slugify } from "@/lib/article";
-import { isContentAccessLevel } from "@/lib/content-access";
-import type { ArticleStatus } from "@/lib/article";
-import { optionalEnglish } from "@/components/admin/EnglishFields";
-import { readHtmlFile } from "@/lib/html-upload";
+import { isArticleCategory } from "@/lib/article";
 
 export type ArticleFormState = { error: string | null };
 
@@ -22,10 +19,6 @@ const PUBLIC_PREFIX = `/storage/v1/object/public/${BUCKET}/`;
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
-function isStatus(value: unknown): value is ArticleStatus {
-  return value === "draft" || value === "published";
-}
-
 /**
  * El listado publico, el detalle y el panel muestran lo mismo. El detalle va
  * con el patron `[slug]` y no con el slug concreto: invalida todos los
@@ -36,76 +29,6 @@ function revalidateArticlePaths() {
   revalidatePath(publicPath("/contenidos"), "page");
   revalidatePath(publicPath("/contenidos/[slug]"), "page");
   revalidatePath("/admin/contenidos");
-}
-
-async function parseArticleForm(formData: FormData) {
-  const title = formData.get("title");
-  const body = formData.get("body");
-  const excerpt = formData.get("excerpt");
-  const category = formData.get("category");
-  const status = formData.get("status");
-  const accessLevel = formData.get("access_level");
-  const slugField = formData.get("slug");
-  const audioField = formData.get("audio_url");
-  // Un contenido es texto (con las cinco reglas) o un HTML subido: en ese caso
-  // el cuerpo es el archivo y se dibuja en un iframe aislado (`HtmlFrame`).
-  const isHtml = formData.get("body_format") === "html";
-
-  const upload = isHtml ? await readHtmlFile(formData.get("html_file")) : null;
-  if (upload?.error) return { error: upload.error, data: null } as const;
-
-  if (
-    typeof title !== "string" ||
-    !title.trim() ||
-    (!isHtml && (typeof body !== "string" || !body.trim())) ||
-    !isArticleCategory(category) ||
-    !isStatus(status) ||
-    !isContentAccessLevel(accessLevel)
-  ) {
-    return { error: "Completa el título y el texto.", data: null } as const;
-  }
-
-  // El slug llega sugerido del form, pero se normaliza igual: es la URL publica
-  // y el CHECK de la tabla rechaza cualquier cosa fuera de [a-z0-9-].
-  const slug =
-    slugify(typeof slugField === "string" && slugField.trim() ? slugField : title) ||
-    // Un titulo entero en otro alfabeto puede no dejar ningun caracter valido.
-    `contenido-${Date.now()}`;
-
-  return {
-    error: null,
-    data: {
-      slug,
-      title: title.trim(),
-      body_format: isHtml ? "html" : "text",
-      // `undefined` = HTML sin archivo nuevo: al editar se conserva el actual.
-      body: isHtml ? upload?.html : (body as string).trim(),
-      excerpt:
-        typeof excerpt === "string" && excerpt.trim() ? excerpt.trim() : null,
-      category,
-      status,
-      access_level: accessLevel,
-      audio_url: ownAudioUrl(audioField),
-      title_en: optionalEnglish(formData, "title_en"),
-      excerpt_en: optionalEnglish(formData, "excerpt_en"),
-      // Un HTML subido no tiene version en ingles: es un unico archivo.
-      body_en: isHtml ? null : optionalEnglish(formData, "body_en"),
-    },
-  } as const;
-}
-
-/**
- * El audio lo sube el browser (`AudioField`) y acá sólo llega la URL. Se acepta
- * únicamente una de nuestro bucket: el campo es oculto pero viaja en el form, y
- * no tiene que poder apuntar el reproductor a cualquier lado.
- */
-function ownAudioUrl(value: FormDataEntryValue | null): string | null {
-  if (typeof value !== "string" || !value.trim()) return null;
-  const url = value.trim();
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  return base && url.startsWith(`${base}${PUBLIC_PREFIX}articles/audio/`)
-    ? url
-    : null;
 }
 
 /** Borra un archivo de nuestro bucket a partir de su URL pública. */

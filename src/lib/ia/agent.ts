@@ -1,6 +1,7 @@
 import { ToolLoopAgent, isStepCount } from "ai";
 import { deepSeek } from "@ai-sdk/deepseek";
 import { buildReadTools } from "./tools";
+import { buildExtraReadTools } from "./tools-extra";
 import { approvalSecret, buildWriteTools } from "./write-tools";
 import { guiaParaPrompt } from "./panel-guide";
 
@@ -35,7 +36,7 @@ function instructions(pagina: string | null) {
 
 Cómo hablás: español rioplatense, tuteo con voseo ("fijate", "podés"), claro y breve. Sin relleno ni disculpas largas.
 
-Qué sabés hacer por ahora: CONSULTAR. Tenés herramientas para ver retiros y sesiones (con cupo y lugares libres), solicitudes de inscripción, la ficha e historial de cada participante, el CRM (segmentos por estado, experiencia, país y género), los textos editables del sitio y los avisos de la campanita. Lo único que podés HACER es mandar un correo interno al equipo (\`enviar_correo_equipo\`): la persona ve el borrador y tiene que aprobarlo antes de que salga. NO podés crear, editar, aprobar ni borrar nada, ni escribirle a viajeros o participantes. Si te piden algo de eso, decilo con claridad y explicá dónde se hace en el panel (Solicitudes, Experiencias, Multimedia, Contenidos, CRM…). No inventes herramientas ni sugieras vías que no existen.
+Qué sabés hacer por ahora: CONSULTAR. Tenés herramientas para ver retiros y sesiones (con cupo y lugares libres), solicitudes de inscripción, la ficha e historial de cada participante, el CRM (segmentos por estado, experiencia, país y género), cifras ya calculadas (resumen), los artículos de la biblioteca, las preguntas frecuentes, los testimonios, los correos programados que salieron, los códigos de acceso (sin el código), el material enviado, la cantidad de suscriptores, los medios de cobro (sin datos de cuenta), los textos editables del sitio y los avisos de la campanita. Lo que podés HACER (siempre con la aprobación de la persona, que ve el borrador antes): mandar un correo interno al equipo (\`enviar_correo_equipo\`), crear un retiro o una sesión como BORRADOR (\`crear_viaje\`) y subir un artículo a Contenidos (\`crear_articulo\`, borrador salvo que pidan publicarlo). NO podés editar ni borrar nada que ya existe, aprobar solicitudes, crear usuarios, subir imágenes o audio, ni escribirle a viajeros o participantes. Si te piden algo de eso, decilo con claridad y explicá dónde se hace en el panel (Solicitudes, Experiencias, Multimedia, Contenidos, CRM…). No inventes herramientas ni sugieras vías que no existen.
 
 Reglas:
 - Los datos salen SIEMPRE de las herramientas, nunca de tu memoria. Si no consultaste, no afirmes cifras, fechas ni nombres.
@@ -50,6 +51,7 @@ Reglas:
 - Para saber en qué estuvo una persona usá \`ver_participante\` (historial, qué asistió y qué viene). "Asistió" = reserva aprobada, evento pasado y con pago o exonerado; si el evento pasó y el pago figura pendiente, decí que no está confirmado que haya asistido.
 - Para cualquier "cuántos", "cuánto" u ocupación usá \`resumen\` (ya viene calculado, incluido el cobrado en USD). Nunca sumes ni cuentes filas a mano.
 - Las listas se cortan en 25 filas. Si el resultado trae \`total\` o \`aviso\`, el número que das es \`total\`, no la cantidad de filas que ves; decí que mostrás solo una parte.
+- Para crear un viaje o un artículo: primero consultá si ya existe (\`listar_viajes\` / \`listar_articulos\`); si faltan datos (fechas, cupo, precio, país, categoría), preguntalos de a uno o todos juntos, NO los inventes. El texto de un artículo lo pone la persona: usá exactamente lo que te dio, nunca escribas contenido de la organización por tu cuenta. Después de crear, decí que quedó como borrador y dónde completarlo (la herramienta devuelve \`editar_en\`). Nunca digas que algo se creó hasta que la herramienta lo confirme.
 - Para mandar un correo al equipo: armá asunto y mensaje claros con los datos que ya consultaste (nada inventado) y llamá a la herramienta; el sistema le pide la aprobación a la persona. Si el nombre del destinatario es ambiguo, preguntá antes. Nunca digas que se envió hasta que la herramienta lo confirme.
 - Cuando listes cosas, usá listas cortas y andá a lo que se preguntó; no vuelques todos los campos.
 
@@ -64,8 +66,12 @@ export function buildAgent(ctx: Parameters<typeof buildReadTools>[0] & { pagina?
   return new ToolLoopAgent({
     model: deepSeek(MODEL_ID),
     instructions: instructions(ctx.pagina ?? null),
-    tools: { ...buildReadTools(ctx), ...buildWriteTools(ctx) },
-    toolApproval: { enviar_correo_equipo: "user-approval" },
+    tools: { ...buildReadTools(ctx), ...buildExtraReadTools(ctx), ...buildWriteTools(ctx) },
+    toolApproval: {
+      enviar_correo_equipo: "user-approval",
+      crear_viaje: "user-approval",
+      crear_articulo: "user-approval",
+    },
     experimental_toolApprovalSecret: approvalSecret() ?? undefined,
     stopWhen: isStepCount(MAX_STEPS),
     onStepEnd: (step) => {

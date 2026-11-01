@@ -1,9 +1,10 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses, type UIMessage } from "ai";
 import { Loader2, Mic, RotateCcw, Send, Square } from "lucide-react";
+import { ApprovalCard, CopyButton, HistoryMenu, Prose, ToolLine, esHerramientaDeEscritura } from "./ChatParts";
 
 /**
  * Chat del asistente. Renderiza SOLO las partes `text` y un renglon por cada
@@ -17,146 +18,9 @@ const SUGERENCIAS = [
   "¿Hay avisos sin leer en la campanita?",
   "¿En qué retiros y sesiones estuvo cada participante de la última sesión?",
   "¿Qué dice hoy el título de la home?",
+  "¿Cuánto llevamos cobrado y qué ocupación tiene cada evento?",
+  "Quiero crear una sesión nueva",
 ];
-
-const HERRAMIENTAS: Record<string, string> = {
-  listar_viajes: "viajes y sesiones",
-  listar_solicitudes: "solicitudes",
-  resumen: "el resumen de cifras",
-  consultar_crm: "el CRM",
-  ver_participante: "la ficha de un participante",
-  listar_textos_sitio: "textos del sitio",
-  listar_avisos: "avisos",
-  enviar_correo_equipo: "el envío de correo al equipo",
-};
-
-/** `**negrita**` dentro de una linea; lo demas, texto plano. */
-function Inline({ text }: { text: string }) {
-  const parts = text.split("**");
-  const last = parts.length - 1;
-  return (
-    <>
-      {parts.map((part, i) =>
-        i % 2 === 1 && i < last ? (
-          <strong key={i} className="font-semibold text-on-surface">
-            {part}
-          </strong>
-        ) : (
-          <Fragment key={i}>{i % 2 === 1 ? `**${part}` : part}</Fragment>
-        )
-      )}
-    </>
-  );
-}
-
-/** Parrafos y listas simples (`- ` y `1. `); alcanza para lo que contesta el agente. */
-function Prose({ text }: { text: string }) {
-  const lines = text.split("\n");
-  return (
-    <div className="space-y-1.5">
-      {lines.map((line, i) => {
-        if (!line.trim()) return <div key={i} className="h-1" />;
-        const bullet = line.match(/^\s*[-*]\s+(.*)$/);
-        const numbered = line.match(/^\s*(\d+)[.)]\s+(.*)$/);
-        if (bullet)
-          return (
-            <p key={i} className="pl-4 -indent-3">
-              <span aria-hidden>• </span>
-              <Inline text={bullet[1]} />
-            </p>
-          );
-        if (numbered)
-          return (
-            <p key={i} className="pl-5 -indent-4">
-              {numbered[1]}. <Inline text={numbered[2]} />
-            </p>
-          );
-        return (
-          <p key={i}>
-            <Inline text={line.replace(/^#+\s*/, "")} />
-          </p>
-        );
-      })}
-    </div>
-  );
-}
-
-function ToolLine({ part }: { part: { type: string; state?: string } }) {
-  const name = part.type.replace(/^tool-/, "");
-  const label = HERRAMIENTAS[name] ?? name;
-  const done = part.state === "output-available";
-  const failed = part.state === "output-error";
-  return (
-    <p className="flex items-center gap-2 text-xs text-on-surface-variant">
-      {done || failed ? (
-        <span aria-hidden>{failed ? "✕" : "✓"}</span>
-      ) : (
-        <Loader2 size={12} className="animate-spin" aria-hidden />
-      )}
-      {done ? "Consultó" : failed ? "No pudo consultar" : "Consultando"} {label}
-    </p>
-  );
-}
-
-
-type CorreoInput = { para?: string; asunto?: string; mensaje?: string };
-
-/**
- * Borrador del correo al equipo: se muestra COMPLETO y no sale hasta que la
- * persona aprueba. Despues del clic el chat continua solo
- * (`sendAutomaticallyWhen`).
- */
-function CorreoCard({
-  part,
-  onRespond,
-}: {
-  part: { state?: string; input?: CorreoInput; approval?: { id: string; approved?: boolean }; output?: { enviados?: string[]; fallidos?: string[]; error?: string } };
-  onRespond: (id: string, approved: boolean) => void;
-}) {
-  const input = part.input ?? {};
-  return (
-    <div className="rounded-xl border border-primary-fixed-dim/40 bg-surface-container/40 p-3 text-xs space-y-2">
-      <p className="font-semibold text-on-surface">Correo al equipo</p>
-      <p>
-        <span className="text-on-surface-variant">Para:</span> {input.para}
-      </p>
-      <p>
-        <span className="text-on-surface-variant">Asunto:</span> {input.asunto}
-      </p>
-      <p className="whitespace-pre-wrap rounded-lg bg-black/10 p-2 text-on-surface">{input.mensaje}</p>
-
-      {part.state === "approval-requested" && part.approval && (
-        <div className="flex gap-2 pt-1">
-          <button
-            type="button"
-            onClick={() => onRespond(part.approval!.id, true)}
-            className="rounded-lg bg-primary-container px-3 py-1.5 font-semibold text-on-primary hover:bg-primary-fixed transition-colors"
-          >
-            Aprobar y enviar
-          </button>
-          <button
-            type="button"
-            onClick={() => onRespond(part.approval!.id, false)}
-            className="rounded-lg border border-outline-variant/60 px-3 py-1.5 text-on-surface-variant hover:text-on-surface"
-          >
-            Rechazar
-          </button>
-        </div>
-      )}
-      {part.state === "approval-responded" && <p className="text-on-surface-variant">Enviando…</p>}
-      {part.state === "output-denied" && <p className="text-on-surface-variant">Rechazaste este correo: no se envió.</p>}
-      {part.state === "output-available" &&
-        (part.output?.error ? (
-          <p className="text-error">{part.output.error}</p>
-        ) : (
-          <p className="text-on-surface-variant">
-            {part.output?.enviados?.length ? `✓ Enviado a ${part.output.enviados.join(", ")}.` : ""}
-            {part.output?.fallidos?.length ? ` ✕ No se pudo enviar a ${part.output.fallidos.join(", ")}.` : ""}
-          </p>
-        ))}
-    </div>
-  );
-}
 
 /** Tipos minimos de la Web Speech API (no vienen en lib.dom). */
 type SpeechRec = {
@@ -243,6 +107,12 @@ function MessageView({
   onApproval: (id: string, approved: boolean) => void;
 }) {
   const isUser = message.role === "user";
+  // Lo que se copia: solo el texto de la respuesta, sin el rastro de herramientas.
+  const texto = message.parts
+    .filter((p): p is { type: "text"; text: string } => p.type === "text")
+    .map((p) => p.text)
+    .join("\n\n")
+    .trim();
   return (
     <div className={isUser ? "flex justify-end" : "flex justify-start"}>
       <div
@@ -263,15 +133,20 @@ function MessageView({
                 <Prose key={i} text={part.text} />
               );
             }
-            if (part.type === "tool-enviar_correo_equipo") {
-              return <CorreoCard key={i} part={part as never} onRespond={onApproval} />;
+            if (esHerramientaDeEscritura(part.type)) {
+              return <ApprovalCard key={i} part={part as never} onRespond={onApproval} />;
             }
             if (part.type.startsWith("tool-")) {
-              return <ToolLine key={i} part={part as { type: string; state?: string }} />;
+              return <ToolLine key={i} part={part as { type: string; state?: string; input?: unknown }} />;
             }
             return null; // `reasoning` y el resto no se muestran
           })}
         </div>
+        {!isUser && texto && (
+          <div className="mt-1.5 -mb-1 flex justify-end">
+            <CopyButton text={texto} />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -331,6 +206,15 @@ export function ChatInterface({
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
   });
 
+  // Retomar una conversacion guardada: se cargan sus mensajes tal cual quedaron.
+  function loadConversation(id: string, saved: UIMessage[]) {
+    stop();
+    clearError();
+    setInput("");
+    setMessages(saved);
+    setConversationId(id);
+  }
+
   function newConversation() {
     stop();
     clearError();
@@ -352,6 +236,14 @@ export function ChatInterface({
   const dictation = useDictation(setInput);
 
   const busy = status === "submitted" || status === "streaming";
+
+  // El cuadro crece con lo que se escribe o dicta (hasta su maximo).
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 128)}px`;
+  }, [input]);
 
   useEffect(() => {
     onBusyChange?.(busy);
@@ -382,8 +274,15 @@ export function ChatInterface({
       }
     >
       <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-4" aria-live="polite">
-        {messages.length > 0 && (
-          <div className="flex justify-end">
+        <div className="-mt-1 flex items-center justify-between">
+          <HistoryMenu
+            currentId={conversationId}
+            onLoad={loadConversation}
+            onDeleted={(id) => {
+              if (id === conversationId) newConversation();
+            }}
+          />
+          {messages.length > 0 && (
             <button
               type="button"
               onClick={newConversation}
@@ -391,8 +290,8 @@ export function ChatInterface({
             >
               <RotateCcw size={12} aria-hidden /> Nueva conversación
             </button>
-          </div>
-        )}
+          )}
+        </div>
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center gap-3 text-center">
             <p className="text-sm text-on-surface-variant">Probá con alguna de estas:</p>

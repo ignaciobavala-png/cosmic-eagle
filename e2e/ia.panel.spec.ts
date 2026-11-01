@@ -86,3 +86,27 @@ test("la burbuja esta en las pantallas del panel, sabe donde estas y no aparece 
   await page.goto("/admin/ia");
   await expect(page.getByRole("button", { name: "Abrir el asistente" })).toHaveCount(0);
 });
+
+test("la conversacion se guarda y aparece en el historial", async ({ page }) => {
+  await page.goto("/admin/ia");
+  await page.getByLabel("Mensaje para el asistente").fill("¿Cuántas sesiones hay abiertas? Contestá corto.");
+  await page.getByRole("button", { name: "Enviar" }).click();
+  await expect(page.getByRole("button", { name: "Enviar" })).toBeVisible({ timeout: 90_000 });
+
+  // Se guarda al terminar el turno; el historial la lista por su primer mensaje.
+  await page.getByRole("button", { name: "Historial" }).click();
+  await expect(page.getByText("¿Cuántas sesiones hay abiertas? Contestá corto.").last()).toBeVisible({ timeout: 15_000 });
+});
+
+test("crear un viaje pide aprobacion, avisa que sera borrador y, rechazado, no crea nada", async ({ page }) => {
+  await page.goto("/admin/ia");
+  await page.getByLabel("Mensaje para el asistente").fill(
+    "Creá una sesión: ciudad Santiago, país Chile, el 2027-03-06 (un solo día), cupo 14, precio 120 dólares, sin seña, sin título. Ya tenés todos los datos, creala."
+  );
+  await page.getByRole("button", { name: "Enviar" }).click();
+
+  await expect(page.getByText("Nuevo viaje o sesión")).toBeVisible({ timeout: 90_000 });
+  await expect(page.getByText(/Se crea como BORRADOR/)).toBeVisible();
+  await page.getByRole("button", { name: "Rechazar" }).click();
+  await expect(page.getByText("Rechazaste crear este viaje: no se creó.")).toBeVisible({ timeout: 90_000 });
+});

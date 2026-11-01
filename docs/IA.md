@@ -127,6 +127,49 @@ termina hoy se cierra mañana.
 - e2e: `e2e/ia.panel.spec.ts` (abre, sabe la pantalla, responde, Esc, no aparece
   en `/admin/ia`).
 
+## Búsqueda de nombres tolerante (01/11)
+
+`src/lib/ia/names.ts`: normaliza (sin acentos ni mayúsculas) y tolera un error de
+tipeo en palabras largas ("Sofia" = "Sofía", "Estella" = "Estela", "Maria Jose" =
+"María José"). Todas las palabras buscadas tienen que aparecer, en cualquier
+orden. Lo usan `listar_solicitudes`, `ver_participante` (por nombre), `listar_viajes`
+(por título: hay "Sabado" con y sin tilde), `consultar_crm` (país) y
+`listar_textos_sitio`. Compara en memoria sobre `id, user_id, full_name` (tope
+5000 filas): alcanza para cientos de personas; si la base crece, el paso
+siguiente es `unaccent` + `pg_trgm` en Postgres. Se verificó con un script suelto
+(no hay runner de tests unitarios en el repo) y que las herramientas corren sin
+error; **falta probarlo con personas reales**, hoy no hay solicitudes cargadas.
+
+## Historial, más lectura, crear viajes y artículos (01/11)
+
+- **Conversaciones guardadas** (`ai_conversations`, migración `20261101180000`):
+  el servidor guarda la charla completa al terminar cada turno (`onFinish`);
+  cada admin ve **solo las suyas** (RLS). El botón **Historial** las lista (lectura
+  directa desde el browser, con RLS), las retoma tal cual quedaron y las borra.
+  No hay borrado automático por antigüedad.
+- **Lectura nueva** (`tools-extra.ts`): artículos, FAQs, testimonios, correos
+  programados enviados, códigos de acceso, material, suscriptores (solo conteo) y
+  medios de cobro. **No salen del servidor** (a propósito, el modelo es un
+  tercero): el valor de los códigos, el token de los links de material, el cuerpo
+  de artículos y material, los correos de los suscriptores y los datos de cuenta.
+- **Escritura con aprobación** (`write-tools.ts`), todas con `toolApproval` y
+  firma: `crear_viaje` (siempre **borrador**, rechaza duplicados por tipo + fechas
+  + ciudad) y `crear_articulo` (borrador salvo que pidan publicar; el texto lo
+  pone la persona, el modelo no escribe contenido de la organización).
+  Las reglas de validación **son las del panel**: se extrajeron a
+  `src/lib/trip-form.ts` y `src/lib/article-form.ts`, y `experiencias/actions.ts`
+  y `contenidos/actions.ts` las importan. Una regla nueva se escribe una vez.
+  No cargan portada, galería, audio ni programa: eso se completa en el panel
+  (la herramienta devuelve `editar_en`).
+- **Interfaz** (`ChatParts.tsx`): tablas, botón Copiar, rastro con los filtros
+  usados ("Consultó solicitudes (estado: pending_review)"), tarjetas de aprobación
+  por herramienta (con aviso de "borrador" o "se publica ya") y cuadro que crece.
+- **Pendiente:** `crear_usuario` (decisión abierta: ver abajo) y edición de lo
+  existente. e2e: `ia.panel.spec.ts` (historial y rechazo de `crear_viaje`);
+  el camino de aprobar se probó a mano creando y borrando un viaje y un artículo.
+- Dos tests viejos de `panel.panel.spec.ts` fallan desde antes: esperan un título
+  "Viajes" (hoy "Retiros") y 13 secciones en el menú (hay 15).
+
 ## Auditoría
 
 `ai_agent_log` (migración `20261028160000`): una fila por llamada a herramienta

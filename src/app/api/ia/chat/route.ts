@@ -19,6 +19,8 @@ const MAX_MESSAGES = 60;
 /** Largo maximo del mensaje nuevo, en caracteres. */
 const MAX_CHARS = 4000;
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /** Mensajes por persona y por dia. Ajustable con `IA_DAILY_LIMIT` sin tocar codigo. */
 const DAILY_LIMIT = Number(process.env.IA_DAILY_LIMIT) || 100;
 
@@ -87,9 +89,30 @@ export async function POST(request: Request) {
     pagina: cleanPagina(body.pagina),
   });
 
+  const pagina = cleanPagina(body.pagina);
+
   return createAgentUIStreamResponse({
     agent,
     uiMessages: body.messages,
     abortSignal: request.signal,
+    // Al terminar el turno se guarda la charla completa (mensajes, resultados de
+    // herramientas y aprobaciones): es lo que permite retomarla desde el historial.
+    onFinish: async ({ messages }) => {
+      if (!conversationId || !UUID.test(conversationId)) return;
+      const first = messages.find((m) => m.role === "user")?.parts.find((p) => p.type === "text");
+      const title = (first && "text" in first ? first.text : "Conversación").replace(/\s+/g, " ").trim().slice(0, 70);
+      const { error } = await supabase.from("ai_conversations").upsert(
+        {
+          id: conversationId,
+          user_id: user.id,
+          title: title || "Conversación",
+          page: pagina,
+          messages: messages as never,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "id" }
+      );
+      if (error) console.error("[ia] no se pudo guardar la conversación:", error.message);
+    },
   });
 }

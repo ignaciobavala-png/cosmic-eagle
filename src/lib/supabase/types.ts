@@ -77,6 +77,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_conversations: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          page: string | null
+          messages: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          user_id: string
+          title?: string
+          page?: string | null
+          messages?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          title?: string
+          page?: string | null
+          messages?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       materiales: {
         Row: {
           id: string
