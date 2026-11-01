@@ -30,6 +30,9 @@ export const HERRAMIENTAS: Record<string, string> = {
   enviar_correo_equipo: "el envío de correo al equipo",
   crear_viaje: "la creación del viaje",
   crear_articulo: "la creación del artículo",
+  ver_testimonio: "un testimonio completo",
+  crear_testimonio: "la carga del testimonio",
+  crear_articulos_desde_testimonios: "la copia de testimonios a artículos",
 };
 
 const CAMPOS: Record<string, string> = {
@@ -212,7 +215,7 @@ type ToolPart = {
   type: string;
   state?: string;
   input?: Record<string, unknown>;
-  approval?: { id: string; approved?: boolean };
+  approval?: { id: string; approved?: boolean; requestReason?: string };
   output?: Record<string, unknown> & { error?: string; editar_en?: string };
 };
 
@@ -269,6 +272,38 @@ const TARJETAS: Record<
     rechazado: "Rechazaste crear este viaje: no se creó.",
     ok: () => "✓ Creado como borrador.",
   },
+  crear_testimonio: {
+    titulo: "Nuevo testimonio",
+    aprobar: "Aprobar y cargar",
+    nota: () => "Se carga como BORRADOR: no se muestra en el sitio hasta que lo publiquen desde Testimonios.",
+    campos: (i) => [
+      ["Sección", i.seccion],
+      ["Autor", i.autor],
+      ["Lugar", i.lugar],
+    ],
+    cuerpo: (i) => [i.cita, i.relato].filter((t) => typeof t === "string" && t).join("\n\n") || null,
+    rechazado: "Rechazaste cargar este testimonio: no se cargó.",
+    ok: () => "✓ Cargado como borrador.",
+  },
+  crear_articulos_desde_testimonios: {
+    titulo: "Copiar testimonios a Contenidos",
+    aprobar: "Aprobar y copiar",
+    nota: () => "Se crean como BORRADOR, categoría Testimonios. El texto se copia completo desde el servidor. Después hay que publicarlos desde Contenidos.",
+    campos: (i) => [["Cantidad", Array.isArray(i.ids) ? i.ids.length : null]],
+    rechazado: "Rechazaste esta copia: no se creó nada.",
+    ok: (o) => {
+      const creados = (o?.creados as string[] | undefined) ?? [];
+      const salteados = (o?.salteados as string[] | undefined) ?? [];
+      const fallidos = (o?.fallidos as string[] | undefined) ?? [];
+      return [
+        creados.length ? `✓ Creados ${creados.length} borradores: ${creados.join(", ")}.` : "",
+        salteados.length ? `Salteados: ${salteados.join(", ")}.` : "",
+        fallidos.length ? `✕ Fallaron: ${fallidos.join(" · ")}.` : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+    },
+  },
   crear_articulo: {
     titulo: "Nuevo artículo",
     aprobar: "Aprobar y crear",
@@ -312,6 +347,9 @@ export function ApprovalCard({
     <div className="space-y-2 rounded-xl border border-primary-fixed-dim/40 bg-surface-container/40 p-3 text-xs">
       <p className="font-semibold text-on-surface">{cfg.titulo}</p>
       {nota && <p className="rounded-md bg-primary-container/10 px-2 py-1 text-primary-fixed-dim">{nota}</p>}
+      {part.approval?.requestReason && (
+        <p className="rounded-md bg-black/10 px-2 py-1 text-on-surface">{part.approval.requestReason}</p>
+      )}
 
       <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
         {cfg.campos(input)

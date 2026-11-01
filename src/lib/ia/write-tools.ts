@@ -13,6 +13,8 @@ import { ARTICLE_CATEGORY_LIST } from "@/lib/article";
 import { CONTENT_ACCESS_LEVELS } from "@/lib/content-access";
 import { parseTripForm } from "@/lib/trip-form";
 import { parseArticleForm } from "@/lib/article-form";
+import { parseTestimonialForm } from "@/lib/testimonial-form";
+import { TESTIMONIAL_MAX_CHARS } from "@/lib/testimonials";
 import type { createClient } from "@/lib/supabase/server";
 
 /**
@@ -293,6 +295,111 @@ export function buildWriteTools(ctx: Ctx) {
           estado: a.estado === "published" ? "publicado" : "borrador",
           editar_en: `/admin/contenidos/${data.id}`,
         };
+      },
+    }),
+
+    crear_testimonio: tool({
+      description:
+        "Carga un testimonio NUEVO como BORRADOR (no se muestra en el sitio hasta que alguien lo publique desde Testimonios). Pide aprobación. El texto es de la persona que lo dio: copialo tal cual, no lo reescribas ni lo inventes. La cita corta no puede pasar de 250 caracteres (es el largo de la tarjeta); un relato más largo va en 'relato'.",
+      inputSchema: z.object({
+        seccion: z.enum(["home", "sesiones", "viajes", "contenidos"]).describe("Dónde se muestra: home (Voces de Luz), sesiones, viajes o contenidos"),
+        autor: z.string().min(2).max(120),
+        lugar: z.string().max(120).optional().describe("Ciudad o país del autor"),
+        cita: z.string().min(5).max(TESTIMONIAL_MAX_CHARS),
+        relato: z.string().max(10000).optional().describe("Relato completo, si lo hay"),
+      }),
+      execute: async (a) => {
+        const fd = new FormData();
+        fd.set("placement", a.seccion);
+        fd.set("author_name", a.autor);
+        if (a.lugar) fd.set("author_location", a.lugar);
+        fd.set("quote", a.cita);
+        if (a.relato) fd.set("body", a.relato);
+        // Sin `is_published`: queda como borrador. Publicar es decision de una persona.
+        const logArgs = { seccion: a.seccion, autor: a.autor };
+        const parsed = parseTestimonialForm(fd);
+        if (parsed.error) {
+          await anotar(logArgs, 0, parsed.error, "crear_testimonio");
+          return { error: parsed.error };
+        }
+        const { data, error } = await supabase.from("testimonials").insert(parsed.data).select("id").single();
+        if (error) {
+          await anotar(logArgs, 0, error.message, "crear_testimonio");
+          return { error: `No se pudo crear: ${error.message}` };
+        }
+        revalidatePath(publicPath("/"), "page");
+        revalidatePath(publicPath("/viajes"), "page");
+        revalidatePath("/admin/testimonios");
+        await anotar({ ...logArgs, id: data.id }, 1, null, "crear_testimonio");
+        return { creado: true, id: data.id, estado: "borrador", editar_en: `/admin/testimonios/${data.id}/editar` };
+      },
+    }),
+
+    crear_articulos_desde_testimonios: tool({
+      description:
+        "Copia testimonios existentes a Contenidos como artículos en BORRADOR, categoría Testimonios. El servidor copia el texto COMPLETO (el relato si lo tiene, si no la cita) y arma el título ('Testimonio de <autor>'): NO necesitás leer ni reescribir el texto. Pasá los ids (de listar_testimonios), hasta 15 por vez. Si ya hay un artículo con ese título, lo saltea. Pide aprobación y muestra qué testimonios se copian. Después hay que publicarlos desde Contenidos.",
+      inputSchema: z.object({
+        ids: z.array(z.string().uuid()).min(1).max(15).describe("Ids de testimonios"),
+        acceso: z
+          .enum(CONTENT_ACCESS_LEVELS.map((l) => l.value) as [string, ...string[]])
+          .optional()
+          .describe("publico por defecto"),
+      }),
+      execute: async (a) => {
+        const { data: testimonios, error: readError } = await supabase
+          .from("testimonials")
+          .select("id, author_name, author_location, quote, body")
+          .in("id", a.ids);
+        if (readError) return { error: readError.message };
+        if (!testimonios?.length) return { error: "No encontré esos testimonios." };
+
+        const { data: existentes } = await supabase.from("articles").select("title");
+        const titulos = new Set((existentes ?? []).map((t) => t.title.trim().toLowerCase()));
+
+        const creados: string[] = [];
+        const salteados: string[] = [];
+        const fallidos: string[] = [];
+
+        for (const t of testimonios) {
+          const titulo = `Testimonio de ${t.author_name.trim()}`;
+          if (titulos.has(titulo.toLowerCase())) {
+            salteados.push(`${t.author_name} (ya existe)`);
+            continue;
+          }
+          const fd = new FormData();
+          fd.set("title", titulo);
+          fd.set("body", (t.body ?? t.quote).trim());
+          fd.set("category", "testimonios");
+          fd.set("access_level", a.acceso ?? "publico");
+          fd.set("status", "draft");
+          if (t.body) fd.set("excerpt", t.quote.trim().slice(0, 400));
+
+          const parsed = await parseArticleForm(fd);
+          if (!parsed.data || parsed.data.body === undefined) {
+            fallidos.push(`${t.author_name}: ${parsed.error ?? "texto vacío"}`);
+            continue;
+          }
+          const { error } = await supabase.from("articles").insert({ ...parsed.data, body: parsed.data.body });
+          if (error) {
+            fallidos.push(`${t.author_name}: ${error.message.includes("articles_slug_key") ? "ya hay uno con esa dirección" : error.message}`);
+            continue;
+          }
+          titulos.add(titulo.toLowerCase());
+          creados.push(t.author_name);
+        }
+
+        if (creados.length) {
+          revalidatePath(publicPath("/contenidos"), "page");
+          revalidatePath(publicPath("/contenidos/[slug]"), "page");
+          revalidatePath("/admin/contenidos");
+        }
+        await anotar(
+          { pedidos: a.ids.length, creados: creados.length, salteados: salteados.length, fallidos: fallidos.length },
+          creados.length,
+          fallidos.length ? fallidos.join(" | ").slice(0, 400) : null,
+          "crear_articulos_desde_testimonios"
+        );
+        return { creados, salteados, fallidos, estado: "borrador", ver_en: "/admin/contenidos" };
       },
     }),
   };

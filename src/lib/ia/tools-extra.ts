@@ -90,28 +90,49 @@ export function buildExtraReadTools(ctx: Ctx) {
     }),
 
     listar_testimonios: tool({
-      description: "Lista los testimonios del sitio: autor, lugar, si está publicado y un recorte del texto.",
+      description:
+        "Lista los testimonios del sitio: sección donde se muestran, autor, lugar, si está publicado, el texto corto (la cita) y si tiene relato completo (y de cuántos caracteres). Para leer el relato completo de uno usá ver_testimonio.",
       inputSchema: z.object({ solo_borradores: z.boolean().optional() }),
       execute: (args) =>
         leer(ctx, "listar_testimonios", args, async () => {
           let query = supabase
             .from("testimonials")
-            .select("id, author_name, author_location, quote, is_published, placement", { count: "exact" })
+            .select("id, author_name, author_location, quote, body, is_published, placement", { count: "exact" })
             .order("sort_order", { ascending: true })
-            .limit(MAX_ROWS);
+            .limit(MAX_ROWS * 2);
           if (args.solo_borradores) query = query.eq("is_published", false);
           const { data, error, count } = await query;
           if (error) return { error: error.message };
           return {
             rows: data.map((t) => ({
               id: t.id,
+              seccion: t.placement,
               autor: t.author_name,
               lugar: t.author_location,
               publicado: t.is_published,
-              texto: clip(t.quote, 160),
+              cita: clip(t.quote, 300),
+              tiene_relato_completo: Boolean(t.body),
+              largo_relato: t.body?.length ?? 0,
             })),
             extra: total(count, data.length),
           };
+        }),
+    }),
+
+    ver_testimonio: tool({
+      description:
+        "Devuelve el texto COMPLETO de un testimonio (la cita y el relato completo si lo tiene), con su autor. Usala solo cuando haga falta leerlo entero; para copiar testimonios a artículos usá crear_articulos_desde_testimonios, que no necesita que leas el texto.",
+      inputSchema: z.object({ id: z.string().uuid().describe("Id sacado de listar_testimonios") }),
+      execute: (args) =>
+        leer(ctx, "ver_testimonio", args, async () => {
+          const { data, error } = await supabase
+            .from("testimonials")
+            .select("id, author_name, author_location, quote, body, placement, is_published")
+            .eq("id", args.id)
+            .maybeSingle();
+          if (error) return { error: error.message };
+          if (!data) return { rows: [] };
+          return { rows: [{ ...data, body: data.body ? data.body.slice(0, 8000) : null }] };
         }),
     }),
 

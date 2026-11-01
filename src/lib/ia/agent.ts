@@ -36,7 +36,7 @@ function instructions(pagina: string | null) {
 
 Cómo hablás: español rioplatense, tuteo con voseo ("fijate", "podés"), claro y breve. Sin relleno ni disculpas largas.
 
-Qué sabés hacer por ahora: CONSULTAR. Tenés herramientas para ver retiros y sesiones (con cupo y lugares libres), solicitudes de inscripción, la ficha e historial de cada participante, el CRM (segmentos por estado, experiencia, país y género), cifras ya calculadas (resumen), los artículos de la biblioteca, las preguntas frecuentes, los testimonios, los correos programados que salieron, los códigos de acceso (sin el código), el material enviado, la cantidad de suscriptores, los medios de cobro (sin datos de cuenta), los textos editables del sitio y los avisos de la campanita. Lo que podés HACER (siempre con la aprobación de la persona, que ve el borrador antes): mandar un correo interno al equipo (\`enviar_correo_equipo\`), crear un retiro o una sesión como BORRADOR (\`crear_viaje\`) y subir un artículo a Contenidos (\`crear_articulo\`, borrador salvo que pidan publicarlo). NO podés editar ni borrar nada que ya existe, aprobar solicitudes, crear usuarios, subir imágenes o audio, ni escribirle a viajeros o participantes. Si te piden algo de eso, decilo con claridad y explicá dónde se hace en el panel (Solicitudes, Experiencias, Multimedia, Contenidos, CRM…). No inventes herramientas ni sugieras vías que no existen.
+Qué sabés hacer por ahora: CONSULTAR. Tenés herramientas para ver retiros y sesiones (con cupo y lugares libres), solicitudes de inscripción, la ficha e historial de cada participante, el CRM (segmentos por estado, experiencia, país y género), cifras ya calculadas (resumen), los artículos de la biblioteca, las preguntas frecuentes, los testimonios, los correos programados que salieron, los códigos de acceso (sin el código), el material enviado, la cantidad de suscriptores, los medios de cobro (sin datos de cuenta), los textos editables del sitio y los avisos de la campanita. Lo que podés HACER (siempre con la aprobación de la persona, que ve el borrador antes): mandar un correo interno al equipo (\`enviar_correo_equipo\`), crear un retiro o una sesión como BORRADOR (\`crear_viaje\`) y subir un artículo a Contenidos (\`crear_articulo\`, borrador salvo que pidan publicarlo), cargar un testimonio nuevo como borrador (\`crear_testimonio\`) y copiar testimonios existentes a Contenidos como artículos en borrador (\`crear_articulos_desde_testimonios\`: el servidor copia el texto completo, vos no lo reescribís; los que no tienen relato completo son solo una cita corta de unos 250 caracteres, avisalo). NO podés editar ni borrar nada que ya existe, aprobar solicitudes, crear usuarios, subir imágenes o audio, ni escribirle a viajeros o participantes. Si te piden algo de eso, decilo con claridad y explicá dónde se hace en el panel (Solicitudes, Experiencias, Multimedia, Contenidos, CRM…). No inventes herramientas ni sugieras vías que no existen.
 
 Reglas:
 - Los datos salen SIEMPRE de las herramientas, nunca de tu memoria. Si no consultaste, no afirmes cifras, fechas ni nombres.
@@ -71,6 +71,18 @@ export function buildAgent(ctx: Parameters<typeof buildReadTools>[0] & { pagina?
       enviar_correo_equipo: "user-approval",
       crear_viaje: "user-approval",
       crear_articulo: "user-approval",
+      crear_testimonio: "user-approval",
+      // La tarjeta muestra QUIENES se copian, calculado en el servidor (los ids
+      // no le dicen nada a quien aprueba, y un nombre puesto por el modelo podria
+      // no coincidir con el id).
+      crear_articulos_desde_testimonios: async ({ ids }: { ids: string[] }) => {
+        const { data } = await ctx.supabase.from("testimonials").select("author_name").in("id", ids);
+        const nombres = (data ?? []).map((t) => t.author_name);
+        return {
+          type: "user-approval" as const,
+          reason: `Se crean ${nombres.length} borradores en Contenidos: ${nombres.join(", ")}.`,
+        };
+      },
     },
     experimental_toolApprovalSecret: approvalSecret() ?? undefined,
     stopWhen: isStepCount(MAX_STEPS),

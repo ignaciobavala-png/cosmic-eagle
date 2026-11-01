@@ -110,3 +110,17 @@ test("crear un viaje pide aprobacion, avisa que sera borrador y, rechazado, no c
   await page.getByRole("button", { name: "Rechazar" }).click();
   await expect(page.getByText("Rechazaste crear este viaje: no se creó.")).toBeVisible({ timeout: 90_000 });
 });
+
+test("copiar testimonios a articulos muestra a quienes y, rechazado, no crea nada", async ({ page }) => {
+  await page.goto("/admin/ia");
+  await page.getByLabel("Mensaje para el asistente").fill(
+    "Copiá a Contenidos, como artículos en borrador, los primeros 2 testimonios de la sección home. Ya tenés todo lo necesario: hacelo."
+  );
+  await page.getByRole("button", { name: "Enviar" }).click();
+
+  await expect(page.getByText("Copiar testimonios a Contenidos")).toBeVisible({ timeout: 120_000 });
+  // El servidor dice QUIENES se copian (no los ids que puso el modelo).
+  await expect(page.getByText(/Se crean \d+ borradores en Contenidos:/)).toBeVisible();
+  await page.getByRole("button", { name: "Rechazar" }).click();
+  await expect(page.getByText("Rechazaste esta copia: no se creó nada.")).toBeVisible({ timeout: 90_000 });
+});

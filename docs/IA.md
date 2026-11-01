@@ -170,6 +170,26 @@ error; **falta probarlo con personas reales**, hoy no hay solicitudes cargadas.
 - Dos tests viejos de `panel.panel.spec.ts` fallan desde antes: esperan un título
   "Viajes" (hoy "Retiros") y 13 secciones en el menú (hay 15).
 
+## Testimonios (01/11)
+
+Antes el asistente solo veía los primeros 160 caracteres de cada testimonio (un
+recorte mío para no gastar tokens), así que no podía copiarlos a artículos ni
+cargar nuevos. Ahora:
+
+- `listar_testimonios` trae la cita completa (≤ 250 caracteres, el largo de la
+  tarjeta) y avisa si hay relato completo y de cuántos caracteres.
+- `ver_testimonio(id)`: cita + relato completo, bajo demanda.
+- `crear_articulos_desde_testimonios(ids)`: **el servidor copia el texto completo**
+  (relato o cita) a Contenidos, categoría Testimonios, **borrador**; el modelo no
+  lee ni reescribe nada. Saltea títulos que ya existen. La tarjeta de aprobación
+  lista **quiénes** se copian, calculado en el servidor (`toolApproval` con
+  `reason`), no los ids que puso el modelo.
+- `crear_testimonio`: borrador, con la validación del panel
+  (`src/lib/testimonial-form.ts`, compartida).
+- Dato real: de los 27 testimonios, 11 son de home y 11 de viajes (mismo largo
+  medio: posiblemente los mismos textos) y 5 de sesiones con relato de hasta 6.178
+  caracteres; **esos 5 ya están publicados en Contenidos**.
+
 ## Auditoría
 
 `ai_agent_log` (migración `20261028160000`): una fila por llamada a herramienta
