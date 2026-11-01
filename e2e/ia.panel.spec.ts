@@ -124,3 +124,16 @@ test("copiar testimonios a articulos muestra a quienes y, rechazado, no crea nad
   await page.getByRole("button", { name: "Rechazar" }).click();
   await expect(page.getByText("Rechazaste esta copia: no se creó nada.")).toBeVisible({ timeout: 90_000 });
 });
+
+test("editar muestra el antes y el despues calculados por el servidor y, rechazado, no cambia nada", async ({ page }) => {
+  await page.goto("/admin/ia");
+  await page.getByLabel("Mensaje para el asistente").fill(
+    "Cambiá el cupo de la sesión del sábado 7 de noviembre a 15 lugares. Ya tenés todo, hacelo."
+  );
+  await page.getByRole("button", { name: "Enviar" }).click();
+
+  await expect(page.getByText("Cambiar viaje o sesión")).toBeVisible({ timeout: 120_000 });
+  await expect(page.getByText(/Cupo: 14 → 15/)).toBeVisible();
+  await page.getByRole("button", { name: "Rechazar" }).click();
+  await expect(page.getByText("Rechazaste este cambio: no se modificó nada.")).toBeVisible({ timeout: 90_000 });
+});

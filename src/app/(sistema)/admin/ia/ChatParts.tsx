@@ -33,6 +33,11 @@ export const HERRAMIENTAS: Record<string, string> = {
   ver_testimonio: "un testimonio completo",
   crear_testimonio: "la carga del testimonio",
   crear_articulos_desde_testimonios: "la copia de testimonios a artículos",
+  editar_viaje: "el cambio del viaje",
+  editar_articulo: "el cambio del artículo",
+  editar_testimonio: "el cambio del testimonio",
+  editar_faq: "el cambio de la pregunta",
+  cambiar_texto_sitio: "el cambio del texto del sitio",
 };
 
 const CAMPOS: Record<string, string> = {
@@ -215,7 +220,7 @@ type ToolPart = {
   type: string;
   state?: string;
   input?: Record<string, unknown>;
-  approval?: { id: string; approved?: boolean; requestReason?: string };
+  approval?: { id: string; approved?: boolean; requestReason?: string; reason?: string };
   output?: Record<string, unknown> & { error?: string; editar_en?: string };
 };
 
@@ -223,6 +228,18 @@ type Campo = [label: string, value: unknown];
 
 const TIPO_VIAJE: Record<string, string> = { retiro: "Retiro (Viaje Cósmico)", ceremonia: "Sesión Cósmica" };
 const ACCESO: Record<string, string> = { publico: "Abierto", miembros: "Con cuenta", programa: "Del programa" };
+
+
+/** Las ediciones muestran el "antes → después" que calculo el servidor (`requestReason`). */
+function tarjetaEdicion(titulo: string) {
+  return {
+    titulo,
+    aprobar: "Aprobar y guardar",
+    campos: () => [] as Campo[],
+    rechazado: "Rechazaste este cambio: no se modificó nada.",
+    ok: (o: ToolPart["output"]) => `✓ Cambios guardados.${o?.nota ? ` ${String(o.nota)}` : ""}`,
+  };
+}
 
 /**
  * Cada herramienta de escritura muestra lo que va a hacer COMPLETO, y no hace
@@ -272,6 +289,11 @@ const TARJETAS: Record<
     rechazado: "Rechazaste crear este viaje: no se creó.",
     ok: () => "✓ Creado como borrador.",
   },
+  editar_viaje: tarjetaEdicion("Cambiar viaje o sesión"),
+  editar_articulo: tarjetaEdicion("Cambiar artículo"),
+  editar_testimonio: tarjetaEdicion("Cambiar testimonio"),
+  editar_faq: tarjetaEdicion("Cambiar pregunta frecuente"),
+  cambiar_texto_sitio: tarjetaEdicion("Cambiar texto del sitio"),
   crear_testimonio: {
     titulo: "Nuevo testimonio",
     aprobar: "Aprobar y cargar",
@@ -348,7 +370,7 @@ export function ApprovalCard({
       <p className="font-semibold text-on-surface">{cfg.titulo}</p>
       {nota && <p className="rounded-md bg-primary-container/10 px-2 py-1 text-primary-fixed-dim">{nota}</p>}
       {part.approval?.requestReason && (
-        <p className="rounded-md bg-black/10 px-2 py-1 text-on-surface">{part.approval.requestReason}</p>
+        <p className="whitespace-pre-line rounded-md bg-black/10 px-2 py-1 text-on-surface">{part.approval.requestReason}</p>
       )}
 
       <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
@@ -398,7 +420,9 @@ export function ApprovalCard({
         </div>
       )}
       {part.state === "approval-responded" && <p className="text-on-surface-variant">Procesando…</p>}
-      {part.state === "output-denied" && <p className="text-on-surface-variant">{cfg.rechazado}</p>}
+      {part.state === "output-denied" && (
+        <p className="text-on-surface-variant">{part.approval?.reason ?? cfg.rechazado}</p>
+      )}
       {part.state === "output-available" &&
         (part.output?.error ? (
           <p className="text-error">{part.output.error}</p>

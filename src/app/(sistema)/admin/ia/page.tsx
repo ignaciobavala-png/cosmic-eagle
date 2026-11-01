@@ -13,9 +13,9 @@ export default function AdminIaPage() {
       </h1>
       <p className="mb-6 max-w-2xl text-sm text-on-surface-variant">
         Preguntale por los viajes, las solicitudes, el CRM, los contenidos o los
-        avisos, o pedile ayuda con el panel. Puede crear viajes, artículos y
-        testimonios como borrador y mandar correos al equipo, siempre con tu
-        aprobación. Ve nombres, pero no mails, teléfonos ni datos de salud.
+        avisos, o pedile ayuda con el panel. Puede crear, editar y publicar viajes,
+        artículos, testimonios y preguntas frecuentes, cambiar textos del sitio y
+        mandar correos al equipo, siempre con tu aprobación. No borra nada. Ve nombres, pero no mails, teléfonos ni datos de salud.
       </p>
       <ChatInterface />
     </div>

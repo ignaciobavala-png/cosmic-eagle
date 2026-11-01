@@ -190,6 +190,33 @@ cargar nuevos. Ahora:
   medio: posiblemente los mismos textos) y 5 de sesiones con relato de hasta 6.178
   caracteres; **esos 5 ya están publicados en Contenidos**.
 
+## Editar y publicar (01/11)
+
+`src/lib/ia/edit-tools.ts`. **Editar sí, publicar sí, borrar no** (no existe ningún
+delete en el asistente).
+
+- `editar_viaje`, `editar_articulo`, `editar_testimonio`, `editar_faq`,
+  `cambiar_texto_sitio`. Todas con `toolApproval` firmado.
+- **La tarjeta muestra el antes → después calculado en el servidor**
+  (`buildEditApprovals`: lee el valor actual de la base y compara), con
+  "⚠ SE PUBLICA" / "Se OCULTA" arriba. Si el objeto no existe o no hay cambios,
+  deniega sin molestar.
+- **Publicar es un campo**: `estado` (`open` abre inscripciones y se ve; `published`
+  en artículos) o `publicado`/`publicada`. El prompt exige que la persona lo pida
+  de forma explícita.
+- **Solo cambia lo que se manda** (update parcial): no pisa programa, galería,
+  habitaciones ni versiones en inglés (que no se tocan y se avisa). Aplica las
+  reglas del panel sobre los valores combinados (fin ≥ inicio, seña < precio, cupo
+  ≥ reservas aprobadas).
+- No edita imágenes, audio, HTML subido (se sube otro archivo), slugs ni los
+  legales (copia literal de la clienta).
+- `cambiar_texto_sitio` usa `revalidateTag(SITE_CONTENT_TAG, { expire: 0 })`:
+  `updateTag` solo existe en Server Actions y esto corre en un Route Handler.
+- Tope de 60 escrituras por persona y día, registradas en `ai_agent_log`.
+- Probado: la cita de un testimonio se editó y guardó con aprobación; publicar se
+  mostró como "SE PUBLICA" y, rechazado, no publicó. **El camino de publicar con
+  aprobación real no se ejecutó** para no tocar el sitio en vivo.
+
 ## Auditoría
 
 `ai_agent_log` (migración `20261028160000`): una fila por llamada a herramienta
