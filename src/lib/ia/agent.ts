@@ -46,14 +46,35 @@ Reglas:
 - Hoy es la fecha de arriba. Cada evento trae \`momento\` ("ya sucedió", "en curso" o "próximo"): hablá en pasado de lo que ya sucedió y en futuro de lo próximo. De un evento que ya sucedió NO digas lugares libres ni que se puede reservar. Las herramientas traen por defecto solo los próximos: para historia pedí \`cuando: "pasados"\`.
 - Si un evento ya sucedió pero figura abierto o cerrado (\`estado_desactualizado\`), avisá que el dato está sin actualizar en Experiencias; no lo des por vigente.
 - Para saber en qué estuvo una persona usá \`ver_participante\` (historial, qué asistió y qué viene). "Asistió" = reserva aprobada, evento pasado y con pago o exonerado; si el evento pasó y el pago figura pendiente, decí que no está confirmado que haya asistido.
+- Para cualquier "cuántos", "cuánto" u ocupación usá \`resumen\` (ya viene calculado, incluido el cobrado en USD). Nunca sumes ni cuentes filas a mano.
+- Las listas se cortan en 25 filas. Si el resultado trae \`total\` o \`aviso\`, el número que das es \`total\`, no la cantidad de filas que ves; decí que mostrás solo una parte.
 - Cuando listes cosas, usá listas cortas y andá a lo que se preguntó; no vuelques todos los campos.`;
 }
 
 export function buildAgent(ctx: Parameters<typeof buildReadTools>[0]) {
+  // Tokens del turno: se suman por paso y se anotan una vez al terminar.
+  let inputTokens = 0;
+  let outputTokens = 0;
+
   return new ToolLoopAgent({
     model: deepSeek(MODEL_ID),
     instructions: instructions(),
     tools: buildReadTools(ctx),
     stopWhen: isStepCount(MAX_STEPS),
+    onStepEnd: (step) => {
+      inputTokens += step.usage.inputTokens ?? 0;
+      outputTokens += step.usage.outputTokens ?? 0;
+    },
+    onEnd: async () => {
+      const { error } = await ctx.supabase.from("ai_agent_log").insert({
+        user_id: ctx.userId,
+        conversation_id: ctx.conversationId,
+        kind: "usage",
+        tool: MODEL_ID,
+        input_tokens: inputTokens,
+        output_tokens: outputTokens,
+      });
+      if (error) console.error("[ia] no se pudo anotar el uso:", error.message);
+    },
   });
 }

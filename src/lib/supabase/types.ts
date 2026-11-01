@@ -45,6 +45,8 @@ export type Database = {
           args: Json
           rows_returned: number | null
           error: string | null
+          input_tokens: number | null
+          output_tokens: number | null
           created_at: string
         }
         Insert: {
@@ -56,6 +58,8 @@ export type Database = {
           args?: Json
           rows_returned?: number | null
           error?: string | null
+          input_tokens?: number | null
+          output_tokens?: number | null
           created_at?: string
         }
         Update: {
@@ -67,6 +71,8 @@ export type Database = {
           args?: Json
           rows_returned?: number | null
           error?: string | null
+          input_tokens?: number | null
+          output_tokens?: number | null
           created_at?: string
         }
         Relationships: []

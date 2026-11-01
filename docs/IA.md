@@ -71,6 +71,21 @@ Lo que devuelve una herramienta **sale a DeepSeek**, un tercero. Por eso:
 pasa a `completed` lo `open`/`closed` cuya `end_date` ya pasó. Un evento que
 termina hoy se cierra mañana.
 
+## Totales, resumen y tope de uso (01/11)
+
+- **`total` real.** `listar_viajes` y `listar_solicitudes` usan `count: "exact"` y
+  devuelven `total` + `aviso` cuando el tope de 25 corta la lista. Antes el modelo
+  podía tomar "25 filas" por "25 en total".
+- **`resumen`**: ocupación, solicitudes y pagos por estado y cobrado en USD, ya
+  calculado (sin nombres). El prompt le prohíbe sumar o contar filas a mano.
+- **Tope diario:** 100 mensajes por persona y por día de Buenos Aires
+  (`IA_DAILY_LIMIT` lo cambia sin tocar código) y 4000 caracteres por mensaje.
+  Responde 429 / 413.
+- **Uso en el log:** `kind='message'` al empezar el turno (un turno abortado
+  igual cuenta) y `kind='usage'` al terminar, con `input_tokens` y
+  `output_tokens` (migración `20261101160000`). Medida inicial: una consulta
+  simple con dos herramientas gastó ~8.300 tokens de entrada.
+
 ## Auditoría
 
 `ai_agent_log` (migración `20261028160000`): una fila por llamada a herramienta

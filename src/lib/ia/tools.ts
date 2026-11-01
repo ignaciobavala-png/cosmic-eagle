@@ -63,6 +63,18 @@ function momento(trip: { type: string; status: string; start_date: string; end_d
   };
 }
 
+/**
+ * El total real de una consulta con tope: sin esto el modelo toma "25 filas"
+ * por "25 en total". `total` viene de `count: "exact"` de PostgREST.
+ */
+function total(count: number | null, shown: number) {
+  if (count === null) return undefined;
+  return {
+    total: count,
+    ...(count > shown ? { aviso: `Se muestran ${shown} de ${count}. El total real es ${count}: no cuentes las filas.` } : {}),
+  };
+}
+
 function clip(text: string | null, max = 240) {
   if (!text) return null;
   return text.length > max ? `${text.slice(0, max)}…` : text;
@@ -122,7 +134,9 @@ export function buildReadTools(ctx: Ctx) {
           const hoy = hoyAR();
           let query = supabase
             .from("trips")
-            .select("id, title, type, status, category, start_date, end_date, capacity, price, deposit_amount, city, country")
+            .select("id, title, type, status, category, start_date, end_date, capacity, price, deposit_amount, city, country", {
+              count: "exact",
+            })
             .order("start_date", { ascending: cuando !== "pasados" })
             .limit(MAX_ROWS);
           if (cuando === "proximos") query = query.gte("end_date", hoy);
@@ -131,9 +145,9 @@ export function buildReadTools(ctx: Ctx) {
           if (args.estado) query = query.eq("status", args.estado);
           if (args.texto && cleanSearch(args.texto)) query = query.ilike("title", `%${cleanSearch(args.texto)}%`);
 
-          const { data: trips, error } = await query;
+          const { data: trips, error, count } = await query;
           if (error) return { error: error.message };
-          if (!trips.length) return { rows: [] };
+          if (!trips.length) return { rows: [], extra: total(count, 0) };
 
           const { data: apps, error: appsError } = await supabase
             .from("applications")
@@ -157,6 +171,7 @@ export function buildReadTools(ctx: Ctx) {
                 lugares_libres: m.ya_paso ? null : Math.max(trip.capacity - aprobadas, 0),
               };
             }),
+            extra: total(count, trips.length),
           };
         }),
     }),
@@ -187,7 +202,8 @@ export function buildReadTools(ctx: Ctx) {
           let query = supabase
             .from("applications")
             .select(
-              `id, full_name, residence_country, status, payment_status, amount_paid, previous_ceremonies, created_at, reviewed_at, trip:trips${inner}(id, title, type, status, start_date, end_date)`
+              `id, full_name, residence_country, status, payment_status, amount_paid, previous_ceremonies, created_at, reviewed_at, trip:trips${inner}(id, title, type, status, start_date, end_date)`,
+              { count: "exact" }
             )
             .order("created_at", { ascending: false })
             .limit(MAX_ROWS);
@@ -199,9 +215,12 @@ export function buildReadTools(ctx: Ctx) {
           if (args.cuando === "proximos") query = query.gte("trips.end_date", hoy);
           if (args.cuando === "pasados") query = query.lt("trips.end_date", hoy);
 
-          const { data, error } = await query;
+          const { data, error, count } = await query;
           if (error) return { error: error.message };
-          return { rows: data.map((a) => ({ ...a, trip: a.trip ? { ...a.trip, ...momento(a.trip) } : null })) };
+          return {
+            rows: data.map((a) => ({ ...a, trip: a.trip ? { ...a.trip, ...momento(a.trip) } : null })),
+            extra: total(count, data.length),
+          };
         }),
     }),
 
@@ -280,6 +299,88 @@ export function buildReadTools(ctx: Ctx) {
             };
           });
           return { rows, extra: ids.length > 1 ? { aviso: "Hay más de una persona con ese nombre." } : undefined };
+        }),
+    }),
+
+    resumen: tool({
+      description:
+        "Números ya calculados por evento: lugares ocupados y libres, % de ocupación, solicitudes por estado, pagos por estado y total cobrado en USD, más los totales de todo lo consultado. USALA para cualquier pregunta de cuántos, cuánto, ocupación o cobros: no sumes a mano filas de otras herramientas. Sin filtros trae los próximos eventos. NO trae nombres ni datos personales.",
+      inputSchema: z.object({
+        viaje_id: z.string().uuid().optional().describe("Un evento puntual, sacado de listar_viajes"),
+        tipo: z.enum(["retiro", "ceremonia"]).optional(),
+        cuando: z
+          .enum(["proximos", "pasados", "todos"])
+          .optional()
+          .describe("proximos (por defecto), pasados o todos"),
+      }),
+      execute: (args) =>
+        leer(ctx, "resumen", args, async () => {
+          const cuando = args.cuando ?? "proximos";
+          const hoy = hoyAR();
+          let query = supabase
+            .from("trips")
+            .select("id, title, type, status, start_date, end_date, capacity, price")
+            .order("start_date", { ascending: cuando !== "pasados" })
+            .limit(MAX_ROWS);
+          if (args.viaje_id) query = query.eq("id", args.viaje_id);
+          if (args.tipo) query = query.eq("type", args.tipo);
+          if (!args.viaje_id && cuando === "proximos") query = query.gte("end_date", hoy);
+          if (!args.viaje_id && cuando === "pasados") query = query.lt("end_date", hoy);
+
+          const { data: trips, error } = await query;
+          if (error) return { error: error.message };
+          if (!trips.length) return { rows: [] };
+
+          // Sin nombres: solo las columnas que se cuentan.
+          const { data: apps, error: appsError, count } = await supabase
+            .from("applications")
+            .select("trip_id, status, payment_status, amount_paid", { count: "exact" })
+            .in("trip_id", trips.map((t) => t.id))
+            .limit(5000);
+          if (appsError) return { error: appsError.message };
+          if (count !== null && count > apps.length) {
+            return { error: "Hay demasiadas solicitudes para resumir de una vez; pedilo por evento." };
+          }
+
+          const sumar = (rows: typeof apps) => rows.reduce((n, a) => n + Number(a.amount_paid ?? 0), 0);
+          const contar = (rows: typeof apps, key: "status" | "payment_status") => {
+            const out: Record<string, number> = {};
+            for (const a of rows) out[a[key]] = (out[a[key]] ?? 0) + 1;
+            return out;
+          };
+
+          const rows = trips.map((trip) => {
+            const own = apps.filter((a) => a.trip_id === trip.id);
+            const aprobadas = own.filter((a) => a.status === "approved");
+            const m = momento(trip);
+            return {
+              evento: trip.title,
+              id: trip.id,
+              tipo_nombre: m.tipo_nombre,
+              momento: m.momento,
+              ...(m.estado_desactualizado ? { estado_desactualizado: true } : {}),
+              cupo: trip.capacity,
+              aprobadas: aprobadas.length,
+              lugares_libres: m.ya_paso ? null : Math.max(trip.capacity - aprobadas.length, 0),
+              ocupacion_pct: trip.capacity > 0 ? Math.round((aprobadas.length / trip.capacity) * 100) : null,
+              solicitudes_por_estado: contar(own, "status"),
+              pagos_por_estado: contar(own, "payment_status"),
+              cobrado_usd: sumar(own),
+              precio_usd: trip.price,
+            };
+          });
+
+          return {
+            rows,
+            extra: {
+              totales: {
+                eventos: rows.length,
+                solicitudes: apps.length,
+                aprobadas: apps.filter((a) => a.status === "approved").length,
+                cobrado_usd: sumar(apps),
+              },
+            },
+          };
         }),
     }),
 
