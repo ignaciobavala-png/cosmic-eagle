@@ -14,7 +14,7 @@ Es la misma cuenta de Resend, pero llegan por caminos distintos:
 | Solicitud aprobada, avisos del admin | Nuestro código | `src/lib/email/resend.ts` |
 
 Y un tercero que no es ninguno de los dos: **Google Workspace** sigue siendo el
-correo humano de ellas (`contacto@cosmiceaglejourney.com`). Resend no tiene
+correo humano de ellas (`booking@cosmiceaglejourney.com`). Resend no tiene
 bandeja de entrada — por eso todos los mails salen con `reply_to` apuntando a esa
 casilla, o una respuesta se pierde en el vacío.
 
@@ -58,7 +58,7 @@ Para que salga un mail hacen falta tres cosas, en orden:
 |---|---|---|
 | `RESEND_API_KEY` | `re_...` | No se manda nada (se loguea) |
 | `RESEND_FROM` | `Cosmic Eagle <hola@envios.cosmiceaglejourney.com>` | Cae al sandbox `onboarding@resend.dev`, que solo entrega a la casilla dueña de la cuenta |
-| `RESEND_REPLY_TO` | `contacto@cosmiceaglejourney.com` | Usa esa misma dirección por defecto |
+| `RESEND_REPLY_TO` | `booking@cosmiceaglejourney.com` | Usa esa misma dirección por defecto |
 | `NEXT_PUBLIC_SITE_URL` | `https://cosmic-eagle.vercel.app` | Usa la URL de Vercel |
 | `SUPABASE_SERVICE_ROLE_KEY` | `eyJ...` | El cron de correos programados no corre (devuelve `ok: false`) |
 | `CRON_SECRET` | cualquier cadena larga | El cron de correos devuelve **401 y no manda nada** |
@@ -246,7 +246,7 @@ deploy vive donde está el que mantiene.
    vars de Vercel. Lo que **nunca** se hace es crear un proyecto nuevo y migrar a
    mano: ahí se pierden los datos y el historial de migraciones.
 
-**Falta confirmar que `contacto@cosmiceaglejourney.com` existe**: es el
+**Falta confirmar que `booking@cosmiceaglejourney.com` existe**: es el
 `reply_to` por defecto de todos los correos (`src/lib/email/resend.ts`). Si esa
 casilla no existe, cada respuesta a un correo automático se pierde y nadie se
 entera — Resend no tiene bandeja de entrada.

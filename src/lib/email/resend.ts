@@ -37,7 +37,7 @@ const FROM = process.env.RESEND_FROM ?? "Cosmic Eagle <onboarding@resend.dev>";
  * Resend no tiene bandeja de entrada: sin `reply_to`, una respuesta se pierde en
  * el vacio. Apunta a la casilla real de Workspace.
  */
-const REPLY_TO = process.env.RESEND_REPLY_TO ?? "contacto@cosmiceaglejourney.com";
+const REPLY_TO = process.env.RESEND_REPLY_TO ?? "booking@cosmiceaglejourney.com";
 
 export type SendResult =
   | { ok: true; id: string }

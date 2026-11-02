@@ -248,7 +248,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
       // /admin/legales. Salieron con un texto preliminar nuestro, no con el
       // anexo de Sofia, que se perdio con `web-cosmic-journey-ES.md`.
       { key: "privacidad", href: "/privacidad" },
-      { key: "contacto", href: "mailto:contacto@cosmiceaglejourney.com" },
+      { key: "contacto", href: "mailto:booking@cosmiceaglejourney.com" },
     ],
   },
 ];
