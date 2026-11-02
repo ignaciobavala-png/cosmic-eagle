@@ -18,30 +18,6 @@ import { articleCover, parseArticleBody } from "@/lib/article";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 /**
- * Los "otros contenidos" que van debajo del recuadro de lectura (pedido de la
- * organización, 23/09 §6). Se prioriza el mismo tema y, si no alcanza, se
- * completa con lo demás publicado. Son las fichas de `articles_public`: no
- * hace falta el cuerpo.
- */
-async function getOthers(slug: string, category: string, locale: string) {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("articles_public")
-    .select("slug, title, title_en, category")
-    .neq("slug", slug)
-    .order("sort_order", { ascending: true })
-    .order("published_at", { ascending: false, nullsFirst: false });
-
-  const rows = (data ?? [])
-    .filter((row) => row.slug && row.title)
-    .map((row) => localizeRow(row, locale, ["title"]));
-  const same = rows.filter((row) => row.category === category);
-  const rest = rows.filter((row) => row.category !== category);
-
-  return [...same, ...rest].slice(0, 6);
-}
-
-/**
  * La portada del articulo, que es publica para todos: titulo, bajada, categoria
  * e imagen. Sale de la vista `articles_public`, que no expone el cuerpo.
  *
@@ -131,7 +107,6 @@ export default async function ContenidoPage({
   const isHtml = article?.body_format === "html";
   const blocks = article && !isHtml ? parseArticleBody(article.body) : [];
   const cover = articleCover(teaser.category!);
-  const others = await getOthers(slug, teaser.category!, rawLocale);
 
   return (
     <>
@@ -237,33 +212,6 @@ export default async function ContenidoPage({
                 </>
               )}
             </div>
-
-            {others.length > 0 && (
-              <section className="mt-14">
-                <h2 className="text-label-sm uppercase text-[#05125a]/70">
-                  {t("library.others")}
-                </h2>
-                <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {others.map((other) => (
-                    <li key={other.slug}>
-                      <Link
-                        href={`/contenidos/${other.slug}`}
-                        className="flex h-full items-center justify-between gap-4 rounded-xl border border-[#f9d78f] bg-[#fff6eb] px-4 py-3 transition-colors hover:border-on-primary-container/50"
-                      >
-                        <span className="min-w-0">
-                          <span className="block text-[11px] uppercase tracking-[0.12em] text-on-primary-container">
-                            {tCat(other.category!)}
-                          </span>
-                          <span className="mt-0.5 block truncate font-display text-body-lg text-[#05125a]">
-                            {other.title}
-                          </span>
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
           </article>
         </CreamSection>
       </main>

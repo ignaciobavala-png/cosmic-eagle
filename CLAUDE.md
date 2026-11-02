@@ -454,9 +454,8 @@ veces en el mismo archivo y el cambio se cuela donde no va.
 
 **Decisiones abiertas que esperan a las clientas:**
 
-- **Si una Sesión es siempre de un día** (abierta desde el 06/08) y **la
-  repetición de fechas** que había pedido Julia: las dos piden tabla hija de
-  fechas, cupo por fecha y revisar el correo [7].
+(Cerrada el 02/11: **cada Sesión es única, irrepetible y dura siempre un día**, lo dijo la organización. No hay tabla hija de fechas, ni cupo por fecha, ni repetición: cada fecha es su propio `trip`, como ya está cargado.)
+
 - Si el cuerpo del sitio pasa a la serif que pide el manual de marca. Era un
   desacuerdo entre el manual y Julia, que cerró Montserrat explícitamente;
   **con ella afuera lo destraba Sofía sola**. Sigue faltando el PDF del manual

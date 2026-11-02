@@ -46,7 +46,7 @@ export function ArticleBody({
   tone?: keyof typeof TONO;
   /**
    * Lectura "flotante" (15/10, pedido de la organización): sin recuadro, el
-   * texto directo sobre la crema. Filete con estrella al arranque y estrella al
+   * texto directo sobre la crema. Filete con estrella al arranque y el mismo filete al
    * cierre, apertura en serif con capitular dorada y citas centradas. Sólo para
    * `tone="light"`; las legales siguen con la plantilla de siempre.
    */
@@ -165,9 +165,11 @@ export function ArticleBody({
       {body}
       <div
         aria-hidden="true"
-        className="mt-12 flex justify-center text-[#b3964b] sm:mt-14"
+        className="mt-12 flex items-center gap-4 text-[#b3964b] sm:mt-14"
       >
-        ✦
+        <span className={filete} />
+        <span className="text-sm">✦</span>
+        <span className={filete + " rotate-180"} />
       </div>
     </div>
   );
