@@ -8,7 +8,12 @@ import { StickyStory } from "@/components/ui/StickyStory";
 import { ClosingHero } from "@/components/ui/ClosingHero";
 import { Reveal, RevealItem } from "@/components/ui/Reveal";
 import { TitleRule } from "@/components/ui/TitleRule";
-import { getSiteContent, isEnabled } from "@/lib/site-content";
+import {
+  EN_SUFFIX,
+  getSiteContent,
+  getSiteOverrides,
+  isEnabled,
+} from "@/lib/site-content";
 import { IMAGES } from "@/lib/constants";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
@@ -72,6 +77,15 @@ export default async function NosotrosPage({
   const t = await getTranslations("Nosotros");
   const content = await getSiteContent(locale);
   const cierreTitle = content("nosotros.cierre.title").trim();
+
+  // "Estela, founder" es editable desde /admin/multimedia. Sin override sale el
+  // texto de messages/<idioma>.json: `content()` no sirve acá porque en inglés
+  // caería al castellano del fallback en vez de al inglés de messages.
+  const overrides = await getSiteOverrides();
+  const estela = (k: "title" | "p1" | "p2" | "p3" | "p4") => {
+    const key = `nosotros.estela.${k}` + (locale === "en" ? EN_SUFFIX : "");
+    return overrides[key]?.trim() ? overrides[key] : t(`estela.${k}`);
+  };
 
   return (
     <>
@@ -402,23 +416,23 @@ export default async function NosotrosPage({
                     tratamiento, título en `primary-container` y cuerpo en el
                     tostado `#d0c5b4`. */}
                 <h2 className="font-display text-h2 font-bold text-primary-container">
-                  {t("estela.title")}
+                  {estela("title")}
                 </h2>
               </RevealItem>
               <TitleRule align="center" grow className="mt-3 mb-6" />
             </div>
             <div className="space-y-6 text-body-md leading-relaxed text-left">
               <RevealItem y={14} duration={0.8} delay={0.15}>
-                <p>{t("estela.p1")}</p>
+                <p className="whitespace-pre-line">{estela("p1")}</p>
               </RevealItem>
               <RevealItem y={14} duration={0.8} delay={0.3}>
-                <p>{t("estela.p2")}</p>
+                <p className="whitespace-pre-line">{estela("p2")}</p>
               </RevealItem>
               <RevealItem y={14} duration={0.8} delay={0.45}>
-                <p>{t("estela.p3")}</p>
+                <p className="whitespace-pre-line">{estela("p3")}</p>
               </RevealItem>
               <RevealItem y={14} duration={0.8} delay={0.6}>
-                <p>{t("estela.p4")}</p>
+                <p className="whitespace-pre-line">{estela("p4")}</p>
               </RevealItem>
             </div>
             {/* Frase final sacada a pedido de la organización (23/09, item 9

@@ -267,6 +267,48 @@ export const SITE_GROUPS = [
         // "Humano Luminoso" — en inglés se mantiene "Luminous Human".
         fallback: "Un viaje hacia el\nHumano de Luz",
       },
+      // "Estela, founder": antes vivía fijo en messages/*.json y la clienta no
+      // podía editarlo (Sofía, 02/11). El fallback es el texto literal de es.json;
+      // la página usa el override y, si no hay, el de messages (es o en).
+      {
+        key: "nosotros.estela.title",
+        label: "Estela, founder · título",
+        help: "El título de la pantalla azul de Estela, casi al final de Nosotros.",
+        type: "text",
+        fallback: "Estela, founder",
+      },
+      {
+        key: "nosotros.estela.p1",
+        label: "Estela, founder · párrafo 1",
+        help: "Primer párrafo de la pantalla de Estela.",
+        type: "multiline",
+        fallback:
+          "Estela lleva más de 25 años explorando la conciencia, la mente, el alma y el potencial humano. Su camino ha sido principalmente experiencial: una búsqueda constante por comprender quiénes somos, cómo funcionamos y hasta dónde podemos evolucionar.",
+      },
+      {
+        key: "nosotros.estela.p2",
+        label: "Estela, founder · párrafo 2",
+        help: "Segundo párrafo de la pantalla de Estela.",
+        type: "multiline",
+        fallback:
+          "A lo largo de estos años ha estudiado y experimentado con distintas corrientes y herramientas, desde la psicología, la metafísica y las filosofías espirituales hasta el yoga, la meditación, la energía Kundalini, la nutrición consciente, las prácticas energéticas, el chamanismo, las plantas de poder y los estados expandidos de conciencia.",
+      },
+      {
+        key: "nosotros.estela.p3",
+        label: "Estela, founder · párrafo 3",
+        help: "Tercer párrafo de la pantalla de Estela.",
+        type: "multiline",
+        fallback:
+          "Con el tiempo, todo este recorrido fue convergiendo en una práctica propia para acompañar procesos de transformación y evolución. Su enfoque integra conocimiento ancestral, herramientas contemporáneas, prácticas energéticas y lo que ella llama conocimiento cósmico: información y tecnologías que ha ido recibiendo y explorando a través de estados expandidos de conciencia y de su conexión con otras dimensiones e inteligencias superiores.",
+      },
+      {
+        key: "nosotros.estela.p4",
+        label: "Estela, founder · párrafo 4",
+        help: "Cuarto y último párrafo de la pantalla de Estela.",
+        type: "multiline",
+        fallback:
+          "Hoy acompaña a personas de distintas partes del mundo en procesos de liberación de patrones y memorias, reconexión con el alma, expansión de conciencia, despertar espiritual y desarrollo de capacidades intuitivas y energéticas. También enseña y acompaña a hombres y mujeres medicina, terapeutas y guías a profundizar en sus propias herramientas, expandir sus capacidades y llevar su práctica a un nuevo nivel.",
+      },
     ],
   },
   {
