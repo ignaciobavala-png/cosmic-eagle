@@ -3410,3 +3410,47 @@ destello = testimonio). Se sacó el campo "Portada" del formulario de contenidos
 `articles.cover_url` queda en la tabla, sin uso (3 artículos tenían una propia).
 Los HTML subidos ya no se abren "en línea" en la biblioteca: la tarjeta navega
 a la página del contenido, donde viven en su iframe.
+
+
+## 2026-11-04 — El asistente de IA sabe cómo funciona la página, lee los contenidos y administra el acceso
+
+Pedido de Ignacio: que la organización deje de preguntarle cómo funciona la
+plataforma y lo resuelva el asistente del panel. Detalle técnico en `docs/IA.md`
+("Guía de la organización…" y "Control de acceso…").
+
+- **Guía** (`docs/GUIA_ORG.md`, 15 temas, en el lenguaje de la organización, con
+  **[PENDIENTE]** donde nadie decidió y **[CONFIRMAR]** donde no está verificado) +
+  `consultar_guia(tema)` y `guia_sin_respuesta` (deja en `ai_agent_log` lo que no
+  supo contestar). El archivo viaja al bundle de Vercel por
+  `outputFileTracingIncludes` en `next.config.ts`. **Es el doc que hay que
+  actualizar el mismo día que cambie una regla de la plataforma.** `docs/ROLES.md`
+  está viejo y no se usó como fuente.
+- **Contenidos:** `buscar_en_contenidos` / `leer_articulo`. Los 31 artículos suman
+  ~225.000 caracteres: en el prompt costarían ~60.000 tokens por mensaje, así que se
+  busca por comienzo de palabra y se lee completo bajo demanda.
+- **Cronología:** `momento()` trae los días ya calculados (el modelo restaba
+  fechas); el prompt separa lo sucedido de lo próximo. Auditado con
+  `e2e/ia.cronologia.panel.spec.ts`. **Trampa del CRM:** "viajero" = tiene una
+  reserva *aprobada*, aunque el evento no haya pasado.
+- **Acceso:** `ver_acceso`, `cambiar_acceso_contenidos`, `habilitar_acceso` /
+  `quitar_acceso`, `cambiar_acceso_por_evento`, `crear_codigo_acceso`,
+  `cambiar_estado_codigo`. Tarjeta de aprobación calculada en el servidor, ⚠ en lo
+  que abre contenido, sin tocar roles ni borrar. Verificado con dos e2e que
+  escriben en la base real y limpian lo suyo.
+- **Bug corregido: el historial del asistente nunca se guardaba.** `route.ts` hacía
+  `upsert` sobre `ai_conversations`; el `ON CONFLICT DO UPDATE` de PostgREST pisa
+  también `id` y `user_id`, y la migración solo da UPDATE sobre `(title, page,
+  messages, updated_at)` → `permission denied` en cada turno. Ahora update y, si no
+  existe, insert. **Regla general:** con grants por columna, un `upsert` falla
+  aunque la fila ya exista.
+- **Burbuja vs. sección Asistente:** mismo componente, mismo endpoint, mismos
+  permisos (verificado en vivo). Solo cambian el contexto de pantalla y las
+  sugerencias.
+- **Datos del panel que el asistente dejó a la vista:** el retiro de noviembre se
+  llama "13-20" pero está cargado del 13 al 18; hay dos "Sesión en Santiago"
+  idénticas (3 y 4/10); los 3 eventos de octubre no tienen reservas (el historial
+  previo a la plataforma no está en el sistema); **no hay ningún contenido
+  publicado del nivel «programa»**.
+- **Pendiente / ideas:** acciones en lote con aprobación (avisos a viajeros), plazos
+  de los correos programados en la base, secuencias de correos (proyecto grande), la
+  guía revisada por Sofía en los **[PENDIENTE]** de pagos.
