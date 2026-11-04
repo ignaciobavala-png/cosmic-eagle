@@ -170,7 +170,7 @@ export function buildExtraReadTools(ctx: Ctx) {
 
     listar_codigos_acceso: tool({
       description:
-        "Lista los códigos de acceso a contenidos: para qué sirven (etiqueta), nivel, evento, si están activos, vencimiento y cuántas veces se usaron de cuántas posibles. NO devuelve el código en sí.",
+        "Lista los códigos de acceso a contenidos: para qué sirven (etiqueta), nivel, evento, si están activos, vencimiento y cuántas veces se usaron de cuántas posibles. Devuelve el `id` (para cambiar_estado_codigo). NO devuelve el código en sí.",
       inputSchema: z.object({ solo_activos: z.boolean().optional() }),
       execute: (args) =>
         leer(ctx, "listar_codigos_acceso", args, async () => {
@@ -192,6 +192,7 @@ export function buildExtraReadTools(ctx: Ctx) {
 
           return {
             rows: data.map((c) => ({
+              id: c.id,
               etiqueta: c.label,
               nivel: contentAccessLabel(c.level),
               evento: c.trip?.title ?? null,

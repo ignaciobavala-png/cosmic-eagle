@@ -46,7 +46,7 @@ function hoyAR() {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }).format(new Date());
 }
 
-async function anotar(ctx: Ctx, toolName: string, args: Record<string, unknown>, rows: number, error: string | null) {
+export async function anotar(ctx: Ctx, toolName: string, args: Record<string, unknown>, rows: number, error: string | null) {
   const { error: logError } = await ctx.supabase.from("ai_agent_log").insert({
     user_id: ctx.userId,
     conversation_id: ctx.conversationId,
@@ -59,7 +59,7 @@ async function anotar(ctx: Ctx, toolName: string, args: Record<string, unknown>,
   if (logError) console.error("[ia] no se pudo escribir ai_agent_log:", logError.message);
 }
 
-async function topeAlcanzado(ctx: Ctx): Promise<string | null> {
+export async function topeAlcanzado(ctx: Ctx): Promise<string | null> {
   const { count } = await ctx.supabase
     .from("ai_agent_log")
     .select("id", { count: "exact", head: true })
@@ -100,12 +100,12 @@ function lineasDeCambios(
   return lineas;
 }
 
-type Previa = { type: "user-approval"; reason: string } | { type: "denied"; reason: string };
+export type Previa = { type: "user-approval"; reason: string } | { type: "denied"; reason: string };
 
-const noEncontrado = (que: string): Previa => ({ type: "denied", reason: `No encontré ${que}.` });
+export const noEncontrado = (que: string): Previa => ({ type: "denied", reason: `No encontré ${que}.` });
 const sinCambios: Previa = { type: "denied", reason: "No hay nada para cambiar: los valores ya son esos." };
 
-function aprobar(encabezado: string | null, titulo: string, lineas: string[]): Previa {
+export function aprobar(encabezado: string | null, titulo: string, lineas: string[]): Previa {
   if (!lineas.length) return sinCambios;
   return {
     type: "user-approval",

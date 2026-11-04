@@ -249,6 +249,35 @@ delete en el asistente).
   updated_at)`. Daba `permission denied` siempre y **el historial nunca se
   guardaba**. Ahora es update y, si no existe, insert.
 
+## Control de acceso desde el asistente (04/11)
+
+`src/lib/ia/access-tools.ts`. Las tres palancas de `/admin/acceso` y
+`/admin/contenidos`, con las mismas reglas del panel y **siempre con tarjeta de
+aprobación calculada en el servidor** (lee la base y lista nombres y títulos
+reales; lo que ABRE contenido a más gente se marca con ⚠):
+
+| Herramienta | Qué hace |
+|---|---|
+| `ver_acceso` (lectura) | contenidos por nivel (publicados / borradores), habilitaciones vigentes con su origen (solicitud, código, manual); con `nombre`: nivel efectivo de esa persona y qué NO puede leer. Devuelve `persona_id` |
+| `cambiar_acceso_contenidos` | nivel de uno o varios contenidos (por categoría o por ids, máx. 40). No cambia el estado publicado/borrador |
+| `habilitar_acceso` / `quitar_acceso` | una persona, nivel programa. Quitar = `revoked_at`, nunca delete |
+| `cambiar_acceso_por_evento` | habilita o quita a todas las reservas **aprobadas** de un evento (máx. 100). Reactiva la fila revocada de esa solicitud en vez de duplicarla; quitar solo revoca las que nacieron de ese evento |
+| `crear_codigo_acceso` / `cambiar_estado_codigo` | códigos de canje; el texto lo da la persona |
+
+Reglas: corre con la sesión del admin (RLS del panel); **nunca toca
+`profiles.is_admin`**; los valores de los códigos no salen en lecturas ni en
+`ai_agent_log`; cada cambio cuenta para el tope de 60 escrituras por día.
+`listar_codigos_acceso` ahora devuelve el `id` (sin el código).
+
+Verificado en vivo (`e2e/ia.acceso.panel.spec.ts` y `ia.acceso-evento.panel.spec.ts`,
+escriben en la base real con datos "Zz …" y los borran): habilitar, quitar,
+cambiar nivel, rechazar un cambio masivo sin tocar nada, crear y apagar un código,
+y habilitar/quitar por evento con reactivación.
+
+**Dato del 04/11:** hoy **no hay ningún contenido publicado del nivel
+«programa»** (30 abiertos, 1 «con cuenta»): habilitar a alguien no le muestra nada
+nuevo hasta que se publique alguno. La tarjeta lo dice.
+
 ## Auditoría
 
 `ai_agent_log` (migración `20261028160000`): una fila por llamada a herramienta

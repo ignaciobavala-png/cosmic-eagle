@@ -335,6 +335,13 @@ lista real es la de `listar_articulos`.
   sitio, testimonios y avisos; explicar cómo se usa el panel; crear y editar
   viajes, artículos, testimonios, FAQs y textos (siempre con una **tarjeta de
   aprobación** que muestra el antes y el después).
+- **También administra el acceso a la biblioteca** (siempre con tarjeta de
+  aprobación, que muestra los nombres y títulos reales afectados): ver qué ve cada
+  categoría de usuario y a quién se habilitó; cambiar el nivel de uno o varios
+  contenidos (abierto, con cuenta, del programa); habilitar o quitar el acceso al
+  programa a una persona o a todas las aprobadas de un evento; crear códigos de
+  acceso y apagarlos. Lo que **abre** contenido a más gente se marca con ⚠. No
+  puede dar permisos de administración ni borrar habilitaciones (solo revocarlas).
 - **No puede**: borrar nada; ver **mails ni teléfonos** de las personas; ver
   **datos de salud**, consentimientos ni comprobantes; editar imágenes, audio,
   slugs ni los textos legales; leer la casilla de correo de la organización.

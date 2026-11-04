@@ -38,6 +38,13 @@ export const HERRAMIENTAS: Record<string, string> = {
   editar_testimonio: "el cambio del testimonio",
   editar_faq: "el cambio de la pregunta",
   cambiar_texto_sitio: "el cambio del texto del sitio",
+  ver_acceso: "quién ve qué",
+  cambiar_acceso_contenidos: "el cambio de acceso a contenidos",
+  habilitar_acceso: "la habilitación de acceso",
+  quitar_acceso: "el retiro de acceso",
+  cambiar_acceso_por_evento: "el cambio de acceso por evento",
+  crear_codigo_acceso: "la creación del código",
+  cambiar_estado_codigo: "el cambio de estado del código",
 };
 
 const CAMPOS: Record<string, string> = {
@@ -241,6 +248,17 @@ function tarjetaEdicion(titulo: string) {
   };
 }
 
+/** Acceso: la tarjeta (calculada en el servidor) dice a quien afecta; el resultado, lo que paso. */
+function tarjetaAcceso(titulo: string) {
+  return {
+    titulo,
+    aprobar: "Aprobar y aplicar",
+    campos: () => [] as Campo[],
+    rechazado: "Rechazaste este cambio: el acceso no se modificó.",
+    ok: (o: ToolPart["output"]) => `✓ ${o?.nota ? String(o.nota) : "Listo."}`,
+  };
+}
+
 /**
  * Cada herramienta de escritura muestra lo que va a hacer COMPLETO, y no hace
  * nada hasta que la persona aprueba.
@@ -294,6 +312,12 @@ const TARJETAS: Record<
   editar_testimonio: tarjetaEdicion("Cambiar testimonio"),
   editar_faq: tarjetaEdicion("Cambiar pregunta frecuente"),
   cambiar_texto_sitio: tarjetaEdicion("Cambiar texto del sitio"),
+  cambiar_acceso_contenidos: tarjetaAcceso("Cambiar quién puede leer los contenidos"),
+  habilitar_acceso: tarjetaAcceso("Habilitar acceso al programa"),
+  quitar_acceso: tarjetaAcceso("Quitar acceso al programa"),
+  cambiar_acceso_por_evento: tarjetaAcceso("Cambiar acceso de un evento"),
+  crear_codigo_acceso: tarjetaAcceso("Crear código de acceso"),
+  cambiar_estado_codigo: tarjetaAcceso("Cambiar estado de un código"),
   crear_testimonio: {
     titulo: "Nuevo testimonio",
     aprobar: "Aprobar y cargar",
