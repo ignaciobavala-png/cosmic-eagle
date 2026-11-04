@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft, Lock } from "lucide-react";
+import { GuestNotice } from "./GuestNotice";
 import { ArticleBody } from "./ArticleBody";
 import { ArticleAudio } from "./ArticleAudio";
 import { CtaLink } from "./CtaLink";
@@ -265,6 +266,9 @@ export function ContentLibrary({
                     aria-hidden="true"
                     className="mx-auto text-on-primary-container"
                   />
+                  <div className="mt-5">
+                    <GuestNotice next={`/contenidos/${openArticle.slug}`} />
+                  </div>
                   <p className="mx-auto mt-4 max-w-md text-body-md text-[#05125a]">
                     {t("library.locked")}
                   </p>

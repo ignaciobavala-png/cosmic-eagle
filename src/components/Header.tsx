@@ -5,6 +5,7 @@ import { useUIStore } from "@/lib/store";
 import { IMAGES, NAV_LINKS, SHOW_LOCALE_SWITCH } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
 import { useSignedIn } from "@/lib/use-signed-in";
+import { useGateModal } from "@/lib/use-gate-modal";
 import { AnimatePresence, motion } from "framer-motion";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { LocaleSwitch } from "@/components/LocaleSwitch";
@@ -16,6 +17,7 @@ import {
   BookOpen,
   User,
   ChevronDown,
+  Lock,
 } from "lucide-react";
 import Image from "next/image";
 // El `Link` del panel no se localiza (`/en/admin` no existe), asi que va el de
@@ -45,6 +47,10 @@ export function Header() {
   const pathname = usePathname();
   const [profile, setProfile] = useState<AccountProfile>(null);
   const signedIn = useSignedIn();
+  // Los accesos cerrados para invitados se pueden apretar: abren el aviso de
+  // sesión en vez de quedar apagados sin explicación.
+  const tg = useTranslations("GateModal");
+  const { openGate, gateModal } = useGateModal();
 
   useEffect(() => {
     const supabase = createClient();
@@ -236,12 +242,16 @@ export function Header() {
                       del mismo degrade) en vez de con otro color: asi el
                       estado activo no se sale de lo que pidio. */}
                   {parentLocked ? (
-                    <span
-                      aria-disabled="true"
-                      className="flex cursor-default items-center gap-1.5 whitespace-nowrap px-3 xl:px-[1.75rem] py-2 font-display text-[13px] uppercase tracking-[0.115em]"
+                    <button
+                      type="button"
+                      aria-haspopup="dialog"
+                      title={tg("hint")}
+                      onClick={() => openGate(link.href)}
+                      className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap px-3 xl:px-[1.75rem] py-2 font-display text-[13px] uppercase tracking-[0.115em]"
                     >
                       {labelContent}
-                    </span>
+                      <Lock size={12} aria-hidden="true" className="shrink-0 opacity-70" />
+                    </button>
                   ) : (
                     <Link
                       href={link.href}
@@ -367,12 +377,16 @@ export function Header() {
                                 fondo (eso era, otra vez, una cajita): cambia el
                                 dorado por la crema. */}
                             {locked ? (
-                              <span
-                                aria-disabled="true"
-                                className="nav-dropdown-item block cursor-default px-1 py-[13px] text-center font-display text-base font-bold tracking-[0.03em] text-primary-container/60"
+                              <button
+                                type="button"
+                                aria-haspopup="dialog"
+                                title={tg("hint")}
+                                onClick={() => openGate(child.href)}
+                                className="nav-dropdown-item flex w-full cursor-pointer items-center justify-center gap-2 px-1 py-[13px] text-center font-display text-base font-bold tracking-[0.03em] text-primary-container/60 transition-colors hover:text-primary-container"
                               >
                                 {t(child.labelKey)}
-                              </span>
+                                <Lock size={12} aria-hidden="true" className="shrink-0" />
+                              </button>
                             ) : (
                               <Link
                                 href={child.href}
@@ -550,12 +564,19 @@ export function Header() {
                   return (
                     <li key={link.href}>
                       {parentLocked ? (
-                        <span
-                          aria-disabled="true"
-                          className="mx-2 flex cursor-default items-center gap-4 px-4 py-3"
+                        <button
+                          type="button"
+                          aria-haspopup="dialog"
+                          title={tg("hint")}
+                          onClick={() => {
+                            setDrawerOpen(false);
+                            openGate(link.href);
+                          }}
+                          className="mx-2 flex w-[calc(100%-1rem)] cursor-pointer items-center gap-4 px-4 py-3 text-left"
                         >
                           {rowContent}
-                        </span>
+                          <Lock size={14} aria-hidden="true" className="ml-auto shrink-0 opacity-70" />
+                        </button>
                       ) : (
                         <Link
                           href={link.href}
@@ -582,12 +603,19 @@ export function Header() {
                             return (
                               <li key={child.href}>
                                 {locked ? (
-                                  <span
-                                    aria-disabled="true"
-                                    className="block cursor-default px-3 py-2 font-display text-sm tracking-[0.05em] text-primary-container/60 uppercase"
+                                  <button
+                                    type="button"
+                                    aria-haspopup="dialog"
+                                    title={tg("hint")}
+                                    onClick={() => {
+                                      setDrawerOpen(false);
+                                      openGate(child.href);
+                                    }}
+                                    className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left font-display text-sm tracking-[0.05em] text-primary-container/60 uppercase"
                                   >
                                     {t(child.labelKey)}
-                                  </span>
+                                    <Lock size={12} aria-hidden="true" className="shrink-0" />
+                                  </button>
                                 ) : (
                                   <Link
                                     href={child.href}
@@ -635,6 +663,7 @@ export function Header() {
           </>
         )}
       </AnimatePresence>
+      {gateModal}
     </>
   );
 }

@@ -131,11 +131,17 @@ export function GateModal({
               {t("title")}
             </h2>
 
-            {/* El parrafo "Para explorar los detalles de esta experiencia
-                cosmica..." salio a pedido de Julia (08/09): el titulo y los dos
-                botones ya dicen todo lo que hay que hacer. Por eso los botones
-                suben su margen, que antes lo daba el parrafo. */}
-            <div className="mt-9 flex flex-col gap-4">
+            {/* Julia sacó el párrafo explicativo el 08/09 ("el título y los dos
+                botones ya dicen todo"). Vuelve el 04/11, más corto, a pedido de
+                la organización: quien toca una sección cerrada sin cuenta
+                tiene que leer *por qué* no abre, o lo toma por un error de la
+                página. Julia ya no está en el proyecto: lo decide la
+                organización. */}
+            <p className="mx-auto mt-4 max-w-[22rem] text-[15px] leading-relaxed text-primary/85">
+              {t("message")}
+            </p>
+
+            <div className="mt-8 flex flex-col gap-4">
               <Link
                 href={`/cuenta?${query.slice(1)}`}
                 className={GATE_BTN}

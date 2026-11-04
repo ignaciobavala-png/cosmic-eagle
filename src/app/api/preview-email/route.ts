@@ -92,6 +92,19 @@ export const PREVIEWS: Record<string, { titulo: string; el: () => React.ReactEle
         necesitaSalud: true,
       }),
   },
+  completo: {
+    titulo: "[3C] Saldo completado",
+    el: () =>
+      PagoRegistrado({
+        ...base,
+        sinCargo: false,
+        esSena: false,
+        saldoCompletado: true,
+        montoPagado: 175,
+        saldo: 0,
+        necesitaSalud: false,
+      }),
+  },
   saldo: {
     titulo: "[3B] Recordatorio de saldo",
     el: () =>

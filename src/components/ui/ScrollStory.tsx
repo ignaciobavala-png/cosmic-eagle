@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useTransform, useReducedMotion, type MotionValue } from "framer-motion";
 import { useSectionProgress } from "@/lib/use-section-progress";
 import { useSignedIn } from "@/lib/use-signed-in";
+import { useGateModal } from "@/lib/use-gate-modal";
 import { COLLAPSIBLE_TOGGLE } from "./Collapsible";
 
 type Cta = { label: string; href: string };
@@ -453,8 +454,10 @@ function StoryCta({ label, href }: Cta) {
   // login en vez de a /viajes. Solo aplica a un `href` real (no a los "#"
   // que abren la cartelera in-page, que no son navegacion a Experiencias).
   const signedIn = useSignedIn();
-  const resolvedHref =
-    !href.startsWith("#") && signedIn === false ? "/cuenta" : href;
+  const { openGate, gateModal } = useGateModal();
+  // Sin sesión ya no se manda a /cuenta sin decir nada: se abre el aviso que
+  // explica que hace falta una cuenta (04/11, pedido de la organización).
+  const guestLocked = !href.startsWith("#") && signedIn === false;
   const className =
     `inline-flex items-center justify-center gap-2 rounded-full border-[1.5px] px-10 py-4 font-display text-[14px] uppercase tracking-[0.071em] transition-[color,background-color,border-color,box-shadow,transform] duration-[250ms] hover:scale-[1.04] ${CTA_TONES.gold}`;
   // Sin flecha adentro: la regla de Julia del 08/09 es que ningun boton la
@@ -488,8 +491,20 @@ function StoryCta({ label, href }: Cta) {
     >
       {content}
     </a>
+  ) : guestLocked ? (
+    <>
+      <button
+        type="button"
+        aria-haspopup="dialog"
+        onClick={() => openGate(href)}
+        className={className}
+      >
+        {content}
+      </button>
+      {gateModal}
+    </>
   ) : (
-    <Link href={resolvedHref} className={className}>
+    <Link href={href} className={className}>
       {content}
     </Link>
   );

@@ -6,6 +6,8 @@ import { Link } from "@/i18n/navigation";
 import { FOOTER_COLUMNS, IMAGES } from "@/lib/constants";
 import { NewsletterForm } from "./NewsletterForm";
 import { useSignedIn } from "@/lib/use-signed-in";
+import { useGateModal } from "@/lib/use-gate-modal";
+import { Lock } from "lucide-react";
 
 export function Footer() {
   const t = useTranslations("Footer");
@@ -18,6 +20,9 @@ export function Footer() {
   // igual que en Header — es preferible que alguien logueado no se coma el
   // candado un instante.
   const signedIn = useSignedIn();
+  // Apagado y mudo se leía como un link roto: ahora abre el aviso de sesión.
+  const tg = useTranslations("GateModal");
+  const { openGate, gateModal } = useGateModal();
   // Las keys de los links (ver FOOTER_COLUMNS), no las etiquetas traducidas:
   // el candado sigue funcionando en cualquier idioma.
   const LOCKED_FOR_GUESTS = [
@@ -66,12 +71,16 @@ export function Footer() {
                 return (
                 <li key={link.key}>
                   {locked ? (
-                    <span
-                      aria-disabled="true"
-                      className="cursor-default text-body-md text-on-surface-variant/50"
+                    <button
+                      type="button"
+                      aria-haspopup="dialog"
+                      title={tg("hint")}
+                      onClick={() => openGate(link.href ?? undefined)}
+                      className="inline-flex cursor-pointer items-center gap-1.5 text-left text-body-md text-on-surface-variant/60 transition-colors hover:text-on-surface-variant"
                     >
                       {label}
-                    </span>
+                      <Lock size={11} aria-hidden="true" className="shrink-0" />
+                    </button>
                   ) : link.href ? (
                     <Link
                       href={link.href}
@@ -118,6 +127,7 @@ export function Footer() {
           {t("copyright")}
         </p>
       </div>
+      {gateModal}
     </footer>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
+import { GuestNotice } from "@/components/ui/GuestNotice";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Lock } from "lucide-react";
@@ -175,6 +176,9 @@ export default async function ContenidoPage({
                     aria-hidden="true"
                     className="mx-auto text-on-primary-container"
                   />
+                  <div className="mt-5">
+                    <GuestNotice next={`/contenidos/${slug}`} />
+                  </div>
                   <p className="mt-4 text-body-lg text-[#05125a]">
                     {t("library.wall")}
                   </p>
