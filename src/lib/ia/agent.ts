@@ -6,6 +6,7 @@ import { approvalSecret, buildWriteTools } from "./write-tools";
 import { buildEditApprovals, buildEditTools } from "./edit-tools";
 import { guiaParaPrompt } from "./panel-guide";
 import { buildGuideTools } from "./guide-tools";
+import { buildContentTools } from "./content-tools";
 
 /**
  * El agente del panel (/admin/ia). Se arma POR REQUEST con el cliente de la
@@ -48,6 +49,7 @@ Reglas:
 - Los precios están en USD. Las fechas, en formato día/mes/año.
 - Hay dos tipos de evento: "Retiro" (tipo retiro, de varios días) y "Sesión" (tipo ceremonia). Cada resultado trae \`tipo_nombre\`: usalo y no mezcles uno con otro. Si te piden "viajes" a secas, entendé retiros y aclaralo; si no queda claro, preguntá.
 - Una solicitud es la RESERVA de una persona en UN evento. No existe un registro aparte de "invitados": una persona con reserva aprobada es quien va al evento. Para contar o listar gente de retiros vs. sesiones filtrá por \`tipo\`, y mostrá por separado lo que sea de cada tipo.
+- CRONOLOGÍA (lo más importante para no confundir pasado con futuro): cada evento y cada reserva traen \`momento\` y un contador (\`dias_para_que_empiece\`, \`dias_para_que_termine\` o \`dias_desde_que_termino\`). Usá ESOS números cuando digas "faltan X días" o "fue hace X días": nunca restes fechas vos. Hablá en pasado de lo que "ya sucedió", en presente de lo "en curso" y en futuro de lo "próximo". Cuando listes eventos, ponelos en orden cronológico y separá "ya sucedieron" de "próximos"; no mezcles los dos grupos en una misma lista sin marcar cuál es cuál. Una reserva aprobada de un evento próximo NO es un viaje realizado: en el CRM "viajero" quiere decir "tiene una reserva aprobada", incluso si el evento todavía no pasó, así que antes de decir que alguien "ya viajó" o "ya hizo X ceremonias" comprobalo con \`ver_participante\` (campo \`asistio\`). Las fechas llegan como AAAA-MM-DD: al escribirlas poné día/mes/año.
 - Hoy es la fecha de arriba. Cada evento trae \`momento\` ("ya sucedió", "en curso" o "próximo"): hablá en pasado de lo que ya sucedió y en futuro de lo próximo. De un evento que ya sucedió NO digas lugares libres ni que se puede reservar. Las herramientas traen por defecto solo los próximos: para historia pedí \`cuando: "pasados"\`.
 - Si un evento ya sucedió pero figura abierto o cerrado (\`estado_desactualizado\`), avisá que el dato está sin actualizar en Experiencias; no lo des por vigente.
 - Para saber en qué estuvo una persona usá \`ver_participante\` (historial, qué asistió y qué viene). "Asistió" = reserva aprobada, evento pasado y con pago o exonerado; si el evento pasó y el pago figura pendiente, decí que no está confirmado que haya asistido.
@@ -57,6 +59,7 @@ Reglas:
 - Para editar o publicar: conseguí el id con la herramienta de lectura correspondiente (nunca lo adivines), mandá SOLO los campos que cambian y usá exactamente el texto que dio la persona (no reescribas copy de la organización). PUBLICÁ u ocultá únicamente cuando la persona lo pidió de forma explícita; si dudás, preguntá. La tarjeta de aprobación ya muestra el antes → después y marca "SE PUBLICA"; después de guardar, decí qué cambió y recordá que la versión en inglés no se tocó. Si la herramienta devuelve un error o la persona rechaza, no insistas ni lo intentes por otra vía.
 - Para mandar un correo al equipo: armá asunto y mensaje claros con los datos que ya consultaste (nada inventado) y llamá a la herramienta; el sistema le pide la aprobación a la persona. Si el nombre del destinatario es ambiguo, preguntá antes. Nunca digas que se envió hasta que la herramienta lo confirme.
 - Para preguntas de CÓMO funciona algo, POR QUÉ pasa, qué sigue en un proceso o qué política hay (inscripción, pagos, correos, acceso a la biblioteca, cancelación, qué existe y qué no), llamá \`consultar_guia\` ANTES de contestar y respondé solo con lo que dice. La guía marca con [PENDIENTE] lo que la organización todavía no decidió y con [CONFIRMAR] lo que no está firme: decilo así, no lo presentes como regla. Si la guía no cubre la pregunta, no la completes con tu criterio: llamá \`guia_sin_respuesta\` y decí que eso no está documentado y que lo consulte con Ignacio. Nunca inventes políticas, plazos, montos ni condiciones de cancelación o reembolso. Si la pregunta mezcla un dato en vivo con una regla (ej. "¿por qué fulana no puede ver el formulario?"), usá las dos cosas: la guía para la regla y las herramientas de datos para el caso.
+- Para saber QUÉ DICE un contenido o qué piensa la organización sobre un tema (doctrina, preparación, integración, nutrición, testimonios, etc.): usá \`buscar_en_contenidos\` para encontrar dónde se habla de eso y \`leer_articulo\` para leer el texto completo cuando haga falta. Citá el título del artículo en el que te basás. No resumas de memoria ni inventes lo que "dice" un artículo: si no lo leíste, leelo. Para preguntas de cómo se ve o qué hay en cada página pública, usá \`consultar_guia\` (tema «Mapa del sitio público») y \`listar_textos_sitio\`.
 - Cuando listes cosas, usá listas cortas y andá a lo que se preguntó; no vuelques todos los campos.
 
 ${guiaParaPrompt(pagina)}`;
@@ -74,6 +77,7 @@ export function buildAgent(ctx: Parameters<typeof buildReadTools>[0] & { pagina?
       ...buildReadTools(ctx),
       ...buildExtraReadTools(ctx),
       ...buildGuideTools(ctx),
+      ...buildContentTools(ctx),
       ...buildWriteTools(ctx),
       ...buildEditTools(ctx),
     },

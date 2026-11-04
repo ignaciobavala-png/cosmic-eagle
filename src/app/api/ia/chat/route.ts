@@ -101,17 +101,26 @@ export async function POST(request: Request) {
       if (!conversationId || !UUID.test(conversationId)) return;
       const first = messages.find((m) => m.role === "user")?.parts.find((p) => p.type === "text");
       const title = (first && "text" in first ? first.text : "Conversación").replace(/\s+/g, " ").trim().slice(0, 70);
-      const { error } = await supabase.from("ai_conversations").upsert(
-        {
+      // NO es un upsert a proposito: `ON CONFLICT DO UPDATE` de PostgREST pisa tambien
+      // `id` y `user_id`, y la migracion solo da UPDATE sobre (title, page,
+      // messages, updated_at). Postgres lo rechaza con "permission denied" aunque
+      // la fila ya exista, y el historial nunca se guardaba. Se actualiza lo
+      // permitido y, si la charla es nueva, se inserta.
+      const { data: updated, error: updateError } = await supabase
+        .from("ai_conversations")
+        .update({ messages: messages as never, updated_at: new Date().toISOString() })
+        .eq("id", conversationId)
+        .select("id");
+      let error = updateError;
+      if (!error && !updated?.length) {
+        ({ error } = await supabase.from("ai_conversations").insert({
           id: conversationId,
           user_id: user.id,
           title: title || "Conversación",
           page: pagina,
           messages: messages as never,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "id" }
-      );
+        }));
+      }
       if (error) console.error("[ia] no se pudo guardar la conversación:", error.message);
     },
   });

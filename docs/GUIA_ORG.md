@@ -241,6 +241,63 @@ agua personalizada no existen todavía.
 - Hay versión en **inglés** del sitio público; no están todavía en inglés el
   recorrido de inscripción, los correos ni los legales.
 
+## Mapa del sitio público (qué hay en cada página)
+
+El sitio está en español e inglés. Estas son las páginas que ve cualquier visitante:
+
+- **Inicio (`/`)**: una página narrativa, sin listas de datos. Cuenta la propuesta
+  de Cosmic Eagle y lleva a los viajes y sesiones.
+- **Nosotros (`/nosotros`)**: cuatro palabras → quiénes somos (el relato de Estela
+  y el equipo) → nuestro propósito → una frase → el enfoque → cierre. El menú de
+  la página y su orden van juntos.
+- **Viajes (`/viajes`)**: dos bloques, **Sesiones Cósmicas** (un día) y **Viajes
+  Cósmicos** (una semana), cada uno con su calendario desplegable. La tarjeta de
+  cada evento **no muestra la fecha**: está escrita en el nombre.
+- **Detalle de un evento (`/viajes/[id]`)**: pública. Descripción, programa,
+  condiciones y botón para postularse. **No muestra la dirección exacta** ni el
+  link de pago.
+- **Contenidos (`/contenidos`)**: la biblioteca. Entra por **cinco tarjetas de
+  tema**: salud, tecnología, evolución, preparación y testimonios. Los contenidos
+  cerrados se ven con candado.
+- **Un contenido (`/contenidos/[slug]`)**: el texto completo si el nivel de acceso
+  de la persona alcanza; si no, un muro que explica qué hace falta (cuenta o
+  código). Tiene botón de **Compartir**.
+- **Preguntas frecuentes (`/faqs`)**: las preguntas y respuestas que la
+  organización carga en el panel.
+- **Privacidad (`/privacidad`) y Términos (`/terminos`)**: los textos legales que
+  se cargan en el panel (**[PENDIENTE]** completar los datos entre corchetes).
+- **Mi cuenta (`/cuenta`)**: ingreso y registro; para quien ya tiene sesión, el
+  panel con sus solicitudes, en qué paso está cada una y qué sigue.
+  - **Recuperar contraseña (`/cuenta/recuperar`)**: manda un correo con un link.
+- **Calendario**: ya no existe. La dirección vieja (`/calendario`) lleva a `/viajes`.
+- **Pie de página**: suscripción al boletín (los mails que se anotan se ven en
+  `Suscriptores`).
+
+Casi todos los textos e imágenes de estas páginas se editan sin tocar código desde
+`Multimedia`; las preguntas frecuentes, los testimonios, los contenidos, los
+medios de cobro y los legales, desde su propia sección del panel.
+
+## Qué dicen los contenidos de la biblioteca
+
+La biblioteca tiene **31 contenidos** (a 04/11/2026), casi todos públicos, en cinco
+temas. Para saber **qué dice** uno o qué enseña la organización sobre un asunto,
+el asistente los lee con `buscar_en_contenidos` y `leer_articulo` (no están
+resumidos acá, para que lo que contesta salga del texto real y no de un resumen):
+
+- **Salud**: movimiento, nutrición consciente, alimentos de poder, la psilocibina
+  como herramienta, el poder de la mente, preparar el cuerpo.
+- **Tecnología** (tecnología humana): la mente, el ego, el alma, la conciencia, la
+  frecuencia interior, la frecuencia del amor, todo es energía, el despertar.
+- **Evolución**: el viaje cósmico, el proceso evolutivo, el camino de la
+  evolución, conectar con el alma, el sanador interior, trascender el ego, de la
+  tercera a la quinta dimensión.
+- **Preparación**: bienvenida (nivel miembros), preparación para el viaje cósmico,
+  prácticas, integración después del viaje.
+- **Testimonios**: relatos de participantes.
+
+Los títulos y temas pueden cambiar cuando la organización publica o edita: la
+lista real es la de `listar_articulos`.
+
 ## Quién puede qué
 
 - **Visitante**: ve el sitio público y los contenidos de nivel Público.

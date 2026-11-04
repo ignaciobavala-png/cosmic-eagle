@@ -52,6 +52,12 @@ const TIPO_NOMBRE = { retiro: "Retiro", ceremonia: "Sesión" } as const;
  * marca un evento pasado que sigue 'open' o 'closed' (nadie lo pasó a
  * 'completed'): el dato está mal cargado, no el evento.
  */
+/** Dias entre dos `YYYY-MM-DD` (b - a). El modelo se equivoca restando fechas: se le da hecho. */
+function diasEntre(a: string, b: string) {
+  const t = (d: string) => Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  return Math.round((t(b) - t(a)) / 86_400_000);
+}
+
 function momento(trip: { type: string; status: string; start_date: string; end_date: string }) {
   const hoy = hoyAR();
   const yaPaso = trip.end_date < hoy;
@@ -60,6 +66,12 @@ function momento(trip: { type: string; status: string; start_date: string; end_d
     tipo_nombre: TIPO_NOMBRE[trip.type as keyof typeof TIPO_NOMBRE] ?? trip.type,
     momento: yaPaso ? "ya sucedió" : enCurso ? "en curso" : "próximo",
     ya_paso: yaPaso,
+    // Un solo numero segun el caso: nunca "faltan -3 dias".
+    ...(yaPaso
+      ? { dias_desde_que_termino: diasEntre(trip.end_date, hoy) }
+      : enCurso
+        ? { dias_para_que_termine: diasEntre(hoy, trip.end_date) }
+        : { dias_para_que_empiece: diasEntre(hoy, trip.start_date) }),
     ...(yaPaso && (trip.status === "open" || trip.status === "closed") ? { estado_desactualizado: true } : {}),
   };
 }
@@ -418,7 +430,7 @@ export function buildReadTools(ctx: Ctx) {
 
     consultar_crm: tool({
       description:
-        "Segmenta a las personas registradas como el CRM del panel: estado de la relación (viajero = tiene una reserva aprobada, solicitante = reserva en revisión, potencial = se registró pero nunca viajó), nivel de experiencia (nuevo, principiante, intermedio, avanzado, experto, según ceremonias), país, género y evento. Devuelve el conteo total del segmento y hasta 25 personas. Sirve para '¿cuántos viajeros nuevos hay?', '¿quiénes son de Chile y ya viajaron?'. NO trae mails ni teléfonos. Los umbrales de avanzado (10) y experto (20) son provisorios.",
+        "Segmenta a las personas registradas como el CRM del panel: estado de la relación (viajero = tiene al menos una reserva APROBADA, aunque el evento todavía no haya sucedido (no significa que ya haya viajado: para eso usá ver_participante y su 'asistio'), solicitante = reserva en revisión, potencial = se registró pero nunca viajó), nivel de experiencia (nuevo, principiante, intermedio, avanzado, experto, según ceremonias), país, género y evento. Devuelve el conteo total del segmento y hasta 25 personas. Sirve para '¿cuántos viajeros nuevos hay?', '¿quiénes son de Chile y ya viajaron?'. NO trae mails ni teléfonos. Los umbrales de avanzado (10) y experto (20) son provisorios.",
       inputSchema: z.object({
         estado: z.enum(RELATIONSHIP_STATES.map((s) => s.value) as [string, ...string[]]).optional(),
         nivel: z.enum(EXPERIENCE_LEVELS.map((l) => l.value) as [string, ...string[]]).optional(),

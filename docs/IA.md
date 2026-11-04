@@ -217,6 +217,38 @@ delete en el asistente).
   mostró como "SE PUBLICA" y, rechazado, no publicó. **El camino de publicar con
   aprobación real no se ejecutó** para no tocar el sitio en vivo.
 
+## Guía de la organización, lectura de contenidos y cronología (04/11)
+
+- **`consultar_guia(tema)`** (`src/lib/ia/guide-tools.ts`) sirve por tema
+  `docs/GUIA_ORG.md`: cómo funciona la plataforma, por qué y qué está **[PENDIENTE]**.
+  El archivo viaja al bundle de Vercel por `outputFileTracingIncludes` en
+  `next.config.ts`. **`guia_sin_respuesta(pregunta)`** deja en `ai_agent_log` lo que
+  la guía no cubre (`select created_at, args->>'pregunta' from ai_agent_log where
+  tool = 'guia_sin_respuesta'`): es la lista de lo que falta documentar.
+- **`buscar_en_contenidos(texto)` y `leer_articulo(id, desde)`**
+  (`content-tools.ts`). Los 31 artículos suman ~225.000 caracteres (~60.000 tokens):
+  en el prompt se pagarían en cada mensaje, así que se busca primero y se lee
+  completo (tramos de 6.000 caracteres) lo que hace falta. La búsqueda es por
+  **comienzo de palabra** ("ayuno" no encuentra "desayuno") y también cubre las
+  preguntas frecuentes. Un HTML subido se pasa a texto plano. Sale a DeepSeek texto
+  que la propia organización escribió, incluido el de nivel "programa".
+- **Cronología.** `momento()` ahora suma un contador ya calculado
+  (`dias_para_que_empiece` / `dias_para_que_termine` / `dias_desde_que_termino`):
+  el modelo restaba fechas mal. **Ojo con el CRM**: "viajero" = tiene al menos una
+  reserva *aprobada*, aunque el evento no haya pasado, y `countCeremonies` también
+  cuenta las futuras. El prompt lo aclara y manda comprobar con
+  `ver_participante.asistio` antes de decir que alguien "ya viajó".
+- **Auditoría** (`e2e/ia.cronologia.panel.spec.ts`, llama a DeepSeek): preguntas con
+  trampa sobre pasado/futuro, contenidos y mapa del sitio; deja las respuestas en
+  `test-results/ia-cronologia.md` para leerlas. Resultado del 04/11: separa bien lo
+  sucedido de lo próximo, los días son correctos y no da "lugares libres" de un
+  evento pasado.
+- **Bug del historial, corregido.** `route.ts` hacía `upsert` sobre
+  `ai_conversations`: el `ON CONFLICT DO UPDATE` de PostgREST pisa también `id` y
+  `user_id`, y la migración solo da UPDATE sobre `(title, page, messages,
+  updated_at)`. Daba `permission denied` siempre y **el historial nunca se
+  guardaba**. Ahora es update y, si no existe, insert.
+
 ## Auditoría
 
 `ai_agent_log` (migración `20261028160000`): una fila por llamada a herramienta
