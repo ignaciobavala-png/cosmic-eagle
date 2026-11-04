@@ -1,16 +1,18 @@
 # Guía de la plataforma para la organización
 
-> **BORRADOR (04/11/2026). No usar todavía con el asistente.** Lo armó Claude a
-> partir de `docs/` y del código. Tiene que leerlo **Sofía** (y Estela donde se
-> indica) antes de que el asistente conteste en nombre de la organización.
+> **Qué es esto (04/11/2026).** Cómo funciona hoy la plataforma, para que el
+> asistente del panel pueda contestárselo a la organización sin pasar por
+> Ignacio. Sale del código y de `docs/`; lo que la organización ya decidió o
+> todavía no, va marcado.
 >
-> Cómo está escrito: cada `## ` es un tema que el asistente va a poder pedir por
-> separado. Lo que **no está decidido** va marcado con **[PENDIENTE]**; el
-> asistente tiene que decir "eso todavía no está definido" y no inventar. Lo que
-> es una suposición mía va marcado con **[CONFIRMAR]**.
+> Cómo está escrito: cada `## ` es un tema que el asistente pide por separado.
+> Lo que **no está decidido** va marcado con **[PENDIENTE]**: el asistente dice
+> "eso todavía no está definido" y no inventa. Lo que no está verificado contra
+> el código va marcado con **[CONFIRMAR]**.
 >
 > Para quien mantiene esto: si cambia una regla de la plataforma, se cambia acá
-> el mismo día.
+> el mismo día. Las preguntas que el asistente no pudo contestar quedan en
+> `ai_agent_log` (tool `guia_sin_respuesta`): son lo que falta documentar.
 
 ---
 
