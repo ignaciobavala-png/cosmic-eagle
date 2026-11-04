@@ -5,6 +5,7 @@ import { buildExtraReadTools } from "./tools-extra";
 import { approvalSecret, buildWriteTools } from "./write-tools";
 import { buildEditApprovals, buildEditTools } from "./edit-tools";
 import { guiaParaPrompt } from "./panel-guide";
+import { buildGuideTools } from "./guide-tools";
 
 /**
  * El agente del panel (/admin/ia). Se arma POR REQUEST con el cliente de la
@@ -55,6 +56,7 @@ Reglas:
 - Para crear un viaje o un artículo: primero consultá si ya existe (\`listar_viajes\` / \`listar_articulos\`); si faltan datos (fechas, cupo, precio, país, categoría), preguntalos de a uno o todos juntos, NO los inventes. El texto de un artículo lo pone la persona: usá exactamente lo que te dio, nunca escribas contenido de la organización por tu cuenta. Después de crear, decí que quedó como borrador y dónde completarlo (la herramienta devuelve \`editar_en\`). Nunca digas que algo se creó hasta que la herramienta lo confirme.
 - Para editar o publicar: conseguí el id con la herramienta de lectura correspondiente (nunca lo adivines), mandá SOLO los campos que cambian y usá exactamente el texto que dio la persona (no reescribas copy de la organización). PUBLICÁ u ocultá únicamente cuando la persona lo pidió de forma explícita; si dudás, preguntá. La tarjeta de aprobación ya muestra el antes → después y marca "SE PUBLICA"; después de guardar, decí qué cambió y recordá que la versión en inglés no se tocó. Si la herramienta devuelve un error o la persona rechaza, no insistas ni lo intentes por otra vía.
 - Para mandar un correo al equipo: armá asunto y mensaje claros con los datos que ya consultaste (nada inventado) y llamá a la herramienta; el sistema le pide la aprobación a la persona. Si el nombre del destinatario es ambiguo, preguntá antes. Nunca digas que se envió hasta que la herramienta lo confirme.
+- Para preguntas de CÓMO funciona algo, POR QUÉ pasa, qué sigue en un proceso o qué política hay (inscripción, pagos, correos, acceso a la biblioteca, cancelación, qué existe y qué no), llamá \`consultar_guia\` ANTES de contestar y respondé solo con lo que dice. La guía marca con [PENDIENTE] lo que la organización todavía no decidió y con [CONFIRMAR] lo que no está firme: decilo así, no lo presentes como regla. Si la guía no cubre la pregunta, no la completes con tu criterio: llamá \`guia_sin_respuesta\` y decí que eso no está documentado y que lo consulte con Ignacio. Nunca inventes políticas, plazos, montos ni condiciones de cancelación o reembolso. Si la pregunta mezcla un dato en vivo con una regla (ej. "¿por qué fulana no puede ver el formulario?"), usá las dos cosas: la guía para la regla y las herramientas de datos para el caso.
 - Cuando listes cosas, usá listas cortas y andá a lo que se preguntó; no vuelques todos los campos.
 
 ${guiaParaPrompt(pagina)}`;
@@ -68,7 +70,13 @@ export function buildAgent(ctx: Parameters<typeof buildReadTools>[0] & { pagina?
   return new ToolLoopAgent({
     model: deepSeek(MODEL_ID),
     instructions: instructions(ctx.pagina ?? null),
-    tools: { ...buildReadTools(ctx), ...buildExtraReadTools(ctx), ...buildWriteTools(ctx), ...buildEditTools(ctx) },
+    tools: {
+      ...buildReadTools(ctx),
+      ...buildExtraReadTools(ctx),
+      ...buildGuideTools(ctx),
+      ...buildWriteTools(ctx),
+      ...buildEditTools(ctx),
+    },
     toolApproval: {
       enviar_correo_equipo: "user-approval",
       crear_viaje: "user-approval",

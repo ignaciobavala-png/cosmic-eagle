@@ -4,6 +4,11 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  // La guia del asistente de IA se lee del disco (src/lib/ia/guide-tools.ts):
+  // sin esto el archivo no viaja en el bundle de Vercel.
+  outputFileTracingIncludes: {
+    "/api/ia/chat": ["./docs/GUIA_ORG.md"],
+  },
   // /calendario se saco a pedido de la organizacion (08/10). Estuvo publica
   // desde el 17/09 y alguien puede tenerla guardada: va a /viajes, que tiene
   // las mismas carteleras.
