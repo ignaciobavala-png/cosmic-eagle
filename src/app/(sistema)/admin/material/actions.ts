@@ -7,6 +7,31 @@ import { readHtmlFile } from "@/lib/html-upload";
 
 export type MaterialFormState = { error: string | null; saved?: boolean };
 
+/**
+ * "Nombre del link" (05/11): el token de `/material/<token>` es texto libre,
+ * asi que la organizacion puede ponerle un nombre legible
+ * (`/material/the-cosmic-game`) en vez del UUID. Se normaliza a minusculas,
+ * sin tildes, con guiones. Devuelve `null` si el campo vino vacio.
+ */
+function linkNameOf(formData: FormData): { name: string | null; error?: string } {
+  const raw = formData.get("link_name");
+  if (typeof raw !== "string" || !raw.trim()) return { name: null };
+  const name = raw
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\.html?$/, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+  if (name.length < 3) {
+    return { name: null, error: "El nombre del link necesita al menos 3 letras o números." };
+  }
+  return { name };
+}
+
+const DUPLICATE_LINK = "Ya hay otro documento con ese nombre de link. Elige otro.";
+
 function revalidate() {
   revalidatePath("/admin/material");
 }
@@ -27,13 +52,17 @@ export async function createMaterial(
   if (file.error) return { error: file.error };
   if (!file.html) return { error: "Elige el archivo .html a subir." };
 
+  const link = linkNameOf(formData);
+  if (link.error) return { error: link.error };
+
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("materiales")
-    .insert({ title, html: file.html })
+    .insert({ title, html: file.html, ...(link.name ? { share_token: link.name } : {}) })
     .select("id")
     .single();
 
+  if (error?.code === "23505") return { error: DUPLICATE_LINK };
   if (error || !data) {
     return { error: `No se pudo crear el documento: ${error?.message ?? "sin respuesta"}` };
   }
@@ -55,16 +84,22 @@ export async function updateMaterial(
   const file = await readHtmlFile(formData.get("html"));
   if (file.error) return { error: file.error };
 
+  const link = linkNameOf(formData);
+  if (link.error) return { error: link.error };
+
   const supabase = await createClient();
   const { error } = await supabase
     .from("materiales")
     .update({
       title,
       ...(file.html ? { html: file.html } : {}),
+      // Vacio = no se toca el link que ya tiene (o que no tiene).
+      ...(link.name ? { share_token: link.name } : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
 
+  if (error?.code === "23505") return { error: DUPLICATE_LINK };
   if (error) return { error: `No se pudo guardar: ${error.message}` };
 
   revalidate();

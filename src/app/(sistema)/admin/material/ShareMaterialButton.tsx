@@ -3,6 +3,10 @@
 import { useState, useTransition } from "react";
 import { shareMaterial, unshareMaterial } from "./actions";
 
+// Mientras el dominio propio no este lanzado, el link que se prueba y se manda
+// es el de Vercel.
+const VERCEL_ORIGIN = "https://cosmic-eagle.vercel.app";
+
 /**
  * "Compartir": genera el link de un documento y lo copia. Quien lo recibe lo
  * lee entero y puede guardarlo como PDF, sin cuenta. La pagina es
@@ -73,6 +77,13 @@ export function ShareMaterialButton({
           className="text-secondary hover:underline"
         >
           Copiar link
+        </button>
+        <button
+          type="button"
+          onClick={() => void copy(`${VERCEL_ORIGIN}/material/${token}`)}
+          className="text-secondary hover:underline"
+        >
+          Copiar link vercel.app
         </button>
         <a
           href={`/material/${token}`}

@@ -13,7 +13,7 @@ export function MaterialForm({
   material,
   action,
 }: {
-  material?: Pick<Tables<"materiales">, "title" | "html">;
+  material?: Pick<Tables<"materiales">, "title" | "html" | "share_token">;
   action: (
     prevState: MaterialFormState,
     formData: FormData
@@ -56,6 +56,29 @@ export function MaterialForm({
           Hasta 3MB. Si lleva fotos, que estén dentro del archivo (o en links
           públicos) y comprimidas.
           {material?.html && " Si no eliges uno, se mantiene el actual."}
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="link_name" className={labelClass}>
+          Nombre del link (opcional)
+        </label>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-on-surface-variant">/material/</span>
+          <input
+            id="link_name"
+            name="link_name"
+            type="text"
+            placeholder="the-cosmic-game"
+            defaultValue={material?.share_token ?? ""}
+            className={`${inputClass} flex-1`}
+          />
+        </div>
+        <p className="text-xs text-on-surface-variant">
+          Con un nombre el link queda legible y sin “.html”. Si lo completas, el
+          documento queda compartido. Cualquiera que conozca el nombre puede
+          abrirlo, así que evita nombres obvios para material privado. Si ya
+          mandaste el link y lo cambias, el anterior deja de abrir.
         </p>
       </div>
 
