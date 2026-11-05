@@ -48,8 +48,8 @@ export default async function MaterialPage({
 
   return (
     // Fondo opaco: el `body` del sitio lleva degradé y estrellas fijas.
-    <main className="relative z-10 min-h-screen bg-white">
-      <HtmlFrame html={material.html} title={material.title} />
+    <main className="relative z-10 h-dvh bg-white">
+      <HtmlFrame html={material.html} title={material.title} fill />
     </main>
   );
 }

@@ -21,10 +21,18 @@ export function HtmlFrame({
   html,
   title,
   className = "",
+  fill = false,
 }: {
   html: string;
   title: string;
   className?: string;
+  /**
+   * El iframe ocupa la pantalla y el documento scrollea por dentro, sin
+   * medirlo. Para HTML que usa unidades `vh` (portada `min-height:100vh`):
+   * con el alto atado al contenido, `100vh` pasa a ser el alto del iframe y
+   * el documento crece sin fin (05/11, /material/the-cosmic-game).
+   */
+  fill?: boolean;
 }) {
   const ref = useRef<HTMLIFrameElement>(null);
   const [height, setHeight] = useState<number | null>(null);
@@ -54,8 +62,10 @@ export function HtmlFrame({
       referrerPolicy="no-referrer"
       loading="lazy"
       onLoad={(event) => event.currentTarget.contentWindow?.postMessage("ceAsk", "*")}
-      style={{ height: height ?? undefined }}
-      className={`block w-full border-0 bg-white ${height ? "" : "min-h-[70vh]"} ${className}`}
+      style={fill ? undefined : { height: height ?? undefined }}
+      className={`block w-full border-0 bg-white ${
+        fill ? "h-dvh" : height ? "" : "min-h-[70vh]"
+      } ${className}`}
     />
   );
 }
