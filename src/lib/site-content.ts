@@ -433,7 +433,7 @@ export const SITE_GROUPS = [
         help: "El video que va arriba de los testimonios de texto, dentro del tema Testimonios de la biblioteca. Pesa hasta 8 MB: si es más largo, comprimilo antes de subirlo.",
         type: "image",
         fallback:
-          "https://hwayqsgwoaznfqofsyly.supabase.co/storage/v1/object/public/site-assets/contenidos/viajeras-chilenas.mp4",
+          "https://hwayqsgwoaznfqofsyly.supabase.co/storage/v1/object/public/site-assets/contenidos/viajeras-chilenas-v2.mp4",
         ratio: "16/9",
         maxPx: 1280,
         video: true,
