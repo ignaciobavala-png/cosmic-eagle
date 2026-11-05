@@ -427,6 +427,17 @@ export const SITE_GROUPS = [
       topicSlot("evolucion", "Evolución & Conciencia", IMAGES.portal3),
       topicSlot("tecnologia", "Tecnología Humana", IMAGES.homeCierre),
       topicSlot("testimonios", "Testimonios", IMAGES.nosotrosProposito),
+      {
+        key: "contenidos.testimonios.video",
+        label: "Video «Viajeras chilenas»",
+        help: "El video que va arriba de los testimonios de texto, dentro del tema Testimonios de la biblioteca. Pesa hasta 8 MB: si es más largo, comprimilo antes de subirlo.",
+        type: "image",
+        fallback:
+          "https://hwayqsgwoaznfqofsyly.supabase.co/storage/v1/object/public/site-assets/contenidos/viajeras-chilenas.mp4",
+        ratio: "16/9",
+        maxPx: 1280,
+        video: true,
+      },
     ],
   },
   {

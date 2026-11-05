@@ -343,6 +343,9 @@
     },
     "library": {
       "listen": "Escuchar",
+      "videoTitle": "Viajeras chilenas",
+      "videoShare": "Compartir video",
+      "videoCopied": "Link copiado",
       "ariaNav": "Temas de la biblioteca",
       "fallback": "Biblioteca",
       "empty": "Todavía no hay contenidos publicados en esta categoría.",

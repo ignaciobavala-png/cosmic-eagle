@@ -343,6 +343,9 @@
     },
     "library": {
       "listen": "Listen",
+      "videoTitle": "Chilean travelers",
+      "videoShare": "Share video",
+      "videoCopied": "Link copied",
       "ariaNav": "Library topics",
       "fallback": "Library",
       "empty": "There is no content published in this category yet.",

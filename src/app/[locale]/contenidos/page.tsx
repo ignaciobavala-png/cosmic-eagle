@@ -160,6 +160,7 @@ export default async function ContenidosPage({
             <ContentLibrary
               categories={categories}
               articles={articles}
+              testimonialsVideo={content("contenidos.testimonios.video")}
             />
           </div>
         </CreamSection>

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft, Lock, Share2 } from "lucide-react";
 import { GuestNotice } from "./GuestNotice";
 import { ArticleBody } from "./ArticleBody";
 import { ArticleAudio } from "./ArticleAudio";
@@ -73,9 +73,12 @@ function isPlainClick(event: MouseEvent<HTMLAnchorElement>) {
 export function ContentLibrary({
   categories,
   articles,
+  testimonialsVideo,
 }: {
   categories: LibraryCategory[];
   articles: LibraryArticle[];
+  /** Video «Viajeras chilenas»: va arriba de los testimonios de texto. */
+  testimonialsVideo?: string;
 }) {
   const t = useTranslations("Contenidos");
   const tCat = useTranslations("ArticleCategories");
@@ -198,6 +201,10 @@ export function ContentLibrary({
             <TitleRule tone="blue" align="center" className="mt-3" />
           </div>
 
+          {active === "testimonios" && testimonialsVideo && (
+            <TestimonialsVideo src={testimonialsVideo} />
+          )}
+
           <div className="mt-10">
             {inCategory.length === 0 ? (
               <p className="mx-auto max-w-md text-center text-body-md text-[#05125a]">
@@ -302,6 +309,65 @@ export function ContentLibrary({
         </section>
       )}
     </div>
+  );
+}
+
+/**
+ * El video «Viajeras chilenas», arriba de los testimonios de texto (pedido de
+ * la organización, 05/11). El link que se comparte es el del tema con ancla,
+ * no el .mp4 suelto: quien lo recibe cae en el video con el sitio alrededor.
+ */
+function TestimonialsVideo({ src }: { src: string }) {
+  const t = useTranslations("Contenidos");
+  const [copied, setCopied] = useState(false);
+
+  async function share() {
+    const url = new URL(window.location.href);
+    url.search = "?categoria=testimonios";
+    url.hash = "viajeras-chilenas";
+    const link = url.toString();
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: t("library.videoTitle"), url: link });
+        return;
+      }
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      // Cancelar el panel de compartir no es un error.
+    }
+  }
+
+  return (
+    <section
+      id="viajeras-chilenas"
+      className="mx-auto mt-10 max-w-3xl scroll-mt-[calc(var(--navbar-h)+2rem)]"
+    >
+      <div className="mx-auto w-fit max-w-full text-center">
+        <h3 className="font-display text-headline-md text-[#05125a] text-balance">
+          {t("library.videoTitle")}
+        </h3>
+        <TitleRule tone="blue" align="center" className="mt-3" />
+      </div>
+      <video
+        src={`${src}#t=0.1`}
+        controls
+        playsInline
+        preload="metadata"
+        className="mt-6 aspect-video w-full rounded-2xl border border-[#f9d78f] bg-[#05125a] shadow-[0_18px_50px_-24px_rgba(5,18,90,0.6)]"
+      />
+      <div className="mt-4 flex justify-center">
+        <button
+          type="button"
+          onClick={share}
+          className="inline-flex items-center gap-2 text-label-sm uppercase text-[#05125a] transition-colors hover:text-on-primary-container"
+        >
+          <Share2 size={15} aria-hidden="true" />
+          {copied ? t("library.videoCopied") : t("library.videoShare")}
+        </button>
+      </div>
+    </section>
   );
 }
 
