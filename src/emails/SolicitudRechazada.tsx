@@ -1,3 +1,4 @@
+import { copyFor, rich, fill, type CopyOverrides } from "@/lib/email/templates";
 import { BaseLayout, CtaButton, Paragraph, Title } from "./BaseLayout";
 
 /**
@@ -16,35 +17,26 @@ export function SolicitudRechazada({
   nombre,
   viaje,
   url,
+  copy,
 }: {
   nombre: string;
   viaje: string;
   url: string;
+  copy?: CopyOverrides;
 }) {
+  const k = copyFor("rechazada", copy);
+  const vars = { nombre, viaje };
   return (
-    <BaseLayout preview={`Sobre tu solicitud para ${viaje}`}>
-      <Title>Sobre tu solicitud</Title>
+    <BaseLayout preview={fill(k.preview, vars)}>
+      <Title>{fill(k.title, vars)}</Title>
 
       <Paragraph>Hola {nombre},</Paragraph>
 
-      <Paragraph>
-        Leímos con atención lo que nos compartiste sobre <strong>{viaje}</strong>{" "}
-        y esta vez no vamos a poder acompañarte en esta experiencia.
-      </Paragraph>
+      <Paragraph preLine>{rich(k.p1, vars)}</Paragraph>
+      <Paragraph preLine>{rich(k.p2, vars)}</Paragraph>
+      <Paragraph preLine>{rich(k.p3, vars)}</Paragraph>
 
-      <Paragraph>
-        No es un juicio sobre ti ni sobre tu proceso: cada círculo tiene un
-        momento y una configuración, y parte de nuestro cuidado es reconocer
-        cuándo no es el encuentro indicado. Si quieres conversarlo, puedes
-        responder este mensaje y te escribimos.
-      </Paragraph>
-
-      <Paragraph>
-        Las puertas siguen abiertas para más adelante. Puedes ver las próximas
-        experiencias del calendario y postularte cuando lo sientas.
-      </Paragraph>
-
-      <CtaButton href={url}>Ver las próximas experiencias</CtaButton>
+      <CtaButton href={url}>{fill(k.button, vars)}</CtaButton>
     </BaseLayout>
   );
 }

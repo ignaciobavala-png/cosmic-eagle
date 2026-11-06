@@ -35,6 +35,8 @@ export function PaymentControls({
   currentReference,
   amountPaid,
   price,
+  currency,
+  discount = 0,
   depositAmount,
 }: {
   id: string;
@@ -42,6 +44,9 @@ export function PaymentControls({
   currentReference: string | null;
   amountPaid: number;
   price: number;
+  currency: string;
+  /** Descuento ya aplicado a esta solicitud; `price` ya viene descontado. */
+  discount?: number;
   /** `null` cuando el viaje no ofrece sena: se paga completo. */
   depositAmount: number | null;
 }) {
@@ -56,6 +61,7 @@ export function PaymentControls({
   const [isPending, startTransition] = useTransition();
 
   const monto = Number(amount || 0);
+  const fmt = (n: number) => formatAmount(n, "es", currency);
   const saldo = price - monto;
   /** Lo que ya esta guardado en la base, para el renglon "Estado actual". */
   const saldoGuardado = price - amountPaid;
@@ -82,13 +88,13 @@ export function PaymentControls({
         ? `Si guardas el monto, el estado queda en «${LABEL[opt]}»`
         : `Vas a marcar «${LABEL[opt]}»`;
     if (opt === "paid" && saldo > 0) {
-      return `${accion} con ${formatAmount(monto)} de ${formatAmount(price)}: le queda un saldo de ${formatAmount(saldo)}, y a la persona se le dice que su pago está completo.`;
+      return `${accion} con ${fmt(monto)} de ${fmt(price)}: le queda un saldo de ${fmt(saldo)}, y a la persona se le dice que su pago está completo.`;
     }
     if (opt === "deposit_paid" && monto <= 0) {
       return `${accion} sin ningún monto recibido: revisa el número antes de guardar.`;
     }
     if (opt === "deposit_paid" && saldo <= 0) {
-      return `${accion} con el total ya cubierto (${formatAmount(monto)} de ${formatAmount(price)}). Si pagó todo, va «Marcar como pagado».`;
+      return `${accion} con el total ya cubierto (${fmt(monto)} de ${fmt(price)}). Si pagó todo, va «Marcar como pagado».`;
     }
     return null;
   }
@@ -113,12 +119,12 @@ export function PaymentControls({
         {currentStatus !== "pending" && currentStatus !== "waived" && (
           <>
             {" "}
-            · recibido {formatAmount(amountPaid)} de {formatAmount(price)}
+            · recibido {fmt(amountPaid)} de {fmt(price)}
             {/* El saldo guardado se dice igual que el previsualizado, con las
                 mismas palabras: si la pantalla lo nombra de dos maneras, el
                 numero se lee como si fueran dos cosas distintas. */}
             {saldoGuardado > 0
-              ? ` · queda un saldo de ${formatAmount(saldoGuardado)}`
+              ? ` · queda un saldo de ${fmt(saldoGuardado)}`
               : " · sin saldo pendiente"}
           </>
         )}
@@ -127,7 +133,7 @@ export function PaymentControls({
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5">
           <span className="text-xs text-on-surface-variant tracking-[0.02em]">
-            Monto recibido en total (USD)
+            Monto recibido en total ({currency})
           </span>
           <input
             type="number"
@@ -139,10 +145,11 @@ export function PaymentControls({
           />
           <span className="text-xs text-on-surface-variant">
             {depositAmount
-              ? `Seña ${formatAmount(depositAmount)} · total ${formatAmount(price)}`
-              : `Total ${formatAmount(price)}`}
+              ? `Seña ${fmt(depositAmount)} · total ${fmt(price)}`
+              : `Total ${fmt(price)}`}
+            {discount > 0 ? ` (con ${fmt(discount)} de descuento)` : ""}
             {saldo > 0
-              ? ` · quedaría un saldo de ${formatAmount(saldo)}`
+              ? ` · quedaría un saldo de ${fmt(saldo)}`
               : " · sin saldo pendiente"}
           </span>
         </label>

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { finalPrice } from "@/lib/discounts";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ReviewButtons } from "../ReviewButtons";
@@ -52,7 +53,7 @@ export default async function SolicitudDetallePage({
   const { data: application } = await supabase
     .from("applications")
     .select(
-      "*, trips(title, start_date, end_date, price, deposit_amount), health_form_first_time(*), consents(*)"
+      "*, trips(title, start_date, end_date, price, currency, deposit_amount), health_form_first_time(*), consents(*)"
     )
     .eq("id", id)
     .single();
@@ -211,7 +212,9 @@ export default async function SolicitudDetallePage({
           currentStatus={application.payment_status}
           currentReference={application.payment_reference}
           amountPaid={application.amount_paid}
-          price={application.trips?.price ?? 0}
+          price={finalPrice(application.trips?.price ?? 0, application.discount_amount)}
+          discount={application.discount_amount}
+          currency={application.trips?.currency ?? "USD"}
           depositAmount={application.trips?.deposit_amount ?? null}
         />
       </div>

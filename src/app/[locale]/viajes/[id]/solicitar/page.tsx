@@ -17,6 +17,7 @@ import {
   pillButton,
 } from "@/components/forms/styles";
 import { ScreeningForm } from "./ScreeningForm";
+import { finalPrice, getSuggestedDiscountCode } from "@/lib/discounts";
 import { PaymentProofUpload } from "./PaymentProofUpload";
 import { localizeRow } from "@/lib/localized";
 
@@ -149,7 +150,7 @@ export default async function SolicitarPage({
   const { data: tripRow } = await supabase
     .from("trips")
     .select(
-      "id, title, title_en, location, start_date, end_date, status, price, deposit_amount, payment_url, start_time, end_time, address, map_url, arrival_notes, arrival_notes_en, packing_list, packing_list_en"
+      "id, title, title_en, location, start_date, end_date, status, price, currency, deposit_amount, payment_url, start_time, end_time, address, map_url, arrival_notes, arrival_notes_en, packing_list, packing_list_en"
     )
     .eq("id", id)
     .single();
@@ -162,12 +163,15 @@ export default async function SolicitarPage({
   const { data: applications } = await supabase
     .from("my_applications")
     .select(
-      "id, status, payment_status, amount_paid, is_first_time, health_form_submitted, consent_submitted, payment_proof_submitted, payment_proof_at"
+      "id, status, payment_status, amount_paid, discount_amount, is_first_time, health_form_submitted, consent_submitted, payment_proof_submitted, payment_proof_at"
     )
     .eq("trip_id", id)
     .order("created_at", { ascending: false });
 
   const existing = applications?.[0];
+  // Lo que de verdad paga: el aporte menos el descuento que se aplicó al postular.
+  const descuento = existing?.discount_amount ?? 0;
+  const precio = finalPrice(trip.price, descuento);
   const step = existing ? nextStep(id, existing) : null;
 
   // Hasta acá se podía postular por URL directa a un viaje ya terminado o a uno
@@ -267,7 +271,11 @@ export default async function SolicitarPage({
               </Link>
             </div>
           ) : (
-            <ScreeningForm tripId={id} defaultEmail={user.email} />
+            <ScreeningForm
+              tripId={id}
+              defaultEmail={user.email}
+              suggestedCode={await getSuggestedDiscountCode(supabase, id)}
+            />
           )}
 
           {enPago && existing?.id && (
@@ -283,13 +291,14 @@ export default async function SolicitarPage({
                     <p>
                       Recibimos{" "}
                       <span className={`font-medium ${panelStrong}`}>
-                        {formatAmount(existing.amount_paid ?? 0, formatLocale)}
+                        {formatAmount(existing.amount_paid ?? 0, formatLocale, trip.currency)}
                       </span>{" "}
-                      de {formatAmount(trip.price, formatLocale)}. Queda un saldo de{" "}
+                      de {formatAmount(precio, formatLocale, trip.currency)}. Queda un saldo de{" "}
                       <span className={`font-medium ${panelStrong}`}>
                         {formatAmount(
-                          trip.price - (existing.amount_paid ?? 0),
-                          formatLocale
+                          precio - (existing.amount_paid ?? 0),
+                          formatLocale,
+                          trip.currency
                         )}
                       </span>
                       , que puedes completar de una vez o en partes.
@@ -299,11 +308,11 @@ export default async function SolicitarPage({
                     <p>
                       Puedes reservar tu cupo con una seña de{" "}
                       <span className={`font-medium ${panelStrong}`}>
-                        {formatAmount(trip.deposit_amount, formatLocale)}
+                        {formatAmount(trip.deposit_amount, formatLocale, trip.currency)}
                       </span>{" "}
                       o pagar el total de{" "}
                       <span className={`font-medium ${panelStrong}`}>
-                        {formatAmount(trip.price, formatLocale)}
+                        {formatAmount(precio, formatLocale, trip.currency)}
                       </span>
                       . Si acordaste otro monto con nosotros, vale lo que
                       acordaron.
@@ -312,10 +321,19 @@ export default async function SolicitarPage({
                     <p>
                       Aporte de la experiencia:{" "}
                       <span className={`font-medium ${panelStrong}`}>
-                        {formatAmount(trip.price, formatLocale)}
+                        {formatAmount(precio, formatLocale, trip.currency)}
                       </span>
                       . Si acordaste una seña o un monto distinto con nosotros,
                       vale lo que acordaron.
+                    </p>
+                  )}
+                  {descuento > 0 && (
+                    <p className="mt-2 text-sm">
+                      Descuento aplicado:{" "}
+                      <span className={`font-medium ${panelStrong}`}>
+                        −{formatAmount(descuento, formatLocale, trip.currency)}
+                      </span>{" "}
+                      (aporte original {formatAmount(trip.price, formatLocale, trip.currency)}).
                     </p>
                   )}
                 </div>

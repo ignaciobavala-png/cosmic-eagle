@@ -1,3 +1,4 @@
+import { copyFor, rich, fill, type CopyOverrides } from "@/lib/email/templates";
 import { BaseLayout, CtaButton, Paragraph, Title } from "./BaseLayout";
 
 /**
@@ -20,6 +21,7 @@ export function DatosFinales({
   queLlevar,
   llegadas,
   url,
+  copy,
 }: {
   nombre: string;
   viaje: string;
@@ -29,17 +31,17 @@ export function DatosFinales({
   queLlevar: string | null;
   llegadas: string | null;
   url: string;
+  copy?: CopyOverrides;
 }) {
+  const k = copyFor("datos", copy);
+  const vars = { nombre, viaje };
   return (
-    <BaseLayout preview={`Todo lo que necesitas saber para llegar a ${viaje}`}>
-      <Title>Todo lo que necesitas saber para tu llegada</Title>
+    <BaseLayout preview={fill(k.preview, vars)}>
+      <Title>{fill(k.title, vars)}</Title>
 
       <Paragraph>Hola {nombre},</Paragraph>
 
-      <Paragraph>
-        Ya estamos cerca. Acá van los datos para tu llegada a{" "}
-        <strong>{viaje}</strong>.
-      </Paragraph>
+      <Paragraph preLine>{rich(k.intro, vars)}</Paragraph>
 
       {donde && (
         <Paragraph>
@@ -67,11 +69,9 @@ export function DatosFinales({
         </Paragraph>
       )}
 
-      <CtaButton href={url}>Ver todos los detalles</CtaButton>
+      <CtaButton href={url}>{fill(k.button, vars)}</CtaButton>
 
-      <Paragraph>
-        Si tienes cualquier duda antes de llegar, escríbenos. Te esperamos.
-      </Paragraph>
+      <Paragraph preLine>{rich(k.closing, vars)}</Paragraph>
     </BaseLayout>
   );
 }

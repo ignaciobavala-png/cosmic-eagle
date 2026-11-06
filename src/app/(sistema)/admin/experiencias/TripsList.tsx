@@ -36,7 +36,7 @@ export async function TripsList({ type }: { type: TripType }) {
   const supabase = await createClient();
   const { data: trips } = await supabase
     .from("trips")
-    .select("id, title, location, start_date, end_date, capacity, price, status")
+    .select("id, title, location, start_date, end_date, capacity, price, currency, status")
     .eq("type", type)
     .order("start_date", { ascending: true });
 
@@ -85,7 +85,7 @@ export async function TripsList({ type }: { type: TripType }) {
                   </td>
                   <td className="px-5 py-4 text-on-surface-variant">{trip.capacity}</td>
                   <td className="px-5 py-4 text-on-surface-variant">
-                    {trip.price > 0 ? formatAmount(trip.price) : "Gratuito"}
+                    {trip.price > 0 ? formatAmount(trip.price, "es", trip.currency) : "Gratuito"}
                   </td>
                   <td className="px-5 py-4">
                     <span

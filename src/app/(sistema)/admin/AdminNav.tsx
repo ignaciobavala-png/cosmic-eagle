@@ -38,6 +38,7 @@ const GROUPS: { title: string; links: NavLink[] }[] = [
     links: [
       { href: "/admin/solicitudes", label: "Solicitudes" },
       { href: "/admin/pagos", label: "Pagos" },
+      { href: "/admin/descuentos", label: "Descuentos" },
       { href: "/admin/crm", label: "CRM" },
     ],
   },
@@ -63,6 +64,7 @@ const GROUPS: { title: string; links: NavLink[] }[] = [
     links: [
       { href: "/admin/ia", label: "Asistente" },
       { href: "/admin/material", label: "Envío material" },
+      { href: "/admin/correos", label: "Correos" },
     ],
   },
   {

@@ -27,9 +27,10 @@ export function DeleteContactButton({ id, name }: { id: string; name: string }) 
       onClick={onClick}
       disabled={pending}
       aria-label={`Eliminar a ${name}`}
-      className="text-on-surface-variant transition-colors hover:text-error disabled:opacity-40"
+      className="flex items-center gap-1.5 rounded-lg border border-error/40 px-2.5 py-1.5 text-xs font-medium text-error transition-colors hover:bg-error/10 disabled:opacity-40"
     >
-      <Trash2 size={16} />
+      <Trash2 size={15} aria-hidden="true" />
+      Eliminar
     </button>
   );
 }

@@ -1,5 +1,8 @@
 "use server";
 
+import { finalPrice } from "@/lib/discounts";
+import { getCopyOverrides } from "@/lib/email/copy-store";
+import { copyFor, fill } from "@/lib/email/templates";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/resend";
@@ -27,7 +30,7 @@ export async function reviewApplication(
   const { data: application } = await supabase
     .from("applications")
     .select(
-      "user_id, full_name, email, status, trip_id, trips(title, start_date, end_date, price, deposit_amount)"
+      "user_id, full_name, email, status, trip_id, discount_amount, trips(title, start_date, end_date, price, currency, deposit_amount)"
     )
     .eq("id", id)
     .single();
@@ -59,6 +62,7 @@ export async function reviewApplication(
       email: application.email,
       tripId: application.trip_id,
       trip: application.trips,
+      descuento: application.discount_amount,
     });
   }
 
@@ -115,7 +119,7 @@ export async function markPayment(
   const { data: application } = await supabase
     .from("applications")
     .select(
-      "full_name, email, status, payment_status, trip_id, previous_ceremonies, trips(title, start_date, end_date, price, deposit_amount)"
+      "full_name, email, status, payment_status, trip_id, previous_ceremonies, discount_amount, trips(title, start_date, end_date, price, currency, deposit_amount)"
     )
     .eq("id", id)
     .single();
@@ -168,7 +172,11 @@ export async function markPayment(
       saldoCompletado:
         paymentStatus === "paid" && application.payment_status === "deposit_paid",
       montoPagado: Math.max(0, amountPaid),
-      saldo: Math.max(0, (application.trips?.price ?? 0) - Math.max(0, amountPaid)),
+      saldo: Math.max(
+        0,
+        finalPrice(application.trips?.price ?? 0, application.discount_amount) -
+          Math.max(0, amountPaid)
+      ),
       // Mismo criterio que la vista `my_applications`: primeriza es la que
       // declaró cero ceremonias, y es la única que tiene etapa 2 (no existe un
       // `health_form_returning`).
@@ -186,7 +194,9 @@ async function notifyApproved({
   email,
   tripId,
   trip,
+  descuento = 0,
 }: {
+  descuento?: number;
   id: string;
   nombre: string;
   email: string;
@@ -196,6 +206,7 @@ async function notifyApproved({
     start_date: string;
     end_date: string;
     price: number;
+    currency: string;
     deposit_amount: number | null;
   } | null;
 }) {
@@ -208,10 +219,13 @@ async function notifyApproved({
   // ve avisado en /admin/pagos.
   const medios = await getActivePaymentMethods();
 
+  const copy = await getCopyOverrides("aprobada");
   const result = await sendEmail({
     to: email,
-    subject: `Tu solicitud para ${trip?.title ?? "el viaje"} fue aprobada`,
+    subject: fill(copyFor("aprobada", copy).subject, { viaje: trip?.title ?? "el viaje" }),
     react: SolicitudAprobada({
+      copy,
+      moneda: trip?.currency,
       // Solo el primer nombre: el formulario pide nombre completo y "Hola María
       // Fernanda Gómez" suena a carta del banco.
       nombre: nombre.split(" ")[0],
@@ -221,8 +235,14 @@ async function notifyApproved({
       // instrucciones de pago y el formulario del comprobante.
       url: `${siteUrl}/viajes/${tripId}/solicitar`,
       medios,
-      total: trip?.price ?? 0,
-      sena: trip?.deposit_amount ?? null,
+      total: finalPrice(trip?.price ?? 0, descuento),
+      // Con un descuento grande la seña puede quedar a la par del total: ahí no hay
+      // dos opciones que ofrecer.
+      sena:
+        trip?.deposit_amount &&
+        trip.deposit_amount < finalPrice(trip.price, descuento)
+          ? trip.deposit_amount
+          : null,
     }),
   });
 
@@ -255,10 +275,12 @@ async function notifyRejected({
 }) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://cosmic-eagle.vercel.app";
 
+  const copy = await getCopyOverrides("rechazada");
   const result = await sendEmail({
     to: email,
-    subject: `Sobre tu solicitud para ${trip?.title ?? "el viaje"}`,
+    subject: fill(copyFor("rechazada", copy).subject, { viaje: trip?.title ?? "el viaje" }),
     react: SolicitudRechazada({
+      copy,
       nombre: nombre.split(" ")[0],
       viaje: trip?.title ?? "el viaje",
       // Al calendario y no al viaje que se rechazó: mandarla de vuelta a la
@@ -291,10 +313,12 @@ async function notifyConversation({
   email: string;
   trip: { title: string; start_date: string; end_date: string } | null;
 }) {
+  const copy = await getCopyOverrides("conversemos");
   const result = await sendEmail({
     to: email,
-    subject: "Sobre tu postulación — nos gustaría conversar",
+    subject: fill(copyFor("conversemos", copy).subject, { viaje: trip?.title ?? "el viaje" }),
     react: SolicitudConversemos({
+      copy,
       nombre: nombre.split(" ")[0],
       viaje: trip?.title ?? "el viaje",
     }),
@@ -333,7 +357,7 @@ async function notifyPaid({
   nombre: string;
   email: string;
   tripId: string;
-  trip: { title: string; start_date: string; end_date: string } | null;
+  trip: { title: string; start_date: string; end_date: string; currency: string } | null;
   sinCargo: boolean;
   esSena: boolean;
   saldoCompletado: boolean;
@@ -355,14 +379,21 @@ async function notifyPaid({
 
   const necesitaSalud = esPrimeriza && !healthForm;
 
+  const copy = await getCopyOverrides("pago");
+  const subjects = copyFor("pago", copy);
   const result = await sendEmail({
     to: email,
-    subject: esSena
-      ? `Tu cupo en ${trip?.title ?? "el viaje"} está reservado`
-      : saldoCompletado
-        ? `Tu pago para ${trip?.title ?? "el viaje"} está completo`
-        : `Tu pago para ${trip?.title ?? "el viaje"} fue confirmado`,
+    subject: fill(
+      esSena
+        ? subjects.subject_sena
+        : saldoCompletado
+          ? subjects.subject_completo
+          : subjects.subject_pagado,
+      { viaje: trip?.title ?? "el viaje" }
+    ),
     react: PagoRegistrado({
+      copy,
+      moneda: trip?.currency,
       nombre: nombre.split(" ")[0],
       viaje: trip?.title ?? "tu viaje",
       fechas: trip ? formatDateRangeCompact(trip.start_date, trip.end_date) : "",

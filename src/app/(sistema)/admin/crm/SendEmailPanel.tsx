@@ -15,8 +15,11 @@ export function SendEmailPanel({
   count,
   max,
   groupLabel,
+  ids,
 }: {
   filters: ContactFilters;
+  /** Si hay personas tildadas, el envío va sólo a ellas. */
+  ids?: string[];
   count: number;
   max: number;
   groupLabel: string;
@@ -40,7 +43,7 @@ export function SendEmailPanel({
     }
     setResult(null);
     startTransition(async () => {
-      const res = await sendSegmentedEmail(filters, subject, message);
+      const res = await sendSegmentedEmail(filters, subject, message, ids);
       setResult(res);
       if (res.ok) {
         setSubject("");
@@ -71,7 +74,7 @@ export function SendEmailPanel({
             Enviar correo a {count} {count === 1 ? "persona" : "personas"}
           </h2>
           <p className="mt-1 text-sm text-on-surface-variant">
-            Grupo: {groupLabel}. Cada persona recibe el correo con su nombre y no
+            {ids && ids.length > 0 ? "Personas tildadas" : `Grupo: ${groupLabel}`}. Cada persona recibe el correo con su nombre y no
             ve a las demás.
           </p>
         </div>

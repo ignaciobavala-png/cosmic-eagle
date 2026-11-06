@@ -1,4 +1,5 @@
 import type { Enums } from "@/lib/supabase/types";
+import { isTripCurrency } from "@/lib/format";
 import { parseSchedule, sortSchedule } from "@/lib/trip-schedule";
 import { isTripType, tripTypeLabel } from "@/lib/trip-type";
 import { isTripCategory } from "@/lib/trip-fields";
@@ -40,6 +41,7 @@ export function parseTripForm(formData: FormData) {
   const end_date = formData.get("end_date");
   const capacity = formData.get("capacity");
   const price = formData.get("price");
+  const currency = formData.get("currency");
   const deposit = formData.get("deposit_amount");
   const status = formData.get("status");
   const type = formData.get("type");
@@ -171,6 +173,7 @@ export function parseTripForm(formData: FormData) {
       end_date,
       capacity: Number(capacity),
       price: priceValue,
+      currency: isTripCurrency(currency) ? currency : "USD",
       deposit_amount: depositValue,
       status: status as Enums<"trip_status">,
       type,

@@ -1,3 +1,4 @@
+import { copyFor, rich, fill, type CopyOverrides } from "@/lib/email/templates";
 import { BaseLayout, CtaButton, Paragraph, Title } from "./BaseLayout";
 
 /**
@@ -18,36 +19,27 @@ export function SolicitudRecibida({
   viaje,
   fechas,
   url,
+  copy,
 }: {
   nombre: string;
   viaje: string;
   fechas: string;
   url: string;
+  copy?: CopyOverrides;
 }) {
+  const k = copyFor("recibida", copy);
+  const vars = { nombre, viaje, fechas };
   return (
-    <BaseLayout preview={`Recibimos tu solicitud para ${viaje}`}>
-      <Title>Recibimos tu solicitud</Title>
+    <BaseLayout preview={fill(k.preview, vars)}>
+      <Title>{fill(k.title, vars)}</Title>
 
       <Paragraph>Hola {nombre},</Paragraph>
 
-      <Paragraph>
-        Tu solicitud para <strong>{viaje}</strong>
-        {fechas ? ` (${fechas})` : ""} ya está con nosotros. Estela la va a leer
-        personalmente, una por una, y te vamos a escribir con la respuesta.
-      </Paragraph>
+      <Paragraph preLine>{rich(k.p1, vars)}</Paragraph>
+      <Paragraph preLine>{rich(k.p2, vars)}</Paragraph>
+      <Paragraph preLine>{rich(k.p3, vars)}</Paragraph>
 
-      <Paragraph>
-        Si contaste algo sobre tu salud o algún tratamiento, nada de eso cierra
-        la puerta: lo preguntamos para poder acompañarte mejor, no para
-        descartar a nadie.
-      </Paragraph>
-
-      <Paragraph>
-        En tu cuenta puedes seguir en qué paso está tu solicitud en cualquier
-        momento.
-      </Paragraph>
-
-      <CtaButton href={url}>Ver el estado de mi solicitud</CtaButton>
+      <CtaButton href={url}>{fill(k.button, vars)}</CtaButton>
     </BaseLayout>
   );
 }

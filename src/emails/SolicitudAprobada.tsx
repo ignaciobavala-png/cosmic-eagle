@@ -1,3 +1,4 @@
+import { copyFor, rich, fill, type CopyOverrides } from "@/lib/email/templates";
 import { Text } from "react-email";
 import { BaseLayout, CtaButton, Paragraph, Title, c, font } from "./BaseLayout";
 import { formatAmount } from "@/lib/format";
@@ -35,6 +36,8 @@ export function SolicitudAprobada({
   medios = [],
   total = 0,
   sena = null,
+  moneda = "USD",
+  copy,
 }: {
   nombre: string;
   viaje: string;
@@ -44,50 +47,40 @@ export function SolicitudAprobada({
   total?: number;
   /** `null` cuando el viaje se paga completo: no hay dos opciones que ofrecer. */
   sena?: number | null;
+  /** Moneda de la experiencia: CLP, USD o EUR. */
+  moneda?: string;
+  copy?: CopyOverrides;
 }) {
+  const k = copyFor("aprobada", copy);
+  const vars = {
+    nombre,
+    viaje,
+    fechas,
+    total: formatAmount(total, "es", moneda),
+    sena: sena ? formatAmount(sena, "es", moneda) : "",
+  };
   return (
-    <BaseLayout preview={`Tu lugar en ${viaje} está confirmado`}>
-      <Title>Tu solicitud fue aprobada</Title>
+    <BaseLayout preview={fill(k.preview, vars)}>
+      <Title>{fill(k.title, vars)}</Title>
 
       <Paragraph>Hola {nombre},</Paragraph>
 
-      <Paragraph>
-        Revisamos tu solicitud para <strong>{viaje}</strong> ({fechas}) y tienes tu
-        lugar confirmado. Nos alegra mucho que nos acompañes.
-      </Paragraph>
+      <Paragraph preLine>{rich(k.intro, vars)}</Paragraph>
 
       {/* Las dos opciones, tal como las pide el correo [2] de Sofía
           (docs/COMUNICACIONES.md). Se dicen antes de los medios de pago: son
           la decisión, y los medios son el cómo. */}
       {total > 0 && (
-        <Paragraph>
-          {sena ? (
-            <>
-              Ya puedes reservar formalmente tu lugar. Puedes hacerlo con una
-              seña de <strong>{formatAmount(sena)}</strong>, o pagar el total de{" "}
-              <strong>{formatAmount(total)}</strong>.
-            </>
-          ) : (
-            <>
-              Ya puedes reservar formalmente tu lugar. El aporte de la
-              experiencia es de <strong>{formatAmount(total)}</strong>.
-            </>
-          )}
+        <Paragraph preLine>
+          {rich(sena ? k.price_deposit : k.price_full, vars)}
         </Paragraph>
       )}
 
       {medios.length === 0 ? (
-        <Paragraph>
-          Para reservar tu cupo falta el pago. Te vamos a escribir con los datos
-          en las próximas horas.
-        </Paragraph>
+        <Paragraph preLine>{rich(k.no_methods, vars)}</Paragraph>
       ) : (
         <>
-          <Paragraph>
-            Para reservar tu cupo falta el pago. Estos son los medios
-            disponibles; elige el que te sirva y envíanos el comprobante desde
-            tu cuenta.
-          </Paragraph>
+          <Paragraph preLine>{rich(k.with_methods, vars)}</Paragraph>
 
           {medios.map((medio) => (
             <table
@@ -153,7 +146,7 @@ export function SolicitudAprobada({
                         }}
                       >
                         <a href={medio.link_url} style={{ color: c.gold }}>
-                          Ir a pagar
+                          {fill(k.pay_link, vars)}
                         </a>
                       </Text>
                     )}
@@ -165,12 +158,9 @@ export function SolicitudAprobada({
         </>
       )}
 
-      <Paragraph>
-        En tu cuenta vas a encontrar los detalles de la experiencia, y ahí mismo
-        puedes subirnos el comprobante del pago.
-      </Paragraph>
+      <Paragraph preLine>{rich(k.account, vars)}</Paragraph>
 
-      <CtaButton href={url}>Ver la experiencia y pagar</CtaButton>
+      <CtaButton href={url}>{fill(k.button, vars)}</CtaButton>
     </BaseLayout>
   );
 }

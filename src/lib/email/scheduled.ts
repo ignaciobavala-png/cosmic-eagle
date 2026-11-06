@@ -1,6 +1,9 @@
 import "server-only";
+import { finalPrice } from "@/lib/discounts";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "./resend";
+import { getAllCopyOverrides } from "./copy-store";
+import { copyFor, fill } from "./templates";
 import { MAX_SENDS_PER_RUN, SCHEDULE, SEND_INTERVAL_MS } from "./schedule-config";
 import { RecordatorioSaldo } from "@/emails/RecordatorioSaldo";
 import { FormulariosPendientes } from "@/emails/FormulariosPendientes";
@@ -90,11 +93,13 @@ type Candidate = {
   payment_status: Enums<"payment_status">;
   amount_paid: number;
   paid_at: string | null;
+  discount_amount: number;
   trips: {
     title: string;
     start_date: string;
     end_date: string;
     price: number;
+    currency: string;
     status: Enums<"trip_status">;
     address: string | null;
     arrival_notes: string | null;
@@ -130,7 +135,11 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://cosmic-eagle.verce
  * paga la sena tarde y ademas no completo el formulario). El tope por corrida y
  * el registro se aplican despues, iguales para todos.
  */
-function dueEmails(app: Candidate, today: Date): Pending[] {
+function dueEmails(
+  app: Candidate,
+  today: Date,
+  copies: Record<string, Record<string, string>>
+): Pending[] {
   const trip = app.trips;
   if (!trip) return [];
 
@@ -176,8 +185,9 @@ function dueEmails(app: Candidate, today: Date): Pending[] {
       applicationId: app.id,
       kind: "final_details",
       to: app.email,
-      subject: `Todo lo que necesitas saber para llegar a ${trip.title}`,
+      subject: fill(copyFor("datos", copies.datos).subject, { viaje: trip.title }),
       react: DatosFinales({
+        copy: copies.datos,
         nombre,
         viaje: trip.title,
         cuando: hora ? `${fechas}, de ${hora}` : fechas,
@@ -192,7 +202,7 @@ function dueEmails(app: Candidate, today: Date): Pending[] {
   // ---------------------------------------------------------------------
   // [3B] Recordatorio de saldo
   // ---------------------------------------------------------------------
-  const saldo = Math.max(0, trip.price - app.amount_paid);
+  const saldo = Math.max(0, finalPrice(trip.price, app.discount_amount) - app.amount_paid);
   const diasDesdePago = app.paid_at
     ? daysBetween(parseDate(app.paid_at.slice(0, 10)), today)
     : 0;
@@ -214,8 +224,10 @@ function dueEmails(app: Candidate, today: Date): Pending[] {
       applicationId: app.id,
       kind: "payment_reminder",
       to: app.email,
-      subject: "Recordatorio de tu saldo pendiente",
+      subject: fill(copyFor("saldo", copies.saldo).subject, { viaje: trip.title }),
       react: RecordatorioSaldo({
+        copy: copies.saldo,
+        moneda: trip.currency,
         nombre,
         viaje: trip.title,
         fechas,
@@ -247,8 +259,11 @@ function dueEmails(app: Candidate, today: Date): Pending[] {
       applicationId: app.id,
       kind: "forms_pending",
       to: app.email,
-      subject: "Ya falta poco para completar tu inscripción",
+      subject: fill(copyFor("formularios", copies.formularios).subject, {
+        viaje: trip.title,
+      }),
       react: FormulariosPendientes({
+        copy: copies.formularios,
         nombre,
         viaje: trip.title,
         fechas,
@@ -288,8 +303,8 @@ export async function runScheduledEmails(): Promise<
     .from("applications")
     .select(
       `id, full_name, email, trip_id, previous_ceremonies, payment_status,
-       amount_paid, paid_at,
-       trips!inner (title, start_date, end_date, price, status,
+       amount_paid, discount_amount, paid_at,
+       trips!inner (title, start_date, end_date, price, currency, status,
                     address, arrival_notes, packing_list, start_time, end_time),
        health_form_first_time (id),
        consents (id),
@@ -319,8 +334,9 @@ export async function runScheduledEmails(): Promise<
   // se lee como un sistema descontrolado. El que queda sale en la corrida
   // siguiente, porque el barrido es idempotente. El orden de `dueEmails` decide
   // cual gana: primero el saldo, que es el que tiene fecha.
+  const copies = await getAllCopyOverrides(supabase);
   const pending = (data as unknown as Candidate[]).flatMap(
-    (app) => dueEmails(app, today).slice(0, 1)
+    (app) => dueEmails(app, today, copies).slice(0, 1)
   );
 
   const run: ScheduledEmailRun = {

@@ -1,3 +1,4 @@
+import { copyFor, rich, fill, type CopyOverrides } from "@/lib/email/templates";
 import { BaseLayout, CtaButton, Paragraph, Title } from "./BaseLayout";
 
 /**
@@ -23,6 +24,7 @@ export function FormulariosPendientes({
   fechas,
   falta,
   url,
+  copy,
 }: {
   nombre: string;
   viaje: string;
@@ -30,61 +32,36 @@ export function FormulariosPendientes({
   /** Que le falta: los dos formularios, o solo la firma. */
   falta: "ambos" | "consentimiento";
   url: string;
+  copy?: CopyOverrides;
 }) {
+  const k = copyFor("formularios", copy);
+  const vars = { nombre, viaje, fechas };
+  const ambos = falta === "ambos";
   return (
-    <BaseLayout preview="Ya falta poco para completar tu inscripción">
-      <Title>
-        {falta === "ambos"
-          ? "Ya falta poco para completar tu inscripción"
-          : "Te falta un paso"}
-      </Title>
+    <BaseLayout preview={fill(k.preview, vars)}>
+      <Title>{fill(ambos ? k.title_both : k.title_consent, vars)}</Title>
 
       <Paragraph>Hola {nombre},</Paragraph>
 
-      {falta === "ambos" ? (
+      {ambos ? (
         <>
-          {/* Texto de Sofía del 27/10, literal (tuteo). */}
-          <Paragraph>
-            Qué alegría que pronto nos acompañarás en <strong>{viaje}</strong>
-            {fechas ? ` (${fechas})` : ""}.
-          </Paragraph>
-          <Paragraph>
-            Tu cupo ya está reservado. Solo quedan dos pasos para completar tu
-            inscripción: el formulario de salud y el consentimiento informado.
-          </Paragraph>
-          <Paragraph>
-            El formulario nos ayudará a conocerte mejor y preparar tu
-            experiencia con el cuidado que merece.
-          </Paragraph>
-          <Paragraph>
-            Luego podrás revisar y firmar el consentimiento informado.
-          </Paragraph>
+          <Paragraph preLine>{rich(k.both_1, vars)}</Paragraph>
+          <Paragraph preLine>{rich(k.both_2, vars)}</Paragraph>
+          <Paragraph preLine>{rich(k.both_3, vars)}</Paragraph>
+          <Paragraph preLine>{rich(k.both_4, vars)}</Paragraph>
         </>
       ) : (
-        <Paragraph>
-          Tu cupo en <strong>{viaje}</strong>
-          {fechas ? ` (${fechas})` : ""} está reservado, pero todavía nos falta
-          tu consentimiento informado firmado.
-        </Paragraph>
-      )}
-
-      {falta === "ambos" ? null : (
-        <Paragraph>
-          Es el documento que explica en qué consiste la experiencia, cuál es el
-          rol del facilitador y cómo cuidamos tu información. Se lee con calma y
-          se firma escribiendo tu nombre completo.
-        </Paragraph>
+        <>
+          <Paragraph preLine>{rich(k.consent_1, vars)}</Paragraph>
+          <Paragraph preLine>{rich(k.consent_2, vars)}</Paragraph>
+        </>
       )}
 
       <CtaButton href={url}>
-        {falta === "ambos"
-          ? "Completar formulario de salud y consentimiento informado"
-          : "Leer y firmar"}
+        {fill(ambos ? k.button_both : k.button_consent, vars)}
       </CtaButton>
 
-      <Paragraph>
-        Si tienes alguna duda o necesitas ayuda, escríbenos con confianza.
-      </Paragraph>
+      <Paragraph preLine>{rich(k.closing, vars)}</Paragraph>
     </BaseLayout>
   );
 }

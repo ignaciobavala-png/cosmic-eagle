@@ -245,6 +245,8 @@ export type Database = {
       applications: {
         Row: {
           amount_paid: number
+          discount_amount: number
+          discount_code_id: string | null
           comment: string | null
           created_at: string
           current_medication: boolean
@@ -271,6 +273,8 @@ export type Database = {
         }
         Insert: {
           amount_paid?: number
+          discount_amount?: number
+          discount_code_id?: string | null
           comment?: string | null
           created_at?: string
           current_medication: boolean
@@ -297,6 +301,8 @@ export type Database = {
         }
         Update: {
           amount_paid?: number
+          discount_amount?: number
+          discount_code_id?: string | null
           comment?: string | null
           created_at?: string
           current_medication?: boolean
@@ -515,6 +521,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      discount_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_on: string | null
+          id: string
+          is_active: boolean
+          kind: string
+          max_uses: number | null
+          note: string | null
+          trip_id: string | null
+          user_id: string | null
+          uses: number
+          value: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_on?: string | null
+          id?: string
+          is_active?: boolean
+          kind: string
+          max_uses?: number | null
+          note?: string | null
+          trip_id?: string | null
+          user_id?: string | null
+          uses?: number
+          value: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_on?: string | null
+          id?: string
+          is_active?: boolean
+          kind?: string
+          max_uses?: number | null
+          note?: string | null
+          trip_id?: string | null
+          user_id?: string | null
+          uses?: number
+          value?: number
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          field_key: string
+          template_key: string
+          updated_at: string
+          updated_by: string | null
+          value: string
+        }
+        Insert: {
+          field_key: string
+          template_key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: string
+        }
+        Update: {
+          field_key?: string
+          template_key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: string
+        }
+        Relationships: []
       }
       faqs: {
         Row: {
@@ -985,6 +1063,7 @@ export type Database = {
           category: Database["public"]["Enums"]["trip_category"]
           city: string
           country: string
+          currency: string
           end_time: string | null
           includes: string | null
           includes_en: string | null
@@ -1024,6 +1103,7 @@ export type Database = {
           category?: Database["public"]["Enums"]["trip_category"]
           city: string
           country: string
+          currency?: string
           end_time?: string | null
           includes?: string | null
           includes_en?: string | null
@@ -1063,6 +1143,7 @@ export type Database = {
           category?: Database["public"]["Enums"]["trip_category"]
           city?: string
           country?: string
+          currency?: string
           end_time?: string | null
           includes?: string | null
           includes_en?: string | null
@@ -1116,6 +1197,7 @@ export type Database = {
       my_applications: {
         Row: {
           amount_paid: number | null
+          discount_amount: number | null
           consent_submitted: boolean | null
           created_at: string | null
           health_form_submitted: boolean | null
@@ -1130,6 +1212,7 @@ export type Database = {
         }
         Insert: {
           amount_paid?: number | null
+          discount_amount?: number | null
           consent_submitted?: never
           created_at?: string | null
           health_form_submitted?: never
@@ -1144,6 +1227,7 @@ export type Database = {
         }
         Update: {
           amount_paid?: number | null
+          discount_amount?: number | null
           consent_submitted?: never
           created_at?: string | null
           health_form_submitted?: never
@@ -1168,6 +1252,26 @@ export type Database = {
       }
     }
     Functions: {
+      check_discount_code: {
+        Args: { p_code: string; p_trip_id: string }
+        Returns: {
+          id: string
+          code: string
+          kind: string
+          value: number
+          amount: number
+        }[]
+      }
+      my_discount_codes: {
+        Args: { p_trip_id: string }
+        Returns: {
+          id: string
+          code: string
+          kind: string
+          value: number
+          amount: number
+        }[]
+      }
       redeem_access_code: { Args: { p_code: string }; Returns: string }
       shared_material: {
         Args: { p_token: string }

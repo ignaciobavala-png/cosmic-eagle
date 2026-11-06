@@ -71,6 +71,7 @@ export default async function CuentaPage({
     status: string;
     payment_status: string;
     amount_paid: number;
+    discount_amount: number;
     is_first_time: boolean;
     health_form_submitted: boolean;
     consent_submitted: boolean;
@@ -81,6 +82,7 @@ export default async function CuentaPage({
       start_date: string;
       end_date: string;
       price: number;
+      currency: string;
       deposit_amount: number | null;
     } | null;
   }[] = [];
@@ -107,7 +109,7 @@ export default async function CuentaPage({
     const { data: mine } = await supabase
       .from("my_applications")
       .select(
-        "id, trip_id, status, payment_status, amount_paid, is_first_time, health_form_submitted, consent_submitted, created_at"
+        "id, trip_id, status, payment_status, amount_paid, discount_amount, is_first_time, health_form_submitted, consent_submitted, created_at"
       )
       .order("created_at", { ascending: false });
 
@@ -126,6 +128,7 @@ export default async function CuentaPage({
               status: a.status,
               payment_status: a.payment_status,
               amount_paid: a.amount_paid ?? 0,
+              discount_amount: a.discount_amount ?? 0,
               is_first_time: a.is_first_time ?? false,
               health_form_submitted: a.health_form_submitted ?? false,
               consent_submitted: a.consent_submitted ?? false,
@@ -140,7 +143,7 @@ export default async function CuentaPage({
       tripIds.length > 0
         ? await supabase
             .from("trips")
-            .select("id, title, title_en, location, start_date, end_date, price, deposit_amount")
+            .select("id, title, title_en, location, start_date, end_date, price, currency, deposit_amount")
             .in("id", tripIds)
         : { data: [] };
 

@@ -1,3 +1,4 @@
+import { copyFor, rich, fill, type CopyOverrides } from "@/lib/email/templates";
 import { BaseLayout, CtaButton, Paragraph, Title } from "./BaseLayout";
 import { formatAmount } from "@/lib/format";
 
@@ -30,6 +31,8 @@ export function PagoRegistrado({
   saldo,
   necesitaSalud,
   url,
+  moneda = "USD",
+  copy,
 }: {
   nombre: string;
   viaje: string;
@@ -45,70 +48,40 @@ export function PagoRegistrado({
   /** Si todavia falta el formulario de salud, el CTA lleva ahi. */
   necesitaSalud: boolean;
   url: string;
+  /** Moneda de la experiencia: CLP, USD o EUR. */
+  moneda?: string;
+  copy?: CopyOverrides;
 }) {
+  const k = copyFor("pago", copy);
+  const vars = {
+    nombre,
+    viaje,
+    fechas,
+    monto: formatAmount(montoPagado, "es", moneda),
+    saldo: formatAmount(saldo, "es", moneda),
+  };
+  const variante = esSena ? "sena" : saldoCompletado ? "completo" : "pagado";
   return (
-    <BaseLayout
-      preview={
-        esSena
-          ? `Tu cupo en ${viaje} está reservado`
-          : saldoCompletado
-            ? `Tu pago para ${viaje} está completo`
-            : `Tu pago para ${viaje} fue confirmado`
-      }
-    >
-      <Title>
-        {esSena
-          ? "Tu cupo está reservado"
-          : saldoCompletado
-            ? "Tu pago está completo"
-            : "Tu pago fue confirmado"}
-      </Title>
+    <BaseLayout preview={fill(k[`preview_${variante}`], vars)}>
+      <Title>{fill(k[`title_${variante}`], vars)}</Title>
 
       <Paragraph>Hola {nombre},</Paragraph>
 
       {/* Reserva con seña: texto de Sofía del 27/10, literal. */}
       {esSena && !sinCargo && (
-        <Paragraph>
-          Qué alegría saber que nos acompañarás en <strong>{viaje}</strong>
-          {fechas ? ` (${fechas})` : ""}.
-        </Paragraph>
+        <Paragraph preLine>{rich(k.sena_alegria, vars)}</Paragraph>
       )}
 
-      <Paragraph>
-        {sinCargo ? (
-          <>
-            Tu lugar en <strong>{viaje}</strong>
-            {fechas ? ` (${fechas})` : ""} quedó confirmado sin cargo.
-          </>
-        ) : (
-          <>
-            {saldoCompletado ? (
-              <>
-                Recibimos el saldo. Tu inscripción en <strong>{viaje}</strong>
-                {fechas ? ` (${fechas})` : ""} está completamente pagada, con un
-                total de <strong>{formatAmount(montoPagado)}</strong>. Gracias
-                por la confianza.
-              </>
-            ) : (
-              <>
-                {esSena ? (
-                  <>
-                    Hemos recibido tu pago de{" "}
-                    <strong>{formatAmount(montoPagado)}</strong> y tu cupo ya
-                    está reservado.
-                  </>
-                ) : (
-                  <>
-                    Recibimos tu pago de{" "}
-                    <strong>{formatAmount(montoPagado)}</strong> para{" "}
-                    <strong>{viaje}</strong>
-                    {fechas ? ` (${fechas})` : ""}. Tu lugar en el círculo está
-                    confirmado.
-                  </>
-                )}
-              </>
-            )}
-          </>
+      <Paragraph preLine>
+        {rich(
+          sinCargo
+            ? k.body_sin_cargo
+            : saldoCompletado
+              ? k.body_completo
+              : esSena
+                ? k.body_sena
+                : k.body_pagado,
+          vars
         )}
       </Paragraph>
 
@@ -117,47 +90,26 @@ export function PagoRegistrado({
           docs/consulta-sofia-pagos.txt), y prometer una fecha que después
           cambia es peor que no darla. */}
       {esSena && saldo > 0 && (
-        <Paragraph>
-          El saldo pendiente (<strong>{formatAmount(saldo)}</strong>) puedes
-          completarlo desde tu cuenta hasta 10 días antes del viaje. Si
-          necesitas conversar sobre los plazos, escríbenos.
-        </Paragraph>
+        <Paragraph preLine>{rich(k.saldo_pendiente, vars)}</Paragraph>
       )}
 
       {necesitaSalud ? (
         <>
-          {esSena && !sinCargo ? (
-            <Paragraph>
-              Incluimos un formulario de experiencia e intenciones que te
-              pedimos rellenar para conocerte mejor y preparar tu experiencia
-              con el cuidado que merece.
-            </Paragraph>
-          ) : (
-            <Paragraph>
-              Queda un paso importante: el formulario de salud completo. Es más
-              largo que el primero y es lo que nos permite preparar la
-              ceremonia y cuidar tu proceso, así que tómate el tiempo de
-              responderlo con calma.
-            </Paragraph>
-          )}
+          <Paragraph preLine>
+            {rich(esSena && !sinCargo ? k.salud_sena : k.salud_normal, vars)}
+          </Paragraph>
 
-          <CtaButton href={url}>Completar el formulario de salud</CtaButton>
+          <CtaButton href={url}>{fill(k.button_salud, vars)}</CtaButton>
 
           {esSena && !sinCargo && (
-            <Paragraph>
-              ¡Gracias por tu confianza! Nos alegra mucho compartir este viaje
-              contigo.
-            </Paragraph>
+            <Paragraph preLine>{rich(k.gracias_sena, vars)}</Paragraph>
           )}
         </>
       ) : (
         <>
-          <Paragraph>
-            Vamos a escribirte con la preparación previa y los datos de
-            logística a medida que se acerque la fecha.
-          </Paragraph>
+          <Paragraph preLine>{rich(k.logistica, vars)}</Paragraph>
 
-          <CtaButton href={url}>Ver los detalles de la experiencia</CtaButton>
+          <CtaButton href={url}>{fill(k.button_detalles, vars)}</CtaButton>
         </>
       )}
     </BaseLayout>

@@ -183,15 +183,28 @@ export type ContactFilters = {
   viaje?: string;
 };
 
+/**
+ * Un filtro puede traer varios valores separados por coma (`estado=viajero,potencial`):
+ * dentro de un eje alcanza con cumplir uno (O), entre ejes se cumplen todos (Y).
+ */
+export function filterValues(value: string | undefined): string[] {
+  return (value ?? "").split(",").map((v) => v.trim()).filter(Boolean);
+}
+
 /** Un solo criterio para la tabla y para el envío: lo que se ve es lo que recibe. */
 export function filterContacts(contacts: Contact[], f: ContactFilters): Contact[] {
+  const estado = filterValues(f.estado);
+  const nivel = filterValues(f.nivel);
+  const pais = filterValues(f.pais);
+  const genero = filterValues(f.genero);
+  const viaje = filterValues(f.viaje);
   return contacts.filter(
     (c) =>
-      (!f.estado || c.state === f.estado) &&
-      (!f.nivel || c.experience === f.nivel) &&
-      (!f.pais || c.country === f.pais) &&
-      (!f.genero || c.gender === f.genero) &&
-      (!f.viaje || c.tripIds.includes(f.viaje))
+      (estado.length === 0 || estado.includes(c.state)) &&
+      (nivel.length === 0 || nivel.includes(c.experience)) &&
+      (pais.length === 0 || (c.country !== null && pais.includes(c.country))) &&
+      (genero.length === 0 || (c.gender !== null && genero.includes(c.gender))) &&
+      (viaje.length === 0 || viaje.some((id) => c.tripIds.includes(id)))
   );
 }
 

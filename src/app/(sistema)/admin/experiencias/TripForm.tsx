@@ -1,5 +1,6 @@
 "use client";
 
+import { TRIP_CURRENCIES } from "@/lib/format";
 import { useActionState, useRef, useState } from "react";
 import { CoverFramer } from "@/components/admin/CoverFramer";
 import { useCoverCrop } from "@/components/admin/use-cover-crop";
@@ -371,8 +372,28 @@ export function TripForm({
           />
         </div>
         <div className="flex flex-col gap-1.5">
+          <label htmlFor="currency" className={labelClass}>
+            Moneda
+          </label>
+          <select
+            id="currency"
+            name="currency"
+            defaultValue={trip?.currency ?? "USD"}
+            className={inputClass}
+          >
+            {TRIP_CURRENCIES.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-on-surface-variant">
+            Vale para el precio y la seña de esta experiencia.
+          </p>
+        </div>
+        <div className="flex flex-col gap-1.5">
           <label htmlFor="price" className={labelClass}>
-            Precio (USD)
+            Precio
           </label>
           <input
             id="price"
@@ -386,7 +407,7 @@ export function TripForm({
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor="deposit_amount" className={labelClass}>
-            Seña para reservar (USD)
+            Seña para reservar
           </label>
           <input
             id="deposit_amount"

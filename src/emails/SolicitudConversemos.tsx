@@ -1,3 +1,4 @@
+import { copyFor, rich, fill, type CopyOverrides } from "@/lib/email/templates";
 import { BaseLayout, Paragraph, Title } from "./BaseLayout";
 
 /**
@@ -22,37 +23,24 @@ import { BaseLayout, Paragraph, Title } from "./BaseLayout";
 export function SolicitudConversemos({
   nombre,
   viaje,
+  copy,
 }: {
   nombre: string;
   viaje: string;
+  copy?: CopyOverrides;
 }) {
+  const k = copyFor("conversemos", copy);
+  const vars = { nombre, viaje };
   return (
-    <BaseLayout preview={`Sobre tu postulación para ${viaje} — nos gustaría conversar`}>
-      <Title>Nos gustaría conversar</Title>
+    <BaseLayout preview={fill(k.preview, vars)}>
+      <Title>{fill(k.title, vars)}</Title>
 
       <Paragraph>Hola {nombre},</Paragraph>
 
-      {/* Texto de Sofía del 27/10, literal. */}
-      <Paragraph>
-        Gracias por tu postulación para <strong>{viaje}</strong>.
-      </Paragraph>
-
-      <Paragraph>
-        Antes de continuar con el proceso, nos gustaría conversar contigo para
-        conocer un poco mejor algunos aspectos de la información que
-        compartiste.
-      </Paragraph>
-
-      <Paragraph>
-        Esto no significa que tu postulación haya sido rechazada, sino que
-        queremos asegurarnos de que la experiencia sea adecuada y segura para
-        ti.
-      </Paragraph>
-
-      <Paragraph>
-        Nuestro equipo se pondrá en contacto contigo para coordinar una
-        conversación.
-      </Paragraph>
+      <Paragraph preLine>{rich(k.p1, vars)}</Paragraph>
+      <Paragraph preLine>{rich(k.p2, vars)}</Paragraph>
+      <Paragraph preLine>{rich(k.p3, vars)}</Paragraph>
+      <Paragraph preLine>{rich(k.p4, vars)}</Paragraph>
     </BaseLayout>
   );
 }

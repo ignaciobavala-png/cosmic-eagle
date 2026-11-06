@@ -72,18 +72,32 @@ export function formatScheduleDay(
 /**
  * El aporte de un viaje: "USD 900".
  *
- * **Los precios de `trips.price` estan fijados en dolares** (definido el
- * 02/09/2026, punto 6 de la consulta de cobros). Los demas rieles cobran el
- * equivalente del dia: el IBAN de Santander en euros, Encuadrado en lo que
- * cobre. Por eso no hay columna `currency` en `trips` — la moneda del viaje es
- * siempre esta, y la del riel la aclara cada medio de cobro.
+ * **Cada experiencia tiene su moneda** (`trips.currency`: CLP, USD o EUR, desde
+ * el 06/11/2026). Hasta entonces todo estaba fijado en dolares (02/09, punto 6
+ * de la consulta de cobros), y USD sigue siendo el valor por defecto. La moneda
+ * del riel de cobro la aclara cada medio de pago, aparte.
  *
  * Es la unica funcion que imprime un precio: antes "USD" estaba escrito a mano
  * en tres pantallas y la cuarta lo omitia a proposito.
  */
 export function formatAmount(
   price: number,
-  locale: FormatLocale = "es"
+  locale: FormatLocale = "es",
+  currency: string | null | undefined = "USD"
 ): string {
-  return `USD ${new Intl.NumberFormat(intlTag(locale), { maximumFractionDigits: 0 }).format(price)}`;
+  return `${currency || "USD"} ${new Intl.NumberFormat(intlTag(locale), { maximumFractionDigits: 0 }).format(price)}`;
+}
+
+/**
+ * Las monedas en que se puede cobrar una experiencia (desde el 06/11/2026; antes
+ * era USD para todas). `trips.currency` las limita con un CHECK.
+ */
+export const TRIP_CURRENCIES = [
+  { value: "CLP", label: "Pesos chilenos (CLP)" },
+  { value: "USD", label: "Dólares (USD)" },
+  { value: "EUR", label: "Euros (EUR)" },
+] as const;
+
+export function isTripCurrency(value: unknown): value is "CLP" | "USD" | "EUR" {
+  return TRIP_CURRENCIES.some((c) => c.value === value);
 }

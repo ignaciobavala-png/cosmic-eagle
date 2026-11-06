@@ -3454,3 +3454,22 @@ plataforma y lo resuelva el asistente del panel. Detalle técnico en `docs/IA.md
 - **Pendiente / ideas:** acciones en lote con aprobación (avisos a viajeros), plazos
   de los correos programados en la base, secuencias de correos (proyecto grande), la
   guía revisada por Sofía en los **[PENDIENTE]** de pagos.
+
+
+## 2026-11-06 — editor de correos, moneda por experiencia, descuentos y CRM
+
+- **Editor de correos** (`/admin/correos`): asunto, título, párrafos y botones de los
+  8 correos del embudo, con variables `{nombre}`, `**negrita**`, vista previa en vivo y
+  «Restaurar». Registro y textos por defecto en `src/lib/email/templates.ts`; lo editado
+  en `email_templates` (RLS: lee cualquier sesión, escribe el admin). El marco, el saludo
+  y los datos de pago siguen en código. El mensaje libre del CRM no entra: ya es texto libre.
+- **Moneda por experiencia**: `trips.currency` (CLP/USD/EUR). Reemplaza la regla de
+  «todo en USD» del 02/09. Pasa por pantallas públicas, panel, correos y cron.
+- **Descuentos** (`/admin/descuentos`): `discount_codes` + `applications.discount_code_id`
+  /`discount_amount`. Trigger `private.apply_discount` recalcula el monto al insertar.
+  El postulante valida con `check_discount_code` y ve el suyo con `my_discount_codes`
+  (no hay SELECT sobre la tabla: no se pueden enumerar códigos). El descuento se resta en
+  /cuenta, /solicitar, mail de aprobación, saldo y panel de pago.
+- **CRM**: filtros combinables (varias categorías por eje), casillas por fila, correo a
+  las tildadas o al grupo, eliminar (botón visible + «Eliminar tildadas»).
+- Sin probar en navegador; sí `tsc`, eslint y una prueba SQL del trigger.

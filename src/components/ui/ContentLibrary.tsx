@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
-import { ArrowLeft, Lock, Share2 } from "lucide-react";
+import { ArrowLeft, Check, Lock, Share2 } from "lucide-react";
 import { GuestNotice } from "./GuestNotice";
 import { ArticleBody } from "./ArticleBody";
 import { ArticleAudio } from "./ArticleAudio";
@@ -326,17 +326,34 @@ function TestimonialsVideo({ src }: { src: string }) {
     url.search = "?categoria=testimonios";
     url.hash = "viajeras-chilenas";
     const link = url.toString();
-    try {
-      if (navigator.share) {
+    // En el teléfono, el menú nativo; en la compu ese panel no da señal de
+    // nada, así que se copia el link y se avisa.
+    const touch = window.matchMedia("(pointer: coarse)").matches;
+    if (touch && typeof navigator.share === "function") {
+      try {
         await navigator.share({ title: t("library.videoTitle"), url: link });
         return;
+      } catch (error) {
+        // Cerrar el menú sin elegir no es un fallo.
+        if ((error as Error).name === "AbortError") return;
       }
-      await navigator.clipboard.writeText(link);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    } catch {
-      // Cancelar el panel de compartir no es un error.
     }
+    try {
+      await navigator.clipboard.writeText(link);
+    } catch {
+      const input = document.createElement("textarea");
+      input.value = link;
+      document.body.appendChild(input);
+      input.select();
+      const ok = document.execCommand("copy");
+      input.remove();
+      if (!ok) {
+        window.prompt(t("library.videoShare"), link);
+        return;
+      }
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   }
 
   return (
@@ -363,8 +380,10 @@ function TestimonialsVideo({ src }: { src: string }) {
           onClick={share}
           className="inline-flex items-center gap-2 text-label-sm uppercase text-[#05125a] transition-colors hover:text-on-primary-container"
         >
-          <Share2 size={15} aria-hidden="true" />
-          {copied ? t("library.videoCopied") : t("library.videoShare")}
+          {copied ? <Check size={15} aria-hidden="true" /> : <Share2 size={15} aria-hidden="true" />}
+          <span aria-live="polite">
+            {copied ? t("library.videoCopied") : t("library.videoShare")}
+          </span>
         </button>
       </div>
     </section>

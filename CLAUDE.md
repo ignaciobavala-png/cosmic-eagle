@@ -59,8 +59,18 @@ comprobante. Los rieles de cobro los carga ella en `/admin/pagos`; los
 comprobantes van al bucket privado `comprobantes` (URLs firmadas a 10 min).
 `payment_status`: `pending` → `deposit_paid` → `paid`, más `waived`.
 **No hay pasarela**: Encuadrado está relevado (`docs/ENCUADRADO.md`) y no
-integrado. `trips.price` está fijado en **USD**; la moneda que varía es la del
-riel (`payment_methods.currency`).
+integrado. Desde el 06/11 **cada experiencia tiene su moneda** (`trips.currency`: CLP, USD o
+EUR, default USD) y `formatAmount(precio, locale, moneda)` la imprime; la del riel
+de cobro sigue aparte (`payment_methods.currency`).
+
+**Descuentos** (06/11, `/admin/descuentos`): `discount_codes` se asigna a una persona
+o queda abierto; el formulario de postulación pregunta por el código y la solicitud
+guarda `discount_amount`, que **calcula un trigger** (nunca el navegador). El precio
+que paga la persona es `finalPrice(trip.price, discount_amount)`.
+
+**Editor de correos** (`/admin/correos`): los textos por defecto viven en
+`src/lib/email/templates.ts` y lo editado en `email_templates`; las plantillas
+recibe `copy`. Sin filas, el correo sale como siempre.
 
 **Correos.** Dos canales que se confunden fácil: los de *auth* los manda Supabase
 por SMTP, los de la *app* salen por el SDK de Resend (`docs/EMAIL.md`). Vamos

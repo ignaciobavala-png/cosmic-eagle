@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/navigation";
+import { finalPrice } from "@/lib/discounts";
 import { getTranslations } from "next-intl/server";
 import { formatAmount, type FormatLocale } from "@/lib/format";
 import { panel, panelDivider } from "@/components/forms/styles";
@@ -25,12 +26,14 @@ type Application = {
   health_form_submitted: boolean;
   consent_submitted: boolean;
   created_at: string;
+  discount_amount?: number | null;
   trip: {
     title: string;
     location: string | null;
     start_date: string;
     end_date: string;
     price: number;
+    currency: string;
     deposit_amount: number | null;
   } | null;
 };
@@ -63,26 +66,26 @@ function pendingStep(a: Application, locale: FormatLocale): PendingStep {
       ? {
           key: "applications.deposit",
           values: {
-            deposit: formatAmount(a.trip.deposit_amount, locale),
-            price: formatAmount(a.trip.price, locale),
+            deposit: formatAmount(a.trip.deposit_amount, locale, a.trip.currency),
+            price: formatAmount(finalPrice(a.trip.price, a.discount_amount), locale, a.trip.currency),
           },
           href: `/viajes/${a.trip_id}/solicitar`,
         }
       : a.trip
         ? {
             key: "applications.payMissing",
-            values: { price: formatAmount(a.trip.price, locale) },
+            values: { price: formatAmount(finalPrice(a.trip.price, a.discount_amount), locale, a.trip.currency) },
             href: `/viajes/${a.trip_id}/solicitar`,
           }
         : { key: "applications.payMissingNoTrip", href: `/viajes/${a.trip_id}/solicitar` };
   }
   const faltaSalud = a.is_first_time && !a.health_form_submitted;
   if (a.payment_status === "deposit_paid" && !faltaSalud) {
-    const saldo = a.trip ? Math.max(0, a.trip.price - a.amount_paid) : 0;
+    const saldo = a.trip ? Math.max(0, finalPrice(a.trip.price, a.discount_amount) - a.amount_paid) : 0;
     return saldo > 0
       ? {
           key: "applications.balance",
-          values: { amount: formatAmount(saldo, locale) },
+          values: { amount: formatAmount(saldo, locale, a.trip?.currency) },
           href: `/viajes/${a.trip_id}/solicitar`,
         }
       : { key: "applications.balanceNoTrip", href: `/viajes/${a.trip_id}/solicitar` };

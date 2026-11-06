@@ -5,14 +5,14 @@ import {
   GENDER_LABELS,
   RELATIONSHIP_STATES,
   filterContacts,
+  filterValues,
   type Contact,
   MAX_RECIPIENTS,
 } from "@/lib/crm";
 import { loadContacts } from "@/lib/crm-data";
 import { GENDERS } from "@/app/[locale]/cuenta/profile-fields";
 import { CopyEmails } from "../suscriptores/CopyEmails";
-import { DeleteContactButton } from "./DeleteContactButton";
-import { SendEmailPanel } from "./SendEmailPanel";
+import { CrmTable } from "./CrmTable";
 
 // El envío de correos segmentados es una server action que se queda esperando
 // ~600 ms por mail; sin esto Vercel la corta a los pocos segundos.
@@ -59,15 +59,22 @@ function FilterRow({
   label: string;
   options: { value: string; label: string; count: number }[];
   param: string;
-  active: string | null;
+  active: string[];
   current: Record<string, string | undefined>;
 }) {
+  // Cada categoría se tilda o se destilda: se pueden combinar varias del mismo
+  // eje (Chile + Argentina) y el grupo es la suma de ellas.
   function hrefFor(value: string | null) {
     const next = new URLSearchParams();
     for (const [key, val] of Object.entries(current)) {
       if (val && key !== param) next.set(key, val);
     }
-    if (value) next.set(param, value);
+    if (value) {
+      const list = active.includes(value)
+        ? active.filter((v) => v !== value)
+        : [...active, value];
+      if (list.length > 0) next.set(param, list.join(","));
+    }
     const qs = next.toString();
     return qs ? `/admin/crm?${qs}` : "/admin/crm";
   }
@@ -80,7 +87,7 @@ function FilterRow({
       <Link
         href={hrefFor(null)}
         className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-          active === null
+          active.length === 0
             ? "border-primary-fixed-dim bg-primary-container/20 text-primary-fixed-dim"
             : "border-outline/40 text-on-surface-variant hover:text-on-surface"
         }`}
@@ -92,11 +99,12 @@ function FilterRow({
           key={opt.value}
           href={hrefFor(opt.value)}
           className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-            active === opt.value
+            active.includes(opt.value)
               ? "border-primary-fixed-dim bg-primary-container/20 text-primary-fixed-dim"
               : "border-outline/40 text-on-surface-variant hover:text-on-surface"
           }`}
         >
+          {active.includes(opt.value) ? "✓ " : ""}
           {opt.label}
           <span className="ml-1.5 opacity-60">{opt.count}</span>
         </Link>
@@ -133,21 +141,21 @@ export default async function AdminCrmPage({
     ...new Set(contacts.map((c) => c.country).filter((c): c is string => !!c)),
   ].sort();
 
-  const activeState = query.estado ?? null;
-  const activeLevel = query.nivel ?? null;
-  const activeCountry = query.pais ?? null;
-  const activeGender = query.genero ?? null;
-  const activeTrip = query.viaje ?? null;
+  const activeState = filterValues(query.estado);
+  const activeLevel = filterValues(query.nivel);
+  const activeCountry = filterValues(query.pais);
+  const activeGender = filterValues(query.genero);
+  const activeTrip = filterValues(query.viaje);
 
   const filtered = filterContacts(contacts, query);
 
   // Cómo se nombra el grupo en el redactor y en la confirmación.
   const groupParts = [
-    activeState && RELATIONSHIP_STATES.find((s) => s.value === activeState)?.label,
-    activeLevel && EXPERIENCE_LEVELS.find((l) => l.value === activeLevel)?.label,
-    activeCountry,
-    activeGender && GENDER_LABELS[activeGender as keyof typeof GENDER_LABELS],
-    activeTrip && trips?.find((t) => t.id === activeTrip)?.title,
+    ...activeState.map((v) => RELATIONSHIP_STATES.find((s) => s.value === v)?.label),
+    ...activeLevel.map((v) => EXPERIENCE_LEVELS.find((l) => l.value === v)?.label),
+    ...activeCountry,
+    ...activeGender.map((v) => GENDER_LABELS[v as keyof typeof GENDER_LABELS]),
+    ...activeTrip.map((v) => trips?.find((t) => t.id === v)?.title),
   ].filter(Boolean);
   const groupLabel = groupParts.length ? groupParts.join(" · ") : "todas las personas registradas";
 
@@ -232,114 +240,35 @@ export default async function AdminCrmPage({
         )}
       </div>
 
-      <div className="mb-8">
-        <SendEmailPanel
-          key={groupLabel}
-          filters={query}
-          count={filtered.filter((c) => c.email && !c.isAdmin).length}
-          max={MAX_RECIPIENTS}
-          groupLabel={groupLabel}
-        />
-      </div>
-
       {filtered.length === 0 ? (
         <p className="text-on-surface-variant">
           No hay contactos que coincidan con este filtro.
         </p>
       ) : (
-        <div className="glass-card overflow-x-auto rounded-2xl">
-          <table className="w-full min-w-[60rem] text-sm">
-            <thead>
-              <tr className="border-b border-outline-variant text-left text-on-surface-variant">
-                <th className="px-5 py-3 font-medium">Persona</th>
-                <th className="px-5 py-3 font-medium">País</th>
-                <th className="px-5 py-3 font-medium">Género</th>
-                <th className="px-5 py-3 font-medium">Experiencia</th>
-                <th className="px-5 py-3 font-medium">Ceremonias</th>
-                <th className="px-5 py-3 font-medium">Estado</th>
-                <th className="px-5 py-3 font-medium">Registro</th>
-                <th className="px-5 py-3 font-medium sr-only">Ficha</th>
-                <th className="px-5 py-3 font-medium sr-only">Eliminar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((contact) => (
-                <tr
-                  key={contact.id}
-                  className="border-b border-outline-variant/40 last:border-0"
-                >
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <span
-                        aria-hidden="true"
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-outline/40 font-display text-sm text-on-surface-variant"
-                      >
-                        {(contact.fullName?.trim()?.[0] ?? contact.email?.[0] ?? "?").toUpperCase()}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="truncate font-medium text-on-surface">
-                          {contact.fullName ?? "Sin nombre"}
-                          {contact.isAdmin && (
-                            <span className="ml-2 text-[10px] uppercase tracking-widest text-primary-fixed-dim">
-                              admin
-                            </span>
-                          )}
-                        </p>
-                        <p className="truncate text-xs text-on-surface-variant">
-                          {contact.email ?? "—"}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4 text-on-surface-variant">
-                    {contact.country ?? "—"}
-                  </td>
-                  <td className="px-5 py-4 text-on-surface-variant">
-                    {GENDER_LABELS[contact.gender as keyof typeof GENDER_LABELS] ?? "—"}
-                  </td>
-                  <td className="px-5 py-4 text-on-surface-variant">
-                    {EXPERIENCE_LEVELS.find(
-                      (l) => l.value === contact.experience
-                    )?.label ?? contact.experience}
-                  </td>
-                  <td className="px-5 py-4 text-on-surface-variant">
-                    {contact.ceremonies}
-                  </td>
-                  <td className="px-5 py-4">
-                    <span
-                      className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${
-                        STATE_CLASS[contact.state] ?? ""
-                      }`}
-                    >
-                      {RELATIONSHIP_STATES.find(
-                        (s) => s.value === contact.state
-                      )?.label ?? contact.state}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-on-surface-variant">
-                    {formatDate(contact.createdAt)}
-                  </td>
-                  <td className="px-5 py-4">
-                    <Link
-                      href={`/admin/crm/${contact.id}`}
-                      className="whitespace-nowrap text-xs text-on-surface-variant transition-colors hover:text-primary-fixed-dim"
-                    >
-                      Ficha de salud →
-                    </Link>
-                  </td>
-                  <td className="px-5 py-4 text-right">
-                    {!contact.isAdmin && (
-                      <DeleteContactButton
-                        id={contact.id}
-                        name={contact.fullName ?? contact.email ?? "esta persona"}
-                      />
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <CrmTable
+          key={groupLabel}
+          filters={query}
+          groupLabel={groupLabel}
+          max={MAX_RECIPIENTS}
+          rows={filtered.map((contact) => ({
+            id: contact.id,
+            fullName: contact.fullName,
+            email: contact.email,
+            isAdmin: contact.isAdmin,
+            country: contact.country,
+            gender:
+              GENDER_LABELS[contact.gender as keyof typeof GENDER_LABELS] ?? null,
+            experience:
+              EXPERIENCE_LEVELS.find((l) => l.value === contact.experience)?.label ??
+              contact.experience,
+            ceremonies: contact.ceremonies,
+            stateLabel:
+              RELATIONSHIP_STATES.find((s) => s.value === contact.state)?.label ??
+              contact.state,
+            stateClass: STATE_CLASS[contact.state] ?? "",
+            createdAt: formatDate(contact.createdAt),
+          }))}
+        />
       )}
 
       <p className="mt-6 text-xs text-on-surface-variant/70">

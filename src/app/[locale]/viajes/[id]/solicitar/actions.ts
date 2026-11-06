@@ -1,5 +1,7 @@
 "use server";
 
+import { getCopyOverrides } from "@/lib/email/copy-store";
+import { copyFor, fill } from "@/lib/email/templates";
 import { revalidatePath } from "next/cache";
 import { redirect } from "@/i18n/redirect";
 import { createClient } from "@/lib/supabase/server";
@@ -89,8 +91,27 @@ export async function submitApplication(
     return { error: "Responde sí o no en las tres preguntas de salud." };
   }
 
+  // Código de descuento (opcional). Se valida acá para avisar con claridad; el
+  // monto lo recalcula la base al insertar, así que el navegador no lo decide.
+  const discountCode = str(formData, "discount_code").toUpperCase();
+  let discountCodeId: string | null = null;
+  if (discountCode) {
+    const { data: found } = await supabase.rpc("check_discount_code", {
+      p_code: discountCode,
+      p_trip_id: tripId,
+    });
+    if (!found?.[0]) {
+      return {
+        error:
+          "Ese código de descuento no es válido para esta experiencia (puede haber vencido o no estar asignado a tu cuenta). Revísalo o déjalo vacío.",
+      };
+    }
+    discountCodeId = found[0].id;
+  }
+
   const { error } = await supabase.from("applications").insert({
     user_id: user.id,
+    discount_code_id: discountCodeId,
     trip_id: tripId,
     full_name,
     email,
@@ -114,6 +135,9 @@ export async function submitApplication(
     // solicitud viva por viaje: rechazada o vencida sí se puede volver a mandar.
     if (error.code === "23505") {
       return { error: "Ya tienes una solicitud en curso para este viaje." };
+    }
+    if (error.message.includes("discount_invalid")) {
+      return { error: "Ese código de descuento ya no está disponible. Revísalo o déjalo vacío." };
     }
     return { error: `No se pudo enviar la solicitud: ${error.message}` };
   }
@@ -152,10 +176,12 @@ async function notifyReceived({
     .eq("id", tripId)
     .single();
 
+  const copy = await getCopyOverrides("recibida");
   await sendEmail({
     to: email,
-    subject: `Recibimos tu solicitud para ${trip?.title ?? "el viaje"}`,
+    subject: fill(copyFor("recibida", copy).subject, { viaje: trip?.title ?? "el viaje" }),
     react: SolicitudRecibida({
+      copy,
       // Solo el primer nombre: el formulario pide nombre completo y "Hola María
       // Fernanda Gómez" suena a carta del banco.
       nombre: nombre.split(" ")[0],

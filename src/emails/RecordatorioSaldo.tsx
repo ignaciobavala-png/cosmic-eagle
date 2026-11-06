@@ -1,3 +1,4 @@
+import { copyFor, rich, fill, type CopyOverrides } from "@/lib/email/templates";
 import { BaseLayout, CtaButton, Paragraph, Title } from "./BaseLayout";
 import { formatAmount } from "@/lib/format";
 
@@ -23,6 +24,8 @@ export function RecordatorioSaldo({
   saldo,
   fechaLimite,
   url,
+  moneda = "USD",
+  copy,
 }: {
   nombre: string;
   viaje: string;
@@ -31,46 +34,25 @@ export function RecordatorioSaldo({
   /** Ya formateada ("12 de octubre"). `null` si el corte ya paso. */
   fechaLimite: string | null;
   url: string;
+  /** Moneda de la experiencia: CLP, USD o EUR. */
+  moneda?: string;
+  copy?: CopyOverrides;
 }) {
+  const k = copyFor("saldo", copy);
+  const vars = { nombre, viaje, fechas, saldo: formatAmount(saldo, "es", moneda), fechaLimite };
   return (
-    <BaseLayout preview={`Queda un saldo pendiente para ${viaje}`}>
-      <Title>Recordatorio de tu saldo pendiente</Title>
+    <BaseLayout preview={fill(k.preview, vars)}>
+      <Title>{fill(k.title, vars)}</Title>
 
       <Paragraph>Hola {nombre},</Paragraph>
 
-      {/* Texto de Sofía del 27/10, literal (tuteo). */}
-      <Paragraph>Esperamos que estés muy bien.</Paragraph>
+      <Paragraph preLine>{rich(k.p1, vars)}</Paragraph>
+      <Paragraph preLine>{rich(k.p2, vars)}</Paragraph>
+      <Paragraph preLine>{rich(fechaLimite ? k.deadline : k.no_deadline, vars)}</Paragraph>
+      <Paragraph preLine>{rich(k.p3, vars)}</Paragraph>
+      <Paragraph preLine>{rich(k.p4, vars)}</Paragraph>
 
-      <Paragraph>
-        Te recordamos que tienes un saldo pendiente de{" "}
-        <strong>{formatAmount(saldo)}</strong> para <strong>{viaje}</strong>
-        {fechas ? ` (${fechas})` : ""}.
-      </Paragraph>
-
-      <Paragraph>
-        {fechaLimite ? (
-          <>
-            Puedes completar tu pago hasta el <strong>{fechaLimite}</strong>,
-            directamente desde tu cuenta.
-          </>
-        ) : (
-          <>
-            Puedes completar tu pago antes de la experiencia, directamente desde
-            tu cuenta.
-          </>
-        )}
-      </Paragraph>
-
-      <Paragraph>
-        Si necesitas coordinar otros plazos, escríbenos con confianza y
-        buscamos juntos una solución.
-      </Paragraph>
-
-      <Paragraph>
-        Nos alegra mucho que pronto podamos compartir esta experiencia.
-      </Paragraph>
-
-      <CtaButton href={url}>Ver saldo</CtaButton>
+      <CtaButton href={url}>{fill(k.button, vars)}</CtaButton>
     </BaseLayout>
   );
 }

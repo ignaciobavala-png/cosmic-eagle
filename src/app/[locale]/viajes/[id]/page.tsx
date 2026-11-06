@@ -29,6 +29,7 @@ import { getSiteContent } from "@/lib/site-content";
 import { todayUTC } from "@/lib/trip-dates";
 import { parseRoomOptions, type RoomOption } from "@/lib/trip-rooms";
 import { ScreeningForm } from "./solicitar/ScreeningForm";
+import { getSuggestedDiscountCode } from "@/lib/discounts";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 type Props = { params: Promise<{ locale: string; id: string }> };
@@ -77,7 +78,7 @@ async function getTrip(id: string, locale: string) {
   const { data } = await supabase
     .from("trips")
     .select(
-      "id, title, title_en, description, description_en, location, start_date, end_date, capacity, price, deposit_amount, status, image_url, type, schedule, terms, terms_en, category, start_time, end_time, venue_type, venue_type_en, includes, includes_en, gallery, room_options"
+      "id, title, title_en, description, description_en, location, start_date, end_date, capacity, price, currency, deposit_amount, status, image_url, type, schedule, terms, terms_en, category, start_time, end_time, venue_type, venue_type_en, includes, includes_en, gallery, room_options"
     )
     .eq("id", id)
     .single();
@@ -134,6 +135,7 @@ export default async function ViajePage({ params }: Props) {
   // Sin viaje terminado, igual que el cierre del alta en /solicitar.
   const puedePostular = isOpen && trip.end_date >= todayUTC();
   let yaPostulo = false;
+  let suggestedCode = "";
   if (user && puedePostular) {
     const { data: apps } = await supabase
       .from("my_applications")
@@ -141,6 +143,7 @@ export default async function ViajePage({ params }: Props) {
       .eq("trip_id", trip.id)
       .limit(1);
     yaPostulo = !!apps?.length;
+    if (!yaPostulo) suggestedCode = await getSuggestedDiscountCode(supabase, trip.id);
   }
   const schedule = groupScheduleByDay(
     localizeSchedule(parseSchedule(trip.schedule), locale)
@@ -210,7 +213,7 @@ export default async function ViajePage({ params }: Props) {
       label: t("fields.aporte"),
       value:
         trip.price > 0
-          ? formatAmount(trip.price, formatLocale)
+          ? formatAmount(trip.price, formatLocale, trip.currency)
           : t("priceConfirm"),
       // Con variantes de habitación (Sofía, 27/10) el aporte se abre y las lista.
       rooms: rooms.length > 0 ? rooms : undefined,
@@ -366,7 +369,7 @@ export default async function ViajePage({ params }: Props) {
                               <li key={r.label} className="flex justify-between gap-4">
                                 <span className="capitalize">{r.label}</span>
                                 <span className="font-semibold">
-                                  {formatAmount(r.price, formatLocale)}
+                                  {formatAmount(r.price, formatLocale, trip.currency)}
                                 </span>
                               </li>
                             ))}
@@ -480,7 +483,11 @@ export default async function ViajePage({ params }: Props) {
                   </p>
                   {user && puedePostular && !yaPostulo ? (
                     <div className="mt-8 text-left">
-                      <ScreeningForm tripId={trip.id} defaultEmail={user.email} />
+                      <ScreeningForm
+                        tripId={trip.id}
+                        defaultEmail={user.email}
+                        suggestedCode={suggestedCode}
+                      />
                     </div>
                   ) : (
                     <div className="mt-8 flex justify-center">

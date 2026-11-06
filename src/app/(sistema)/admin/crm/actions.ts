@@ -52,7 +52,12 @@ export type SendResultState = {
 export async function sendSegmentedEmail(
   filters: ContactFilters,
   subject: string,
-  message: string
+  message: string,
+  /**
+   * Personas tildadas a mano en la tabla. Se **intersecta** con el filtro en el
+   * servidor: tildar nunca agrega a nadie que el filtro no muestre.
+   */
+  onlyIds?: string[]
 ): Promise<SendResultState> {
   const admin = await requireAdmin();
   if (!admin) return { ok: false, message: "No tienes permiso para hacer esto." };
@@ -64,8 +69,9 @@ export async function sendSegmentedEmail(
   }
 
   const contacts = await loadContacts(admin.supabase);
+  const only = onlyIds && onlyIds.length > 0 ? new Set(onlyIds) : null;
   const recipients = filterContacts(contacts, filters).filter(
-    (c) => c.email && !c.isAdmin
+    (c) => c.email && !c.isAdmin && (!only || only.has(c.id))
   );
 
   if (recipients.length === 0) {
@@ -175,4 +181,29 @@ export async function deleteContact(id: string): Promise<SendResultState> {
   revalidatePath("/admin/crm");
   revalidatePath("/admin");
   return { ok: true, message: "Persona eliminada." };
+}
+
+/** Elimina a varias personas (las tildadas en la tabla), una por una. */
+export async function deleteContacts(ids: string[]): Promise<SendResultState> {
+  if (ids.length === 0) return { ok: false, message: "No hay nadie seleccionado." };
+  if (ids.length > 50) return { ok: false, message: "Son demasiadas a la vez: máximo 50." };
+
+  let done = 0;
+  const failed: string[] = [];
+  for (const id of ids) {
+    const res = await deleteContact(id);
+    if (res.ok) done++;
+    else failed.push(res.message);
+  }
+
+  if (failed.length > 0) {
+    return {
+      ok: false,
+      message: `Se eliminaron ${done} de ${ids.length}. ${failed[0]}`,
+    };
+  }
+  return {
+    ok: true,
+    message: `Se ${done === 1 ? "eliminó 1 persona" : `eliminaron ${done} personas`}.`,
+  };
 }

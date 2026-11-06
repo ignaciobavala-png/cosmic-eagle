@@ -30,9 +30,12 @@ import { submitApplication, type ApplicationFormState } from "./actions";
 export function ScreeningForm({
   tripId,
   defaultEmail,
+  suggestedCode = "",
 }: {
   tripId: string;
   defaultEmail?: string;
+  /** Código que la organización le asignó a esta persona, si tiene uno. */
+  suggestedCode?: string;
 }) {
   const [state, formAction, pending] = useActionState<
     ApplicationFormState,
@@ -148,6 +151,25 @@ export function ScreeningForm({
           Tema o intención que quieres trabajar (opcional)
         </label>
         <textarea name="theme" rows={2} className={inputClass} />
+      </div>
+
+      <div className="flex flex-col gap-1.5 pb-4">
+        <label htmlFor="discount_code" className={labelClass}>
+          ¿Tienes un código de descuento? (opcional)
+        </label>
+        <input
+          id="discount_code"
+          name="discount_code"
+          defaultValue={suggestedCode}
+          autoComplete="off"
+          maxLength={30}
+          className={`${inputClass} uppercase`}
+        />
+        {suggestedCode && (
+          <p className="text-xs text-white/60">
+            La organización te asignó este código: ya lo dejamos escrito.
+          </p>
+        )}
       </div>
 
       {state.error && (
