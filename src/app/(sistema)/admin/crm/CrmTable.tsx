@@ -132,7 +132,7 @@ export function CrmTable({
         <table className="w-full min-w-[60rem] text-sm">
           <thead>
             <tr className="border-b border-outline-variant text-left text-on-surface-variant">
-              <th className="w-10 px-5 py-3">
+              <th className="w-10 px-3 py-3">
                 <input
                   type="checkbox"
                   aria-label="Tildar a todas las personas de la lista"
@@ -143,16 +143,15 @@ export function CrmTable({
                   }
                 />
               </th>
-              <th className="px-5 py-3 font-medium">Persona</th>
-              <th className="px-5 py-3 font-medium">País</th>
-              <th className="px-5 py-3 font-medium">Género</th>
-              <th className="px-5 py-3 font-medium">Experiencia</th>
-              <th className="px-5 py-3 font-medium">Ceremonias</th>
-              <th className="px-5 py-3 font-medium">Estado</th>
-              <th className="px-5 py-3 font-medium">Registro</th>
-              <th className="px-5 py-3 font-medium sr-only">Ficha</th>
-              <th className="sticky right-0 bg-surface-container px-5 py-3 font-medium">
-                Eliminar
+              <th className="px-3 py-3 font-medium">Persona</th>
+              <th className="px-3 py-3 font-medium">País</th>
+              <th className="px-3 py-3 font-medium">Género</th>
+              <th className="px-3 py-3 font-medium">Experiencia</th>
+              <th className="px-3 py-3 font-medium">Ceremonias</th>
+              <th className="px-3 py-3 font-medium">Estado</th>
+              <th className="px-3 py-3 font-medium">Registro</th>
+              <th className="sticky right-0 bg-surface-container px-3 py-3 font-medium">
+                Acciones
               </th>
             </tr>
           </thead>
@@ -162,7 +161,7 @@ export function CrmTable({
                 key={contact.id}
                 className="border-b border-outline-variant/40 last:border-0"
               >
-                <td className="px-5 py-4">
+                <td className="px-3 py-4">
                   {!contact.isAdmin && (
                     <input
                       type="checkbox"
@@ -172,7 +171,7 @@ export function CrmTable({
                     />
                   )}
                 </td>
-                <td className="px-5 py-4">
+                <td className="px-3 py-4">
                   <div className="flex items-center gap-3">
                     <span
                       aria-hidden="true"
@@ -182,7 +181,13 @@ export function CrmTable({
                     </span>
                     <div className="min-w-0">
                       <p className="truncate font-medium text-on-surface">
-                        {contact.fullName ?? "Sin nombre"}
+                        <Link
+                          href={`/admin/crm/${contact.id}`}
+                          title="Abrir la ficha: solicitudes, pago y salud"
+                          className="underline-offset-4 transition-colors hover:text-primary-fixed-dim hover:underline"
+                        >
+                          {contact.fullName ?? "Sin nombre"}
+                        </Link>
                         {contact.isAdmin && (
                           <span className="ml-2 text-[10px] uppercase tracking-widest text-primary-fixed-dim">
                             admin
@@ -195,11 +200,11 @@ export function CrmTable({
                     </div>
                   </div>
                 </td>
-                <td className="px-5 py-4 text-on-surface-variant">{contact.country ?? "—"}</td>
-                <td className="px-5 py-4 text-on-surface-variant">{contact.gender ?? "—"}</td>
-                <td className="px-5 py-4 text-on-surface-variant">{contact.experience}</td>
-                <td className="px-5 py-4 text-on-surface-variant">{contact.ceremonies}</td>
-                <td className="px-5 py-4">
+                <td className="px-3 py-4 text-on-surface-variant">{contact.country ?? "—"}</td>
+                <td className="px-3 py-4 text-on-surface-variant">{contact.gender ?? "—"}</td>
+                <td className="px-3 py-4 text-on-surface-variant">{contact.experience}</td>
+                <td className="px-3 py-4 text-on-surface-variant">{contact.ceremonies}</td>
+                <td className="px-3 py-4">
                   {/* El estado, y debajo lo que falta: qué hacer o cómo va el
                       pago. Van en la misma celda para que se lean juntos y la
                       tabla no gane una columna que tape al resto. */}
@@ -226,26 +231,26 @@ export function CrmTable({
                     )}
                   </div>
                 </td>
-                <td className="px-5 py-4 text-on-surface-variant">{contact.createdAt}</td>
-                <td className="px-5 py-4">
-                  <Link
-                    href={`/admin/crm/${contact.id}`}
-                    className="whitespace-nowrap text-xs text-on-surface-variant transition-colors hover:text-primary-fixed-dim"
-                  >
-                    Abrir ficha →
-                  </Link>
-                </td>
-                <td className="sticky right-0 bg-surface-container px-5 py-4">
-                  {contact.isAdmin ? (
-                    <span className="text-xs text-on-surface-variant/60" title="Las cuentas de administración no se eliminan desde acá">
-                      —
-                    </span>
-                  ) : (
-                    <DeleteContactButton
-                      id={contact.id}
-                      name={contact.fullName ?? contact.email ?? "esta persona"}
-                    />
-                  )}
+                <td className="whitespace-nowrap px-3 py-4 text-on-surface-variant">{contact.createdAt}</td>
+                <td className="sticky right-0 bg-surface-container px-3 py-4">
+                  {/* "Abrir ficha" es un botón con texto, no un nombre clickeable:
+                      la ficha es donde se aprueba y se cobra, y no puede depender
+                      de que alguien intuya que hay que tocar el nombre. Va apilado
+                      sobre Eliminar para no sumar una columna. */}
+                  <div className="flex flex-col items-stretch gap-2">
+                    <Link
+                      href={`/admin/crm/${contact.id}`}
+                      className="whitespace-nowrap rounded-lg border border-primary-fixed-dim/60 bg-primary-container/10 px-2.5 py-1.5 text-center text-xs font-medium text-primary-fixed-dim transition-colors hover:bg-primary-container/25"
+                    >
+                      Abrir ficha →
+                    </Link>
+                    {!contact.isAdmin && (
+                      <DeleteContactButton
+                        id={contact.id}
+                        name={contact.fullName ?? contact.email ?? "esta persona"}
+                      />
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
