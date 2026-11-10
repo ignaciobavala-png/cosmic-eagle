@@ -45,7 +45,7 @@ export type TemplateDef = {
 
 const V = {
   nombre: { name: "nombre", label: "Primer nombre de la persona", sample: "Camila" },
-  viaje: { name: "viaje", label: "Nombre del viaje o sesión", sample: "Sesión en Buenos Aires" },
+  viaje: { name: "viaje", label: "Nombre del viaje o sesión", sample: "Sesión en Santiago" },
   fechas: { name: "fechas", label: "Fechas (vacía si no hay)", sample: "5 de septiembre de 2026" },
 } satisfies Record<string, TemplateVar>;
 
@@ -321,7 +321,7 @@ export const EMAIL_TEMPLATES: TemplateDef[] = [
         key: "body_sena",
         label: "Cuerpo · con seña",
         multiline: true,
-        default: "Hemos recibido tu pago de **{monto}** y tu cupo ya está reservado.",
+        default: "Recibimos tu pago de **{monto}** y tu cupo ya está reservado.",
       },
       {
         key: "body_pagado",
@@ -344,7 +344,7 @@ export const EMAIL_TEMPLATES: TemplateDef[] = [
         hint: "Cuando falta el formulario de salud y pagó con seña.",
         multiline: true,
         default:
-          "Incluimos un formulario de experiencia e intenciones que te pedimos rellenar para conocerte mejor y preparar tu experiencia con el cuidado que merece.",
+          "Incluimos un formulario de experiencia e intenciones que te pedimos completar para conocerte mejor y preparar tu experiencia con el cuidado que merece.",
       },
       {
         key: "salud_normal",
@@ -552,7 +552,7 @@ export const EMAIL_TEMPLATES: TemplateDef[] = [
         key: "intro",
         label: "Apertura",
         multiline: true,
-        default: "Ya estamos cerca. Acá van los datos para tu llegada a **{viaje}**.",
+        default: "Ya estamos cerca. Aquí van los datos para tu llegada a **{viaje}**.",
       },
       { key: "button", label: "Botón", default: "Ver todos los detalles" },
       {

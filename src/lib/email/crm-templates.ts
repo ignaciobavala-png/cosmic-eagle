@@ -9,9 +9,9 @@ export const CRM_TEMPLATE_NUEVAS_FECHAS = {
   // El asunto no vino en el texto de Sofía: se mantiene el que ya usaba el
   // ejemplo del CRM.
   subject: "Una invitación para ti",
-  message: `Esperamos que estés muy bien!
+  message: `¡Esperamos que estés muy bien!
 
-Queremos contarte que hemos abierto nuevas fechas para nuestras próximas experiencias y nos encantaría volver a compartir este camino contigo.
+Queremos contarte que abrimos nuevas fechas para nuestras próximas experiencias y nos encantaría volver a compartir este camino contigo.
 
 Cada viaje es una oportunidad para seguir explorando y profundizando en nuestro proceso de evolución personal.
 
