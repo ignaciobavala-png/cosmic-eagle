@@ -60,13 +60,40 @@ export const RELATIONSHIP_STATES = [
 export type RelationshipState = (typeof RELATIONSHIP_STATES)[number]["value"];
 
 export type ApplicationRow = {
+  id: string;
   user_id: string;
   trip_id: string;
   residence_country: string;
   status: Enums<"application_status">;
+  payment_status: Enums<"payment_status">;
   previous_ceremonies: number;
   created_at: string;
 };
+
+/**
+ * Lo que la organización tiene que HACER con una persona. Es una señal aparte
+ * del estado de la relación, a propósito: "viajero" ya quiere decir "tiene una
+ * reserva aprobada" para el filtro de envíos y para el asistente de IA, y
+ * redefinirlo los rompería.
+ *
+ * - `revisar`: hay una solicitud esperando la decisión.
+ * - `comprobante`: aprobada, sin pago registrado y con un comprobante subido
+ *   que nadie confirmó todavía.
+ */
+export type PendingAction = "revisar" | "comprobante";
+
+export const PENDING_ACTION_LABELS: Record<PendingAction, string> = {
+  revisar: "Revisar solicitud",
+  comprobante: "Confirmar pago",
+};
+
+/** Cómo va el pago de lo aprobado, para leerlo sin abrir la solicitud. */
+export const PAYMENT_SUMMARY_LABELS = {
+  pending: "Pago pendiente",
+  deposit_paid: "Seña pagada",
+  paid: "Pagado",
+  waived: "Sin cargo",
+} as const satisfies Record<Enums<"payment_status">, string>;
 
 /**
  * El pais vive en el formulario de salud extenso (etapa 2), no en la solicitud:
@@ -103,6 +130,13 @@ export type Contact = {
   experience: ExperienceLevel;
   state: RelationshipState;
   applications: number;
+  /** Qué hay que hacer con esta persona ahora, o `null` si nada. */
+  action: PendingAction | null;
+  /**
+   * El pago de su solicitud aprobada más reciente, o `null` si no tiene ninguna
+   * aprobada (sin reserva no hay nada que cobrar).
+   */
+  payment: Enums<"payment_status"> | null;
 };
 
 /**
@@ -122,11 +156,16 @@ export function buildContacts({
   profiles,
   applications,
   healthForms,
+  proofApplicationIds = [],
 }: {
   profiles: ProfileRow[];
   applications: ApplicationRow[];
   healthForms: HealthFormRow[];
+  /** Solicitudes que tienen al menos un comprobante subido. */
+  proofApplicationIds?: string[];
 }): Contact[] {
+  const withProof = new Set(proofApplicationIds);
+
   return profiles.map((profile) => {
     const all = applications.filter((a) => a.user_id === profile.id);
 
@@ -158,6 +197,20 @@ export function buildContacts({
 
     const ceremonies = countCeremonies(approved, declared);
 
+    // Una solicitud por revisar manda sobre el pago: es lo que bloquea a la
+    // persona. El comprobante sólo cuenta si la plata todavía no se registró.
+    const approvedApps = all.filter((a) => a.status === "approved");
+    const action: PendingAction | null = all.some(
+      (a) => a.status === "pending_review"
+    )
+      ? "revisar"
+      : approvedApps.some(
+            (a) => a.payment_status === "pending" && withProof.has(a.id)
+          )
+        ? "comprobante"
+        : null;
+    const payment = latest(approvedApps)?.payment_status ?? null;
+
     return {
       id: profile.id,
       fullName: profile.full_name,
@@ -171,6 +224,8 @@ export function buildContacts({
       experience: experienceLevel(ceremonies),
       state,
       applications: all.length,
+      action,
+      payment,
     };
   });
 }
@@ -181,6 +236,8 @@ export type ContactFilters = {
   pais?: string;
   genero?: string;
   viaje?: string;
+  /** `1` deja sólo a quienes tienen algo pendiente (`Contact.action`). */
+  accion?: string;
 };
 
 /**
@@ -198,8 +255,10 @@ export function filterContacts(contacts: Contact[], f: ContactFilters): Contact[
   const pais = filterValues(f.pais);
   const genero = filterValues(f.genero);
   const viaje = filterValues(f.viaje);
+  const soloPendientes = filterValues(f.accion).includes("1");
   return contacts.filter(
     (c) =>
+      (!soloPendientes || c.action !== null) &&
       (estado.length === 0 || estado.includes(c.state)) &&
       (nivel.length === 0 || nivel.includes(c.experience)) &&
       (pais.length === 0 || (c.country !== null && pais.includes(c.country))) &&

@@ -19,6 +19,11 @@ export type CrmRow = {
   ceremonies: number;
   stateLabel: string;
   stateClass: string;
+  /** Lo que hay que hacer con la persona ("Revisar solicitud"), o `null`. */
+  actionLabel: string | null;
+  /** Cómo va el pago de lo aprobado ("Pago pendiente"), o `null` sin reserva. */
+  paymentLabel: string | null;
+  paymentClass: string;
   createdAt: string;
 };
 
@@ -195,11 +200,31 @@ export function CrmTable({
                 <td className="px-5 py-4 text-on-surface-variant">{contact.experience}</td>
                 <td className="px-5 py-4 text-on-surface-variant">{contact.ceremonies}</td>
                 <td className="px-5 py-4">
-                  <span
-                    className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${contact.stateClass}`}
-                  >
-                    {contact.stateLabel}
-                  </span>
+                  {/* El estado, y debajo lo que falta: qué hacer o cómo va el
+                      pago. Van en la misma celda para que se lean juntos y la
+                      tabla no gane una columna que tape al resto. */}
+                  <div className="flex flex-col items-start gap-1.5">
+                    <span
+                      className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${contact.stateClass}`}
+                    >
+                      {contact.stateLabel}
+                    </span>
+                    {contact.actionLabel && (
+                      <Link
+                        href={`/admin/crm/${contact.id}`}
+                        className="whitespace-nowrap rounded-full border border-primary-fixed-dim bg-primary-container/25 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-fixed-dim transition-colors hover:bg-primary-container/40"
+                      >
+                        {contact.actionLabel} →
+                      </Link>
+                    )}
+                    {contact.paymentLabel && (
+                      <span
+                        className={`whitespace-nowrap rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${contact.paymentClass}`}
+                      >
+                        {contact.paymentLabel}
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td className="px-5 py-4 text-on-surface-variant">{contact.createdAt}</td>
                 <td className="px-5 py-4">
@@ -207,7 +232,7 @@ export function CrmTable({
                     href={`/admin/crm/${contact.id}`}
                     className="whitespace-nowrap text-xs text-on-surface-variant transition-colors hover:text-primary-fixed-dim"
                   >
-                    Ficha de salud →
+                    Abrir ficha →
                   </Link>
                 </td>
                 <td className="sticky right-0 bg-surface-container px-5 py-4">

@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   EXPERIENCE_LEVELS,
   GENDER_LABELS,
+  PAYMENT_SUMMARY_LABELS,
+  PENDING_ACTION_LABELS,
   RELATIONSHIP_STATES,
   filterContacts,
   filterValues,
@@ -39,6 +41,14 @@ const STATE_CLASS: Record<string, string> = {
     "bg-primary-container/20 text-primary-fixed-dim border-primary-fixed-dim/40",
   potencial:
     "bg-outline-variant/30 text-on-surface-variant border-outline/40",
+};
+
+// El pago se lee de un vistazo: lo que falta va en dorado, lo resuelto en verde.
+const PAYMENT_CLASS: Record<string, string> = {
+  pending: "border-primary-fixed-dim/50 text-primary-fixed-dim",
+  deposit_paid: "border-secondary/40 text-secondary",
+  paid: "bg-secondary/20 border-secondary/40 text-secondary",
+  waived: "border-outline/40 text-on-surface-variant",
 };
 
 function formatDate(iso: string) {
@@ -122,6 +132,7 @@ export default async function AdminCrmPage({
     pais?: string;
     genero?: string;
     viaje?: string;
+    accion?: string;
   }>;
 }) {
   // Ya awaiteado: `query` y no `params` para no confundirlo con el params de la ruta.
@@ -146,11 +157,13 @@ export default async function AdminCrmPage({
   const activeCountry = filterValues(query.pais);
   const activeGender = filterValues(query.genero);
   const activeTrip = filterValues(query.viaje);
+  const activeAction = filterValues(query.accion);
 
   const filtered = filterContacts(contacts, query);
 
   // Cómo se nombra el grupo en el redactor y en la confirmación.
   const groupParts = [
+    ...(activeAction.includes("1") ? ["Requiere acción"] : []),
     ...activeState.map((v) => RELATIONSHIP_STATES.find((s) => s.value === v)?.label),
     ...activeLevel.map((v) => EXPERIENCE_LEVELS.find((l) => l.value === v)?.label),
     ...activeCountry,
@@ -175,6 +188,28 @@ export default async function AdminCrmPage({
         Las {contacts.length} personas registradas, con su nivel de experiencia y
         su estado calculados a partir del historial de solicitudes.
       </p>
+
+      {/* Lo primero que se mira: quién espera algo de la organización. Antes
+          había que recordar que las solicitudes viven en otra pantalla. */}
+      <div className="glass-card mb-4 flex flex-col gap-3 rounded-2xl border border-primary-fixed-dim/30 p-5">
+        <FilterRow
+          label="Pendiente"
+          param="accion"
+          active={activeAction}
+          current={query}
+          options={[
+            {
+              value: "1",
+              label: "Requiere acción",
+              count: countBy((c) => c.action !== null),
+            },
+          ]}
+        />
+        <p className="text-xs text-on-surface-variant">
+          Solicitudes por revisar y pagos con comprobante por confirmar. Se
+          resuelven desde la ficha de cada persona, sin salir del CRM.
+        </p>
+      </div>
 
       <div className="glass-card mb-8 flex flex-col gap-3 rounded-2xl p-5">
         <FilterRow
@@ -266,6 +301,15 @@ export default async function AdminCrmPage({
               RELATIONSHIP_STATES.find((s) => s.value === contact.state)?.label ??
               contact.state,
             stateClass: STATE_CLASS[contact.state] ?? "",
+            actionLabel: contact.action
+              ? PENDING_ACTION_LABELS[contact.action]
+              : null,
+            paymentLabel: contact.payment
+              ? PAYMENT_SUMMARY_LABELS[contact.payment]
+              : null,
+            paymentClass: contact.payment
+              ? (PAYMENT_CLASS[contact.payment] ?? "")
+              : "",
             createdAt: formatDate(contact.createdAt),
           }))}
         />

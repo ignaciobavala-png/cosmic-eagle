@@ -97,6 +97,9 @@ export async function reviewApplication(
 
   revalidatePath("/admin/solicitudes");
   revalidatePath(`/admin/solicitudes/${id}`);
+  // La ficha del CRM también decide y cobra: sin esto mostraría el estado viejo.
+  revalidatePath("/admin/crm");
+  revalidatePath("/admin/crm/[id]", "page");
 }
 
 /**
@@ -186,6 +189,9 @@ export async function markPayment(
 
   revalidatePath("/admin/solicitudes");
   revalidatePath(`/admin/solicitudes/${id}`);
+  // La ficha del CRM también decide y cobra: sin esto mostraría el estado viejo.
+  revalidatePath("/admin/crm");
+  revalidatePath("/admin/crm/[id]", "page");
 }
 
 async function notifyApproved({

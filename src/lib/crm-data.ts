@@ -10,23 +10,32 @@ import type { Database } from "@/lib/supabase/types";
  * Va con la sesión del admin (la RLS de estas tablas ya lo deja leer todo).
  */
 export async function loadContacts(supabase: SupabaseClient<Database>) {
-  const [{ data: profiles }, { data: applications }, { data: healthForms }] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("id, full_name, email, is_admin, created_at, country, gender")
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("applications")
-        .select("user_id, trip_id, residence_country, status, previous_ceremonies, created_at"),
-      supabase
-        .from("health_form_first_time")
-        .select("country, created_at, applications(user_id)"),
-    ]);
+  const [
+    { data: profiles },
+    { data: applications },
+    { data: healthForms },
+    { data: proofs },
+  ] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, full_name, email, is_admin, created_at, country, gender")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("applications")
+      .select(
+        "id, user_id, trip_id, residence_country, status, payment_status, previous_ceremonies, created_at"
+      ),
+    supabase
+      .from("health_form_first_time")
+      .select("country, created_at, applications(user_id)"),
+    // Sólo hace falta saber QUÉ solicitudes tienen comprobante, no el archivo.
+    supabase.from("payment_proofs").select("application_id"),
+  ]);
 
   return buildContacts({
     profiles: profiles ?? [],
     applications: applications ?? [],
+    proofApplicationIds: (proofs ?? []).map((p) => p.application_id),
     // El pais cuelga del formulario extenso; se aplana el join acá para que
     // `buildContacts` no dependa de la forma que devuelve PostgREST.
     healthForms: (healthForms ?? []).flatMap((h) =>
