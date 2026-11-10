@@ -8,6 +8,7 @@ import {
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { loadContacts } from "@/lib/crm-data";
 import { TRIP_TYPES, tripAdminPath, tripTypeLabel } from "@/lib/trip-type";
 import { todayUTC } from "@/lib/trip-dates";
 import { LAUNCH_KEY } from "@/lib/maintenance";
@@ -38,8 +39,7 @@ export default async function AdminDashboardPage() {
     { count: totalRetiros },
     { count: openCeremonias },
     { count: totalCeremonias },
-    { count: pendingCount },
-    { count: approvedCount },
+    contacts,
     { count: subscribers },
     { count: contactsCount },
     { data: upcomingTrips },
@@ -64,14 +64,10 @@ export default async function AdminDashboardPage() {
       .from("trips")
       .select("*", { count: "exact", head: true })
       .eq("type", "ceremonia"),
-    supabase
-      .from("applications")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "pending_review"),
-    supabase
-      .from("applications")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "approved"),
+    // Las tarjetas de solicitudes salen de la MISMA carga que usa el CRM, no de
+    // un conteo propio: así el número de la tarjeta es el del filtro al que
+    // lleva, y no pueden diferir (un comprobante por confirmar cuenta en los dos).
+    loadContacts(supabase),
     supabase
       .from("newsletter_subscribers")
       .select("*", { count: "exact", head: true }),
@@ -92,12 +88,15 @@ export default async function AdminDashboardPage() {
       .limit(4),
     supabase
       .from("applications")
-      .select("id, full_name, previous_ceremonies, created_at, trips(title)")
+      .select("id, user_id, full_name, previous_ceremonies, created_at, trips(title)")
       .eq("status", "pending_review")
       .order("created_at", { ascending: false })
       .limit(5),
     supabase.from("site_content").select("value").eq("key", LAUNCH_KEY).maybeSingle(),
   ]);
+
+  const needsAction = contacts.filter((c) => c.action !== null).length;
+  const travelers = contacts.filter((c) => c.state === "viajero").length;
 
   const stats = [
     // Un solo KPI para viajes y sesiones (Sofía, 14/10). Lleva al listado de
@@ -110,18 +109,18 @@ export default async function AdminDashboardPage() {
       icon: Compass,
     },
     {
-      href: "/admin/solicitudes?status=pending_review",
-      label: "Solicitudes pendientes",
-      value: pendingCount ?? 0,
-      hint: "esperando revisión",
+      href: "/admin/crm?accion=1",
+      label: "Requiere acción",
+      value: needsAction,
+      hint: "solicitudes por revisar y pagos por confirmar",
       icon: ClipboardList,
-      highlight: (pendingCount ?? 0) > 0,
+      highlight: needsAction > 0,
     },
     {
-      href: "/admin/solicitudes?status=approved",
+      href: "/admin/crm?estado=viajero",
       label: "Aprobaciones vigentes",
-      value: approvedCount ?? 0,
-      hint: "acceso al panel de viajero",
+      value: travelers,
+      hint: "personas con reserva aprobada",
       icon: UserCheck,
     },
     {
@@ -198,7 +197,7 @@ export default async function AdminDashboardPage() {
               Solicitudes recientes
             </h2>
             <Link
-              href="/admin/solicitudes"
+              href="/admin/crm?accion=1"
               className="text-xs text-secondary hover:underline"
             >
               Ver todas
@@ -214,7 +213,7 @@ export default async function AdminDashboardPage() {
               {recentApplications.map((app) => (
                 <li key={app.id} className="py-3">
                   <Link
-                    href={`/admin/solicitudes/${app.id}`}
+                    href={`/admin/crm/${app.user_id}`}
                     className="flex items-center justify-between gap-4 group"
                   >
                     <div className="min-w-0">
