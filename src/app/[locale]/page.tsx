@@ -132,7 +132,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             {/* `text-h1` (token de globals.css, 24/09): es la frase que
                 Sofia marcó como el h1 de la página al definir el sistema de
                 escala. Mismo tamaño que tenía en duro, ahora nombrado. */}
-            <h1 className="font-display text-h1 text-primary">
+            <h1 className="font-display text-h1 text-center text-primary">
               <RevealItem as="span" className="inline-block" y={40} duration={1.6}>
                 {content("home.frase.left")}
               </RevealItem>
