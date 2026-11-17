@@ -2,7 +2,7 @@ import { Link } from "@/i18n/navigation";
 import { ArrowUpRight } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { formatDateRangeCompact, type FormatLocale } from "@/lib/format";
-import { isTripType } from "@/lib/trip-type";
+import { cardTitle, isTripType } from "@/lib/trip-type";
 import type { TripDate } from "@/lib/trip-groups";
 import { TripCover } from "./TripCover";
 
@@ -58,6 +58,7 @@ export async function TripCard({
   const t = await getTranslations("TripTypes");
   const locale: FormatLocale = (await getLocale()) === "en" ? "en" : "es";
   const light = tone === "light";
+  const title = cardTitle(trip.title, trip.type);
   const many = (dates?.length ?? 0) > 1;
   const tipo = isTripType(trip.type) ? t(`${trip.type}.one`) : undefined;
   const statusLabel =
@@ -101,7 +102,7 @@ export async function TripCard({
             </div>
 
             <h3 className="font-display text-headline-md text-[#05125a]">
-              {trip.title}
+              {title}
             </h3>
 
             <div className="mt-4 border-t border-[#e0e0e0] pt-4">
@@ -119,7 +120,7 @@ export async function TripCard({
                     <Link
                       key={date.id}
                       href={`/viajes/${date.id}`}
-                      aria-label={`${trip.title}, ${formatDateRangeCompact(date.start_date, date.end_date, locale)}`}
+                      aria-label={`${title}, ${formatDateRangeCompact(date.start_date, date.end_date, locale)}`}
                       className="rounded-full border-2 border-[#05125a] px-3.5 py-1.5 font-body text-[13px] font-semibold uppercase tracking-[0.02em] text-[#05125a] transition-colors duration-300 hover:bg-[#05125a] hover:text-white"
                     >
                       {formatDateRangeCompact(date.start_date, date.end_date, locale)}
@@ -179,7 +180,7 @@ export async function TripCard({
 
         <div className="flex flex-1 flex-col p-5 sm:p-6">
           <h3 className="font-display text-headline-md text-on-surface">
-            {trip.title}
+            {title}
           </h3>
           {trip.description && (
             <p className="mt-3 line-clamp-4 text-body-md text-on-surface-variant">
@@ -198,7 +199,7 @@ export async function TripCard({
                   <Link
                     key={date.id}
                     href={`/viajes/${date.id}`}
-                    aria-label={`${trip.title}, ${formatDateRangeCompact(date.start_date, date.end_date, locale)}`}
+                    aria-label={`${title}, ${formatDateRangeCompact(date.start_date, date.end_date, locale)}`}
                     className="rounded-full border border-primary-container/55 px-3.5 py-1.5 text-label-sm uppercase text-primary-container transition-colors duration-300 hover:bg-primary-container hover:text-on-primary"
                   >
                     {formatDateRangeCompact(date.start_date, date.end_date, locale)}

@@ -272,10 +272,10 @@ export const SITE_GROUPS = [
       // la página usa el override y, si no hay, el de messages (es o en).
       {
         key: "nosotros.estela.title",
-        label: "Estela, founder · título",
+        label: "Fundadora · título",
         help: "El título de la pantalla azul de Estela, casi al final de Nosotros.",
         type: "text",
-        fallback: "Estela, founder",
+        fallback: "Fundadora",
       },
       {
         key: "nosotros.estela.p1",

@@ -254,8 +254,8 @@ export default async function ViajePage({ params }: Props) {
           title={trip.title}
           subtitle={trip.location ?? undefined}
           subtitleStyle="display"
-          scrollHint={t("hero.scrollHint")}
-          scrollTo="detalle"
+          // Sin el hint "Ver la experiencia" (correcciones web 17/11, 6.4): la
+          // persona ya está viendo esa experiencia.
           actions={
             isOpen
               ? [
