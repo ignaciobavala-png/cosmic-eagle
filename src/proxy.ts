@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "@/i18n/routing";
 import { refreshSession } from "@/lib/supabase/proxy";
 import { maintenanceResponse } from "@/lib/maintenance";
+import { ACCOUNT_PATH, isProtectedPath, stripLocale } from "@/lib/protected-routes";
 
 const handleI18nRouting = createMiddleware(routing);
 
@@ -21,11 +22,30 @@ export async function proxy(request: NextRequest) {
   const maintenance = await maintenanceResponse(request);
   if (maintenance) return maintenance;
 
-  const cookies = await refreshSession(request);
+  const { cookies, signedIn } = await refreshSession(request);
 
   const response = SIN_IDIOMA.test(request.nextUrl.pathname)
     ? NextResponse.next({ request })
     : handleI18nRouting(request);
+
+  // Gate de miembros, del lado del servidor (ver src/lib/protected-routes.ts).
+  // Se mira el path pedido y el path interno al que reescribio next-intl, asi
+  // un alias de URL en ingles no abre un hueco.
+  if (!signedIn && !SIN_IDIOMA.test(request.nextUrl.pathname)) {
+    const rewrite = response.headers.get("x-middleware-rewrite");
+    const internal = rewrite ? new URL(rewrite).pathname : null;
+    const { pathname, search } = request.nextUrl;
+    if (isProtectedPath(pathname) || (internal && isProtectedPath(internal))) {
+      const prefix = pathname.startsWith("/en/") || pathname === "/en" ? "/en" : "";
+      const login = new URL(`${prefix}${ACCOUNT_PATH}`, request.url);
+      login.searchParams.set("next", `${stripLocale(pathname)}${search}`);
+      const redirect = NextResponse.redirect(login);
+      cookies.forEach(({ name, value, options }) =>
+        redirect.cookies.set(name, value, options)
+      );
+      return redirect;
+    }
+  }
 
   cookies.forEach(({ name, value, options }) =>
     response.cookies.set(name, value, options)
