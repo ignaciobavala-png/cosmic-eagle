@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
@@ -20,7 +21,12 @@ export function LocaleSwitch({
   large?: boolean;
 }) {
   const locale = useLocale();
+  // Con `pathnames`, `usePathname` devuelve la ruta real CON plantilla
+  // (`/viajes/[id]`): los params salen de `useParams` y juntos arman el link
+  // a la misma pagina en el otro idioma (`/en/experiences/abc`).
   const pathname = usePathname();
+  const { locale: _locale, ...params } = useParams<Record<string, string | string[]>>();
+  void _locale;
   const t = useTranslations("LocaleSwitch");
 
   return (
@@ -29,7 +35,7 @@ export function LocaleSwitch({
         <span key={l} className={`flex items-center ${large ? "gap-1" : "gap-1.5"}`}>
           {i > 0 && <span aria-hidden="true" className="text-primary/40">/</span>}
           <Link
-            href={pathname}
+            href={{ pathname, params }}
             locale={l}
             aria-current={l === locale ? "true" : undefined}
             className={`font-display uppercase transition-colors ${
