@@ -1,3 +1,4 @@
+import { effectiveTripStatus } from "@/lib/trip-status";
 import { Link } from "@/i18n/navigation";
 import { ArrowUpRight } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
@@ -22,6 +23,7 @@ export type TripCardData = {
 
 const STATUS_KEY: Record<string, string> = {
   closed: "closed",
+  in_progress: "inProgress",
   completed: "completed",
 };
 
@@ -60,10 +62,10 @@ export async function TripCard({
   const light = tone === "light";
   const many = (dates?.length ?? 0) > 1;
   const tipo = isTripType(trip.type) ? t(`${trip.type}.one`) : undefined;
+  // El estado sale de la fecha (En curso / Finalizado solos, corrección 6.6).
+  const estado = trip.status ? effectiveTripStatus({ ...trip, status: trip.status }) : null;
   const statusLabel =
-    trip.status && STATUS_KEY[trip.status]
-      ? t(`status.${STATUS_KEY[trip.status]}`)
-      : undefined;
+    estado && STATUS_KEY[estado] ? t(`status.${STATUS_KEY[estado]}`) : undefined;
   const dateLabel = many ? t("dates") : t("date");
 
   const className = light

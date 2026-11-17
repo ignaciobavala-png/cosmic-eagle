@@ -1,3 +1,4 @@
+import { effectiveTripStatus } from "@/lib/trip-status";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
@@ -40,6 +41,7 @@ const STATUS_CLASS: Record<string, string> = {
   open: "bg-[#f9d78f] text-[#05125a]",
   closed: "bg-[#05125a]/80 text-primary-container border border-primary-container/50",
   completed: "bg-[#05125a]/80 text-primary-container border border-primary-container/50",
+  in_progress: "bg-[#05125a]/80 text-primary-container border border-primary-container/50",
 };
 
 // Postgres `date` llega como "YYYY-MM-DD": parsear y formatear en UTC evita que
@@ -129,6 +131,9 @@ export default async function ViajePage({ params }: Props) {
 
   const solicitarHref = `/viajes/${trip.id}/solicitar`;
   const isOpen = trip.status === "open";
+  // La etiqueta sale de la fecha (corrección 6.6); `isOpen` sigue mirando el
+  // estado guardado: es lo que abre o cierra las postulaciones.
+  const estado = effectiveTripStatus(trip);
 
   // El filtro corto va en esta misma página (pedido de Sofía, 27/10): quien ya
   // tiene solicitud no lo ve de nuevo, sino un link a su pantalla de estado.
@@ -242,12 +247,12 @@ export default async function ViajePage({ params }: Props) {
               </span>
               <span
                 className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${
-                  STATUS_CLASS[trip.status] ?? ""
+                  STATUS_CLASS[estado] ?? ""
                 }`}
               >
-                {["open", "closed", "completed"].includes(trip.status)
-                  ? tTrip(`status.${trip.status}`)
-                  : trip.status}
+                {["open", "closed", "in_progress", "completed"].includes(estado)
+                  ? tTrip(`status.${estado === "in_progress" ? "inProgress" : estado}`)
+                  : estado}
               </span>
             </div>
           }

@@ -12,8 +12,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * atiende a nadie. Usa el service role porque corre sin sesión (la RLS de
  * `trips` deja escribir solo a admin).
  *
- * `end_date` es `date` sin hora: "hoy" se calcula en Buenos Aires, y un evento
- * que termina hoy se cierra mañana.
+ * `end_date` es `date` sin hora: "hoy" se calcula en Buenos Aires. Un evento
+ * pasa a `completed` el DÍA de su término (corrección 6.6, 17/11), igual que lo
+ * muestra `effectiveTripStatus` al leer; "En curso" no se guarda, se calcula.
+ * Una Sesión dura un día, así que su `end_date` es su fecha.
  */
 export const dynamic = "force-dynamic";
 
@@ -40,7 +42,7 @@ export async function GET(request: NextRequest) {
     .from("trips")
     .update({ status: "completed" })
     .in("status", ["open", "closed"])
-    .lt("end_date", hoy)
+    .lte("end_date", hoy)
     .select("id, title");
 
   if (error) {

@@ -79,6 +79,7 @@
     "status": {
       "open": "Cupos disponibles",
       "closed": "Cupo completo",
+      "inProgress": "En curso",
       "completed": "Finalizado"
     },
     "date": "Fecha",
