@@ -3498,7 +3498,10 @@ Se repartió en 4 agentes con worktree y uno de sólo lectura; todo integrado en
   Siguen en español: encabezado de `/solicitar`, HealthForm, ConsentForm, otros correos (haría falta guardar locale).
 - **Tipografías (3):** `~/Escritorio/Listado-Tipografias-Cosmic-Eagle.html`, para mandar a Chloe.
 
-**Pendiente:** el `pnpm build` del conjunto integrado quedó corriendo/sin resultado al cerrar; revisar
-lint + i18n:check + build antes de mergear a `main`. Probar a mano login con `next=`. Si `nosotros.estela.title`
+**Verificado en la rama integrada:** `eslint src` 0 errores (9 warnings previos), `tsc` sobre src 0 errores,
+`i18n:check` OK (402 claves), `pnpm build` pasa. (`pnpm lint` a secas da miles de errores porque recorre
+`.claude/worktrees/` y `.next`: borrar los worktrees antes de usarlo.)
+
+**Pendiente:** probar a mano login con `next=`. Si `nosotros.estela.title`
 sigue diciendo «Estela, founder», está guardado en `site_content`. Animaciones, T&C, política de
 reserva e Instagram esperan a las clientas. Los worktrees `.claude/worktrees/agent-*` se pueden borrar al integrar.
