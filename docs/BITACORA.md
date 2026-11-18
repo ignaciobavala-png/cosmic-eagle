@@ -3473,3 +3473,32 @@ plataforma y lo resuelva el asistente del panel. Detalle técnico en `docs/IA.md
 - **CRM**: filtros combinables (varias categorías por eje), casillas por fila, correo a
   las tildadas o al grupo, eliminar (botón visible + «Eliminar tildadas»).
 - Sin probar en navegador; sí `tsc`, eslint y una prueba SQL del trigger.
+
+
+## 2026-11-17 — correcciones de Chloe y Sofía (multiagente)
+
+Entrega: `docs/entregas/2026-11-17-correcciones-web/` (docx con 7 puntos + definiciones).
+Se repartió en 4 agentes con worktree y uno de sólo lectura; todo integrado en la rama
+`integracion-correcciones-1711` (merge sin conflictos). **No está en `main` ni pusheado.**
+
+- **Acceso (1 y 7.1):** `src/proxy.ts` redirige con 307 a `/cuenta?next=` si no hay sesión en
+  `/viajes`, `/contenidos` y subrutas (también `/en`). Lista única en `src/lib/protected-routes.ts`.
+  Abiertas: inicio, nosotros, faqs, términos, privacidad, cuenta. Sin tocar `/compartido` ni `/material` (token).
+- **URLs en inglés (7.2):** `pathnames` de next-intl (`/en/about-us`, `/experiences`, `/content`,
+  `/privacy`, `/terms`, `/account`, `/shared`; apply/health/consent), redirects 301 de las viejas.
+  Helper `src/i18n/localize-href.ts`. Una ruta pública nueva hay que declararla en `routing.ts`.
+- **Estados (6.6):** `effectiveTripStatus` (`src/lib/trip-status.ts`), calculado al leer, sin migración;
+  el cron `cerrar-eventos` ahora guarda `completed` el mismo día del fin.
+- **6.5 sin reproducir:** se agregó bloque «Estado de tu solicitud» en `/solicitar` a ciegas. Falta saber
+  con qué estado y desde dónde (mail o detalle) se vio la página vacía.
+- **Mecánico:** 4.2, 4.3, 5.2 («Fundadora»), 6.1 (prefijos alfabéticos), 6.3 (`cardTitle`), 6.4.
+  **El agente sacó del inicio la frase atmosférica y la franja dorada de Contenidos sin que el doc lo pidiera: confirmar con Sofía o revertir.**
+- **Idioma y errores (2 y 6.2):** namespace `Screening` y `Forms`, `ValidatedForm` con `noValidate`,
+  correo «Recibimos tu solicitud» en el idioma de la request. El inglés es traducción mía: que lo revise Sofía.
+  Siguen en español: encabezado de `/solicitar`, HealthForm, ConsentForm, otros correos (haría falta guardar locale).
+- **Tipografías (3):** `~/Escritorio/Listado-Tipografias-Cosmic-Eagle.html`, para mandar a Chloe.
+
+**Pendiente:** el `pnpm build` del conjunto integrado quedó corriendo/sin resultado al cerrar; revisar
+lint + i18n:check + build antes de mergear a `main`. Probar a mano login con `next=`. Si `nosotros.estela.title`
+sigue diciendo «Estela, founder», está guardado en `site_content`. Animaciones, T&C, política de
+reserva e Instagram esperan a las clientas. Los worktrees `.claude/worktrees/agent-*` se pueden borrar al integrar.
