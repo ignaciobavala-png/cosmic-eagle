@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldError, ValidatedForm } from "@/components/forms/validation";
 import { useActionState, useRef, useState } from "react";
 import { Paperclip } from "lucide-react";
 import { compressImage } from "@/lib/compress-image";
@@ -63,7 +64,7 @@ export function PaymentProofUpload({
   }
 
   return (
-    <form action={formAction} className="mt-6 space-y-4">
+    <ValidatedForm action={formAction} className="mt-6 space-y-4">
       <div>
         <label
           htmlFor="proof"
@@ -85,6 +86,7 @@ export function PaymentProofUpload({
         {fileName && (
           <p className="mt-2 text-sm text-white/70">{fileName}</p>
         )}
+        <FieldError name="proof" />
         <p className="mt-2 text-xs text-white/55">
           Una foto, una captura o el PDF del banco. Hasta 5MB.
         </p>
@@ -122,6 +124,6 @@ export function PaymentProofUpload({
             ? "Enviando..."
             : "Enviar comprobante"}
       </button>
-    </form>
+    </ValidatedForm>
   );
 }

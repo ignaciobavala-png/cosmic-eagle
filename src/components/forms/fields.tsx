@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { fieldInput, fieldLabel, panelDivider } from "./styles";
+import { FieldError, RequiredMark } from "./validation";
 import {
   countryFlag,
   DEFAULT_PHONE_COUNTRY,
@@ -44,16 +46,19 @@ export function NumberInput({
   maxLength?: number;
 }) {
   return (
-    <input
-      name={name}
-      type="text"
-      inputMode="numeric"
-      pattern="[0-9]*"
-      maxLength={maxLength}
-      required={required}
-      defaultValue={defaultValue}
-      className={inputClass}
-    />
+    <>
+      <input
+        name={name}
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        maxLength={maxLength}
+        required={required}
+        defaultValue={defaultValue}
+        className={inputClass}
+      />
+      <FieldError name={name} />
+    </>
   );
 }
 
@@ -74,10 +79,10 @@ export function YesNoQuestion({
   name,
   label,
   hint,
-  placeholder = "Cuéntanos más...",
+  placeholder,
   detailName,
   detailRequired = false,
-  detailLabel = "Aclaraciones",
+  detailLabel,
 }: {
   name: string;
   label: string;
@@ -88,13 +93,17 @@ export function YesNoQuestion({
   detailRequired?: boolean;
   detailLabel?: string;
 }) {
+  const t = useTranslations("Forms");
   const [answer, setAnswer] = useState<"si" | "no" | null>(null);
 
   return (
     <fieldset
       className={`flex flex-col gap-2 border-b py-4 last:border-0 ${panelDivider}`}
     >
-      <legend className="text-white">{label}</legend>
+      <legend className="text-white">
+        {label}
+        <RequiredMark />
+      </legend>
       {hint && <p className="text-xs text-white/55">{hint}</p>}
 
       <div className="flex gap-6 pt-1">
@@ -112,23 +121,28 @@ export function YesNoQuestion({
               onChange={() => setAnswer(value)}
               className="h-4 w-4 accent-[#f9d78f]"
             />
-            {value === "si" ? "Sí" : "No"}
+            {value === "si" ? t("yes") : t("no")}
           </label>
         ))}
       </div>
 
       {answer === "si" && (
         <div className="flex flex-col gap-1.5 pt-1">
-          <label className={labelClass}>{detailLabel}</label>
+          <label className={labelClass}>
+            {detailLabel ?? t("details")}
+            {detailRequired && <RequiredMark />}
+          </label>
           <textarea
             name={detailName ?? `${name}_detail`}
             required={detailRequired}
-            placeholder={placeholder}
+            placeholder={placeholder ?? t("tellMore")}
             rows={3}
             className={inputClass}
           />
+          <FieldError name={detailName ?? `${name}_detail`} />
         </div>
       )}
+      <FieldError name={name} />
     </fieldset>
   );
 }
@@ -150,6 +164,7 @@ export function PhoneInput({
   defaultCountry?: string;
   defaultNumber?: string;
 }) {
+  const t = useTranslations("Forms");
   const [country, setCountry] = useState(defaultCountry);
 
   // Cada campo va envuelto y el ancho lo pone el envoltorio: `inputClass`
@@ -158,13 +173,14 @@ export function PhoneInput({
   // Así el selector ocupaba todo el renglón y el número quedaba afuera de la
   // pantalla en mobile (encontrado el 03/10 armando el perfil de /cuenta).
   return (
+    <>
     <div className="flex gap-2">
       <div className="w-[6.5rem] shrink-0">
         <select
           name="phone_country"
           value={country}
           onChange={(e) => setCountry(e.target.value)}
-          aria-label="País"
+          aria-label={t("countryLabel")}
           className={inputClass}
         >
           {PHONE_COUNTRIES.map((c) => (
@@ -186,5 +202,7 @@ export function PhoneInput({
         />
       </div>
     </div>
+    <FieldError name="phone_number" />
+    </>
   );
 }

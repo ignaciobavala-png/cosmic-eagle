@@ -3,11 +3,13 @@
 import { getCopyOverrides } from "@/lib/email/copy-store";
 import { copyFor, fill } from "@/lib/email/templates";
 import { revalidatePath } from "next/cache";
+import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/redirect";
 import { createClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/resend";
 import { SolicitudRecibida } from "@/emails/SolicitudRecibida";
 import { formatDateRangeCompact } from "@/lib/format";
+import { localized } from "@/lib/localized";
 import { todayUTC } from "@/lib/trip-dates";
 import { dialCodeFor } from "@/lib/phone-countries";
 
@@ -38,6 +40,8 @@ export async function submitApplication(
   _prevState: ApplicationFormState,
   formData: FormData
 ): Promise<ApplicationFormState> {
+  const t = await getTranslations("Screening.errors");
+  const locale = (await getLocale()) === "en" ? "en" : "es";
   const supabase = await createClient();
   const {
     data: { user },
@@ -55,7 +59,7 @@ export async function submitApplication(
     .single();
 
   if (!trip || trip.status !== "open" || trip.end_date < todayUTC()) {
-    return { error: "Este viaje ya no está recibiendo solicitudes." };
+    return { error: t("tripClosed") };
   }
 
   const full_name = str(formData, "full_name");
@@ -68,12 +72,12 @@ export async function submitApplication(
   const phone_dial = dialCodeFor(phone_country);
 
   if (!full_name || !email || !residence_country || !phone_number || !phone_dial) {
-    return { error: "Completa todos los campos requeridos." };
+    return { error: t("incomplete") };
   }
 
   const phone = `+${phone_dial} ${phone_number}`;
   if (!Number.isInteger(previous_ceremonies) || previous_ceremonies < 0) {
-    return { error: "Las ceremonias previas tienen que ser un número entero." };
+    return { error: t("previousInvalid") };
   }
 
   // Las tres preguntas de Sofía (19/08/2026). Ninguna rechaza sola: el encuadre
@@ -88,7 +92,7 @@ export async function submitApplication(
     mental_health_treatment === null ||
     current_medication === null
   ) {
-    return { error: "Responde sí o no en las tres preguntas de salud." };
+    return { error: t("healthAnswers") };
   }
 
   // Código de descuento (opcional). Se valida acá para avisar con claridad; el
@@ -102,8 +106,7 @@ export async function submitApplication(
     });
     if (!found?.[0]) {
       return {
-        error:
-          "Ese código de descuento no es válido para esta experiencia (puede haber vencido o no estar asignado a tu cuenta). Revísalo o déjalo vacío.",
+        error: t("codeInvalid"),
       };
     }
     discountCodeId = found[0].id;
@@ -134,17 +137,17 @@ export async function submitApplication(
     // El índice parcial `applications_one_active_per_trip_idx` deja una sola
     // solicitud viva por viaje: rechazada o vencida sí se puede volver a mandar.
     if (error.code === "23505") {
-      return { error: "Ya tienes una solicitud en curso para este viaje." };
+      return { error: t("alreadyActive") };
     }
     if (error.message.includes("discount_invalid")) {
-      return { error: "Ese código de descuento ya no está disponible. Revísalo o déjalo vacío." };
+      return { error: t("codeUnavailable") };
     }
-    return { error: `No se pudo enviar la solicitud: ${error.message}` };
+    return { error: t("failed", { message: error.message }) };
   }
 
   // El acuse va después del insert y antes del redirect (que lanza). Si el mail
   // no sale, la solicitud ya está guardada igual — `sendEmail` no lanza nunca.
-  await notifyReceived({ tripId, nombre: full_name, email });
+  await notifyReceived({ tripId, nombre: full_name, email, locale });
 
   return await redirect(`/viajes/${tripId}/solicitar`);
 }
@@ -162,32 +165,42 @@ async function notifyReceived({
   tripId,
   nombre,
   email,
+  locale,
 }: {
   tripId: string;
   nombre: string;
   email: string;
+  /** El idioma en que la persona navegaba: es el del correo. */
+  locale: "es" | "en";
 }) {
   const supabase = await createClient();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://cosmic-eagle.vercel.app";
 
   const { data: trip } = await supabase
     .from("trips")
-    .select("title, start_date, end_date")
+    .select("title, title_en, start_date, end_date")
     .eq("id", tripId)
     .single();
 
-  const copy = await getCopyOverrides("recibida");
+  // Los textos editados en el panel están en castellano: sólo aplican al correo
+  // en castellano (ver `copyFor`).
+  const copy = locale === "es" ? await getCopyOverrides("recibida") : null;
+  const title = trip ? localized(locale, trip.title, trip.title_en) : null;
+  const prefix = locale === "en" ? "/en" : "";
   await sendEmail({
     to: email,
-    subject: fill(copyFor("recibida", copy).subject, { viaje: trip?.title ?? "el viaje" }),
+    subject: fill(copyFor("recibida", copy, locale).subject, {
+      viaje: title ?? (locale === "en" ? "the trip" : "el viaje"),
+    }),
     react: SolicitudRecibida({
       copy,
+      locale,
       // Solo el primer nombre: el formulario pide nombre completo y "Hola María
       // Fernanda Gómez" suena a carta del banco.
       nombre: nombre.split(" ")[0],
-      viaje: trip?.title ?? "tu viaje",
-      fechas: trip ? formatDateRangeCompact(trip.start_date, trip.end_date) : "",
-      url: `${siteUrl}/viajes/${tripId}/solicitar`,
+      viaje: title ?? (locale === "en" ? "your trip" : "tu viaje"),
+      fechas: trip ? formatDateRangeCompact(trip.start_date, trip.end_date, locale) : "",
+      url: `${siteUrl}${prefix}/viajes/${tripId}/solicitar`,
     }),
   });
 }

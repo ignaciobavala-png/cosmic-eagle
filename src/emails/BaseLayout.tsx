@@ -74,13 +74,16 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://cosmic-eagle.verce
 export function BaseLayout({
   preview,
   children,
+  locale = "es",
 }: {
+  /** Idioma del correo: el del sitio en que navegaba la persona. */
+  locale?: "es" | "en";
   /** Renglon que el cliente de correo muestra al lado del asunto. */
   preview: string;
   children: React.ReactNode;
 }) {
   return (
-    <Html lang="es">
+    <Html lang={locale}>
       <Head>
         <meta name="color-scheme" content="light dark" />
         <meta name="supported-color-schemes" content="light dark" />
@@ -130,7 +133,7 @@ export function BaseLayout({
                       <tr>
                         <td style={{ padding: "32px 28px" }}>
                           {children}
-                          <Signature />
+                          <Signature locale={locale} />
                         </td>
                       </tr>
                     </tbody>
@@ -277,7 +280,7 @@ export function CtaButton({ href, children }: { href: string; children: React.Re
  * regla del documento —"firma de todos los correos"— y escribirla siete veces
  * garantiza que el octavo mail se olvide de ponerla.
  */
-function Signature() {
+function Signature({ locale }: { locale: "es" | "en" }) {
   return (
     <Text
       style={{
@@ -288,11 +291,15 @@ function Signature() {
         fontFamily: font.body,
       }}
     >
-      Con cariño,
+      {locale === "en" ? "With love," : "Con cariño,"}
       <br />
-      Equipo Cosmic Eagle
+      {locale === "en" ? "The Cosmic Eagle Team" : "Equipo Cosmic Eagle"}
       <br />
-      <em>Un viaje hacia el Humano Luminoso.</em>
+      <em>
+        {locale === "en"
+          ? "A journey toward the Luminous Human."
+          : "Un viaje hacia el Humano Luminoso."}
+      </em>
     </Text>
   );
 }

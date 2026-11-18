@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  FieldError,
+  RequiredLegend,
+  RequiredMark,
+  ValidatedForm,
+} from "@/components/forms/validation";
 import { useActionState } from "react";
 import {
   NumberInput,
@@ -23,32 +29,52 @@ export function HealthForm({
   );
 
   return (
-    <form
+    <ValidatedForm
       action={formAction}
       className={`flex max-w-2xl flex-col gap-2 p-6 md:p-8 ${panel}`}
     >
-      <h2 className={`mb-2 ${panelTitle}`}>Tus datos</h2>
+      <h2 className={`mb-1 ${panelTitle}`}>Tus datos</h2>
+      <RequiredLegend />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Edad</label>
+          <label className={labelClass}>
+            Edad
+            <RequiredMark />
+          </label>
           <NumberInput name="age" required />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Altura</label>
+          <label className={labelClass}>
+            Altura
+            <RequiredMark />
+          </label>
           <input name="height" type="text" placeholder="1.70m" required className={inputClass} />
+          <FieldError name="height" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Peso</label>
+          <label className={labelClass}>
+            Peso
+            <RequiredMark />
+          </label>
           <input name="weight" type="text" placeholder="65kg" required className={inputClass} />
+          <FieldError name="weight" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>País de origen</label>
+          <label className={labelClass}>
+            País de origen
+            <RequiredMark />
+          </label>
           <input name="country" type="text" required className={inputClass} />
+          <FieldError name="country" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Ocupación</label>
+          <label className={labelClass}>
+            Ocupación
+            <RequiredMark />
+          </label>
           <input name="occupation" type="text" required className={inputClass} />
+          <FieldError name="occupation" />
         </div>
       </div>
 
@@ -115,6 +141,6 @@ export function HealthForm({
       >
         {pending ? "Enviando..." : "Enviar formulario"}
       </button>
-    </form>
+    </ValidatedForm>
   );
 }

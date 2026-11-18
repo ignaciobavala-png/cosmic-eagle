@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import {
   NumberInput,
   PhoneInput,
@@ -15,13 +16,21 @@ import {
   panelTitle,
   submitButton,
 } from "@/components/forms/styles";
+import {
+  FieldError,
+  RequiredLegend,
+  RequiredMark,
+  ValidatedForm,
+} from "@/components/forms/validation";
 import { submitApplication, type ApplicationFormState } from "./actions";
 
 /**
  * El filtro corto: lo llenan todos, primerizos y recurrentes.
  *
  * El encuadre y las tres preguntas son el texto que mandó Sofía el 19/08/2026,
- * literal. No reescribirlo sin consultar: es copy de la clienta.
+ * literal. No reescribirlo sin consultar: es copy de la clienta. Vive en
+ * `messages/es.json` (namespace `Screening`); el inglés es traducción de ese
+ * texto. Los errores de campo salen de `ValidatedForm` (`noValidate`).
  *
  * Ojo con lo que dice ese texto: "nada de lo que nos cuentes cierra la puerta
  * de entrada". El encuadre es INFORMATIVO, no excluyente — ninguna respuesta
@@ -37,50 +46,43 @@ export function ScreeningForm({
   /** Código que la organización le asignó a esta persona, si tiene uno. */
   suggestedCode?: string;
 }) {
+  const t = useTranslations("Screening");
   const [state, formAction, pending] = useActionState<
     ApplicationFormState,
     FormData
   >(submitApplication.bind(null, tripId), { error: null });
 
   return (
-    <form
+    <ValidatedForm
       action={formAction}
       className={`flex max-w-2xl flex-col gap-2 p-6 md:p-8 ${panel}`}
     >
       <div
         className={`mb-2 flex flex-col gap-3 border-b pb-6 text-sm leading-relaxed ${panelDivider} ${panelBody}`}
       >
-        <p className="text-white">
-          Qué bueno que quieras ser parte de este espacio. Te compartimos
-          algunas cosas antes de avanzar.
-        </p>
-        <p>
-          Este es un espacio orientado a la expansión de conciencia, el
-          desarrollo humano y los procesos evolutivos.
-        </p>
-        <p>
-          No está enfocado en el tratamiento directo de adicciones al alcohol o
-          a otras sustancias, trastorno bipolar, depresión severa, enfermedades
-          crónicas o autoinmunes, ni reemplaza un tratamiento médico,
-          psicológico o psiquiátrico.
-        </p>
-        <p>
-          En estos casos, la participación deberá ser evaluada previamente y,
-          cuando corresponda, podrá requerir el acompañamiento de un profesional
-          o terapeuta especializado que pueda sostener el proceso de manera
-          adecuada y segura.
-        </p>
+        <p className="text-white">{t("intro1")}</p>
+        <p>{t("intro2")}</p>
+        <p>{t("intro3")}</p>
+        <p>{t("intro4")}</p>
       </div>
 
-      <h2 className={`mb-2 ${panelTitle}`}>Datos personales</h2>
+      <h2 className={`mb-1 ${panelTitle}`}>{t("personalTitle")}</h2>
+      <RequiredLegend />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Nombre completo</label>
+          <label className={labelClass}>
+            {t("fullName")}
+            <RequiredMark />
+          </label>
           <input name="full_name" type="text" required className={inputClass} />
+          <FieldError name="full_name" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Email</label>
+          <label className={labelClass}>
+            {t("email")}
+            <RequiredMark />
+          </label>
           <input
             name="email"
             type="email"
@@ -88,74 +90,74 @@ export function ScreeningForm({
             defaultValue={defaultEmail}
             className={inputClass}
           />
+          <FieldError name="email" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Teléfono</label>
+          <label className={labelClass}>
+            {t("phone")}
+            <RequiredMark />
+          </label>
           <PhoneInput required />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>País de residencia</label>
+          <label className={labelClass}>
+            {t("country")}
+            <RequiredMark />
+          </label>
           <input
             name="residence_country"
             type="text"
             required
             className={inputClass}
           />
+          <FieldError name="residence_country" />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className={labelClass}>
-            Ceremonias que hiciste con Estela
+            {t("previous")}
+            <RequiredMark />
           </label>
           <NumberInput name="previous_ceremonies" defaultValue={0} required />
-          <span className="text-xs text-white/55">
-            Si es tu primera vez, deja el 0.
-          </span>
+          <span className="text-xs text-white/55">{t("previousHint")}</span>
         </div>
       </div>
 
-      <h2 className={`mb-1 mt-4 ${panelTitle}`}>
-        Por eso nos gustaría que nos cuentes
-      </h2>
+      <h2 className={`mb-1 mt-4 ${panelTitle}`}>{t("tellTitle")}</h2>
 
       <p className={`pb-2 text-sm leading-relaxed ${panelBody}`}>
-        Te pedimos responder con la mayor honestidad y detalle posible. Esta
-        información es confidencial y su único propósito es cuidarte. Nada de
-        lo que nos cuentes cierra la puerta de entrada: solo nos permite saber
-        qué cuidados necesita tu proceso, y conversarlo contigo con calma.
+        {t("tellBody")}
       </p>
 
       <YesNoQuestion
         name="serious_illness"
         detailRequired
-        label="¿Tienes o has tenido alguna enfermedad grave?"
-        hint="Cardíaca, neurológica, epilepsia, hepática, oncológica, autoinmune u otra."
-        placeholder="Cuéntanos cuál y cuándo."
+        label={t("illness")}
+        hint={t("illnessHint")}
+        placeholder={t("illnessPlaceholder")}
       />
       <YesNoQuestion
         name="mental_health_treatment"
         detailRequired
-        label="¿Estás o has estado en tratamiento psiquiátrico o psicológico?"
-        hint="Si es así, cuéntanos por qué motivo y hace cuánto."
-        placeholder="Motivo y hace cuánto tiempo."
+        label={t("mental")}
+        hint={t("mentalHint")}
+        placeholder={t("mentalPlaceholder")}
       />
       <YesNoQuestion
         name="current_medication"
         detailRequired
-        label="¿Estás en algún tratamiento médico actualmente?"
-        hint="Qué medicamentos tomás, con o sin receta. Incluí antidepresivos, ansiolíticos, analgésicos, suplementos y hierbas."
-        placeholder="Medicamentos, suplementos y hierbas."
+        label={t("medication")}
+        hint={t("medicationHint")}
+        placeholder={t("medicationPlaceholder")}
       />
 
       <div className="flex flex-col gap-1.5 py-4">
-        <label className={labelClass}>
-          Tema o intención que quieres trabajar (opcional)
-        </label>
+        <label className={labelClass}>{t("theme")}</label>
         <textarea name="theme" rows={2} className={inputClass} />
       </div>
 
       <div className="flex flex-col gap-1.5 pb-4">
         <label htmlFor="discount_code" className={labelClass}>
-          ¿Tienes un código de descuento? (opcional)
+          {t("discount")}
         </label>
         <input
           id="discount_code"
@@ -166,9 +168,7 @@ export function ScreeningForm({
           className={`${inputClass} uppercase`}
         />
         {suggestedCode && (
-          <p className="text-xs text-white/60">
-            La organización te asignó este código: ya lo dejamos escrito.
-          </p>
+          <p className="text-xs text-white/60">{t("discountAssigned")}</p>
         )}
       </div>
 
@@ -183,8 +183,8 @@ export function ScreeningForm({
         disabled={pending}
         className={`mt-4 ${submitButton}`}
       >
-        {pending ? "Enviando..." : "Enviar solicitud"}
+        {pending ? t("pending") : t("submit")}
       </button>
-    </form>
+    </ValidatedForm>
   );
 }

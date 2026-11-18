@@ -58,7 +58,7 @@ export const fieldLabel =
   "mb-2 block text-[11px] uppercase tracking-[0.14em] text-white/55";
 
 export const fieldInput =
-  "w-full rounded-lg border border-white/[0.18] bg-white/5 px-4 py-3.5 text-[15px] text-white outline-none transition-[border-color,box-shadow,background-color] duration-300 placeholder:text-white/30 focus:border-[#0079b3] focus:bg-white/[0.08] focus:shadow-[0_0_0_4px_rgba(0,121,179,0.28),0_0_26px_rgba(0,121,179,0.5)]";
+  "w-full rounded-lg border border-white/[0.18] bg-white/5 px-4 py-3.5 text-[15px] text-white outline-none transition-[border-color,box-shadow,background-color] duration-300 placeholder:text-white/30 aria-invalid:border-[#ffb4a8] focus:border-[#0079b3] focus:bg-white/[0.08] focus:shadow-[0_0_0_4px_rgba(0,121,179,0.28),0_0_26px_rgba(0,121,179,0.5)]";
 
 /** El input de contraseña deja lugar al ojito. */
 export const fieldInputPassword = `${fieldInput} pr-12`;
@@ -81,3 +81,6 @@ export const ghostButton =
   "inline-flex cursor-pointer items-center gap-2 rounded-full border border-primary-container/55 px-5 py-2.5 text-sm font-medium text-primary-container transition-colors hover:bg-primary-container/10";
 
 export const formError = "mb-5 text-sm text-[#ffb4a8]";
+
+/** El aviso de un campo inválido, bajo el campo y una sola vez. */
+export const fieldError = "mt-1.5 text-[13px] leading-snug text-[#ffb4a8]";

@@ -2,6 +2,12 @@
 
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  FieldError,
+  RequiredLegend,
+  RequiredMark,
+  ValidatedForm,
+} from "@/components/forms/validation";
 import { Link } from "@/i18n/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { login, type LoginState } from "./actions";
@@ -27,12 +33,14 @@ export function LoginForm({ next }: { next?: string }) {
   const [email, setEmail] = useState("");
 
   return (
-    <form action={formAction}>
+    <ValidatedForm action={formAction}>
+      <RequiredLegend className="mb-5" />
       {next && <input type="hidden" name="next" value={next} />}
 
       <div className={fieldWrap}>
         <label htmlFor="email" className={fieldLabel}>
           {t("login.email")}
+          <RequiredMark />
         </label>
         <input
           id="email"
@@ -45,11 +53,13 @@ export function LoginForm({ next }: { next?: string }) {
           placeholder={t("login.emailPlaceholder")}
           className={fieldInput}
         />
+        <FieldError name="email" />
       </div>
 
       <div className={fieldWrap}>
         <label htmlFor="password" className={fieldLabel}>
           {t("login.password")}
+          <RequiredMark />
         </label>
         <div className="relative">
           <input
@@ -70,6 +80,7 @@ export function LoginForm({ next }: { next?: string }) {
             {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
           </button>
         </div>
+        <FieldError name="password" />
       </div>
 
       {/* Arriba del botón y alineado a la derecha, como en el mockup: el margen
@@ -90,6 +101,6 @@ export function LoginForm({ next }: { next?: string }) {
       <button type="submit" disabled={pending} className={submitButton}>
         {pending ? t("login.pending") : t("login.submit")}
       </button>
-    </form>
+    </ValidatedForm>
   );
 }

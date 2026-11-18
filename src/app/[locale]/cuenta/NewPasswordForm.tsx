@@ -2,6 +2,12 @@
 
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  FieldError,
+  RequiredLegend,
+  RequiredMark,
+  ValidatedForm,
+} from "@/components/forms/validation";
 import { Eye, EyeOff } from "lucide-react";
 import { updatePassword, type NewPasswordState } from "./actions";
 import {
@@ -25,10 +31,12 @@ export function NewPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <form action={formAction}>
+    <ValidatedForm action={formAction}>
+      <RequiredLegend className="mb-5" />
       <div className={fieldWrap}>
         <label htmlFor="new-password" className={fieldLabel}>
           {t("newPassword.password")}
+          <RequiredMark />
         </label>
         <div className="relative">
           <input
@@ -50,11 +58,13 @@ export function NewPasswordForm() {
             {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
           </button>
         </div>
+        <FieldError name="password" />
       </div>
 
       <div className="mb-9">
         <label htmlFor="new-password-confirm" className={fieldLabel}>
           {t("newPassword.confirm")}
+          <RequiredMark />
         </label>
         <input
           id="new-password-confirm"
@@ -66,6 +76,7 @@ export function NewPasswordForm() {
           placeholder="••••••••"
           className={fieldInput}
         />
+        <FieldError name="password_confirm" />
       </div>
 
       {state.error && (
@@ -77,6 +88,6 @@ export function NewPasswordForm() {
       <button type="submit" disabled={pending} className={submitButton}>
         {pending ? t("newPassword.pending") : t("newPassword.submit")}
       </button>
-    </form>
+    </ValidatedForm>
   );
 }
