@@ -111,6 +111,14 @@ la organización la escribe en el nombre. `start_date` se sigue cargando y usand
 `/contenidos` entra por un **índice de cinco tarjetas de tema** (08/10), no por
 píldoras; el tema vive en `?categoria=` (`pushState` + `useSearchParams`).
 
+**Acceso y rutas (18/11).** `/viajes` y `/contenidos` (y subrutas, también bajo `/en`)
+exigen sesión **desde `src/proxy.ts`** (307 a `/cuenta?next=`; lista en
+`src/lib/protected-routes.ts`). Las URLs en inglés son `pathnames` de next-intl
+(`/en/about-us`, `/experiences`, `/content`, `/privacy`, `/terms`, `/account`): una
+ruta pública nueva hay que declararla en `src/i18n/routing.ts`. El estado de una
+experiencia («En curso», «Finalizado») se **calcula al leer** con
+`effectiveTripStatus` (`src/lib/trip-status.ts`), no es un valor del enum.
+
 **Tests.** Playwright en `e2e/` (`docs/E2E.md`): 38 públicos + 18 del panel, más
 dos recorridos que generan capturas para mostrarle el producto a la clienta
 (`capturas.escritura` = el embudo, `capturas-sitio.lectura` = el sitio). Salen a

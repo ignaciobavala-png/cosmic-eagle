@@ -3479,7 +3479,7 @@ plataforma y lo resuelva el asistente del panel. Detalle técnico en `docs/IA.md
 
 Entrega: `docs/entregas/2026-11-17-correcciones-web/` (docx con 7 puntos + definiciones).
 Se repartió en 4 agentes con worktree y uno de sólo lectura; todo integrado en la rama
-`integracion-correcciones-1711` (merge sin conflictos). **No está en `main` ni pusheado.**
+`integracion-correcciones-1711` (merge sin conflictos). **Mergeada a `main` y pusheada el 18/11** (ver entrada siguiente).
 
 - **Acceso (1 y 7.1):** `src/proxy.ts` redirige con 307 a `/cuenta?next=` si no hay sesión en
   `/viajes`, `/contenidos` y subrutas (también `/en`). Lista única en `src/lib/protected-routes.ts`.
@@ -3505,3 +3505,34 @@ Se repartió en 4 agentes con worktree y uno de sólo lectura; todo integrado en
 **Pendiente:** probar a mano login con `next=`. Si `nosotros.estela.title`
 sigue diciendo «Estela, founder», está guardado en `site_content`. Animaciones, T&C, política de
 reserva e Instagram esperan a las clientas. Los worktrees `.claude/worktrees/agent-*` se pueden borrar al integrar.
+
+## 2026-11-18 — merge a `main`, aviso a Sofía y listado de tipografías corto
+
+- **Merge y push:** `integracion-correcciones-1711` entró a `main` en fast-forward
+  (`4e5b64d..2fc9bba`, 40 archivos, +1122/−385). Sin migraciones: `trip_status` ya
+  tenía `completed`, «En curso» se calcula al leer, y el cuadro «Estado de tu
+  solicitud» lee columnas que ya existían. Rama local borrada; los worktrees de los
+  agentes ya no estaban.
+- **Verificado en `cosmic-eagle.vercel.app`:** `/viajes` sin sesión da 307 a
+  `/cuenta?next=%2Fviajes` y `/en/about-us` da 200. `cosmiceaglejourney.com`
+  sigue con la pantalla de mantenimiento, así que ahí no se ve nada de esto.
+  **No se probó a mano** el login con `next=` ni la postulación en inglés.
+- **Aviso a Sofía** (texto plano, mismo día): qué cambió, y seis cosas para que
+  revise o conteste: (a) la frase atmosférica del inicio y la franja dorada de
+  Contenidos, que un agente sacó sin que el documento lo pidiera; (b) el inglés
+  de formularios y correo, traducido por nosotros; (c) lo que sigue en español
+  (encabezado de `/solicitar`, salud, consentimiento, otros correos); (d) el
+  punto 6.5, que no se reprodujo; (e) «Estela, founder» guardado en
+  `site_content`; (f) probar el ingreso con cuenta real.
+- **Tipografías (punto 3 de Chloe):** además del listado largo, hay una versión
+  corta en `~/Escritorio/Tipografias-Cosmic-Eagle-RESUMEN.pdf` (y `.html`): una
+  tabla de 5 roles, los 7 desajustes que más se repiten y el detalle por página.
+  Lleva una **aclaración**: el sitio usa Sorts Mill Goudy y Montserrat (libres),
+  no LTC Goudy Old Style ni Dolly Pro del manual (de pago, archivos sin licencia).
+  Las filas del detalle por página no traen el texto de ejemplo; si Chloe lo
+  necesita, va el listado largo.
+- **Queda abierto:** borrar `origin/spike/i18n` (0 commits sobre `main`); el
+  `stash@{0}` del 07/10 (18 archivos, casi seguro obsoleto, sin mirar);
+  `docs/entregas/2026-10-28-texto-egipto/` sin commitear; confirmar la base real
+  tiene todas las migraciones (el MCP de Supabase no conectó).
+
