@@ -1,5 +1,6 @@
 "use client";
 
+import { effectiveTripStatus } from "@/lib/trip-status";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CtaLink, CTA_TONES } from "./CtaLink";
@@ -43,6 +44,7 @@ const TYPE_BADGE_KEY: Record<string, string> = {
 // Mismo vocabulario que el resto del sitio (`TripTypes.status`).
 const STATUS_KEY: Record<string, string> = {
   closed: "closed",
+  in_progress: "inProgress",
   completed: "completed",
 };
 
@@ -146,10 +148,10 @@ function ExperienceCard({ trip }: { trip: TripCardData }) {
   const tTrip = useTranslations("TripTypes");
   const tipoKey = trip.type ? TYPE_BADGE_KEY[trip.type] : undefined;
   const tipo = tipoKey ? t(`filter.${tipoKey}`) : undefined;
+  // El estado sale de la fecha (En curso / Finalizado solos, corrección 6.6).
+  const estado = trip.status ? effectiveTripStatus({ ...trip, status: trip.status }) : null;
   const status =
-    trip.status && STATUS_KEY[trip.status]
-      ? tTrip(`status.${STATUS_KEY[trip.status]}`)
-      : undefined;
+    estado && STATUS_KEY[estado] ? tTrip(`status.${STATUS_KEY[estado]}`) : undefined;
 
   // Sin letra blanca adentro de la tarjeta (pedido de la organización, 08/10):
   // el estado sobre la foto va en el oro claro, como el candado de la

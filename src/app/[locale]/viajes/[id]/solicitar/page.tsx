@@ -132,6 +132,51 @@ function nextStep(
   };
 }
 
+type Progress = { label: string; state: "done" | "current" | "todo" }[];
+
+const STATUS_LABEL: Record<string, string> = {
+  pending_review: "En revisión",
+  needs_conversation: "Por conversar",
+  approved: "Aprobada",
+  rejected: "No aprobada",
+  expired: "Invalidada",
+};
+
+/**
+ * Las etapas del embudo con su estado, para que la pantalla DIGA dónde está la
+ * solicitud y no sólo cuál es el paso siguiente (corrección 6.5, 17/11: la
+ * pantalla de estado "no mostraba información"). Rechazada o vencida cortan el
+ * recorrido: no hay etapas que mostrar.
+ */
+function progress(app: {
+  status: string | null;
+  payment_status: string | null;
+  is_first_time: boolean | null;
+  health_form_submitted: boolean | null;
+  consent_submitted: boolean | null;
+}): Progress {
+  if (app.status === "rejected" || app.status === "expired") return [];
+  const aprobada = app.status === "approved";
+  const pagoListo =
+    app.payment_status === "paid" ||
+    app.payment_status === "waived" ||
+    app.payment_status === "deposit_paid";
+  const etapas: { label: string; done: boolean }[] = [
+    { label: "Solicitud enviada", done: true },
+    { label: "Revisión de la organización", done: aprobada },
+    { label: "Pago de la reserva", done: aprobada && pagoListo },
+    ...(app.is_first_time
+      ? [{ label: "Formulario de salud", done: !!app.health_form_submitted }]
+      : []),
+    { label: "Consentimiento informado", done: !!app.consent_submitted },
+  ];
+  const actual = etapas.findIndex((e) => !e.done);
+  return etapas.map((e, i) => ({
+    label: e.label,
+    state: e.done ? "done" : i === actual ? "current" : "todo",
+  }));
+}
+
 export default async function SolicitarPage({
   params,
 }: {
@@ -163,7 +208,7 @@ export default async function SolicitarPage({
   const { data: applications } = await supabase
     .from("my_applications")
     .select(
-      "id, status, payment_status, amount_paid, discount_amount, is_first_time, health_form_submitted, consent_submitted, payment_proof_submitted, payment_proof_at"
+      "id, status, payment_status, amount_paid, discount_amount, is_first_time, health_form_submitted, consent_submitted, payment_proof_submitted, payment_proof_at, created_at"
     )
     .eq("trip_id", id)
     .order("created_at", { ascending: false });
@@ -173,6 +218,7 @@ export default async function SolicitarPage({
   const descuento = existing?.discount_amount ?? 0;
   const precio = finalPrice(trip.price, descuento);
   const step = existing ? nextStep(id, existing) : null;
+  const etapas = existing ? progress(existing) : [];
 
   // Hasta acá se podía postular por URL directa a un viaje ya terminado o a uno
   // que la clienta dejó en `draft`/`closed`: la página sólo miraba `status`, y
@@ -254,6 +300,55 @@ export default async function SolicitarPage({
 
           {step ? (
             <div className={`p-6 md:p-8 ${panel}`}>
+              {existing && (
+                <div className="mb-6 border-b border-white/15 pb-6">
+                  <p className="text-xs uppercase tracking-widest text-white/55">
+                    Estado de tu solicitud
+                  </p>
+                  <p className="mt-1.5 text-sm text-white/80">
+                    <span className="mr-2 rounded-full border border-primary-container/50 bg-primary-container/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-container">
+                      {STATUS_LABEL[existing.status ?? ""] ?? existing.status}
+                    </span>
+                    {existing.created_at &&
+                      `Enviada el ${new Date(existing.created_at).toLocaleDateString(
+                        formatLocale === "en" ? "en-US" : "es-CL",
+                        { day: "numeric", month: "long", year: "numeric" }
+                      )}`}
+                  </p>
+                  {etapas.length > 0 && (
+                    <ol className="mt-4 space-y-2">
+                      {etapas.map((e) => (
+                        <li
+                          key={e.label}
+                          aria-current={e.state === "current" ? "step" : undefined}
+                          className={`flex items-center gap-3 text-sm ${
+                            e.state === "todo" ? "text-white/45" : "text-white"
+                          }`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] ${
+                              e.state === "done"
+                                ? "border-primary-container bg-primary-container text-[#05125a]"
+                                : e.state === "current"
+                                  ? "border-primary-container text-primary-container"
+                                  : "border-white/30"
+                            }`}
+                          >
+                            {e.state === "done" ? "✓" : ""}
+                          </span>
+                          {e.label}
+                          {e.state === "current" && (
+                            <span className="text-xs text-primary-container">
+                              · estamos acá
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </div>
+              )}
               <h2 className={`mb-2 ${panelTitle}`}>{step.title}</h2>
               <p className={panelBody}>{step.body}</p>
               {step.cta && (

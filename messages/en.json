@@ -79,6 +79,7 @@
     "status": {
       "open": "Spots available",
       "closed": "Full",
+      "inProgress": "In progress",
       "completed": "Completed"
     },
     "date": "Date",

@@ -1,3 +1,4 @@
+import { effectiveTripStatus } from "@/lib/trip-status";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { TRIP_TYPES, type TripType } from "@/lib/trip-type";
@@ -8,6 +9,7 @@ const STATUS_LABEL: Record<string, string> = {
   draft: "Borrador",
   open: "Abierto",
   closed: "Cerrado",
+  in_progress: "En curso",
   completed: "Finalizado",
 };
 
@@ -15,6 +17,7 @@ const STATUS_CLASS: Record<string, string> = {
   draft: "bg-outline-variant/30 text-on-surface-variant border-outline/40",
   open: "bg-secondary/20 text-secondary border-secondary/40",
   closed: "bg-error/20 text-error border-error/40",
+  in_progress: "bg-secondary/20 text-secondary border-secondary/40",
   completed: "bg-primary-container/20 text-primary-fixed-dim border-primary-fixed-dim/40",
 };
 
@@ -36,7 +39,7 @@ export async function TripsList({ type }: { type: TripType }) {
   const supabase = await createClient();
   const { data: trips } = await supabase
     .from("trips")
-    .select("id, title, location, start_date, end_date, capacity, price, currency, status")
+    .select("id, title, location, start_date, end_date, capacity, price, currency, status, type")
     .eq("type", type)
     .order("start_date", { ascending: true });
 
@@ -89,9 +92,9 @@ export async function TripsList({ type }: { type: TripType }) {
                   </td>
                   <td className="px-5 py-4">
                     <span
-                      className={`px-2.5 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest border ${STATUS_CLASS[trip.status] ?? ""}`}
+                      className={`px-2.5 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest border ${STATUS_CLASS[effectiveTripStatus(trip)] ?? ""}`}
                     >
-                      {STATUS_LABEL[trip.status] ?? trip.status}
+                      {STATUS_LABEL[effectiveTripStatus(trip)] ?? trip.status}
                     </span>
                   </td>
                   <td className="px-5 py-4">
