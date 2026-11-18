@@ -4,14 +4,14 @@ import type { NextRequest } from "next/server";
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 
 /**
- * Refresca la sesion y devuelve las cookies que hay que mandarle al browser.
+ * Refresca la sesion y devuelve si hay usuario y las cookies que hay que mandarle al browser.
  * No arma la respuesta: la arma `proxy.ts`, que puede ser un rewrite de
  * next-intl. Las cookies nuevas se escriben tambien en `request.cookies`, que
  * actualiza el header `cookie` que next-intl copia al reescribir.
  */
 export async function refreshSession(
   request: NextRequest
-): Promise<CookieToSet[]> {
+): Promise<{ cookies: CookieToSet[]; signedIn: boolean }> {
   let pending: CookieToSet[] = [];
 
   const supabase = createServerClient(
@@ -33,7 +33,9 @@ export async function refreshSession(
   );
 
   // Refresca la sesion (getUser valida el JWT contra Supabase, getSession no).
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  return pending;
+  return { cookies: pending, signedIn: Boolean(user) };
 }

@@ -11,7 +11,8 @@ import { GateModal } from "./GateModal";
  * tarjeta de solicitud de inicio de sesión").
  *
  * **No toca las tarjetas**: escucha el click en el contenedor y mira si salió
- * de un link a `/viajes/<id>`. Eso mantiene a `TripCard` como Server Component
+ * de un link a `/viajes/<id>`. (Desde 7.1 la ruta se protege tambien en el
+ * servidor, `src/proxy.ts`: esto queda como la invitacion amable antes del 307.) Eso mantiene a `TripCard` como Server Component
  * y, sobre todo, deja la tarjeta como un `<a>` de verdad — se indexa, se abre
  * en pestaña nueva y, si el JS no cargó, sigue llevando al detalle, que es
  * público. El gate es una capa de invitación, no un candado: la página del
