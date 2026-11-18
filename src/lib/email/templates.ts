@@ -28,6 +28,12 @@ export type CopyField = {
   /** Un párrafo largo (textarea) en vez de una línea. */
   multiline?: boolean;
   default: string;
+  /**
+   * El texto en inglés, para los correos que ya salen en el idioma de quien
+   * navegaba (hoy sólo «recibida»). Lo editado en el panel es castellano y no
+   * se aplica al inglés: sin `defaultEn` el correo en inglés usa `default`.
+   */
+  defaultEn?: string;
 };
 
 export type TemplateVar = { name: string; label: string; sample: string };
@@ -57,20 +63,33 @@ export const EMAIL_TEMPLATES: TemplateDef[] = [
     when: "Apenas la persona envía el filtro corto.",
     vars: [V.nombre, V.viaje, V.fechas],
     fields: [
-      { key: "subject", label: "Asunto", default: "Recibimos tu solicitud para {viaje}" },
+      {
+        key: "subject",
+        label: "Asunto",
+        default: "Recibimos tu solicitud para {viaje}",
+        defaultEn: "We received your application for {viaje}",
+      },
       {
         key: "preview",
         label: "Vista previa en la bandeja",
         hint: "Lo que se lee junto al asunto antes de abrir el correo.",
         default: "Recibimos tu solicitud para {viaje}",
+        defaultEn: "We received your application for {viaje}",
       },
-      { key: "title", label: "Título", default: "Recibimos tu solicitud" },
+      {
+        key: "title",
+        label: "Título",
+        default: "Recibimos tu solicitud",
+        defaultEn: "We received your application",
+      },
       {
         key: "p1",
         label: "Párrafo 1",
         multiline: true,
         default:
           "Tu solicitud para **{viaje}** ({fechas}) ya está con nosotros. Estela la va a leer personalmente, una por una, y te vamos a escribir con la respuesta.",
+        defaultEn:
+          "Your application for **{viaje}** ({fechas}) is now with us. Estela will read it personally, one by one, and we will write to you with her answer.",
       },
       {
         key: "p2",
@@ -78,6 +97,8 @@ export const EMAIL_TEMPLATES: TemplateDef[] = [
         multiline: true,
         default:
           "Si contaste algo sobre tu salud o algún tratamiento, nada de eso cierra la puerta: lo preguntamos para poder acompañarte mejor, no para descartar a nadie.",
+        defaultEn:
+          "If you told us anything about your health or any treatment, none of it closes the door: we ask so that we can support you better, not to turn anyone away.",
       },
       {
         key: "p3",
@@ -85,8 +106,15 @@ export const EMAIL_TEMPLATES: TemplateDef[] = [
         multiline: true,
         default:
           "En tu cuenta puedes seguir en qué paso está tu solicitud en cualquier momento.",
+        defaultEn:
+          "In your account you can follow what step your application is at any time.",
       },
-      { key: "button", label: "Botón", default: "Ver el estado de mi solicitud" },
+      {
+        key: "button",
+        label: "Botón",
+        default: "Ver el estado de mi solicitud",
+        defaultEn: "See my application status",
+      },
     ],
   },
   {
@@ -575,10 +603,21 @@ export type EmailCopy = Record<string, string>;
 /** Lo que hay en la tabla para un correo: `campo → texto`. */
 export type CopyOverrides = Record<string, string> | null | undefined;
 
-export function copyFor(templateKey: string, overrides?: CopyOverrides): EmailCopy {
+export function copyFor(
+  templateKey: string,
+  overrides?: CopyOverrides,
+  locale: "es" | "en" = "es"
+): EmailCopy {
   const def = getTemplateDef(templateKey);
   const out: EmailCopy = {};
   for (const field of def?.fields ?? []) {
+    // En inglés van los textos por defecto en inglés: lo que se edita en el
+    // panel está en castellano y le llegaría en otro idioma a quien navegaba
+    // en inglés.
+    if (locale === "en") {
+      out[field.key] = field.defaultEn ?? field.default;
+      continue;
+    }
     const saved = overrides?.[field.key];
     out[field.key] = saved && saved.trim() ? saved : field.default;
   }

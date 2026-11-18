@@ -20,20 +20,23 @@ export function SolicitudRecibida({
   fechas,
   url,
   copy,
+  locale = "es",
 }: {
   nombre: string;
   viaje: string;
   fechas: string;
   url: string;
   copy?: CopyOverrides;
+  /** El idioma en que la persona navegaba al enviar el filtro. */
+  locale?: "es" | "en";
 }) {
-  const k = copyFor("recibida", copy);
+  const k = copyFor("recibida", copy, locale);
   const vars = { nombre, viaje, fechas };
   return (
-    <BaseLayout preview={fill(k.preview, vars)}>
+    <BaseLayout preview={fill(k.preview, vars)} locale={locale}>
       <Title>{fill(k.title, vars)}</Title>
 
-      <Paragraph>Hola {nombre},</Paragraph>
+      <Paragraph>{locale === "en" ? `Hi ${nombre},` : `Hola ${nombre},`}</Paragraph>
 
       <Paragraph preLine>{rich(k.p1, vars)}</Paragraph>
       <Paragraph preLine>{rich(k.p2, vars)}</Paragraph>

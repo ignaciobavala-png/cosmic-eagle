@@ -2,6 +2,12 @@
 
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  FieldError,
+  RequiredLegend,
+  RequiredMark,
+  ValidatedForm,
+} from "@/components/forms/validation";
 import { Eye, EyeOff } from "lucide-react";
 import { signup, type SignupState } from "./actions";
 import {
@@ -23,12 +29,14 @@ export function SignupForm({ next }: { next?: string }) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <form action={formAction}>
+    <ValidatedForm action={formAction}>
+      <RequiredLegend className="mb-5" />
       {next && <input type="hidden" name="next" value={next} />}
 
       <div className={fieldWrap}>
         <label htmlFor="full_name" className={fieldLabel}>
           {t("signup.fullName")}
+          <RequiredMark />
         </label>
         <input
           id="full_name"
@@ -39,11 +47,13 @@ export function SignupForm({ next }: { next?: string }) {
           placeholder={t("signup.fullNamePlaceholder")}
           className={fieldInput}
         />
+        <FieldError name="full_name" />
       </div>
 
       <div className={fieldWrap}>
         <label htmlFor="signup-email" className={fieldLabel}>
           {t("login.email")}
+          <RequiredMark />
         </label>
         <input
           id="signup-email"
@@ -54,11 +64,13 @@ export function SignupForm({ next }: { next?: string }) {
           placeholder={t("login.emailPlaceholder")}
           className={fieldInput}
         />
+        <FieldError name="email" />
       </div>
 
       <div className="mb-9">
         <label htmlFor="signup-password" className={fieldLabel}>
           {t("login.password")}
+          <RequiredMark />
         </label>
         <div className="relative">
           <input
@@ -81,6 +93,7 @@ export function SignupForm({ next }: { next?: string }) {
           </button>
         </div>
         <p className={fieldHint}>{t("signup.hint")}</p>
+        <FieldError name="password" />
       </div>
 
       {state.error && (
@@ -92,6 +105,6 @@ export function SignupForm({ next }: { next?: string }) {
       <button type="submit" disabled={pending} className={submitButton}>
         {pending ? t("signup.pending") : t("signup.submit")}
       </button>
-    </form>
+    </ValidatedForm>
   );
 }

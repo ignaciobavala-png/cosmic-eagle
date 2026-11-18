@@ -2,6 +2,12 @@
 
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  FieldError,
+  RequiredLegend,
+  RequiredMark,
+  ValidatedForm,
+} from "@/components/forms/validation";
 import { requestPasswordReset, type RecoverState } from "./actions";
 import {
   fieldInput,
@@ -30,10 +36,12 @@ export function RecoverForm() {
   }
 
   return (
-    <form action={formAction}>
+    <ValidatedForm action={formAction}>
+      <RequiredLegend className="mb-5" />
       <div className={fieldWrap}>
         <label htmlFor="recover-email" className={fieldLabel}>
           {t("login.email")}
+          <RequiredMark />
         </label>
         <input
           id="recover-email"
@@ -44,6 +52,7 @@ export function RecoverForm() {
           placeholder={t("login.emailPlaceholder")}
           className={fieldInput}
         />
+        <FieldError name="email" />
       </div>
 
       {state.error && (
@@ -55,6 +64,6 @@ export function RecoverForm() {
       <button type="submit" disabled={pending} className={submitButton}>
         {pending ? t("recover.pending") : t("recover.submit")}
       </button>
-    </form>
+    </ValidatedForm>
   );
 }
