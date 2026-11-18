@@ -70,3 +70,16 @@ export function tripTypeLabel(value: string): string {
 export function tripAdminPath(value: string): string {
   return isTripType(value) ? TRIP_TYPES[value].adminPath : TRIP_TYPES.retiro.adminPath;
 }
+
+/**
+ * El nombre de una Sesión en la tarjeta: sin el "Sesión en" / "Session in"
+ * delante, solo el lugar (correcciones web 17/11, 6.3: "ya se entiende que son
+ * sesiones por el contexto"). El título sigue completo en la base y en el
+ * detalle; esto solo cambia lo que se dibuja en la cartelera. Un título que no
+ * arranca así (o un retiro) queda como está.
+ */
+export function cardTitle(title: string, type?: string | null): string {
+  if (type !== "ceremonia") return title;
+  const place = title.replace(/^\s*(sesi[oó]n|session)\s+(en|in)\s+/i, "").trim();
+  return place || title;
+}

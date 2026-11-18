@@ -166,7 +166,7 @@ export const NAV_LINKS: NavLink[] = [
       { labelKey: "nosotros.enfoque", href: "/nosotros#nuestro-enfoque" },
       // Tercer nombre de la misma entrada: "Fundadora" -> "Equipo" (Sofia,
       // 11/09) -> "Founder" (Ignacio, 17/09). Con este vuelve a decir lo mismo
-      // que el titulo de la pantalla a la que lleva, que es "Estela, founder"
+      // que el titulo de la pantalla a la que lleva. 17/11 (correcciones web 5.2): ambos pasan a llamarse solo "Fundadora" ("Founder" en ingles); antes la pantalla decia "Estela, founder"
       // y es copy literal de la clienta: entre el 11 y el 17 el menu nombraba
       // una seccion que en pantalla se llamaba de otra manera.
       { labelKey: "nosotros.founder", href: "/nosotros#estela" },

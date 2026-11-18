@@ -26,7 +26,12 @@ export function countryFlag(iso2: string): string {
     .join("");
 }
 
-export const PHONE_COUNTRIES: PhoneCountry[] = [
+/**
+ * Orden alfabético por nombre (correcciones web 17/11, 6.1: "los códigos de
+ * país no siguen ningún orden"). Se ordena acá, una vez, y no a mano: un país
+ * nuevo se agrega en cualquier lugar de la lista y queda en su sitio.
+ */
+const RAW_PHONE_COUNTRIES: PhoneCountry[] = [
   { iso2: "AR", name: "Argentina", dial: "54" },
   { iso2: "CL", name: "Chile", dial: "56" },
   { iso2: "UY", name: "Uruguay", dial: "598" },
@@ -51,6 +56,10 @@ export const PHONE_COUNTRIES: PhoneCountry[] = [
   { iso2: "GB", name: "Reino Unido", dial: "44" },
   { iso2: "AU", name: "Australia", dial: "61" },
 ];
+
+export const PHONE_COUNTRIES: PhoneCountry[] = [...RAW_PHONE_COUNTRIES].sort(
+  (a, b) => a.name.localeCompare(b.name, "es"),
+);
 
 export const DEFAULT_PHONE_COUNTRY = "AR";
 

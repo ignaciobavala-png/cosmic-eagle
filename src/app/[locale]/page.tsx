@@ -1,10 +1,8 @@
-import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ImmersiveHero } from "@/components/ui/ImmersiveHero";
 import { ScrollStory } from "@/components/ui/ScrollStory";
 import { MediaStatement } from "@/components/ui/MediaStatement";
-import { CreamSection, GOLD } from "@/components/ui/CreamSection";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { Reveal, RevealItem, RevealLine } from "@/components/ui/Reveal";
 import { TitleRule } from "@/components/ui/TitleRule";
@@ -105,7 +103,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           // para una pantalla completa) se quedaba corto: la frase quedaba
           // pegada al borde de arriba. Sube a `md:pt-16`, sin volver al
           // `pt-24` original (27/09).
-          className="flex w-full items-center bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] pt-20 pb-2 md:items-end md:pt-16 md:pb-24"
+          className="flex w-full items-center bg-[linear-gradient(to_bottom,#0079b3_0%,#05125a_65%,#011360_100%)] px-[6vw] pt-32 pb-2 md:items-end md:pt-40 md:pb-6"
         >
           {/* Las dos lineas entran por separado, la segunda 0.15s despues:
               es el `transition-delay` que Julia le pone al `.line-reveal` que
@@ -169,36 +167,6 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           // calendario y testimonios"). El CTA pasa a llevar directo a
           // Experiencias.
           cta={{ label: t("relato.cta"), href: "/viajes" }}
-        />
-
-        {/* Julia pidió imagen a pantalla completa con una frase encima. La key
-            del slot es la de las cuatro promesas, que el rediseño elimina. */}
-        <MediaStatement
-          id="atmosferica"
-          image={content("home.promesas.image")}
-          imageAlt={t("atmosfericaAlt")}
-          text={content("home.atmos.text")}
-          veil={0.35}
-          overlay={isEnabled(content("home.promesas.overlay"))}
-          height={900}
-          // En mobile ocupa la pantalla entera; los 900px fijos del mockup
-          // valen de `md` para arriba. Ver `mobileFull` en el componente.
-          mobileFull
-          // `text-h2`: acá es donde de verdad vive "Un camino hacia un
-          // conocimiento más profundo" (slot `home.atmos.text`, pedido de
-          // Ignacio 24/09 — que pese igual que el cierre "Cuando el alma
-          // está lista..."). Antes era 22-28px, bastante más chico.
-          textClassName="text-h2"
-          // La frase va DORADA y no en el blanco cálido (pedido de Sofía,
-          // 11/09). Es el token `primary-container`, el mismo oro que el resto
-          // del sitio usa sobre fondo azul — no el `primary-fixed-dim` de
-          // acento (regla del 28/08). El texto en sí lo carga ella desde
-          // /admin/multimedia (slot `home.atmos.text`), acá sólo va el color.
-          textColorClassName="text-primary-container"
-          // Sin indicador de scroll: hasta el 15/09 el pie del banner llevaba
-          // "Nuestro proposito" con su flechita, y Ignacio lo saco — la frase
-          // se queda sola sobre la imagen. La seccion #proposito sigue abajo y
-          // se llega por scroll; el ancla no se borra porque la usa el menu.
         />
 
         <Reveal
@@ -271,158 +239,11 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             siguen existiendo en /viajes, no en la puerta de entrada. Ver
             `docs/ARQUITECTURA_ACCESO_PUBLICO.md`. */}
 
-        {/* Contenidos: la puerta a /contenidos. Título y copy actualizados
-            (pedido de la organización, 23/09): pasa a llamarse "Contenidos" y
-            el texto ya no describe metodologías, sino que invita a
-            profundizar. La composición en dos columnas (texto izquierda /
-            frase destacada derecha) que pide el doc queda para una pasada de
-            diseño aparte — acá se resuelve sólo el copy y el título.
-
-            Umbral 0.25 y un solo observador para texto e imagen: en el mockup
-            entran juntos. Titulo, linea e imagen a 0ms; los tres parrafos a
-            150/300/450 y el boton a 600. La imagen ademas escala desde 0.98. */}
-        {/* En mobile la sección tiene que entrar en UNA pantalla, con el texto
-            centrado en vertical (fix v3 de Julia, docs/entregas/2026-09-03-julia).
-            En escritorio no cambia nada: sigue siendo el par texto/imagen. */}
-        {/* El fondo de ESTA franja no es el crema del sitio: es la banda
-            dorada (`GOLD`), el mismo degrade `#f9d78f → #b3964b` de la pildora y
-            del cierre de la home. Lo eligio Sofia el 11/09 sobre un comparador
-            de ocho fondos ("el crema no, que vaya mas hacia el golden"). Va por
-            la prop `background` y NO por `className`: dos utilidades de fondo de
-            la misma especificidad las resuelve el orden de la hoja generada.
-
-            Fue la primera franja con este fondo y desde el 15/09 hay una
-            segunda, la biblioteca de /contenidos, como prueba antes de decidir
-            si el dorado reemplaza al crema en todo el sitio. El resto
-            (/nosotros, /viajes, el detalle, /faqs y las legales) sigue con el
-            crema.
-
-            Sobre el dorado hay dos piezas que dejan de verse y por eso cambian
-            con el: el filete pasa al oro oscuro (el claro da 1,00:1 sobre este
-            fondo, o sea invisible) y el boton pasa a la pildora azul, porque la
-            dorada se funde. */}
-        {/* Pedido de Sofia (24/09): "que el slide contenidos ocupe el alto
-            de la pantalla 1:1" — antes era pantalla completa solo en mobile
-            (`max-md:`), ahora en cualquier ancho.
-            `relative`: la imagen se pinea contra el borde REAL de la sección
-            (ver más abajo), no contra la fila de texto. */}
-        <CreamSection
-          id="tecnologia"
-          background={GOLD}
-          full={false}
-          className="relative flex min-h-[100svh] items-center"
-          reveal={{ amount: 0.25, stagger: 0 }}
-        >
-          <div className="mx-auto flex w-full max-w-narrative flex-col items-center gap-12 md:flex-row md:gap-16">
-            {/* El mismo formato que "Propósito" (Sofía, 06/10): título en
-                mayúscula al tamaño `text-h2` —todos los títulos iguales y
-                centrados, regla del 06/10, que reemplaza la del 24/09 que lo
-                dejaba un escalón abajo—, filete centrado de ancho fijo y cuerpo
-                centrado. El filete va AZUL como el título: la regla es que el
-                filete toma el color del texto (antes era oro oscuro, que sobre
-                el fondo dorado se leía como una raya amarilla). */}
-            <div className="w-full text-center md:flex-1">
-              <RevealItem duration={0.8}>
-                <h2 className="font-display text-h2 font-bold uppercase tracking-[0.5px] text-[#05125a]">
-                  {t("contenidos.title")}
-                </h2>
-              </RevealItem>
-              <div className="mx-auto mt-4 mb-[30px] w-[120px] md:mt-5 md:mb-[50px] md:w-[160px]">
-                <TitleRule tone="blue" align="center" grow />
-              </div>
-              {/* El cuerpo va AZUL, no negro. Hasta el 11/09 era negro puro en
-                  mobile y gris #333 en escritorio, que era spec explícita de
-                  Julia (fix v3 del 03/09); lo cambió Sofía, que lo veía negro.
-                  Sobre la banda dorada el azul mide 5,95:1 en el punto más
-                  oscuro del degradé contra los 4,44:1 del gris, que estaba
-                  abajo del mínimo legible. Desde el 16/09 el azul es la regla
-                  de TODO el cuerpo sobre fondo claro —no queda gris en el
-                  sitio—, por pedido de Sofía: "texto negro no es parte del
-                  manual". Conviene avisarle a Julia. */}
-              {/* Subido junto con el título (24/09): "que todas las letras
-                  sean relativamente un poquito más grandes para que quede
-                  compensado con que el slide ahora es más alto". */}
-              <div className="space-y-5 text-[18px] leading-[1.75] text-[#05125a] md:mx-auto md:max-w-[480px] md:space-y-6 md:text-[18px]">
-                <RevealItem duration={0.8} delay={0.15}>
-                  <p>{t("contenidos.body")}</p>
-                </RevealItem>
-              </div>
-              <RevealItem duration={0.8} delay={0.6}>
-                {/* El MISMO boton que el "Ir mas profundo" de "Nuestro
-                    proposito" (pedido de Ignacio, 11/09: coherencia de pagina):
-                    la variante `outline` que eligio Sofia el 09/09, con su
-                    mismo padding y cuerpo. Lo unico que cambia es el color, que
-                    en `outline` lo pone quien lo usa y arrastra el contorno
-                    (`border-current`): alla va dorado sobre azul, aca azul
-                    sobre el fondo dorado. Antes era la pildora dorada, que
-                    sobre este fondo se fundia. */}
-                <CtaLink
-                  href="/contenidos"
-                  tone="dark"
-                  className="mt-10 px-7 py-3.5 text-[15px] md:px-10 md:py-4"
-                >
-                  {t("contenidos.cta")}
-                </CtaLink>
-              </RevealItem>
-            </div>
-
-            {/* En mobile la imagen se oculta ENTERA y queda solo el texto
-                (`.tec-image` es `display:none` abajo de 768px en el mockup).
-                Antes se apilaba arriba del texto. Acá sólo queda un espaciador
-                del mismo ancho (`flex-1`, invisible) para que la columna de
-                texto conserve su proporción de dos columnas: la imagen de
-                verdad se mudó fuera de esta fila (ver más abajo). */}
-            <div className="hidden w-full flex-1 md:block" aria-hidden="true" />
-          </div>
-
-          {/* Pedido de Sofía (reunión del 20/09): el corte recto de abajo de
-              la imagen "no le convencía" — quería que apoyara contra el borde
-              de ABAJO de la sección, para que coincida con el límite real de
-              la franja dorada y no quede colgando en el medio.
-              Vive FUERA de la fila de texto (a diferencia de antes) porque
-              desde que la sección pasó a `min-h-[100svh]` con `items-center`
-              (pedido de Sofía, 24/09: "que ocupe el alto de pantalla 1:1"), la
-              fila entera queda centrada verticalmente con aire de sobra
-              arriba y abajo — el viejo truco (`self-end` + `-mb-24` cancelando
-              el `py-24` de `CreamSection`) anclaba contra el borde de la FILA,
-              no de la SECCIÓN, y con la fila centrada la imagen quedaba
-              flotando de nuevo. Por eso pasa a `absolute bottom-0` contra la
-              sección (que ahora es `relative`), con su propio contenedor
-              `max-w-narrative` para caer en la misma columna que ocupaba
-              dentro de la fila (el padding horizontal de `CreamSection` es
-              simétrico, así que centrar sobre el ancho completo de la sección
-              da la misma posición que centrar sobre su columna con padding). */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 mx-auto hidden w-full max-w-narrative md:flex md:gap-16">
-            <div className="flex-1" aria-hidden="true" />
-            <RevealItem
-              className="w-full flex-1"
-              y={0}
-              duration={1}
-              scaleFrom={0.98}
-            >
-              <div className="relative aspect-[4/4.4] w-full overflow-hidden rounded-xl">
-                {/* `object-top` y no centrado, por lo mismo que el hero de la
-                    home (20/08): la caja (4/4.4 = 0,909) es mas apaisada que la
-                    figura (900x1195 = 0,753), asi que `cover` escala por el
-                    ancho y le sobra alto. Centrado recorta 8,6% arriba y 8,6%
-                    abajo, y la cabeza empieza al 9% de la imagen — se la comia
-                    siempre. Anclada arriba, todo el recorte cae en el pie,
-                    donde la figura ya se deshace en particulas. */}
-                {/* `scale-x-[-1]`: pedido de Sofia (24/09), "la chica de
-                    contenidos que mire para el otro lado, efecto espejo". No
-                    afecta el recorte de `object-top`: el flip es puramente
-                    horizontal. */}
-                <Image
-                  src={content("home.tecnologia.image")}
-                  alt={t("contenidos.imageAlt")}
-                  fill
-                  sizes="(min-width: 768px) 50vw, 100vw"
-                  className="scale-x-[-1] object-cover object-top"
-                />
-              </div>
-            </RevealItem>
-          </div>
-        </CreamSection>
+        {/* Correcciones web del 17/11 (4.1): el home queda en apertura →
+            "Explorar experiencias" → presentación con "Ir más profundo" →
+            preguntas frecuentes. Se sacaron la frase atmosférica y la franja
+            de Contenidos (Contenidos pide cuenta y pasa a /nosotros). Las keys
+            de slots `home.promesas.*` y `home.tecnologia.image` se conservan. */}
 
         {/* Preguntas frecuentes de la home (entrega del 28/09, texto fijo en
             `src/lib/home-faqs.ts`). Van DESPUÉS de todo lo que presenta el
@@ -464,17 +285,6 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
             <div className="mt-12 md:mt-16">
               <FaqList faqs={getHomeFaqs(locale)} tone="dark" />
-            </div>
-
-            {/* "Explorar más" todavía no lleva a ningún lado (28/09): el
-                "espacio privado" del que habla la última respuesta no está
-                definido. Es un `span` con la forma del botón y SIN hover, para
-                que no prometa un click que no hace nada. Cuando tenga destino
-                pasa a `CtaLink`. */}
-            <div className="mt-12 text-center md:mt-16">
-              <span className="inline-flex items-center justify-center gap-2 rounded-full border-[1.5px] border-primary-container/70 px-7 py-3.5 font-display text-label-sm uppercase tracking-[0.038em] text-primary-container md:px-10 md:py-4">
-                {t("faqs.more")}
-              </span>
             </div>
           </div>
         </section>
